@@ -71,7 +71,7 @@ jobs:
           --verbosity normal
           /p:CollectCoverage=true
           /p:CoverletOutputFormat=cobertura
-          /p:CoverletOutput="$COVERAGE_OUTPUT/"
+          /p:CoverletOutput="${{ github.workspace }}/${{ env.COVERAGE_OUTPUT }}/"
           /p:Threshold=75
           /p:ThresholdType=line
           /p:ThresholdStat=total

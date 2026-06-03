@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata below."
+title: "ASI Backbone"
+version: "0.1.0-alpha.1"
+date-released: "2026-06-01"
+repository-code: "https://github.com/cdcavell/ASIBackbone"
+url: "https://cdcavell.github.io/ASIBackbone/"
+type: software
+license: MIT
+identifiers:
+  - type: doi
+    value: ""
+    description: "Zenodo Concept DOI"
+authors:
+  - family-names: "Cavell"
+    given-names: "Christopher D."
+    orcid: "https://orcid.org/0009-0002-2113-0245"
+abstract: "ASI Backbone"
+keywords:
+  - aspnetcore
+  - dotnet
+  - software-architecture

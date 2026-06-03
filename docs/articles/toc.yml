@@ -4,3 +4,8 @@
 - name: Getting Started
   href: getting-started.md
 
+- name: Core Domain Language
+  href: core-domain-language.md
+
+- name: Alpha Package Boundary
+  href: alpha-package-boundary.md

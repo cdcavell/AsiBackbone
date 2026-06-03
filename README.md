@@ -2,14 +2,6 @@
 
 Core domain abstractions for the ASI Backbone framework.
 
-This package is intended to remain dependency-light and host-independent. It does not require ASP.NET Core, Entity Framework Core, or NetCoreApplicationTemplate.
-
-## Current Status
-
-Early alpha foundation package.# CDCavell.ASIBackbone.Core
-
-Core domain abstractions for the ASI Backbone framework.
-
 `CDCavell.ASIBackbone.Core` is the dependency-light foundation package for the ASI Backbone package family. It is intended to define shared contracts, base abstractions, result primitives, and domain language that can be reused by future integration packages.
 
 This package does **not** require ASP.NET Core, Entity Framework Core, or NetCoreApplicationTemplate.

@@ -32,4 +32,15 @@
     <RepositoryUrl>https://github.com/cdcavell/ASIBackbone</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageIcon>PACKAGE-ICON.png</PackageIcon>
+  </PropertyGroup>
+
+  <ItemGroup Condition="Exists('$(MSBuildThisFileDirectory)PACKAGE-ICON.png')">
+    <None Include="$(MSBuildThisFileDirectory)PACKAGE-ICON.png"
+          Pack="true"
+          PackagePath="/"
+          Visible="false" />
+  </ItemGroup>
 </Project>

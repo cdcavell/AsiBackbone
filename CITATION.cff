@@ -2,21 +2,28 @@ cff-version: 1.2.0
 message: "If you use this software, please cite it using the metadata below."
 title: "ASI Backbone"
 version: "0.1.0-alpha.1"
-date-released: "2026-06-01"
+date-released: "2026-06-04"
 repository-code: "https://github.com/cdcavell/ASIBackbone"
 url: "https://cdcavell.github.io/ASIBackbone/"
 type: software
 license: MIT
 identifiers:
   - type: doi
-    value: ""
+    value: "10.5281/zenodo.20546032"
     description: "Zenodo Concept DOI"
 authors:
   - family-names: "Cavell"
     given-names: "Christopher D."
     orcid: "https://orcid.org/0009-0002-2113-0245"
-abstract: "ASI Backbone"
+abstract: "ASIBackbone is a .NET package-family project providing framework-neutral governance primitives for consequential software decision flow, including actor context, constraint evaluation, governance decisions, audit residue, and acknowledgment handshakes."
 keywords:
-  - aspnetcore
+  - asi-backbone
   - dotnet
   - software-architecture
+  - governance
+  - decision-flow
+  - constraint-evaluation
+  - audit-residue
+  - acknowledgment
+  - responsible-ai
+  - package-development

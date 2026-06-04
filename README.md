@@ -66,7 +66,7 @@ Important terms:
 | Collapse boundary | The practical software point where open possibility becomes a concrete decision or action. |
 | Actor context | The framework-neutral description of who or what is requesting the action. |
 | Policy context | The evaluation input assembled from actor, intent, resource, risk, policy, and correlation data. |
-| Decision result | The governance output, such as allow, deny, defer, require acknowledgment, or escalate. |
+| Decision result | The governance output, such as allow, warn, deny, defer, require acknowledgment, or escalate. |
 | Operation result | The package execution result, separate from the governance decision outcome. |
 | Audit residue | The trace left by decision flow: reason codes, policy version, hash, correlation ID, timestamp, and related metadata. |
 | Acknowledgment workflow | A responsibility or reflexive acknowledgment step before consequential action. |
@@ -87,7 +87,7 @@ The intended `0.1.0-alpha.1` boundary is language and primitives only.
 - Operation result primitives
 - Reason code primitives
 - Acknowledgment or responsibility-handshake abstractions
-- Audit receipt abstractions
+- Audit residue abstractions
 - Capability-token abstractions
 - Policy version and policy hash fields
 - Correlation ID support

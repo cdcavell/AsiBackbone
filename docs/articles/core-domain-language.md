@@ -57,7 +57,9 @@ Examples include:
 * required acknowledgment rules
 * policy version requirements
 
-A constraint may allow, deny, defer, require acknowledgment, or escalate a request.
+A constraint may allow, deny, warn, or determine that it does not apply to a request.
+
+Governance decisions may defer, require acknowledgment, or recommend escalation after constraint evaluation is composed into a decision.
 
 ### Active policy structure
 
@@ -75,11 +77,12 @@ In Core, this is a practical software boundary, not a physical collapse claim. I
 
 Supported initial decision outcomes are:
 
-* `Allow`
-* `Deny`
-* `Defer`
-* `RequireAcknowledgment`
-* `Escalate`
+* `Allowed`
+* `Warning`
+* `Denied`
+* `Deferred`
+* `AcknowledgmentRequired`
+* `EscalationRecommended`
 
 ### Actor context
 
@@ -199,7 +202,7 @@ The `0.1.0-alpha.1` boundary should establish language and primitives, not a ful
 * operation result primitives
 * reason code primitives
 * acknowledgment or responsibility-handshake abstractions
-* audit receipt abstractions
+* audit residue abstractions
 * capability-token abstractions
 * policy version and policy hash fields
 * correlation ID support

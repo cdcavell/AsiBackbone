@@ -1,6 +1,4 @@
-using CDCavell.ASIBackbone.Core.Actors;
-
-namespace CDCavell.ASIBackbone.Core.Constraints;
+namespace CDCavell.ASIBackbone.Core.Actors;
 
 /// <summary>
 /// Defines a framework-neutral description of the actor participating in an ASIBackbone operation.

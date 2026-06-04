@@ -1,9 +1,12 @@
 name: CI
 
 on:
+  workflow_dispatch:
+
   push:
     branches:
       - main
+
   pull_request:
     branches:
       - main
@@ -79,13 +82,28 @@ jobs:
           /p:ThresholdType=line
           /p:ThresholdStat=total
 
-      - name: Pack Core package
-        run: >
-          dotnet pack
-          src/CDCavell.ASIBackbone.Core/CDCavell.ASIBackbone.Core.csproj
-          --configuration "$CONFIGURATION"
-          --no-build
-          --output "$PACKAGE_OUTPUT"
+      - name: Pack packages
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mkdir -p "$PACKAGE_OUTPUT"
+
+          mapfile -t package_projects < <(find ./src -name '*.csproj' -type f | sort)
+
+          if [ "${#package_projects[@]}" -eq 0 ]; then
+            echo "No package projects were found under ./src."
+            exit 1
+          fi
+
+          for project in "${package_projects[@]}"; do
+            echo "Packing $project"
+            dotnet pack "$project" \
+              --configuration "$CONFIGURATION" \
+              --no-build \
+              --output "$PACKAGE_OUTPUT" \
+              /p:ContinuousIntegrationBuild=true
+          done
 
       - name: Upload package artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
@@ -128,10 +146,10 @@ jobs:
           build-mode: none
 
       - name: Restore dependencies
-        run: dotnet restore ${{ env.SOLUTION_FILE }}
+        run: dotnet restore ${{ env.SOLUTION_PATH }}
 
       - name: Build solution for CodeQL
-        run: dotnet build ${{ env.SOLUTION_FILE }} --configuration ${{ env.CONFIGURATION }} --no-restore /p:ContinuousIntegrationBuild=true
+        run: dotnet build ${{ env.SOLUTION_PATH }} --configuration ${{ env.CONFIGURATION }} --no-restore /p:ContinuousIntegrationBuild=true
 
       - name: Perform CodeQL analysis
         uses: github/codeql-action/analyze@87557b9c84dde89fdd9b10e88954ac2f4248e463 # v4

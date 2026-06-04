@@ -205,4 +205,131 @@ public sealed class LiabilityHandshakeRequestTests
                 acknowledgmentCode,
                 "I understand."));
     }
+
+    /// <summary>
+    /// Verifies that the <see cref="LiabilityHandshakeRequest.FromDecision"/> method uses default reason code and message values when the provided <see cref="GovernanceDecision"/> does not specify any reasons, ensuring that the resulting handshake request contains meaningful information even in cases where the decision lacks explicit reasoning details.
+    /// </summary>
+    [Fact]
+    public void FromDecision_WithNoReasons_UsesDefaultReasonCodeAndMessage()
+    {
+        var request = LiabilityHandshakeRequest.FromDecision(
+            AsiBackboneActorContext.System,
+            "system.sync",
+            GovernanceDecision.Allow(),
+            "ACK-001",
+            "I understand this action is consequential.",
+            handshakeId: "handshake-123");
+
+        Assert.Equal("handshake.required", request.ReasonCode);
+        Assert.Equal("Acknowledgment is required before proceeding.", request.Message);
+    }
+
+    /// <summary>
+    /// Verifies that the <see cref="LiabilityHandshakeRequest.Create"/> method normalizes optional string fields by treating null, empty, or whitespace-only values as null, ensuring that the resulting handshake request has consistent handling of optional data and avoids storing meaningless or invalid values for these fields.
+    /// </summary>
+    [Fact]
+    public void Create_WithWhitespaceOptionalFields_NormalizesToNull()
+    {
+        var request = LiabilityHandshakeRequest.Create(
+            AsiBackboneActorContext.System,
+            "system.sync",
+            "ack.required",
+            "Acknowledgment is required.",
+            "ACK-001",
+            "I understand.",
+            riskCategory: " ",
+            correlationId: " ",
+            traceId: "",
+            policyVersion: "\t",
+            policyHash: " ");
+
+        Assert.Null(request.RiskCategory);
+        Assert.Null(request.CorrelationId);
+        Assert.Null(request.TraceId);
+        Assert.Null(request.PolicyVersion);
+        Assert.Null(request.PolicyHash);
+    }
+
+    /// <summary>
+    /// Verifies that the <see cref="LiabilityHandshakeRequest.Create"/> method correctly handles null or empty metadata by treating it as having no metadata, ensuring that the resulting handshake request has consistent handling of metadata and does not contain any entries when null or empty metadata is provided.
+    /// </summary>
+    [Fact]
+    public void Create_WithNullMetadata_HasNoMetadata()
+    {
+        var request = LiabilityHandshakeRequest.Create(
+            AsiBackboneActorContext.System,
+            "system.sync",
+            "ack.required",
+            "Acknowledgment is required.",
+            "ACK-001",
+            "I understand.",
+            metadata: null);
+
+        Assert.False(request.HasMetadata);
+        Assert.Empty(request.Metadata);
+    }
+
+    /// <summary>
+    /// Verifies that the <see cref="LiabilityHandshakeRequest.Create"/> method correctly handles explicitly empty metadata by treating it as having no metadata, ensuring that the resulting handshake request has consistent handling of metadata and does not contain any entries when an empty metadata dictionary is provided.
+    /// </summary>
+    [Fact]
+    public void Create_WithEmptyMetadata_HasNoMetadata()
+    {
+        var request = LiabilityHandshakeRequest.Create(
+            AsiBackboneActorContext.System,
+            "system.sync",
+            "ack.required",
+            "Acknowledgment is required.",
+            "ACK-001",
+            "I understand.",
+            metadata: new Dictionary<string, string>());
+
+        Assert.False(request.HasMetadata);
+        Assert.Empty(request.Metadata);
+    }
+
+    /// <summary>
+    /// Verifies that the <see cref="LiabilityHandshakeRequest.Create"/> method correctly ignores metadata entries with blank keys by treating them as invalid and excluding them from the resulting handshake request, ensuring that the resulting handshake request has consistent handling of metadata and does not contain any entries with blank keys.
+    /// </summary>
+    [Fact]
+    public void Create_WithOnlyBlankMetadataKeys_HasNoMetadata()
+    {
+        var request = LiabilityHandshakeRequest.Create(
+            AsiBackboneActorContext.System,
+            "system.sync",
+            "ack.required",
+            "Acknowledgment is required.",
+            "ACK-001",
+            "I understand.",
+            metadata: new Dictionary<string, string>
+            {
+                [" "] = "ignored",
+                ["\t"] = "also ignored"
+            });
+
+        Assert.False(request.HasMetadata);
+        Assert.Empty(request.Metadata);
+    }
+
+    /// <summary>
+    /// Verifies that the <see cref="LiabilityHandshakeRequest.Create"/> method correctly handles null metadata values by storing an empty string, ensuring that the resulting handshake request has consistent handling of metadata and avoids storing null values.
+    /// </summary>
+    [Fact]
+    public void Create_WithNullMetadataValue_StoresEmptyString()
+    {
+        var request = LiabilityHandshakeRequest.Create(
+            AsiBackboneActorContext.System,
+            "system.sync",
+            "ack.required",
+            "Acknowledgment is required.",
+            "ACK-001",
+            "I understand.",
+            metadata: new Dictionary<string, string>
+            {
+                [" source "] = null!
+            });
+
+        Assert.True(request.HasMetadata);
+        Assert.Equal(string.Empty, request.Metadata["source"]);
+    }
 }

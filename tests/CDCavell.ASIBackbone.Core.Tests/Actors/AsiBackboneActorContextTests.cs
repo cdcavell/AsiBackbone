@@ -43,7 +43,7 @@ public sealed class AsiBackboneActorContextTests
     [Fact]
     public void HumanCreatesKnownHumanActorContext()
     {
-        AsiBackboneActorContext actorContext = AsiBackboneActorContext.Human(
+        var actorContext = AsiBackboneActorContext.Human(
             " user-123 ",
             " Test User ");
 
@@ -60,7 +60,7 @@ public sealed class AsiBackboneActorContextTests
     [Fact]
     public void HumanCanRepresentKnownUnauthenticatedActor()
     {
-        AsiBackboneActorContext actorContext = AsiBackboneActorContext.Human(
+        var actorContext = AsiBackboneActorContext.Human(
             "user-123",
             isAuthenticated: false);
 
@@ -76,7 +76,7 @@ public sealed class AsiBackboneActorContextTests
     [Fact]
     public void ServiceCreatesKnownAuthenticatedServiceActorContext()
     {
-        AsiBackboneActorContext actorContext = AsiBackboneActorContext.Service(
+        var actorContext = AsiBackboneActorContext.Service(
             " service-worker ",
             " Background Worker ");
 
@@ -93,7 +93,7 @@ public sealed class AsiBackboneActorContextTests
     [Fact]
     public void AgentCreatesKnownAgentActorContext()
     {
-        AsiBackboneActorContext actorContext = AsiBackboneActorContext.Agent("agent-001");
+        var actorContext = AsiBackboneActorContext.Agent("agent-001");
 
         Assert.Equal("agent-001", actorContext.ActorId);
         Assert.Equal(AsiBackboneActorType.Agent, actorContext.ActorType);
@@ -119,7 +119,7 @@ public sealed class AsiBackboneActorContextTests
     [Fact]
     public void BlankDisplayNameNormalizesToNull()
     {
-        AsiBackboneActorContext actorContext = AsiBackboneActorContext.Human(
+        var actorContext = AsiBackboneActorContext.Human(
             "user-123",
             " ");
 

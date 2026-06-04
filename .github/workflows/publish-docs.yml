@@ -65,7 +65,7 @@ jobs:
             -reports:"./artifacts/test-results/**/coverage.cobertura.xml" `
             -targetdir:"./artifacts/coverage-report" `
             -reporttypes:"Html;MarkdownSummaryGithub;Cobertura" `
-            -assemblyfilters:"+ProjectTemplate.*;-*.Tests" `
+            -assemblyfilters:"-*.Tests" `
             -filefilters:"-**/bin/**;-**/obj/**;-**/*.g.cs"
 
       - name: Build DocFX site

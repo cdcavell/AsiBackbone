@@ -1,4 +1,14 @@
 # CDCavell.ASIBackbone.Core
+[![CI](https://github.com/cdcavell/ASIBackbone/actions/workflows/ci.yml/badge.svg)](https://github.com/cdcavell/ASIBackbone/actions/workflows/ci.yml)
+[![Coverage Report](https://img.shields.io/badge/coverage%20gate-75%25-brightgreen)](https://cdcavell.github.io/ASIBackbone/coverage/index.html)
+[![Documentation](https://github.com/cdcavell/ASIBackbone/actions/workflows/publish-docs.yml/badge.svg)](https://github.com/cdcavell/ASIBackbone/actions/workflows/publish-docs.yml)
+[![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://cdcavell.github.io/ASIBackbone/)
+[![.NET](https://img.shields.io/badge/.NET-10.0-purple)](https://dotnet.microsoft.com/)
+[![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE.txt)
+[![GitHub Release](https://img.shields.io/github/v/release/cdcavell/ASIBackbone?display_name=tag&include_prereleases&sort=semver)](https://github.com/cdcavell/ASIBackbone/releases)
+[![NuGet](https://img.shields.io/nuget/v/CDCavell.ASIBackbone.Core?label=NuGet)](https://www.nuget.org/packages/CDCavell.ASIBackbone.Core)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/CDCavell.ASIBackbone.Core?label=downloads)](https://www.nuget.org/packages/CDCavell.ASIBackbone.Core)
+[![Zenodo DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.20546032-blue)](https://doi.org/10.5281/zenodo.20546032)
 
 Core domain abstractions for the ASI Backbone framework.
 

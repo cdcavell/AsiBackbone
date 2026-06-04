@@ -178,4 +178,113 @@ public sealed class GovernanceDecisionTests
         Assert.Null(decision.PolicyVersion);
         Assert.Null(decision.PolicyHash);
     }
+
+    /// <summary>
+    /// Verifies that the outcome flags (IsAllowed, IsWarning, IsDenied, IsDeferred, RequiresAcknowledgment, EscalationRecommended) correctly reflect the properties of each governance decision outcome.
+    /// </summary>
+    [Fact]
+    public void OutcomeFlagsReflectEachGovernanceDecisionOutcome()
+    {
+        var allowed = GovernanceDecision.Allow();
+
+        Assert.True(allowed.CanProceed);
+        Assert.True(allowed.IsAllowed);
+        Assert.False(allowed.IsWarning);
+        Assert.False(allowed.IsDenied);
+        Assert.False(allowed.IsDeferred);
+        Assert.False(allowed.RequiresAcknowledgment);
+        Assert.False(allowed.EscalationRecommended);
+
+        var warning = GovernanceDecision.Warning(
+            "decision.warning",
+            "Decision produced a warning.");
+
+        Assert.True(warning.CanProceed);
+        Assert.False(warning.IsAllowed);
+        Assert.True(warning.IsWarning);
+        Assert.False(warning.IsDenied);
+        Assert.False(warning.IsDeferred);
+        Assert.False(warning.RequiresAcknowledgment);
+        Assert.False(warning.EscalationRecommended);
+
+        var denied = GovernanceDecision.Deny(
+            "decision.denied",
+            "Decision denied the operation.");
+
+        Assert.False(denied.CanProceed);
+        Assert.False(denied.IsAllowed);
+        Assert.False(denied.IsWarning);
+        Assert.True(denied.IsDenied);
+        Assert.False(denied.IsDeferred);
+        Assert.False(denied.RequiresAcknowledgment);
+        Assert.False(denied.EscalationRecommended);
+
+        var deferred = GovernanceDecision.Defer(
+            "decision.deferred",
+            "Decision was deferred.");
+
+        Assert.False(deferred.CanProceed);
+        Assert.False(deferred.IsAllowed);
+        Assert.False(deferred.IsWarning);
+        Assert.False(deferred.IsDenied);
+        Assert.True(deferred.IsDeferred);
+        Assert.False(deferred.RequiresAcknowledgment);
+        Assert.False(deferred.EscalationRecommended);
+
+        var acknowledgmentRequired = GovernanceDecision.RequireAcknowledgment(
+            "ack.required",
+            "Acknowledgment is required.");
+
+        Assert.False(acknowledgmentRequired.CanProceed);
+        Assert.False(acknowledgmentRequired.IsAllowed);
+        Assert.False(acknowledgmentRequired.IsWarning);
+        Assert.False(acknowledgmentRequired.IsDenied);
+        Assert.False(acknowledgmentRequired.IsDeferred);
+        Assert.True(acknowledgmentRequired.RequiresAcknowledgment);
+        Assert.False(acknowledgmentRequired.EscalationRecommended);
+
+        var escalationRecommended = GovernanceDecision.Escalate(
+            "escalation.required",
+            "Escalation is required.");
+
+        Assert.False(escalationRecommended.CanProceed);
+        Assert.False(escalationRecommended.IsAllowed);
+        Assert.False(escalationRecommended.IsWarning);
+        Assert.False(escalationRecommended.IsDenied);
+        Assert.False(escalationRecommended.IsDeferred);
+        Assert.False(escalationRecommended.RequiresAcknowledgment);
+        Assert.True(escalationRecommended.EscalationRecommended);
+    }
+
+    /// <summary>
+    /// Verifies that the Deny factory method creates a decision with the Denied outcome and default reason when null is provided for reasons.
+    /// </summary>
+    [Fact]
+    public void DenyWithNullReasonsUsesDefaultDeniedReason()
+    {
+        var decision = GovernanceDecision.Deny(
+            (IEnumerable<OperationReason>?)null!);
+
+        Assert.True(decision.IsDenied);
+
+        OperationReason reason = Assert.Single(decision.Reasons);
+        Assert.Equal("decision.denied", reason.Code);
+        Assert.Equal("Decision denied the operation.", reason.Message);
+    }
+
+    /// <summary>
+    /// Verifies that the Warning factory method creates a decision with the Warning outcome and default reason when null is provided for reasons.
+    /// </summary>
+    [Fact]
+    public void WarningWithNullReasonsUsesDefaultWarningReason()
+    {
+        var decision = GovernanceDecision.Warning(
+            (IEnumerable<OperationReason>?)null!);
+
+        Assert.True(decision.IsWarning);
+
+        OperationReason reason = Assert.Single(decision.Reasons);
+        Assert.Equal("decision.warning", reason.Code);
+        Assert.Equal("Decision produced a warning.", reason.Message);
+    }
 }

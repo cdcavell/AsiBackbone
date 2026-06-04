@@ -1,4 +1,3 @@
-using CDCavell.ASIBackbone.Core.Abstractions;
 using CDCavell.ASIBackbone.Core.Entities;
 using Xunit;
 

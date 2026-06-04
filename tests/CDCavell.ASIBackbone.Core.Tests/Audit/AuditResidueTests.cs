@@ -116,7 +116,7 @@ public sealed class AuditResidueTests
     }
 
     /// <summary>
-    /// Verifies that the <see cref="AuditResidue.Create"/> method throws an <see cref="ArgumentNullException"/> when the required <paramref name="actor"/> parameter is null, as an audit residue cannot be created without an actor context.
+    /// Verifies that the <see cref="AuditResidue.Create"/> method throws an <see cref="ArgumentNullException"/> when the required <c>actor</c> parameter is null.
     /// </summary>
     [Fact]
     public void CreateThrowsForMissingActor()

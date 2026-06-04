@@ -1,4 +1,4 @@
-namespace CDCavell.ASIBackbone.Core.Abstractions;
+namespace CDCavell.ASIBackbone.Core.Entities;
 
 /// <summary>
 /// Defines the minimum identity contract for ASI Backbone entities.

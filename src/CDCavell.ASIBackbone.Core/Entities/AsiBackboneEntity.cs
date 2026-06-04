@@ -1,5 +1,3 @@
-using CDCavell.ASIBackbone.Core.Abstractions;
-
 namespace CDCavell.ASIBackbone.Core.Entities;
 
 /// <summary>

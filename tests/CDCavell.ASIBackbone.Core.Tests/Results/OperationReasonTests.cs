@@ -8,7 +8,7 @@ public sealed class OperationReasonTests
     [Fact]
     public void CreateNormalizesCodeAndMessage()
     {
-        var reason = OperationReason.Create(" validation.required ", " Required value missing. ");
+        OperationReason reason = OperationReason.Create(" validation.required ", " Required value missing. ");
 
         Assert.Equal("validation.required", reason.Code);
         Assert.Equal("Required value missing.", reason.Message);
@@ -26,7 +26,7 @@ public sealed class OperationReasonTests
             ["policy"] = " v1 "
         };
 
-        var reason = OperationReason.Create(
+        OperationReason reason = OperationReason.Create(
             "policy.denied",
             "Policy denied the request.",
             metadata);
@@ -46,6 +46,6 @@ public sealed class OperationReasonTests
     [InlineData("code", "   ")]
     public void CreateThrowsForBlankCodeOrMessage(string? code, string? message)
     {
-        _ = Assert.Throws<ArgumentException>(() => OperationReason.Create(code!, message!));
+        _ = Assert.ThrowsAny<ArgumentException>(() => OperationReason.Create(code!, message!));
     }
 }

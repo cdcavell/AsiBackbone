@@ -83,6 +83,10 @@ Supported initial decision outcomes are:
 
 ### Actor context
 
+The Core abstraction for this concept is `IAsiBackboneActorContext`.
+
+Host integrations may map their current-user, current-service, worker, or agent identity model into this abstraction. For example, a future ASP.NET Core integration may adapt a host `ClaimsPrincipal` into `IAsiBackboneActorContext`, but Core itself must not depend on `ClaimsPrincipal`, `HttpContext`, authentication middleware, or any specific host identity provider.
+
 Actor context describes who or what is requesting the action.
 
 It may include:

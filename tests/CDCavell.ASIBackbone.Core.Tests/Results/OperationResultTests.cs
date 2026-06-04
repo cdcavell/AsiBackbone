@@ -8,7 +8,7 @@ public sealed class OperationResultTests
     [Fact]
     public void SuccessCreatesSucceededResult()
     {
-        OperationResult result = OperationResult.Success();
+        var result = OperationResult.Success();
 
         Assert.True(result.Succeeded);
         Assert.False(result.Failed);
@@ -21,7 +21,7 @@ public sealed class OperationResultTests
     [Fact]
     public void SuccessWithWarningsStoresNormalizedWarnings()
     {
-        OperationResult result = OperationResult.Success([
+        var result = OperationResult.Success([
             " First warning. ",
             "",
             " Second warning. "
@@ -37,7 +37,7 @@ public sealed class OperationResultTests
     [Fact]
     public void FailureWithCodeAndMessageCreatesFailedResult()
     {
-        OperationResult result = OperationResult.Failure("validation.required", "Required value missing.");
+        var result = OperationResult.Failure("validation.required", "Required value missing.");
 
         Assert.False(result.Succeeded);
         Assert.True(result.Failed);
@@ -50,7 +50,7 @@ public sealed class OperationResultTests
     [Fact]
     public void FailureWithMultipleReasonsStoresReasonCodes()
     {
-        OperationResult result = OperationResult.Failure([
+        var result = OperationResult.Failure([
             OperationReason.Create("policy.denied", "Policy denied the request."),
             OperationReason.Create("constraint.failed", "Constraint failed.")
         ]);
@@ -63,7 +63,7 @@ public sealed class OperationResultTests
     [Fact]
     public void FailureWithNoReasonsUsesDefaultFailureReason()
     {
-        OperationResult result = OperationResult.Failure([]);
+        var result = OperationResult.Failure([]);
 
         Assert.False(result.Succeeded);
         OperationReason reason = Assert.Single(result.Reasons);
@@ -74,7 +74,7 @@ public sealed class OperationResultTests
     [Fact]
     public void FailureWithWarningsStoresNormalizedWarnings()
     {
-        OperationResult result = OperationResult.Failure(
+        var result = OperationResult.Failure(
             [OperationReason.Create("policy.denied", "Policy denied the request.")],
             [" Needs review. ", ""]);
 

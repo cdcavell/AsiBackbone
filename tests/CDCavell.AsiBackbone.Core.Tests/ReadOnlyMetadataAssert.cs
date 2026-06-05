@@ -7,11 +7,15 @@ internal static class ReadOnlyMetadataAssert
 {
     public static void CannotMutateThroughCasts(IReadOnlyDictionary<string, string> metadata)
     {
-        AssertCannotMutateThroughGenericDictionary(metadata);
-        AssertCannotMutateThroughNonGenericDictionary(metadata);
+        bool genericCastWasAvailable = AssertCannotMutateThroughGenericDictionary(metadata);
+        bool nonGenericCastWasAvailable = AssertCannotMutateThroughNonGenericDictionary(metadata);
+
+        Assert.True(
+            genericCastWasAvailable || nonGenericCastWasAvailable ||
+            (metadata is not IDictionary<string, string> && metadata is not IDictionary));
     }
 
-    private static void AssertCannotMutateThroughGenericDictionary(
+    private static bool AssertCannotMutateThroughGenericDictionary(
         IReadOnlyDictionary<string, string> metadata)
     {
         const string setKey = "__mutation_set__";
@@ -19,7 +23,8 @@ internal static class ReadOnlyMetadataAssert
 
         if (metadata is not IDictionary<string, string> dictionary)
         {
-            return;
+            Assert.False(metadata is IDictionary<string, string>);
+            return false;
         }
 
         _ = Assert.Throws<NotSupportedException>(() => dictionary[setKey] = "blocked");
@@ -27,9 +32,11 @@ internal static class ReadOnlyMetadataAssert
 
         Assert.False(metadata.ContainsKey(setKey));
         Assert.False(metadata.ContainsKey(addKey));
+
+        return true;
     }
 
-    private static void AssertCannotMutateThroughNonGenericDictionary(
+    private static bool AssertCannotMutateThroughNonGenericDictionary(
         IReadOnlyDictionary<string, string> metadata)
     {
         const string setKey = "__non_generic_mutation_set__";
@@ -37,7 +44,8 @@ internal static class ReadOnlyMetadataAssert
 
         if (metadata is not IDictionary dictionary)
         {
-            return;
+            Assert.False(metadata is IDictionary);
+            return false;
         }
 
         _ = Assert.Throws<NotSupportedException>(() => dictionary[setKey] = "blocked");
@@ -45,5 +53,7 @@ internal static class ReadOnlyMetadataAssert
 
         Assert.False(metadata.ContainsKey(setKey));
         Assert.False(metadata.ContainsKey(addKey));
+
+        return true;
     }
 }

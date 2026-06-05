@@ -151,4 +151,58 @@ public sealed class AsiBackboneConstraintEvaluationContextTests
         Assert.True(context.HasMetadata);
         Assert.Equal(string.Empty, context.Metadata["source"]);
     }
+
+    /// <summary>
+    /// Verifies that mutating the source metadata after construction does not change the constraint evaluation context metadata.
+    /// </summary>
+    [Fact]
+    public void ConstructorDoesNotAliasSourceMetadata()
+    {
+        Dictionary<string, string> metadata = new(StringComparer.Ordinal)
+        {
+            [" region "] = " us-la "
+        };
+
+        var context = new AsiBackboneConstraintEvaluationContext(
+            metadata: metadata);
+
+        metadata[" region "] = " us-tx ";
+        metadata[" risk "] = " high ";
+
+        _ = Assert.Single(context.Metadata);
+        Assert.Equal("us-la", context.Metadata["region"]);
+        Assert.False(context.Metadata.ContainsKey("risk"));
+    }
+
+    /// <summary>
+    /// Verifies that metadata cannot be mutated through dictionary casts.
+    /// </summary>
+    [Fact]
+    public void MetadataCannotBeMutatedThroughDictionaryCasts()
+    {
+        var context = new AsiBackboneConstraintEvaluationContext(
+            metadata: new Dictionary<string, string>
+            {
+                [" region "] = " us-la "
+            });
+
+        ReadOnlyMetadataAssert.CannotMutateThroughCasts(context.Metadata);
+
+        _ = Assert.Single(context.Metadata);
+        Assert.Equal("us-la", context.Metadata["region"]);
+    }
+
+    /// <summary>
+    /// Verifies that empty metadata cannot be mutated through dictionary casts.
+    /// </summary>
+    [Fact]
+    public void EmptyMetadataCannotBeMutatedThroughDictionaryCasts()
+    {
+        var context = new AsiBackboneConstraintEvaluationContext();
+
+        ReadOnlyMetadataAssert.CannotMutateThroughCasts(context.Metadata);
+
+        Assert.False(context.HasMetadata);
+        Assert.Empty(context.Metadata);
+    }
 }

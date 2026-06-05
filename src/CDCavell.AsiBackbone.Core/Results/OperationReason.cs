@@ -1,3 +1,5 @@
+using System.Collections.ObjectModel;
+
 namespace CDCavell.AsiBackbone.Core.Results;
 
 /// <summary>
@@ -6,7 +8,8 @@ namespace CDCavell.AsiBackbone.Core.Results;
 public sealed class OperationReason
 {
     private static readonly IReadOnlyDictionary<string, string> EmptyMetadata =
-        new Dictionary<string, string>(StringComparer.Ordinal);
+        new ReadOnlyDictionary<string, string>(
+            new Dictionary<string, string>(StringComparer.Ordinal));
 
     /// <summary>
     /// Initializes a new instance of the <see cref="OperationReason"/> class.
@@ -105,6 +108,6 @@ public sealed class OperationReason
 
         return normalizedMetadata.Count == 0
             ? EmptyMetadata
-            : normalizedMetadata;
+            : new ReadOnlyDictionary<string, string>(normalizedMetadata);
     }
 }

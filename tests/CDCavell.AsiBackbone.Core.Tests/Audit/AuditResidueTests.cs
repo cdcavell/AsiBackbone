@@ -354,4 +354,92 @@ public sealed class AuditResidueTests
                 "external.call",
                 constraintResult: null!));
     }
+
+    /// <summary>
+    /// Verifies that the default timestamp is generated in UTC and falls within the creation window.
+    /// </summary>
+    [Fact]
+    public void CreateWithoutTimestampUsesCurrentUtcTimestamp()
+    {
+        AsiBackboneActorContext actor = AsiBackboneActorContext.System;
+        DateTimeOffset beforeCreate = DateTimeOffset.UtcNow;
+
+        var residue = AuditResidue.Create(
+            actor,
+            "system.sync",
+            "Allowed");
+
+        DateTimeOffset afterCreate = DateTimeOffset.UtcNow;
+
+        Assert.Equal(TimeSpan.Zero, residue.OccurredUtc.Offset);
+        Assert.InRange(residue.OccurredUtc, beforeCreate, afterCreate);
+    }
+
+    /// <summary>
+    /// Verifies that mutating source reason codes and metadata after creation does not change the audit residue.
+    /// </summary>
+    [Fact]
+    public void CreateDoesNotAliasSourceCollections()
+    {
+        AsiBackboneActorContext actor = AsiBackboneActorContext.System;
+        List<string> reasonCodes = [" policy.warning "];
+        Dictionary<string, string> metadata = new(StringComparer.Ordinal)
+        {
+            [" source "] = " original "
+        };
+
+        var residue = AuditResidue.Create(
+            actor,
+            "system.sync",
+            "Warning",
+            reasonCodes: reasonCodes,
+            metadata: metadata);
+
+        reasonCodes.Add("policy.added");
+        metadata[" source "] = " mutated ";
+        metadata[" other "] = " added ";
+
+        Assert.Equal("policy.warning", Assert.Single(residue.ReasonCodes));
+        _ = Assert.Single(residue.Metadata);
+        Assert.Equal("original", residue.Metadata["source"]);
+        Assert.False(residue.Metadata.ContainsKey("other"));
+    }
+
+    /// <summary>
+    /// Verifies that metadata cannot be mutated through dictionary casts.
+    /// </summary>
+    [Fact]
+    public void MetadataCannotBeMutatedThroughDictionaryCasts()
+    {
+        var residue = AuditResidue.Create(
+            AsiBackboneActorContext.System,
+            "system.sync",
+            "Allowed",
+            metadata: new Dictionary<string, string>
+            {
+                [" source "] = " unit-test "
+            });
+
+        ReadOnlyMetadataAssert.CannotMutateThroughCasts(residue.Metadata);
+
+        _ = Assert.Single(residue.Metadata);
+        Assert.Equal("unit-test", residue.Metadata["source"]);
+    }
+
+    /// <summary>
+    /// Verifies that empty metadata cannot be mutated through dictionary casts.
+    /// </summary>
+    [Fact]
+    public void EmptyMetadataCannotBeMutatedThroughDictionaryCasts()
+    {
+        var residue = AuditResidue.Create(
+            AsiBackboneActorContext.System,
+            "system.sync",
+            "Allowed");
+
+        ReadOnlyMetadataAssert.CannotMutateThroughCasts(residue.Metadata);
+
+        Assert.False(residue.HasMetadata);
+        Assert.Empty(residue.Metadata);
+    }
 }

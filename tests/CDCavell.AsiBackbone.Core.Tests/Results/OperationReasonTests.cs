@@ -240,4 +240,64 @@ public sealed class OperationReasonTests
         Assert.True(reason.HasMetadata);
         Assert.Equal("unit-test", reason.Metadata["source"]);
     }
+
+    /// <summary>
+    /// Verifies that mutating the source metadata after creation does not change the OperationReason metadata.
+    /// </summary>
+    [Fact]
+    public void CreateWithMetadataDoesNotAliasSourceMetadata()
+    {
+        Dictionary<string, string> metadata = new(StringComparer.Ordinal)
+        {
+            [" source "] = " original "
+        };
+
+        var reason = OperationReason.Create(
+            "policy.denied",
+            "Policy denied the request.",
+            metadata);
+
+        metadata[" source "] = " mutated ";
+        metadata[" other "] = " added ";
+
+        _ = Assert.Single(reason.Metadata);
+        Assert.Equal("original", reason.Metadata["source"]);
+        Assert.False(reason.Metadata.ContainsKey("other"));
+    }
+
+    /// <summary>
+    /// Verifies that metadata cannot be mutated through dictionary casts.
+    /// </summary>
+    [Fact]
+    public void MetadataCannotBeMutatedThroughDictionaryCasts()
+    {
+        var reason = OperationReason.Create(
+            "policy.denied",
+            "Policy denied the request.",
+            new Dictionary<string, string>
+            {
+                [" source "] = " unit-test "
+            });
+
+        ReadOnlyMetadataAssert.CannotMutateThroughCasts(reason.Metadata);
+
+        _ = Assert.Single(reason.Metadata);
+        Assert.Equal("unit-test", reason.Metadata["source"]);
+    }
+
+    /// <summary>
+    /// Verifies that empty metadata cannot be mutated through dictionary casts.
+    /// </summary>
+    [Fact]
+    public void EmptyMetadataCannotBeMutatedThroughDictionaryCasts()
+    {
+        var reason = OperationReason.Create(
+            "policy.denied",
+            "Policy denied the request.");
+
+        ReadOnlyMetadataAssert.CannotMutateThroughCasts(reason.Metadata);
+
+        Assert.False(reason.HasMetadata);
+        Assert.Empty(reason.Metadata);
+    }
 }

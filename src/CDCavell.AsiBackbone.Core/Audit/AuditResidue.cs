@@ -14,7 +14,8 @@ public sealed class AuditResidue : IAsiBackboneAuditResidue
         Array.AsReadOnly(Array.Empty<string>());
 
     private static readonly IReadOnlyDictionary<string, string> EmptyMetadata =
-        new Dictionary<string, string>(StringComparer.Ordinal);
+        new ReadOnlyDictionary<string, string>(
+            new Dictionary<string, string>(StringComparer.Ordinal));
 
     private AuditResidue(
         string eventId,
@@ -270,6 +271,6 @@ public sealed class AuditResidue : IAsiBackboneAuditResidue
 
         return normalizedMetadata.Count == 0
             ? EmptyMetadata
-            : normalizedMetadata;
+            : new ReadOnlyDictionary<string, string>(normalizedMetadata);
     }
 }

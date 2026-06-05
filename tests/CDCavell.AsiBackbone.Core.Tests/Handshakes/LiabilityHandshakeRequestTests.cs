@@ -332,4 +332,48 @@ public sealed class LiabilityHandshakeRequestTests
         Assert.True(request.HasMetadata);
         Assert.Equal(string.Empty, request.Metadata["source"]);
     }
+
+    /// <summary>
+    /// Verifies that metadata cannot be mutated through dictionary casts.
+    /// </summary>
+    [Fact]
+    public void MetadataCannotBeMutatedThroughDictionaryCasts()
+    {
+        var request = LiabilityHandshakeRequest.Create(
+            AsiBackboneActorContext.System,
+            "system.sync",
+            "ack.required",
+            "Acknowledgment is required.",
+            "ACK-001",
+            "I understand.",
+            metadata: new Dictionary<string, string>
+            {
+                [" source "] = " unit-test "
+            });
+
+        ReadOnlyMetadataAssert.CannotMutateThroughCasts(request.Metadata);
+
+        _ = Assert.Single(request.Metadata);
+        Assert.Equal("unit-test", request.Metadata["source"]);
+    }
+
+    /// <summary>
+    /// Verifies that empty metadata cannot be mutated through dictionary casts.
+    /// </summary>
+    [Fact]
+    public void EmptyMetadataCannotBeMutatedThroughDictionaryCasts()
+    {
+        var request = LiabilityHandshakeRequest.Create(
+            AsiBackboneActorContext.System,
+            "system.sync",
+            "ack.required",
+            "Acknowledgment is required.",
+            "ACK-001",
+            "I understand.");
+
+        ReadOnlyMetadataAssert.CannotMutateThroughCasts(request.Metadata);
+
+        Assert.False(request.HasMetadata);
+        Assert.Empty(request.Metadata);
+    }
 }

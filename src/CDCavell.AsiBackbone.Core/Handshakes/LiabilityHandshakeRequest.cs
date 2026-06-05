@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using CDCavell.AsiBackbone.Core.Actors;
 using CDCavell.AsiBackbone.Core.Decisions;
 
@@ -9,7 +10,8 @@ namespace CDCavell.AsiBackbone.Core.Handshakes;
 public sealed class LiabilityHandshakeRequest
 {
     private static readonly IReadOnlyDictionary<string, string> EmptyMetadata =
-        new Dictionary<string, string>(StringComparer.Ordinal);
+        new ReadOnlyDictionary<string, string>(
+            new Dictionary<string, string>(StringComparer.Ordinal));
 
     private LiabilityHandshakeRequest(
         string handshakeId,
@@ -282,6 +284,6 @@ public sealed class LiabilityHandshakeRequest
 
         return normalizedMetadata.Count == 0
             ? EmptyMetadata
-            : normalizedMetadata;
+            : new ReadOnlyDictionary<string, string>(normalizedMetadata);
     }
 }

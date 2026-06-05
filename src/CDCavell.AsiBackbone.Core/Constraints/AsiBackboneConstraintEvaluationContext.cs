@@ -1,3 +1,5 @@
+using System.Collections.ObjectModel;
+
 namespace CDCavell.AsiBackbone.Core.Constraints;
 
 /// <summary>
@@ -17,7 +19,8 @@ public sealed class AsiBackboneConstraintEvaluationContext(
     IReadOnlyDictionary<string, string>? metadata = null) : IAsiBackboneConstraintEvaluationContext
 {
     private static readonly IReadOnlyDictionary<string, string> EmptyMetadata =
-        new Dictionary<string, string>(StringComparer.Ordinal);
+        new ReadOnlyDictionary<string, string>(
+            new Dictionary<string, string>(StringComparer.Ordinal));
 
     /// <inheritdoc />
     public string? CorrelationId { get; } = NormalizeOptional(correlationId);
@@ -65,6 +68,6 @@ public sealed class AsiBackboneConstraintEvaluationContext(
 
         return normalizedMetadata.Count == 0
             ? EmptyMetadata
-            : normalizedMetadata;
+            : new ReadOnlyDictionary<string, string>(normalizedMetadata);
     }
 }

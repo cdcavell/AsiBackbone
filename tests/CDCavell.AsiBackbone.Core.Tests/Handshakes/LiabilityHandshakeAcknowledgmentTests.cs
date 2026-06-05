@@ -292,6 +292,94 @@ public sealed class LiabilityHandshakeAcknowledgmentTests
                 actor: null!));
     }
 
+    /// <summary>
+    /// Verifies that the default acknowledgment timestamp is generated in UTC and falls within the creation window.
+    /// </summary>
+    [Fact]
+    public void AcceptWithoutTimestampUsesCurrentUtcTimestamp()
+    {
+        AsiBackboneActorContext actor = AsiBackboneActorContext.System;
+        LiabilityHandshakeRequest request = CreateRequest(actor);
+        DateTimeOffset beforeCreate = DateTimeOffset.UtcNow;
+
+        var acknowledgment = LiabilityHandshakeAcknowledgment.Accept(
+            request,
+            actor);
+
+        DateTimeOffset afterCreate = DateTimeOffset.UtcNow;
+
+        Assert.Equal(TimeSpan.Zero, acknowledgment.OccurredUtc.Offset);
+        Assert.InRange(acknowledgment.OccurredUtc, beforeCreate, afterCreate);
+    }
+
+    /// <summary>
+    /// Verifies that mutating source metadata after creation does not change acknowledgment metadata.
+    /// </summary>
+    [Fact]
+    public void CreateDoesNotAliasSourceMetadata()
+    {
+        AsiBackboneActorContext actor = AsiBackboneActorContext.System;
+        LiabilityHandshakeRequest request = CreateRequest(actor);
+        Dictionary<string, string> metadata = new(StringComparer.Ordinal)
+        {
+            [" source "] = " original "
+        };
+
+        var acknowledgment = LiabilityHandshakeAcknowledgment.Accept(
+            request,
+            actor,
+            metadata: metadata);
+
+        metadata[" source "] = " mutated ";
+        metadata[" other "] = " added ";
+
+        _ = Assert.Single(acknowledgment.Metadata);
+        Assert.Equal("original", acknowledgment.Metadata["source"]);
+        Assert.False(acknowledgment.Metadata.ContainsKey("other"));
+    }
+
+    /// <summary>
+    /// Verifies that metadata cannot be mutated through dictionary casts.
+    /// </summary>
+    [Fact]
+    public void MetadataCannotBeMutatedThroughDictionaryCasts()
+    {
+        AsiBackboneActorContext actor = AsiBackboneActorContext.System;
+        LiabilityHandshakeRequest request = CreateRequest(actor);
+
+        var acknowledgment = LiabilityHandshakeAcknowledgment.Accept(
+            request,
+            actor,
+            metadata: new Dictionary<string, string>
+            {
+                [" source "] = " unit-test "
+            });
+
+        ReadOnlyMetadataAssert.CannotMutateThroughCasts(acknowledgment.Metadata);
+
+        _ = Assert.Single(acknowledgment.Metadata);
+        Assert.Equal("unit-test", acknowledgment.Metadata["source"]);
+    }
+
+    /// <summary>
+    /// Verifies that empty metadata cannot be mutated through dictionary casts.
+    /// </summary>
+    [Fact]
+    public void EmptyMetadataCannotBeMutatedThroughDictionaryCasts()
+    {
+        AsiBackboneActorContext actor = AsiBackboneActorContext.System;
+        LiabilityHandshakeRequest request = CreateRequest(actor);
+
+        var acknowledgment = LiabilityHandshakeAcknowledgment.Accept(
+            request,
+            actor);
+
+        ReadOnlyMetadataAssert.CannotMutateThroughCasts(acknowledgment.Metadata);
+
+        Assert.False(acknowledgment.HasMetadata);
+        Assert.Empty(acknowledgment.Metadata);
+    }
+
     private static LiabilityHandshakeRequest CreateRequest(IAsiBackboneActorContext actor)
     {
         return LiabilityHandshakeRequest.Create(

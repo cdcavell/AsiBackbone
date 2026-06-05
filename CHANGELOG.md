@@ -13,11 +13,15 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 * Added tests proving the extension can be called from a host-owned `DbContext`.
 * Added argument validation for null `ModelBuilder` usage.
 * Updated EF Core documentation samples to show host applications calling the extension from `OnModelCreating`.
+* Added provider-neutral EF Core persistence entities and configurations for audit ledger records, reason codes, metadata, handshake requests, and handshake acknowledgments.
+* Added EF Core tests proving host-owned DbContext integration, model metadata, keys, relationships, indexes, enum conversion, and basic persistence behavior.
+
 
 ### Notes
 
 * The EF Core integration preserves host ownership of the `DbContext`, database provider, connection string, migrations, deployment process, and schema lifecycle.
 * AsiBackbone contributes model configuration; the consuming application remains the persistence composition root.
+* Wired the configurations through the existing `ApplyAsiBackboneConfigurations` `ModelBuilder` extension.
 
 ## [0.1.0-alpha.1] - 2026-06-04
 

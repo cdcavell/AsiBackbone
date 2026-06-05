@@ -171,6 +171,20 @@ The EF Core package should support:
 
 The integration should be documented in a way that works without assuming NetCoreApplicationTemplate conventions.
 
+## Implemented EF Core model configuration surface
+
+The EF Core package contributes provider-neutral model configurations for:
+
+- audit ledger records
+- audit ledger reason codes
+- audit ledger metadata
+- handshake requests
+- handshake request metadata
+- handshake acknowledgments
+- handshake acknowledgment metadata
+
+The host application still owns the DbContext, provider, migrations, schema lifecycle, retention policy, and deployment workflow.
+
 ## Initial persistence focus
 
 The first EF Core milestone should focus on accountability records, not broad application persistence.

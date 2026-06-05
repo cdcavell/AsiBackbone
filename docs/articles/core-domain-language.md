@@ -155,6 +155,11 @@ It may include:
 
 Core should define audit-oriented primitives without requiring a specific storage provider.
 
+A persistent audit ledger record is the storage-ready snapshot of audit residue.
+Core defines the record shape and storage contract only. Concrete persistence,
+database mappings, migrations, signing, retention, and archival behavior belong
+to host applications or future storage/signing packages.
+
 ### Acknowledgment and responsibility handshake
 
 Some consequential actions should require acknowledgment before execution.

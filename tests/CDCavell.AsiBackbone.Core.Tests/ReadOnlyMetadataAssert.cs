@@ -10,6 +10,12 @@ internal static class ReadOnlyMetadataAssert
         bool genericDictionaryCastWasAvailable = AssertCannotMutateThroughGenericDictionary(metadata);
         bool nonGenericDictionaryCastWasAvailable = AssertCannotMutateThroughNonGenericDictionary(metadata);
 
+        // This assertion is intentional. The production metadata implementation currently uses
+        // ReadOnlyDictionary<string, string>, which still exposes dictionary cast surfaces but throws
+        // on mutation attempts. Requiring at least one cast surface prevents this helper from passing
+        // without exercising an actual mutation path. If metadata later switches to a type that only
+        // implements IReadOnlyDictionary<string, string>, this assertion should be revisited because
+        // that would be a stricter immutable shape with no cast attack surface to test.
         Assert.True(
             genericDictionaryCastWasAvailable || nonGenericDictionaryCastWasAvailable,
             "Metadata did not expose a dictionary cast surface to test.");

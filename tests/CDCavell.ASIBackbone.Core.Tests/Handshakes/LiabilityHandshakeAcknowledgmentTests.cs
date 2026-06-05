@@ -241,7 +241,7 @@ public sealed class LiabilityHandshakeAcknowledgmentTests
             });
 
         Assert.True(acknowledgment.HasMetadata);
-        Assert.Single(acknowledgment.Metadata);
+        _ = Assert.Single(acknowledgment.Metadata);
         Assert.Equal("second", acknowledgment.Metadata["source"]);
     }
 

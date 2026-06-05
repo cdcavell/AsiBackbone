@@ -132,7 +132,7 @@ public sealed class AsiBackboneConstraintEvaluationContextTests
             });
 
         Assert.True(context.HasMetadata);
-        Assert.Single(context.Metadata);
+        _ = Assert.Single(context.Metadata);
         Assert.Equal("us-tx", context.Metadata["region"]);
     }
 

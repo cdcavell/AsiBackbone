@@ -24,6 +24,21 @@ public sealed class OperationReasonTests
     }
 
     /// <summary>
+    /// Verifies that the Create metadata overload accepts null metadata and returns no metadata.
+    /// </summary>
+    [Fact]
+    public void CreateWithNullMetadataReturnsNoMetadata()
+    {
+        var reason = OperationReason.Create(
+            "policy.denied",
+            "Policy denied the request.",
+            null!);
+
+        Assert.False(reason.HasMetadata);
+        Assert.Empty(reason.Metadata);
+    }
+
+    /// <summary>
     /// Verifies that the Create method with metadata normalizes the metadata keys and values by trimming whitespace and ignoring blank keys.
     /// </summary>
     [Fact]

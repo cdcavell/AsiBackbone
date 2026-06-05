@@ -14,3 +14,6 @@ Start with [Getting Started](getting-started.md), then use the navigation menu t
 
 * [Alpha Package Boundary](alpha-package-boundary.md)
   Documents the intended `0.1.0-alpha.1` boundary for `CDCavell.AsiBackbone.Core`, including what belongs in Core and what belongs in later integration packages.
+
+* [EF Core Integration Boundary](ef-core-integration-boundary.md)  
+  Defines the intended boundary for the future EF Core storage package, including host-owned `DbContext`, migration ownership, provider-neutral configuration, and `ModelBuilder` extension expectations.

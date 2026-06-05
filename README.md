@@ -52,6 +52,7 @@ The initial Core language is documented in:
 * [Core Domain Language and Alpha Boundary](docs/articles/core-domain-language.md)
 * [Equations and Toy Models](docs/articles/equations-and-toy-models.md)
 * [Alpha Package Boundary](docs/articles/alpha-package-boundary.md)
+* [EF Core Integration Boundary](docs/articles/ef-core-integration-boundary.md)
 
 The central technical lane is:
 
@@ -178,7 +179,11 @@ Planned future package for samples, tests, and early validation hosts that need 
 
 ## CDCavell.AsiBackbone.Storage.EntityFrameworkCore
 
-Planned future package for EF Core model contributions.
+Planned future package for EF Core model contributions and persistence integration.
+
+The EF Core package is intended to support host-owned persistence. AsiBackbone should contribute model configuration and storage helpers, while the consuming application owns the `DbContext`, database provider, connection string, migrations, deployment, and schema lifecycle.
+
+See [EF Core Integration Boundary](docs/articles/ef-core-integration-boundary.md) for the current design boundary.
 
 The preferred persistence model is host-owned data access:
 

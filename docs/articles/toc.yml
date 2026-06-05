@@ -13,5 +13,8 @@
 - name: Alpha Package Boundary
   href: alpha-package-boundary.md
 
+- name: EF Core Integration Boundary
+  href: ef-core-integration-boundary.md
+
 - name: Core Alpha Readiness Review
   href: core-alpha-readiness-review.md

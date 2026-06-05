@@ -55,6 +55,23 @@ public sealed class AuditResidueTests
     }
 
     /// <summary>
+    /// Verifies that the <see cref="AuditResidue.Create"/> method generates a non-empty EventId when the supplied event identifier is whitespace.
+    /// </summary>
+    [Fact]
+    public void CreateGeneratesEventIdWhenEventIdIsWhitespace()
+    {
+        AsiBackboneActorContext actor = AsiBackboneActorContext.System;
+
+        var residue = AuditResidue.Create(
+            actor,
+            "system.sync",
+            "Allowed",
+            eventId: "   ");
+
+        Assert.False(string.IsNullOrWhiteSpace(residue.EventId));
+    }
+
+    /// <summary>
     /// Verifies that the <see cref="AuditResidue.Create"/> method normalizes reason codes by trimming whitespace and removing empty entries, and that it normalizes trace fields and
     /// </summary>
     [Fact]
@@ -116,6 +133,86 @@ public sealed class AuditResidueTests
     }
 
     /// <summary>
+    /// Verifies that null reason codes are filtered and blank reason codes do not create audit residue entries.
+    /// </summary>
+    [Fact]
+    public void CreateFiltersNullAndBlankReasonCodes()
+    {
+        AsiBackboneActorContext actor = AsiBackboneActorContext.System;
+        string[] reasonCodes = [" policy.warning ", null!, "", "   "];
+
+        var residue = AuditResidue.Create(
+            actor,
+            "system.sync",
+            "Warning",
+            reasonCodes: reasonCodes);
+
+        Assert.True(residue.HasReasonCodes);
+        Assert.Equal("policy.warning", Assert.Single(residue.ReasonCodes));
+    }
+
+    /// <summary>
+    /// Verifies that null metadata values are normalized to empty strings.
+    /// </summary>
+    [Fact]
+    public void CreateWithNullMetadataValueStoresEmptyString()
+    {
+        AsiBackboneActorContext actor = AsiBackboneActorContext.System;
+
+        var residue = AuditResidue.Create(
+            actor,
+            "system.sync",
+            "Allowed",
+            metadata: new Dictionary<string, string>
+            {
+                [" source "] = null!
+            });
+
+        Assert.True(residue.HasMetadata);
+        Assert.Equal(string.Empty, residue.Metadata["source"]);
+    }
+
+    /// <summary>
+    /// Verifies that empty metadata returns the shared empty metadata representation.
+    /// </summary>
+    [Fact]
+    public void CreateWithEmptyMetadataReturnsNoMetadata()
+    {
+        AsiBackboneActorContext actor = AsiBackboneActorContext.System;
+
+        var residue = AuditResidue.Create(
+            actor,
+            "system.sync",
+            "Allowed",
+            metadata: new Dictionary<string, string>());
+
+        Assert.False(residue.HasMetadata);
+        Assert.Empty(residue.Metadata);
+    }
+
+    /// <summary>
+    /// Verifies that metadata containing only blank keys returns no metadata.
+    /// </summary>
+    [Fact]
+    public void CreateWithOnlyBlankMetadataKeysReturnsNoMetadata()
+    {
+        AsiBackboneActorContext actor = AsiBackboneActorContext.System;
+
+        var residue = AuditResidue.Create(
+            actor,
+            "system.sync",
+            "Allowed",
+            metadata: new Dictionary<string, string>
+            {
+                [" "] = "ignored",
+                ["\t"] = "also ignored"
+            });
+
+        Assert.False(residue.HasMetadata);
+        Assert.Empty(residue.Metadata);
+    }
+
+    /// <summary>
     /// Verifies that the <see cref="AuditResidue.Create"/> method throws an <see cref="ArgumentNullException"/> when the required <c>actor</c> parameter is null.
     /// </summary>
     [Fact]
@@ -135,16 +232,17 @@ public sealed class AuditResidueTests
     /// The invalid operation name value to test, which can be an empty string or a whitespace string. The test will verify that both cases are properly handled by the method and result in an exception being thrown.
     /// </param>
     [Theory]
+    [InlineData(null)]
     [InlineData("")]
     [InlineData(" ")]
-    public void CreateThrowsForMissingOperationName(string operationName)
+    public void CreateThrowsForMissingOperationName(string? operationName)
     {
         AsiBackboneActorContext actor = AsiBackboneActorContext.System;
 
         _ = Assert.Throws<ArgumentException>(() =>
             AuditResidue.Create(
                 actor,
-                operationName,
+                operationName!,
                 "Allowed"));
     }
 
@@ -155,9 +253,10 @@ public sealed class AuditResidueTests
     /// The invalid outcome value to test, which can be an empty string or a whitespace string. The test will verify that both cases are properly handled by the method and result in an exception being thrown.
     /// </param>
     [Theory]
+    [InlineData(null)]
     [InlineData("")]
     [InlineData(" ")]
-    public void CreateThrowsForMissingOutcome(string outcome)
+    public void CreateThrowsForMissingOutcome(string? outcome)
     {
         AsiBackboneActorContext actor = AsiBackboneActorContext.System;
 
@@ -165,7 +264,7 @@ public sealed class AuditResidueTests
             AuditResidue.Create(
                 actor,
                 "document.approve",
-                outcome));
+                outcome!));
     }
 
     /// <summary>
@@ -200,6 +299,21 @@ public sealed class AuditResidueTests
     }
 
     /// <summary>
+    /// Verifies that the <see cref="AuditResidue.FromDecision"/> method throws when the decision is missing.
+    /// </summary>
+    [Fact]
+    public void FromDecisionThrowsForMissingDecision()
+    {
+        AsiBackboneActorContext actor = AsiBackboneActorContext.System;
+
+        _ = Assert.Throws<ArgumentNullException>(() =>
+            AuditResidue.FromDecision(
+                actor,
+                "document.approve",
+                decision: null!));
+    }
+
+    /// <summary>
     /// Verifies that the <see cref="AuditResidue.FromConstraint"/> method correctly copies the outcome, reason codes, correlation ID, and policy version from the provided <see cref="ConstraintEvaluationResult"/> when creating an audit residue, ensuring that all relevant information from the constraint evaluation is captured in the audit record.
     /// </summary>
     [Fact]
@@ -224,5 +338,20 @@ public sealed class AuditResidueTests
         Assert.Equal("constraint.high_risk", Assert.Single(residue.ReasonCodes));
         Assert.Equal("correlation-123", residue.CorrelationId);
         Assert.Equal("v1", residue.PolicyVersion);
+    }
+
+    /// <summary>
+    /// Verifies that the <see cref="AuditResidue.FromConstraint"/> method throws when the constraint result is missing.
+    /// </summary>
+    [Fact]
+    public void FromConstraintThrowsForMissingConstraintResult()
+    {
+        AsiBackboneActorContext actor = AsiBackboneActorContext.System;
+
+        _ = Assert.Throws<ArgumentNullException>(() =>
+            AuditResidue.FromConstraint(
+                actor,
+                "external.call",
+                constraintResult: null!));
     }
 }

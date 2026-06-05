@@ -73,6 +73,40 @@ public sealed class LiabilityHandshakeAcknowledgmentTests
     }
 
     /// <summary>
+    /// Verifies that the <see cref="LiabilityHandshakeAcknowledgment.Accept"/> method generates a non-empty acknowledgment ID when a whitespace identifier is provided.
+    /// </summary>
+    [Fact]
+    public void CreateGeneratesAcknowledgmentIdWhenIdentifierIsWhitespace()
+    {
+        AsiBackboneActorContext actor = AsiBackboneActorContext.System;
+        LiabilityHandshakeRequest request = CreateRequest(actor);
+
+        var acknowledgment = LiabilityHandshakeAcknowledgment.Accept(
+            request,
+            actor,
+            acknowledgmentId: "   ");
+
+        Assert.False(string.IsNullOrWhiteSpace(acknowledgment.AcknowledgmentId));
+    }
+
+    /// <summary>
+    /// Verifies that the <see cref="LiabilityHandshakeAcknowledgment.Accept"/> method trims a provided acknowledgment identifier.
+    /// </summary>
+    [Fact]
+    public void CreateTrimsAcknowledgmentId()
+    {
+        AsiBackboneActorContext actor = AsiBackboneActorContext.System;
+        LiabilityHandshakeRequest request = CreateRequest(actor);
+
+        var acknowledgment = LiabilityHandshakeAcknowledgment.Accept(
+            request,
+            actor,
+            acknowledgmentId: " acknowledgment-123 ");
+
+        Assert.Equal("acknowledgment-123", acknowledgment.AcknowledgmentId);
+    }
+
+    /// <summary>
     /// Verifies that the <see cref="LiabilityHandshakeAcknowledgment.Accept"/> method normalizes the provided timestamp to UTC.
     /// </summary>
     [Fact]
@@ -87,6 +121,24 @@ public sealed class LiabilityHandshakeAcknowledgmentTests
             occurredUtc: new DateTimeOffset(2026, 6, 4, 7, 0, 0, TimeSpan.FromHours(-5)));
 
         Assert.Equal(new DateTimeOffset(2026, 6, 4, 12, 0, 0, TimeSpan.Zero), acknowledgment.OccurredUtc);
+    }
+
+    /// <summary>
+    /// Verifies that optional actor and request trace values normalize to null when the source values are absent.
+    /// </summary>
+    [Fact]
+    public void CreateNormalizesMissingOptionalValuesToNull()
+    {
+        var actor = AsiBackboneActorContext.Human("user-123");
+        LiabilityHandshakeRequest request = CreateRequestWithoutTrace(actor);
+
+        var acknowledgment = LiabilityHandshakeAcknowledgment.Accept(
+            request,
+            actor);
+
+        Assert.Null(acknowledgment.ActorDisplayName);
+        Assert.Null(acknowledgment.CorrelationId);
+        Assert.Null(acknowledgment.TraceId);
     }
 
     /// <summary>
@@ -110,6 +162,108 @@ public sealed class LiabilityHandshakeAcknowledgmentTests
         Assert.True(acknowledgment.HasMetadata);
         Assert.Equal("unit-test", acknowledgment.Metadata["source"]);
         Assert.False(acknowledgment.Metadata.ContainsKey(" "));
+    }
+
+    /// <summary>
+    /// Verifies that null metadata is normalized to an empty metadata collection.
+    /// </summary>
+    [Fact]
+    public void CreateWithNullMetadataReturnsNoMetadata()
+    {
+        var actor = AsiBackboneActorContext.Service("service-123");
+        LiabilityHandshakeRequest request = CreateRequest(actor);
+
+        var acknowledgment = LiabilityHandshakeAcknowledgment.Accept(
+            request,
+            actor,
+            metadata: null);
+
+        Assert.False(acknowledgment.HasMetadata);
+        Assert.Empty(acknowledgment.Metadata);
+    }
+
+    /// <summary>
+    /// Verifies that empty metadata is normalized to an empty metadata collection.
+    /// </summary>
+    [Fact]
+    public void CreateWithEmptyMetadataReturnsNoMetadata()
+    {
+        var actor = AsiBackboneActorContext.Service("service-123");
+        LiabilityHandshakeRequest request = CreateRequest(actor);
+
+        var acknowledgment = LiabilityHandshakeAcknowledgment.Accept(
+            request,
+            actor,
+            metadata: new Dictionary<string, string>());
+
+        Assert.False(acknowledgment.HasMetadata);
+        Assert.Empty(acknowledgment.Metadata);
+    }
+
+    /// <summary>
+    /// Verifies that metadata containing only blank keys is normalized to an empty metadata collection.
+    /// </summary>
+    [Fact]
+    public void CreateWithOnlyBlankMetadataKeysReturnsNoMetadata()
+    {
+        var actor = AsiBackboneActorContext.Service("service-123");
+        LiabilityHandshakeRequest request = CreateRequest(actor);
+
+        var acknowledgment = LiabilityHandshakeAcknowledgment.Accept(
+            request,
+            actor,
+            metadata: new Dictionary<string, string>
+            {
+                [" "] = "ignored",
+                ["\t"] = "also ignored"
+            });
+
+        Assert.False(acknowledgment.HasMetadata);
+        Assert.Empty(acknowledgment.Metadata);
+    }
+
+    /// <summary>
+    /// Verifies that duplicate keys after trimming use the later normalized value.
+    /// </summary>
+    [Fact]
+    public void CreateWithDuplicateTrimmedMetadataKeysUsesLastValue()
+    {
+        var actor = AsiBackboneActorContext.Service("service-123");
+        LiabilityHandshakeRequest request = CreateRequest(actor);
+
+        var acknowledgment = LiabilityHandshakeAcknowledgment.Accept(
+            request,
+            actor,
+            metadata: new Dictionary<string, string>
+            {
+                [" source "] = " first ",
+                ["source"] = " second "
+            });
+
+        Assert.True(acknowledgment.HasMetadata);
+        Assert.Single(acknowledgment.Metadata);
+        Assert.Equal("second", acknowledgment.Metadata["source"]);
+    }
+
+    /// <summary>
+    /// Verifies that null metadata values are normalized to empty strings while preserving valid keys.
+    /// </summary>
+    [Fact]
+    public void CreateWithNullMetadataValueStoresEmptyString()
+    {
+        var actor = AsiBackboneActorContext.Service("service-123");
+        LiabilityHandshakeRequest request = CreateRequest(actor);
+
+        var acknowledgment = LiabilityHandshakeAcknowledgment.Accept(
+            request,
+            actor,
+            metadata: new Dictionary<string, string>
+            {
+                [" source "] = null!
+            });
+
+        Assert.True(acknowledgment.HasMetadata);
+        Assert.Equal(string.Empty, acknowledgment.Metadata["source"]);
     }
 
     /// <summary>
@@ -151,5 +305,18 @@ public sealed class LiabilityHandshakeAcknowledgmentTests
             handshakeId: "handshake-123",
             correlationId: "correlation-123",
             traceId: "trace-456");
+    }
+
+    private static LiabilityHandshakeRequest CreateRequestWithoutTrace(IAsiBackboneActorContext actor)
+    {
+        return LiabilityHandshakeRequest.Create(
+            actor,
+            "document.approve",
+            "ack.required",
+            "Acknowledgment is required.",
+            "ACK-001",
+            "I understand this action is consequential.",
+            LiabilityHandshakeRiskLevel.High,
+            handshakeId: "handshake-123");
     }
 }

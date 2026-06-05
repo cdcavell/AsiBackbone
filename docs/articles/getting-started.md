@@ -1,8 +1,8 @@
 # Getting Started
 
-This guide explains the current direction of the ASIBackbone repository and how to begin working with the project.
+This guide explains the current direction of the AsiBackbone repository and how to begin working with the project.
 
-ASIBackbone is currently in an early foundation stage. The first package focus is `CDCavell.ASIBackbone.Core`, a dependency-light package intended to define shared contracts, abstractions, result primitives, and domain language.
+AsiBackbone is currently in an early foundation stage. The first package focus is `CDCavell.AsiBackbone.Core`, a dependency-light package intended to define shared contracts, abstractions, result primitives, and domain language.
 
 > [!IMPORTANT]
 > This project does not implement artificial superintelligence. It provides governance-oriented software building blocks inspired by the ASI Backbone framework.
@@ -40,16 +40,16 @@ dotnet tool restore
 ## Clone the repository
 
 ```bash
-git clone https://github.com/cdcavell/ASIBackbone.git
-cd ASIBackbone
+git clone https://github.com/cdcavell/AsiBackbone.git
+cd AsiBackbone
 ```
 
 ## Restore, build, and test
 
 ```bash
-dotnet restore ASIBackbone.slnx
-dotnet build ASIBackbone.slnx --configuration Release
-dotnet test ASIBackbone.slnx --configuration Release --no-build --no-restore
+dotnet restore AsiBackbone.slnx
+dotnet build AsiBackbone.slnx --configuration Release
+dotnet test AsiBackbone.slnx --configuration Release --no-build --no-restore
 ```
 
 ## Build the documentation site locally
@@ -65,9 +65,9 @@ DocFX will build the documentation and serve it locally. Use the local URL print
 
 ## Project orientation
 
-ASIBackbone should be understood as a governance spine.
+AsiBackbone should be understood as a governance spine.
 
-A typical ASIBackbone-style flow is:
+A typical AsiBackbone-style flow is:
 
 ```text
 Intent or request
@@ -206,9 +206,9 @@ Robotics and physical execution should remain later-stage examples after the cor
 
 ## Current package
 
-## CDCavell.ASIBackbone.Core
+## CDCavell.AsiBackbone.Core
 
-`CDCavell.ASIBackbone.Core` is the current foundation package.
+`CDCavell.AsiBackbone.Core` is the current foundation package.
 
 It should provide:
 
@@ -234,18 +234,18 @@ It should avoid:
 
 Future packages may include:
 
-* `CDCavell.ASIBackbone.AspNetCore`
-* `CDCavell.ASIBackbone.Storage.InMemory`
-* `CDCavell.ASIBackbone.Storage.EntityFrameworkCore`
-* `CDCavell.ASIBackbone.Signing`
-* `CDCavell.ASIBackbone.Samples`
-* `CDCavell.ASIBackbone.Robotics`
+* `CDCavell.AsiBackbone.AspNetCore`
+* `CDCavell.AsiBackbone.Storage.InMemory`
+* `CDCavell.AsiBackbone.Storage.EntityFrameworkCore`
+* `CDCavell.AsiBackbone.Signing`
+* `CDCavell.AsiBackbone.Samples`
+* `CDCavell.AsiBackbone.Robotics`
 
 Package names may be adjusted before stable release.
 
 ## Relationship to NetCoreApplicationTemplate
 
-NetCoreApplicationTemplate may be used as a preferred host baseline during development and validation, but ASIBackbone should not require it.
+NetCoreApplicationTemplate may be used as a preferred host baseline during development and validation, but AsiBackbone should not require it.
 
 The intended relationship is:
 
@@ -253,14 +253,14 @@ The intended relationship is:
 NetCoreApplicationTemplate
     = preferred host baseline
 
-ASIBackbone
+AsiBackbone
     = optional governance/module package family
 
 Consumer application
     = chooses whether to use either or both
 ```
 
-A consumer should eventually be able to use ASIBackbone in:
+A consumer should eventually be able to use AsiBackbone in:
 
 * an application generated from NetCoreApplicationTemplate
 * an existing ASP.NET Core application

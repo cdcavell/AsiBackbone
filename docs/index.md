@@ -2,10 +2,10 @@
 
 Welcome to the ASI Backbone documentation site.
 
-ASIBackbone is a .NET governance and policy-control framework inspired by the ASI Backbone concept. The project begins as a **governance spine**, not an intelligence engine. Its purpose is to define practical software patterns for policy evaluation, decision results, acknowledgment workflows, audit receipts, capability-gated execution, and host integration.
+AsiBackbone is a .NET governance and policy-control framework inspired by the ASI Backbone concept. The project begins as a **governance spine**, not an intelligence engine. Its purpose is to define practical software patterns for policy evaluation, decision results, acknowledgment workflows, audit receipts, capability-gated execution, and host integration.
 
 > [!IMPORTANT]
-> ASIBackbone does not implement artificial superintelligence. It provides framework-neutral building blocks for governing consequential actions in software systems.
+> AsiBackbone does not implement artificial superintelligence. It provides framework-neutral building blocks for governing consequential actions in software systems.
 
 ## Start here
 
@@ -16,10 +16,10 @@ ASIBackbone is a .NET governance and policy-control framework inspired by the AS
   Initial terminology and `0.1.0-alpha.1` Core boundary for governance spine, constraints, collapse boundary, actor context, decision results, audit residue, acknowledgment, capability tokens, and gateway boundaries.
 
 * [Equations and Toy Models](articles/equations-and-toy-models.md)
-  Explains the conceptual progression from `Λ(t)` to `Λ(τ)` to `ΛS(x, τ)` and maps the Eden/ASI collapse notation into practical ASIBackbone software terms: active policy structure, allowed decision states, acknowledgment, audit residue, and gateway-safe execution.
+  Explains the conceptual progression from `Λ(t)` to `Λ(τ)` to `ΛS(x, τ)` and maps the Eden/ASI collapse notation into practical AsiBackbone software terms: active policy structure, allowed decision states, acknowledgment, audit residue, and gateway-safe execution.
 
 * [Alpha Package Boundary](articles/alpha-package-boundary.md)
-  Focused release-boundary guidance for `CDCavell.ASIBackbone.Core` before integration packages are added.
+  Focused release-boundary guidance for `CDCavell.AsiBackbone.Core` before integration packages are added.
 
 * [Documentation Articles](articles/)
   Conceptual and implementation documentation for the ASI Backbone package family.
@@ -30,7 +30,7 @@ ASIBackbone is a .NET governance and policy-control framework inspired by the AS
 * [Test Coverage](coverage/)
   Generated test coverage report when available.
 
-* [Repository](https://github.com/cdcavell/ASIBackbone)
+* [Repository](https://github.com/cdcavell/AsiBackbone)
   Source code, issues, pull requests, and release history.
 
 ## Concept and model pages
@@ -43,7 +43,7 @@ Planned article: `articles/asi-backbone-concept.md`
 
 This page should summarize the ASI Backbone concept in plain technical language:
 
-* ASIBackbone as a governance spine
+* AsiBackbone as a governance spine
 * Policy-controlled decision flow
 * Controlled collapse through constraints
 * Regional/local policy enforcement
@@ -72,7 +72,7 @@ The public API may use safer implementation terms such as acknowledgment, respon
 
 Planned article: `articles/gateway-and-regional-policy-flow.md`
 
-This page should describe how ASIBackbone handles externally consequential systems.
+This page should describe how AsiBackbone handles externally consequential systems.
 
 Suggested sections:
 
@@ -85,13 +85,13 @@ Suggested sections:
 
 ## Package documentation
 
-The ASIBackbone package family should remain modular. Consumers should be able to adopt the pieces they need without inheriting unnecessary host assumptions.
+The AsiBackbone package family should remain modular. Consumers should be able to adopt the pieces they need without inheriting unnecessary host assumptions.
 
-## CDCavell.ASIBackbone.Core
+## CDCavell.AsiBackbone.Core
 
 Current package.
 
-`CDCavell.ASIBackbone.Core` is the dependency-light foundation package. It defines shared contracts, domain abstractions, result primitives, and framework-neutral language used by the rest of the package family.
+`CDCavell.AsiBackbone.Core` is the dependency-light foundation package. It defines shared contracts, domain abstractions, result primitives, and framework-neutral language used by the rest of the package family.
 
 Core should remain free of direct ASP.NET Core, Entity Framework Core, database-provider, host-template, robotics, and AI-model assumptions.
 
@@ -107,7 +107,7 @@ Primary responsibilities:
 * Shared value objects
 * Framework-neutral domain language
 
-## CDCavell.ASIBackbone.Abstractions
+## CDCavell.AsiBackbone.Abstractions
 
 Planned package or future split candidate.
 
@@ -122,7 +122,7 @@ Primary responsibilities:
 * Capability token contracts
 * No implementation dependencies
 
-## CDCavell.ASIBackbone.AspNetCore
+## CDCavell.AsiBackbone.AspNetCore
 
 Planned package.
 
@@ -137,7 +137,7 @@ Primary responsibilities:
 * HTTP request policy context building
 * Problem Details integration where appropriate
 
-## CDCavell.ASIBackbone.Storage.InMemory
+## CDCavell.AsiBackbone.Storage.InMemory
 
 Planned package.
 
@@ -151,11 +151,11 @@ Primary responsibilities:
 * Test/demo storage behavior
 * Non-production sample support
 
-## CDCavell.ASIBackbone.Storage.EntityFrameworkCore
+## CDCavell.AsiBackbone.Storage.EntityFrameworkCore
 
 Planned package.
 
-Entity Framework Core integration should remain host-owned. ASIBackbone should provide model configuration hooks and persistence abstractions while allowing the consumer application to own the `DbContext`.
+Entity Framework Core integration should remain host-owned. AsiBackbone should provide model configuration hooks and persistence abstractions while allowing the consumer application to own the `DbContext`.
 
 Primary responsibilities:
 
@@ -166,7 +166,7 @@ Primary responsibilities:
 * Policy version persistence
 * Host-owned DbContext integration
 
-## CDCavell.ASIBackbone.Signing
+## CDCavell.AsiBackbone.Signing
 
 Planned package.
 
@@ -180,7 +180,7 @@ Primary responsibilities:
 * Signature verification abstractions
 * Key-provider integration seams
 
-## CDCavell.ASIBackbone.Samples
+## CDCavell.AsiBackbone.Samples
 
 Planned package or folder.
 
@@ -195,7 +195,7 @@ Potential samples:
 * Acknowledgment workflow demo
 * Simulated gateway validation demo
 
-## CDCavell.ASIBackbone.Robotics
+## CDCavell.AsiBackbone.Robotics
 
 Later integration package.
 
@@ -223,10 +223,10 @@ The first implementation path should remain:
 8. Sample app
 9. Documentation
 
-This gives ASIBackbone a practical software foundation while preserving the broader framework boundary.
+This gives AsiBackbone a practical software foundation while preserving the broader framework boundary.
 
 ## Design principle
 
-ASIBackbone should make consequential software actions easier to govern, audit, constrain, acknowledge, and explain.
+AsiBackbone should make consequential software actions easier to govern, audit, constrain, acknowledge, and explain.
 
 It should not pretend to be an intelligence engine.

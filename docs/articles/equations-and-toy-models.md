@@ -1,13 +1,13 @@
 # Equations and Toy Models
 
-This article explains the conceptual equations and toy models that inspired the ASIBackbone software architecture.
+This article explains the conceptual equations and toy models that inspired the AsiBackbone software architecture.
 
-The equations are used here as architectural language. They are not claims that `CDCavell.ASIBackbone.Core` performs literal physical collapse, implements artificial superintelligence, or proves the Eden Hypothesis.
+The equations are used here as architectural language. They are not claims that `CDCavell.AsiBackbone.Core` performs literal physical collapse, implements artificial superintelligence, or proves the Eden Hypothesis.
 
-`CDCavell.ASIBackbone.Core` is best understood as a governance spine: a framework-neutral set of primitives for policy evaluation, constrained outcomes, acknowledgment, audit residue, capability boundaries, and gateway-safe execution.
+`CDCavell.AsiBackbone.Core` is best understood as a governance spine: a framework-neutral set of primitives for policy evaluation, constrained outcomes, acknowledgment, audit residue, capability boundaries, and gateway-safe execution.
 
 > [!IMPORTANT]
-> ASIBackbone uses collapse language conceptually and structurally. In software terms, collapse means that a proposed request is narrowed into a bounded decision outcome through explicit policy structure.
+> AsiBackbone uses collapse language conceptually and structurally. In software terms, collapse means that a proposed request is narrowed into a bounded decision outcome through explicit policy structure.
 
 ## Core software interpretation
 
@@ -17,7 +17,7 @@ The key software interpretation is:
 
 That sentence is the bridge between the conceptual notation and the package design.
 
-In `CDCavell.ASIBackbone.Core`, a request enters as open possibility. It may represent a user intent, service request, administrative action, external API call, document approval, simulated command, or gateway-bound operation.
+In `CDCavell.AsiBackbone.Core`, a request enters as open possibility. It may represent a user intent, service request, administrative action, external API call, document approval, simulated command, or gateway-bound operation.
 
 The policy pipeline then narrows that request into one of the supported governance outcomes.
 
@@ -44,7 +44,7 @@ The conceptual progression is:
 ```
 This progression moves from a simple time-indexed collapse accumulator toward a relational, state-dependent, structure-conditioned model.
 
-For software purposes, that means ASIBackbone should not treat decisions as merely time-based or request-based. A decision should also depend on the current actor, intent, region, policy version, configured constraints, risk classification, gateway boundary, and acknowledgment requirements.
+For software purposes, that means AsiBackbone should not treat decisions as merely time-based or request-based. A decision should also depend on the current actor, intent, region, policy version, configured constraints, risk classification, gateway boundary, and acknowledgment requirements.
 
 ## Original collapse accumulator: `Λ(t)`
 
@@ -78,7 +78,7 @@ Request received
 
 The request does not need a global clock to be governed. It needs an internal evaluation sequence that can be logged, explained, and repeated.
 
-For ASIBackbone, this supports correlation IDs, policy version tracking, audit receipts, and decision records. Each decision should be explainable as part of a specific evaluation sequence.
+For AsiBackbone, this supports correlation IDs, policy version tracking, audit receipts, and decision records. Each decision should be explainable as part of a specific evaluation sequence.
 
 ## Structure-conditioned collapse: `ΛS(x, τ)`
 
@@ -107,7 +107,7 @@ A request should not be evaluated in isolation. The same request may produce dif
 - capability-token scope
 - current operational state
 
-That is the practical meaning of `ΛS(x, τ)` for ASIBackbone.
+That is the practical meaning of `ΛS(x, τ)` for AsiBackbone.
 
 The package should help a host application make the active policy structure explicit, evaluate the request against that structure, and return a bounded decision result.
 
@@ -138,7 +138,7 @@ For example, a low-risk request may allow a direct `Allowed` outcome. A conseque
 
 `A(Sτ)` represents the set of states allowed by the active structure.
 
-In ASIBackbone software terms, this maps to the bounded decision outcomes made available by policy.
+In AsiBackbone software terms, this maps to the bounded decision outcomes made available by policy.
 
 Initial decision outcomes may include:
 
@@ -182,7 +182,7 @@ It should answer:
 - which policy version and hash were used
 - which correlation ID connects the decision to logs and audit records
 
-This keeps the package grounded. ASIBackbone does not need to be an intelligence engine. Its first responsibility is to make consequential decision flow governable, auditable, and explainable.
+This keeps the package grounded. AsiBackbone does not need to be an intelligence engine. Its first responsibility is to make consequential decision flow governable, auditable, and explainable.
 
 ## Toy model: policy narrowing
 
@@ -197,7 +197,7 @@ Request:
 
 Without governance, the host might treat this as a simple yes/no question.
 
-With ASIBackbone, the request is evaluated through active policy structure:
+With AsiBackbone, the request is evaluated through active policy structure:
 
 ```text
 Actor role
@@ -323,7 +323,7 @@ Operation requested
 
 This is the practical software version of constrained execution.
 
-## Why this matters for `CDCavell.ASIBackbone.Core`
+## Why this matters for `CDCavell.AsiBackbone.Core`
 
 The Core package should remain framework-neutral and host-neutral. It should define the primitives that make these flows possible without owning the host application.
 
@@ -360,21 +360,21 @@ The equation language should be read as conceptual documentation.
 
 Safe interpretation:
 
-> ASIBackbone is inspired by the Eden Hypothesis and ASI Backbone framework. It implements governance-oriented software primitives for constrained decision flow, acknowledgment, audit residue, capability boundaries, and gateway-safe execution.
+> AsiBackbone is inspired by the Eden Hypothesis and ASI Backbone framework. It implements governance-oriented software primitives for constrained decision flow, acknowledgment, audit residue, capability boundaries, and gateway-safe execution.
 
 Avoid interpretation:
 
-> ASIBackbone performs literal physical collapse.
+> AsiBackbone performs literal physical collapse.
 
 Avoid interpretation:
 
-> ASIBackbone implements ASI.
+> AsiBackbone implements ASI.
 
 Avoid interpretation:
 
-> ASIBackbone proves the Eden Hypothesis.
+> AsiBackbone proves the Eden Hypothesis.
 
-The practical value is architectural. ASIBackbone helps a host application make its active policy structure explicit so consequential requests can narrow into explainable, auditable, bounded outcomes.
+The practical value is architectural. AsiBackbone helps a host application make its active policy structure explicit so consequential requests can narrow into explainable, auditable, bounded outcomes.
 
 ## Summary
 

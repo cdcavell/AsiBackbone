@@ -1,7 +1,7 @@
-using CDCavell.ASIBackbone.Core.Actors;
-using CDCavell.ASIBackbone.Core.Decisions;
+using CDCavell.AsiBackbone.Core.Actors;
+using CDCavell.AsiBackbone.Core.Decisions;
 
-namespace CDCavell.ASIBackbone.Core.Handshakes;
+namespace CDCavell.AsiBackbone.Core.Handshakes;
 
 /// <summary>
 /// Represents a framework-neutral liability or responsibility handshake request before consequential execution.

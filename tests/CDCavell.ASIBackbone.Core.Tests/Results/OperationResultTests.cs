@@ -1,7 +1,7 @@
-using CDCavell.ASIBackbone.Core.Results;
+using CDCavell.AsiBackbone.Core.Results;
 using Xunit;
 
-namespace CDCavell.ASIBackbone.Core.Tests.Results;
+namespace CDCavell.AsiBackbone.Core.Tests.Results;
 
 /// <summary>
 /// Unit tests for the <see cref="OperationResult"/> class, which represents the result of an operation in the ASI Backbone system, including success/failure status, reasons for failure, and any warnings.

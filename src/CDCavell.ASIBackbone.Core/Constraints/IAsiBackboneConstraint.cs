@@ -1,4 +1,4 @@
-namespace CDCavell.ASIBackbone.Core.Constraints;
+namespace CDCavell.AsiBackbone.Core.Constraints;
 
 /// <summary>
 /// Evaluates whether a supplied context satisfies a governance constraint.

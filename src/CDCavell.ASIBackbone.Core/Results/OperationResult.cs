@@ -1,4 +1,4 @@
-namespace CDCavell.ASIBackbone.Core.Results;
+namespace CDCavell.AsiBackbone.Core.Results;
 
 /// <summary>
 /// Represents the framework-neutral outcome of an operation.

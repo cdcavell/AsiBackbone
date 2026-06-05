@@ -1,6 +1,6 @@
 # Core Alpha Readiness Review
 
-This document records the readiness review for `CDCavell.ASIBackbone.Core` before the `0.1.0-alpha.1` milestone is completed.
+This document records the readiness review for `CDCavell.AsiBackbone.Core` before the `0.1.0-alpha.1` milestone is completed.
 
 ## Review scope
 
@@ -16,7 +16,7 @@ This review confirms that the Core package:
 
 ## Core package boundary
 
-`CDCavell.ASIBackbone.Core` remains a dependency-light foundation package.
+`CDCavell.AsiBackbone.Core` remains a dependency-light foundation package.
 
 Core is responsible for framework-neutral domain primitives such as:
 
@@ -47,13 +47,13 @@ Core does not provide:
 The public API is organized by domain area:
 
 ```text
-CDCavell.ASIBackbone.Core.Actors
-CDCavell.ASIBackbone.Core.Audit
-CDCavell.ASIBackbone.Core.Constraints
-CDCavell.ASIBackbone.Core.Decisions
-CDCavell.ASIBackbone.Core.Entities
-CDCavell.ASIBackbone.Core.Handshakes
-CDCavell.ASIBackbone.Core.Results
+CDCavell.AsiBackbone.Core.Actors
+CDCavell.AsiBackbone.Core.Audit
+CDCavell.AsiBackbone.Core.Constraints
+CDCavell.AsiBackbone.Core.Decisions
+CDCavell.AsiBackbone.Core.Entities
+CDCavell.AsiBackbone.Core.Handshakes
+CDCavell.AsiBackbone.Core.Results
 ```
 
 The domain-based namespace model keeps Core readable and avoids a broad catch-all abstractions namespace.
@@ -116,9 +116,9 @@ Review status: Complete for alpha.
 
 ## Documentation review
 
-The README and Core domain language documentation should describe ASIBackbone as governance infrastructure, not an intelligence engine.
+The README and Core domain language documentation should describe AsiBackbone as governance infrastructure, not an intelligence engine.
 
-Documentation should avoid claims that ASIBackbone:
+Documentation should avoid claims that AsiBackbone:
 
 - implements artificial superintelligence;
 - proves the Eden Hypothesis;

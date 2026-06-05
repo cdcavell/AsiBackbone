@@ -1,8 +1,8 @@
-using CDCavell.ASIBackbone.Core.Constraints;
-using CDCavell.ASIBackbone.Core.Results;
+using CDCavell.AsiBackbone.Core.Constraints;
+using CDCavell.AsiBackbone.Core.Results;
 using Xunit;
 
-namespace CDCavell.ASIBackbone.Core.Tests.Constraints;
+namespace CDCavell.AsiBackbone.Core.Tests.Constraints;
 
 /// <summary>
 /// Unit tests for the <see cref="ConstraintEvaluationResult"/> class, verifying the correctness of factory methods and properties for different constraint evaluation outcomes.

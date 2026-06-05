@@ -1,4 +1,4 @@
-namespace CDCavell.ASIBackbone.Core.Constraints;
+namespace CDCavell.AsiBackbone.Core.Constraints;
 
 /// <summary>
 /// Default framework-neutral context value used during constraint evaluation.

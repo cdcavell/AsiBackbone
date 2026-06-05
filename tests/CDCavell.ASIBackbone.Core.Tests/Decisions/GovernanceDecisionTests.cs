@@ -1,8 +1,8 @@
-using CDCavell.ASIBackbone.Core.Decisions;
-using CDCavell.ASIBackbone.Core.Results;
+using CDCavell.AsiBackbone.Core.Decisions;
+using CDCavell.AsiBackbone.Core.Results;
 using Xunit;
 
-namespace CDCavell.ASIBackbone.Core.Tests.Decisions;
+namespace CDCavell.AsiBackbone.Core.Tests.Decisions;
 
 /// <summary>
 /// Unit tests for the GovernanceDecision class, covering creation of different decision outcomes,

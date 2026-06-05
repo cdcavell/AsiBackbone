@@ -1,6 +1,6 @@
-using CDCavell.ASIBackbone.Core.Actors;
+using CDCavell.AsiBackbone.Core.Actors;
 
-namespace CDCavell.ASIBackbone.Core.Handshakes;
+namespace CDCavell.AsiBackbone.Core.Handshakes;
 
 /// <summary>
 /// Represents a framework-neutral acknowledgment response for a liability or responsibility handshake.

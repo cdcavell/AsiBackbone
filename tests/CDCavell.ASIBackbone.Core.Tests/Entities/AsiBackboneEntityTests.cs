@@ -1,7 +1,7 @@
-using CDCavell.ASIBackbone.Core.Entities;
+using CDCavell.AsiBackbone.Core.Entities;
 using Xunit;
 
-namespace CDCavell.ASIBackbone.Core.Tests.Entities;
+namespace CDCavell.AsiBackbone.Core.Tests.Entities;
 
 public sealed class AsiBackboneEntityTests
 {

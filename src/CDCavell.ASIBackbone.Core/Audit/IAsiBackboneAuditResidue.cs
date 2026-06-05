@@ -1,9 +1,9 @@
-using CDCavell.ASIBackbone.Core.Actors;
+using CDCavell.AsiBackbone.Core.Actors;
 
-namespace CDCavell.ASIBackbone.Core.Audit;
+namespace CDCavell.AsiBackbone.Core.Audit;
 
 /// <summary>
-/// Defines the framework-neutral audit residue produced by an ASIBackbone operation.
+/// Defines the framework-neutral audit residue produced by an AsiBackbone operation.
 /// </summary>
 public interface IAsiBackboneAuditResidue
 {

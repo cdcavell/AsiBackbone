@@ -1,4 +1,4 @@
-namespace CDCavell.ASIBackbone.Core.Entities;
+namespace CDCavell.AsiBackbone.Core.Entities;
 
 /// <summary>
 /// Defines a contract for entities that expose an optimistic concurrency token.

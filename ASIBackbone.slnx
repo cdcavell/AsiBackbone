@@ -1,8 +1,8 @@
 <Solution>
   <Folder Name="/src/">
-    <Project Path="src/CDCavell.ASIBackbone.Core/CDCavell.ASIBackbone.Core.csproj" />
+    <Project Path="src/CDCavell.AsiBackbone.Core/CDCavell.AsiBackbone.Core.csproj" DisplayName="CDCavell.AsiBackbone.Core" />
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="tests/CDCavell.ASIBackbone.Core.Tests/CDCavell.ASIBackbone.Core.Tests.csproj" />
+    <Project Path="tests/CDCavell.AsiBackbone.Core.Tests/CDCavell.AsiBackbone.Core.Tests.csproj" DisplayName="CDCavell.AsiBackbone.Core.Tests" />
   </Folder>
 </Solution>

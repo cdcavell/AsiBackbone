@@ -1,7 +1,7 @@
-using CDCavell.ASIBackbone.Core.Constraints;
+using CDCavell.AsiBackbone.Core.Constraints;
 using Xunit;
 
-namespace CDCavell.ASIBackbone.Core.Tests.Constraints;
+namespace CDCavell.AsiBackbone.Core.Tests.Constraints;
 
 /// <summary>
 /// Unit tests for <see cref="AsiBackboneConstraintEvaluationContext"/> to verify that it correctly normalizes optional values and metadata.

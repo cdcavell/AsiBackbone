@@ -1,10 +1,10 @@
-using CDCavell.ASIBackbone.Core.Actors;
-using CDCavell.ASIBackbone.Core.Audit;
-using CDCavell.ASIBackbone.Core.Constraints;
-using CDCavell.ASIBackbone.Core.Decisions;
+using CDCavell.AsiBackbone.Core.Actors;
+using CDCavell.AsiBackbone.Core.Audit;
+using CDCavell.AsiBackbone.Core.Constraints;
+using CDCavell.AsiBackbone.Core.Decisions;
 using Xunit;
 
-namespace CDCavell.ASIBackbone.Core.Tests.Audit;
+namespace CDCavell.AsiBackbone.Core.Tests.Audit;
 
 /// <summary>
 /// Unit tests for the <see cref="AuditResidue"/> class, which represents the audit information captured from a governance decision or constraint evaluation.

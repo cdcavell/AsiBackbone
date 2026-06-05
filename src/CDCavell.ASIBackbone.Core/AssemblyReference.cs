@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace CDCavell.ASIBackbone.Core;
+namespace CDCavell.AsiBackbone.Core;
 
 /// <summary>
 /// Provides a stable marker for locating the ASI Backbone Core assembly.

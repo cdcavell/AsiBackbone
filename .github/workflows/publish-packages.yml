@@ -1,4 +1,4 @@
-name: Publish ASIBackbone Packages
+name: Publish AsiBackbone Packages
 
 on:
   push:
@@ -24,7 +24,7 @@ permissions:
 env:
   DOTNET_NOLOGO: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
-  SOLUTION_PATH: ASIBackbone.slnx
+  SOLUTION_PATH: AsiBackbone.slnx
   CONFIGURATION: Release
   PACKAGE_OUTPUT: ./artifacts/packages
 

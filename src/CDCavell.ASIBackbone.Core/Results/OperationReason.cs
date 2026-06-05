@@ -1,4 +1,4 @@
-namespace CDCavell.ASIBackbone.Core.Results;
+namespace CDCavell.AsiBackbone.Core.Results;
 
 /// <summary>
 /// Represents a machine-readable reason associated with an operation result.

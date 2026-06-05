@@ -1,4 +1,4 @@
-namespace CDCavell.ASIBackbone.Core.Decisions;
+namespace CDCavell.AsiBackbone.Core.Decisions;
 
 /// <summary>
 /// Represents the outcome selected by a governance decision.

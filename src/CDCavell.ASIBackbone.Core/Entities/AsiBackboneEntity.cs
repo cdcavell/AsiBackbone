@@ -1,4 +1,4 @@
-namespace CDCavell.ASIBackbone.Core.Entities;
+namespace CDCavell.AsiBackbone.Core.Entities;
 
 /// <summary>
 /// Provides a base implementation for ASI Backbone entities.

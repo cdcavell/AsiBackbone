@@ -29,7 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\CDCavell.ASIBackbone.Core\CDCavell.ASIBackbone.Core.csproj" />
+    <ProjectReference Include="..\..\src\CDCavell.AsiBackbone.Core\CDCavell.AsiBackbone.Core.csproj" />
   </ItemGroup>
 
 </Project>

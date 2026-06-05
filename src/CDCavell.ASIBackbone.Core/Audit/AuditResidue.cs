@@ -1,12 +1,12 @@
 using System.Collections.ObjectModel;
-using CDCavell.ASIBackbone.Core.Actors;
-using CDCavell.ASIBackbone.Core.Constraints;
-using CDCavell.ASIBackbone.Core.Decisions;
+using CDCavell.AsiBackbone.Core.Actors;
+using CDCavell.AsiBackbone.Core.Constraints;
+using CDCavell.AsiBackbone.Core.Decisions;
 
-namespace CDCavell.ASIBackbone.Core.Audit;
+namespace CDCavell.AsiBackbone.Core.Audit;
 
 /// <summary>
-/// Represents the framework-neutral audit residue produced by an ASIBackbone operation.
+/// Represents the framework-neutral audit residue produced by an AsiBackbone operation.
 /// </summary>
 public sealed class AuditResidue : IAsiBackboneAuditResidue
 {

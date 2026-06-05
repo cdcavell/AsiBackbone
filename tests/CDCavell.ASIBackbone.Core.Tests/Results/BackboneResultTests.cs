@@ -1,7 +1,7 @@
-using CDCavell.ASIBackbone.Core.Results;
+using CDCavell.AsiBackbone.Core.Results;
 using Xunit;
 
-namespace CDCavell.ASIBackbone.Core.Tests.Results;
+namespace CDCavell.AsiBackbone.Core.Tests.Results;
 
 /// <summary>
 /// Unit tests for the BackboneResult class, verifying the behavior of success and failure result creation, message normalization, and handling of blank messages.

@@ -1,4 +1,4 @@
-namespace CDCavell.ASIBackbone.Core.Actors;
+namespace CDCavell.AsiBackbone.Core.Actors;
 
 /// <summary>
 /// Provides a default framework-neutral actor context implementation.

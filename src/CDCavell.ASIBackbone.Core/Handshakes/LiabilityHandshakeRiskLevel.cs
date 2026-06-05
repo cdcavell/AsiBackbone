@@ -1,4 +1,4 @@
-namespace CDCavell.ASIBackbone.Core.Handshakes;
+namespace CDCavell.AsiBackbone.Core.Handshakes;
 
 /// <summary>
 /// Represents the risk level associated with a liability or responsibility handshake.

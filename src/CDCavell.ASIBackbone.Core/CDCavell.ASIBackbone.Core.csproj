@@ -4,7 +4,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <PackageId>CDCavell.ASIBackbone.Core</PackageId>
+    <PackageId>CDCavell.AsiBackbone.Core</PackageId>
     <Title>CDCavell ASI Backbone Core</Title>
     <Description>Core domain abstractions for the ASI Backbone framework.</Description>
     <Authors>Christopher D. Cavell</Authors>

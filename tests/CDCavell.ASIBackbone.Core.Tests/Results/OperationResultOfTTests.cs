@@ -1,7 +1,7 @@
-using CDCavell.ASIBackbone.Core.Results;
+using CDCavell.AsiBackbone.Core.Results;
 using Xunit;
 
-namespace CDCavell.ASIBackbone.Core.Tests.Results;
+namespace CDCavell.AsiBackbone.Core.Tests.Results;
 
 public sealed class OperationResultOfTTests
 {

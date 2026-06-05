@@ -109,4 +109,75 @@ public sealed class ConstraintEvaluationResultTests
         Assert.Empty(result.Reasons);
         Assert.Empty(result.ReasonCodes);
     }
+
+    /// <summary>
+    /// Verifies that the properties of the ConstraintEvaluationResult correctly reflect the outcome of the constraint evaluation, ensuring that the CanProceed, IsDenied, IsWarning, and IsNotApplicable flags are set appropriately for each type of outcome.
+    /// </summary>
+    [Fact]
+    public void OutcomeFlagsReflectEachConstraintOutcome()
+    {
+        var allowed = ConstraintEvaluationResult.Allow();
+
+        Assert.True(allowed.CanProceed);
+        Assert.False(allowed.IsDenied);
+        Assert.False(allowed.IsWarning);
+        Assert.False(allowed.IsNotApplicable);
+
+        var denied = ConstraintEvaluationResult.Deny(
+            "constraint.denied",
+            "Constraint denied the operation.");
+
+        Assert.False(denied.CanProceed);
+        Assert.True(denied.IsDenied);
+        Assert.False(denied.IsWarning);
+        Assert.False(denied.IsNotApplicable);
+
+        var warning = ConstraintEvaluationResult.Warning(
+            "constraint.warning",
+            "Constraint produced a warning.");
+
+        Assert.True(warning.CanProceed);
+        Assert.False(warning.IsDenied);
+        Assert.True(warning.IsWarning);
+        Assert.False(warning.IsNotApplicable);
+
+        var notApplicable = ConstraintEvaluationResult.NotApplicable();
+
+        Assert.True(notApplicable.CanProceed);
+        Assert.False(notApplicable.IsDenied);
+        Assert.False(notApplicable.IsWarning);
+        Assert.True(notApplicable.IsNotApplicable);
+    }
+
+    /// <summary>
+    /// Verifies that the Deny factory method creates a denied result with the default reason when null is passed as the reasons parameter, ensuring that the default denied reason is used in this case.
+    /// </summary>
+    [Fact]
+    public void DenyWithNullReasonsUsesDefaultDeniedReason()
+    {
+        var result = ConstraintEvaluationResult.Deny(
+            (IEnumerable<OperationReason>?)null!);
+
+        Assert.True(result.IsDenied);
+
+        OperationReason reason = Assert.Single(result.Reasons);
+        Assert.Equal("constraint.denied", reason.Code);
+        Assert.Equal("Constraint denied the operation.", reason.Message);
+    }
+
+    /// <summary>
+    /// Verifies that the Warning factory method creates a warning result with the default reason when null is passed as the reasons parameter, ensuring that the default warning reason is used in this case.
+    /// </summary>
+    [Fact]
+    public void WarningWithNullReasonsUsesDefaultWarningReason()
+    {
+        var result = ConstraintEvaluationResult.Warning(
+            (IEnumerable<OperationReason>?)null!);
+
+        Assert.True(result.IsWarning);
+
+        OperationReason reason = Assert.Single(result.Reasons);
+        Assert.Equal("constraint.warning", reason.Code);
+        Assert.Equal("Constraint produced a warning.", reason.Message);
+    }
 }

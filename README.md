@@ -1,20 +1,20 @@
-# CDCavell.ASIBackbone.Core
-[![CI](https://github.com/cdcavell/ASIBackbone/actions/workflows/ci.yml/badge.svg)](https://github.com/cdcavell/ASIBackbone/actions/workflows/ci.yml)
-[![Coverage Report](https://img.shields.io/badge/coverage%20gate-75%25-brightgreen)](https://cdcavell.github.io/ASIBackbone/coverage/index.html)
-[![Documentation](https://github.com/cdcavell/ASIBackbone/actions/workflows/publish-docs.yml/badge.svg)](https://github.com/cdcavell/ASIBackbone/actions/workflows/publish-docs.yml)
-[![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://cdcavell.github.io/ASIBackbone/)
+# CDCavell.AsiBackbone.Core
+[![CI](https://github.com/cdcavell/AsiBackbone/actions/workflows/ci.yml/badge.svg)](https://github.com/cdcavell/AsiBackbone/actions/workflows/ci.yml)
+[![Coverage Report](https://img.shields.io/badge/coverage%20gate-75%25-brightgreen)](https://cdcavell.github.io/AsiBackbone/coverage/index.html)
+[![Documentation](https://github.com/cdcavell/AsiBackbone/actions/workflows/publish-docs.yml/badge.svg)](https://github.com/cdcavell/AsiBackbone/actions/workflows/publish-docs.yml)
+[![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://cdcavell.github.io/AsiBackbone/)
 [![.NET](https://img.shields.io/badge/.NET-10.0-purple)](https://dotnet.microsoft.com/)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE.txt)
-[![GitHub Release](https://img.shields.io/github/v/release/cdcavell/ASIBackbone?include_prerelease=true&sort=semver&display_name=tag&label=release)](https://github.com/cdcavell/ASIBackbone/releases)
-[![NuGet](https://img.shields.io/nuget/v/CDCavell.ASIBackbone.Core?label=NuGet)](https://www.nuget.org/packages/CDCavell.ASIBackbone.Core)
-[![NuGet Downloads](https://img.shields.io/nuget/dt/CDCavell.ASIBackbone.Core?label=downloads)](https://www.nuget.org/packages/CDCavell.ASIBackbone.Core)
+[![GitHub Release](https://img.shields.io/github/v/release/cdcavell/AsiBackbone?include_prerelease=true&sort=semver&display_name=tag&label=release)](https://github.com/cdcavell/AsiBackbone/releases)
+[![NuGet](https://img.shields.io/nuget/v/CDCavell.AsiBackbone.Core?label=NuGet)](https://www.nuget.org/packages/CDCavell.AsiBackbone.Core)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/CDCavell.AsiBackbone.Core?label=downloads)](https://www.nuget.org/packages/CDCavell.AsiBackbone.Core)
 [![Zenodo DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.20546032-blue)](https://doi.org/10.5281/zenodo.20546032)
 
 Core domain abstractions for the ASI Backbone framework.
 
-`CDCavell.ASIBackbone.Core` is the dependency-light foundation package for the ASIBackbone package family. It defines shared contracts, base abstractions, result primitives, and domain language for governance-oriented decision flow.
+`CDCavell.AsiBackbone.Core` is the dependency-light foundation package for the AsiBackbone package family. It defines shared contracts, base abstractions, result primitives, and domain language for governance-oriented decision flow.
 
-ASIBackbone should be understood as a **governance spine**, not an intelligence engine. It is infrastructure around intelligent or decision-producing systems: policy evaluation, constraints, acknowledgment workflows, audit receipts, capability-gated execution, and accountable host or gateway execution.
+AsiBackbone should be understood as a **governance spine**, not an intelligence engine. It is infrastructure around intelligent or decision-producing systems: policy evaluation, constraints, acknowledgment workflows, audit receipts, capability-gated execution, and accountable host or gateway execution.
 
 > [!IMPORTANT]
 > This package does **not** implement artificial superintelligence, host AI models, train AI models, or prove the ASI Backbone concept. It provides framework-neutral building blocks for governing consequential actions in software systems.
@@ -29,16 +29,16 @@ The repository is currently establishing the Core package boundary before adding
 
 ## Project Direction
 
-ASIBackbone is planned as a host-integrated .NET module ecosystem.
+AsiBackbone is planned as a host-integrated .NET module ecosystem.
 
 The Core package should answer the question:
 
-> What are the shared ASIBackbone abstractions and domain primitives?
+> What are the shared AsiBackbone abstractions and domain primitives?
 
 It should not answer:
 
-> How is ASIBackbone persisted?
-> How is ASIBackbone exposed through web middleware or endpoints?
+> How is AsiBackbone persisted?
+> How is AsiBackbone exposed through web middleware or endpoints?
 > Which host application template must be used?
 > Which AI model, if any, produced the request being governed?
 > How are physical or robotic systems controlled?
@@ -52,6 +52,7 @@ The initial Core language is documented in:
 * [Core Domain Language and Alpha Boundary](docs/articles/core-domain-language.md)
 * [Equations and Toy Models](docs/articles/equations-and-toy-models.md)
 * [Alpha Package Boundary](docs/articles/alpha-package-boundary.md)
+* [EF Core Integration Boundary](docs/articles/ef-core-integration-boundary.md)
 
 The central technical lane is:
 
@@ -88,7 +89,7 @@ Important terms:
 
 The intended `0.1.0-alpha.1` boundary is language and primitives only.
 
-`CDCavell.ASIBackbone.Core` may include:
+`CDCavell.AsiBackbone.Core` may include:
 
 - Framework-neutral domain abstractions
 - Actor context primitives
@@ -105,7 +106,7 @@ The intended `0.1.0-alpha.1` boundary is language and primitives only.
 - Shared value objects
 - XML documentation for public types
 
-`CDCavell.ASIBackbone.Core` should avoid:
+`CDCavell.AsiBackbone.Core` should avoid:
 
 - Entity Framework Core dependencies
 - ASP.NET Core dependencies
@@ -121,7 +122,7 @@ The intended `0.1.0-alpha.1` boundary is language and primitives only.
 
 ## Package Boundary
 
-`CDCavell.ASIBackbone.Core` is responsible for:
+`CDCavell.AsiBackbone.Core` is responsible for:
 
 - Core domain abstractions
 - Policy and constraint contracts
@@ -132,7 +133,7 @@ The intended `0.1.0-alpha.1` boundary is language and primitives only.
 - Assembly markers or discovery-friendly primitives
 - Framework-neutral domain language
 
-`CDCavell.ASIBackbone.Core` should avoid:
+`CDCavell.AsiBackbone.Core` should avoid:
 
 - Entity Framework Core dependencies
 - ASP.NET Core dependencies
@@ -149,54 +150,58 @@ The intended `0.1.0-alpha.1` boundary is language and primitives only.
 The intended package family is:
 
 ```text
-CDCavell.ASIBackbone.Core
-CDCavell.ASIBackbone.AspNetCore
-CDCavell.ASIBackbone.Storage.InMemory
-CDCavell.ASIBackbone.Storage.EntityFrameworkCore
-CDCavell.ASIBackbone.Signing
-CDCavell.ASIBackbone.Samples
-CDCavell.ASIBackbone.Robotics
+CDCavell.AsiBackbone.Core
+CDCavell.AsiBackbone.AspNetCore
+CDCavell.AsiBackbone.Storage.InMemory
+CDCavell.AsiBackbone.Storage.EntityFrameworkCore
+CDCavell.AsiBackbone.Signing
+CDCavell.AsiBackbone.Samples
+CDCavell.AsiBackbone.Robotics
 ```
 
 Package names may be adjusted before stable release.
 
-## CDCavell.ASIBackbone.Core
+## CDCavell.AsiBackbone.Core
 
 Current package.
 
 Defines framework-neutral domain abstractions and primitives.
 
-## CDCavell.ASIBackbone.AspNetCore
+## CDCavell.AsiBackbone.AspNetCore
 
 Planned future package for ASP.NET Core integration.
 
 This may eventually provide service registration extensions, middleware, endpoint mapping, policy hooks, current-user/current-actor resolution, request-level policy context building, or Problem Details integration where appropriate.
 
-## CDCavell.ASIBackbone.Storage.InMemory
+## CDCavell.AsiBackbone.Storage.InMemory
 
 Planned future package for samples, tests, and early validation hosts that need non-production storage behavior.
 
-## CDCavell.ASIBackbone.Storage.EntityFrameworkCore
+## CDCavell.AsiBackbone.Storage.EntityFrameworkCore
 
-Planned future package for EF Core model contributions.
+Planned future package for EF Core model contributions and persistence integration.
+
+The EF Core package is intended to support host-owned persistence. AsiBackbone should contribute model configuration and storage helpers, while the consuming application owns the `DbContext`, database provider, connection string, migrations, deployment, and schema lifecycle.
+
+See [EF Core Integration Boundary](docs/articles/ef-core-integration-boundary.md) for the current design boundary.
 
 The preferred persistence model is host-owned data access:
 
-> ASIBackbone owns its domain model.<br />
+> AsiBackbone owns its domain model.<br />
 > The host application owns the DbContext.<br />
-> ASIBackbone provides model configuration hooks.<br />
+> AsiBackbone provides model configuration hooks.<br />
 
-## CDCavell.ASIBackbone.Signing
+## CDCavell.AsiBackbone.Signing
 
 Planned future package for signing and verification support around decision receipts, policy hashes, capability tokens, and audit records.
 
-## CDCavell.ASIBackbone.Samples
+## CDCavell.AsiBackbone.Samples
 
 Planned future samples or validation hosts.
 
 Samples may include a console or worker host, a plain ASP.NET Core host, and a NetCoreApplicationTemplate-based host.
 
-## CDCavell.ASIBackbone.Robotics
+## CDCavell.AsiBackbone.Robotics
 
 Later integration package.
 
@@ -204,7 +209,7 @@ Robotics should remain a later-stage gateway example. The first release path sho
 
 ## Relationship to NetCoreApplicationTemplate
 
-NetCoreApplicationTemplate may be used as a preferred host baseline during development and validation, but ASIBackbone should not require it.
+NetCoreApplicationTemplate may be used as a preferred host baseline during development and validation, but AsiBackbone should not require it.
 
 The intended relationship is:
 
@@ -212,14 +217,14 @@ The intended relationship is:
 NetCoreApplicationTemplate
     = preferred host baseline
 
-ASIBackbone
+AsiBackbone
     = optional governance/module package family
 
 Consumer application
     = chooses whether to use either or both
 ```
 
-A consumer should be able to use ASIBackbone in:
+A consumer should be able to use AsiBackbone in:
 
 - an application generated from NetCoreApplicationTemplate
 - an existing ASP.NET Core application
@@ -227,21 +232,21 @@ A consumer should be able to use ASIBackbone in:
 
 ## Alignment Boundary
 
-ASIBackbone documentation may reference the broader ASI Backbone concept and Eden/ASI framework as conceptual inspiration.
+AsiBackbone documentation may reference the broader ASI Backbone concept and Eden/ASI framework as conceptual inspiration.
 
 Safe language:
 
-- ASIBackbone is inspired by the ASI Backbone framework.
-- ASIBackbone implements governance-oriented software primitives.
-- ASIBackbone helps structure consequential decision flow through constraints, acknowledgment, audit, and capability boundaries.
-- ASIBackbone can surround intelligent or decision-producing systems with accountable execution infrastructure.
+- AsiBackbone is inspired by the ASI Backbone framework.
+- AsiBackbone implements governance-oriented software primitives.
+- AsiBackbone helps structure consequential decision flow through constraints, acknowledgment, audit, and capability boundaries.
+- AsiBackbone can surround intelligent or decision-producing systems with accountable execution infrastructure.
 
 Avoid language such as:
 
-- ASIBackbone implements ASI.
-- ASIBackbone proves the Eden Hypothesis.
-- ASIBackbone is an AI model.
-- ASIBackbone replaces AI safety governance, legal review, or organizational accountability.
+- AsiBackbone implements ASI.
+- AsiBackbone proves the Eden Hypothesis.
+- AsiBackbone is an AI model.
+- AsiBackbone replaces AI safety governance, legal review, or organizational accountability.
 
 ## Design Principles
 
@@ -253,4 +258,4 @@ Avoid language such as:
 - Let future packages own persistence, web integration, signing, storage, samples, and external execution concerns.
 - Keep package boundaries clear before adding behavior.
 - Treat NetCoreApplicationTemplate as a preferred host, not a parent framework.
-- Treat ASIBackbone as governance infrastructure, not an intelligence engine.
+- Treat AsiBackbone as governance infrastructure, not an intelligence engine.

@@ -17,7 +17,7 @@ permissions:
 env:
   DOTNET_NOLOGO: true
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
-  SOLUTION_PATH: ASIBackbone.slnx
+  SOLUTION_PATH: AsiBackbone.slnx
   CONFIGURATION: Release
   PACKAGE_OUTPUT: artifacts/packages
   COVERAGE_OUTPUT: artifacts/coverage

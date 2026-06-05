@@ -19,7 +19,7 @@
   ],
   "related_identifiers": [
     {
-      "identifier": "https://github.com/cdcavell/ASIBackbone",
+      "identifier": "https://github.com/cdcavell/AsiBackbone",
       "relation": "isIdenticalTo",
       "scheme": "url",
       "resource_type": "software"

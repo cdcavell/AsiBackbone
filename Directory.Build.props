@@ -29,7 +29,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
 
-    <RepositoryUrl>https://github.com/cdcavell/ASIBackbone</RepositoryUrl>
+    <RepositoryUrl>https://github.com/cdcavell/AsiBackbone</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 

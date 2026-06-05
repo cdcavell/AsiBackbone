@@ -1,11 +1,11 @@
 # Core Domain Language and Alpha Boundary
 
-This article defines the initial domain language for `CDCavell.ASIBackbone.Core` and the intended `0.1.0-alpha.1` package boundary.
+This article defines the initial domain language for `CDCavell.AsiBackbone.Core` and the intended `0.1.0-alpha.1` package boundary.
 
-`CDCavell.ASIBackbone.Core` is the framework-neutral foundation for the ASIBackbone package family. Its purpose is to define shared primitives for governing consequential software actions through explicit policy, constraint, acknowledgment, audit, and capability boundaries.
+`CDCavell.AsiBackbone.Core` is the framework-neutral foundation for the AsiBackbone package family. Its purpose is to define shared primitives for governing consequential software actions through explicit policy, constraint, acknowledgment, audit, and capability boundaries.
 
 > [!IMPORTANT]
-> ASIBackbone is governance infrastructure around intelligent or decision-producing systems. It is not a completed ASI implementation, not an AI model package, and not proof of artificial superintelligence.
+> AsiBackbone is governance infrastructure around intelligent or decision-producing systems. It is not a completed ASI implementation, not an AI model package, and not proof of artificial superintelligence.
 
 ## Core technical lane
 
@@ -155,6 +155,11 @@ It may include:
 
 Core should define audit-oriented primitives without requiring a specific storage provider.
 
+A persistent audit ledger record is the storage-ready snapshot of audit residue.
+Core defines the record shape and storage contract only. Concrete persistence,
+database mappings, migrations, signing, retention, and archival behavior belong
+to host applications or future storage/signing packages.
+
 ### Acknowledgment and responsibility handshake
 
 Some consequential actions should require acknowledgment before execution.
@@ -192,7 +197,7 @@ The `0.1.0-alpha.1` boundary should establish language and primitives, not a ful
 
 ### In scope for Core
 
-`CDCavell.ASIBackbone.Core` may include:
+`CDCavell.AsiBackbone.Core` may include:
 
 * framework-neutral domain abstractions
 * actor context primitives
@@ -211,7 +216,7 @@ The `0.1.0-alpha.1` boundary should establish language and primitives, not a ful
 
 ### Out of scope for Core
 
-`CDCavell.ASIBackbone.Core` should not include:
+`CDCavell.AsiBackbone.Core` should not include:
 
 * Entity Framework Core dependencies
 * ASP.NET Core dependencies
@@ -231,32 +236,32 @@ Future packages can build on Core without changing its host-neutral boundary.
 
 | Package area | Ownership |
 | --- | --- |
-| `CDCavell.ASIBackbone.Core` | Framework-neutral governance primitives and domain language. |
-| `CDCavell.ASIBackbone.AspNetCore` | ASP.NET Core service registration, middleware, endpoints, current-actor resolution, and HTTP policy hooks. |
-| `CDCavell.ASIBackbone.Storage.InMemory` | Demo and test storage for early validation. |
-| `CDCavell.ASIBackbone.Storage.EntityFrameworkCore` | EF Core model configuration and persistence hooks while the host owns the `DbContext`. |
-| `CDCavell.ASIBackbone.Signing` | Signing and verification helpers for receipts, policy hashes, and capability tokens. |
-| `CDCavell.ASIBackbone.Samples` | Console, worker, ASP.NET Core, and NetCoreApplicationTemplate-based examples. |
-| `CDCavell.ASIBackbone.Robotics` | Later simulated or physical gateway examples after the governance spine is proven. |
+| `CDCavell.AsiBackbone.Core` | Framework-neutral governance primitives and domain language. |
+| `CDCavell.AsiBackbone.AspNetCore` | ASP.NET Core service registration, middleware, endpoints, current-actor resolution, and HTTP policy hooks. |
+| `CDCavell.AsiBackbone.Storage.InMemory` | Demo and test storage for early validation. |
+| `CDCavell.AsiBackbone.Storage.EntityFrameworkCore` | EF Core model configuration and persistence hooks while the host owns the `DbContext`. |
+| `CDCavell.AsiBackbone.Signing` | Signing and verification helpers for receipts, policy hashes, and capability tokens. |
+| `CDCavell.AsiBackbone.Samples` | Console, worker, ASP.NET Core, and NetCoreApplicationTemplate-based examples. |
+| `CDCavell.AsiBackbone.Robotics` | Later simulated or physical gateway examples after the governance spine is proven. |
 
 ## Alignment boundary
 
-ASIBackbone documentation may reference the ASI Backbone concept and the Eden/ASI framework as conceptual inspiration. It should remain careful about claims.
+AsiBackbone documentation may reference the ASI Backbone concept and the Eden/ASI framework as conceptual inspiration. It should remain careful about claims.
 
 Safe language:
 
-* ASIBackbone is inspired by the ASI Backbone framework.
-* ASIBackbone implements governance-oriented software primitives.
-* ASIBackbone helps structure consequential decision flow through constraints, acknowledgment, audit, and capability boundaries.
-* ASIBackbone can surround intelligent or decision-producing systems with accountable execution infrastructure.
+* AsiBackbone is inspired by the ASI Backbone framework.
+* AsiBackbone implements governance-oriented software primitives.
+* AsiBackbone helps structure consequential decision flow through constraints, acknowledgment, audit, and capability boundaries.
+* AsiBackbone can surround intelligent or decision-producing systems with accountable execution infrastructure.
 
 Avoid language such as:
 
-* ASIBackbone implements ASI.
-* ASIBackbone proves the Eden Hypothesis.
-* ASIBackbone is an AI model.
-* ASIBackbone replaces AI safety governance, legal review, or organizational accountability.
+* AsiBackbone implements ASI.
+* AsiBackbone proves the Eden Hypothesis.
+* AsiBackbone is an AI model.
+* AsiBackbone replaces AI safety governance, legal review, or organizational accountability.
 
 ## Guiding principle
 
-`CDCavell.ASIBackbone.Core` should make consequential software actions easier to govern, audit, constrain, acknowledge, and explain while remaining free of host, persistence, web, and AI-model assumptions.
+`CDCavell.AsiBackbone.Core` should make consequential software actions easier to govern, audit, constrain, acknowledge, and explain while remaining free of host, persistence, web, and AI-model assumptions.

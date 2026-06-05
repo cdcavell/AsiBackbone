@@ -1,6 +1,6 @@
 # Alpha Package Boundary
 
-This article defines the intended `0.1.0-alpha.1` boundary for `CDCavell.ASIBackbone.Core`.
+This article defines the intended `0.1.0-alpha.1` boundary for `CDCavell.AsiBackbone.Core`.
 
 `0.1.0-alpha.1` should establish the first stable language for the package family. It should not try to deliver persistence, web integration, signing infrastructure, robotics integration, or AI model functionality.
 
@@ -11,7 +11,7 @@ This article defines the intended `0.1.0-alpha.1` boundary for `CDCavell.ASIBack
 
 The first alpha should answer one question:
 
-> What are the shared framework-neutral primitives that future ASIBackbone packages will build on?
+> What are the shared framework-neutral primitives that future AsiBackbone packages will build on?
 
 It should provide enough vocabulary for later implementation issues to reference the same concepts consistently.
 
@@ -29,7 +29,7 @@ The alpha documentation and package metadata should preserve these boundaries:
 
 ## Initial package responsibility
 
-`CDCavell.ASIBackbone.Core` is responsible for defining the first set of shared abstractions and primitives around:
+`CDCavell.AsiBackbone.Core` is responsible for defining the first set of shared abstractions and primitives around:
 
 * governance spine
 * intent/request evaluation

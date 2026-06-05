@@ -7,12 +7,12 @@ internal static class ReadOnlyMetadataAssert
 {
     public static void CannotMutateThroughCasts(IReadOnlyDictionary<string, string> metadata)
     {
-        bool genericCastWasAvailable = AssertCannotMutateThroughGenericDictionary(metadata);
-        bool nonGenericCastWasAvailable = AssertCannotMutateThroughNonGenericDictionary(metadata);
+        bool genericDictionaryCastWasAvailable = AssertCannotMutateThroughGenericDictionary(metadata);
+        bool nonGenericDictionaryCastWasAvailable = AssertCannotMutateThroughNonGenericDictionary(metadata);
 
         Assert.True(
-            genericCastWasAvailable || nonGenericCastWasAvailable ||
-            (metadata is not IDictionary<string, string> && metadata is not IDictionary));
+            genericDictionaryCastWasAvailable || nonGenericDictionaryCastWasAvailable,
+            "Metadata did not expose a dictionary cast surface to test.");
     }
 
     private static bool AssertCannotMutateThroughGenericDictionary(
@@ -23,7 +23,6 @@ internal static class ReadOnlyMetadataAssert
 
         if (metadata is not IDictionary<string, string> dictionary)
         {
-            Assert.False(metadata is IDictionary<string, string>);
             return false;
         }
 
@@ -44,7 +43,6 @@ internal static class ReadOnlyMetadataAssert
 
         if (metadata is not IDictionary dictionary)
         {
-            Assert.False(metadata is IDictionary);
             return false;
         }
 

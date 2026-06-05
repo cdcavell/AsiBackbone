@@ -36,6 +36,25 @@ public sealed class BackboneResultTests
     }
 
     /// <summary>
+    /// Verifies that the Success method with populated messages creates a result with normalized messages.
+    /// </summary>
+    [Fact]
+    public void SuccessWithMessagesStoresNormalizedMessages()
+    {
+        var result = BackboneResult.Success(
+        [
+            " First success. ",
+            " Second success. "
+        ]);
+
+        Assert.True(result.Succeeded);
+        Assert.False(result.Failed);
+        Assert.Equal(2, result.Messages.Count);
+        Assert.Equal("First success.", result.Messages[0]);
+        Assert.Equal("Second success.", result.Messages[1]);
+    }
+
+    /// <summary>
     /// Verifies that the Success method with multiple messages creates a result with Succeeded = true, Failed = false, and all messages are stored without leading/trailing whitespace.
     /// </summary>
     [Fact]

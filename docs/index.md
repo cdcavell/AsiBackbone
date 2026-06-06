@@ -24,7 +24,7 @@ AsiBackbone is a .NET governance and policy-control framework inspired by the AS
 * [Documentation Articles](articles/)
   Conceptual and implementation documentation for the ASI Backbone package family.
 
-* [API Reference](api/)
+* [API Reference](https://cdcavell.github.io/AsiBackbone/api/CDCavell.AsiBackbone.Core.html)
   Generated API documentation for public types.
 
 * [Test Coverage](coverage/)

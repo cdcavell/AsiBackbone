@@ -23,14 +23,15 @@
 
     <PackageReference Include="xunit.v3" />
 
-	<PackageReference Include="coverlet.msbuild">
-	  <PrivateAssets>all</PrivateAssets>
-	  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-	</PackageReference>  
+    <PackageReference Include="coverlet.msbuild">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\CDCavell.AsiBackbone.Core\CDCavell.AsiBackbone.Core.csproj" />
+    <ProjectReference Include="../../src/CDCavell.AsiBackbone.Core/CDCavell.AsiBackbone.Core.csproj" />
+    <ProjectReference Include="..\..\src\CDCavell.ASIBackbone.Storage.InMemory\CDCavell.AsiBackbone.Storage.InMemory.csproj" />
   </ItemGroup>
 
 </Project>

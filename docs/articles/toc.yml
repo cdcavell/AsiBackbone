@@ -10,6 +10,9 @@
 - name: Equations and Toy Models
   href: equations-and-toy-models.md
 
+- name: Policy Evaluator Pipeline
+  href: policy-evaluator-pipeline.md
+
 - name: Alpha Package Boundary
   href: alpha-package-boundary.md
 

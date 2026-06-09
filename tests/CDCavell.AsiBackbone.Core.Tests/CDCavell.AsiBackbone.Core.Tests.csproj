@@ -31,7 +31,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../../src/CDCavell.AsiBackbone.Core/CDCavell.AsiBackbone.Core.csproj" />
-    <ProjectReference Include="..\..\src\CDCavell.ASIBackbone.Storage.InMemory\CDCavell.AsiBackbone.Storage.InMemory.csproj" />
+    <ProjectReference Include="../../src/CDCavell.AsiBackbone.Storage.InMemory/CDCavell.AsiBackbone.Storage.InMemory.csproj" />
   </ItemGroup>
 
 </Project>

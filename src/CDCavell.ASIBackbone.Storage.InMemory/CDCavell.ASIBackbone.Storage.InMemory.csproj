@@ -4,7 +4,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <PackageId>CDCavell.ASIBackbone.Storage.InMemory</PackageId>
+    <PackageId>CDCavell.AsiBackbone.Storage.InMemory</PackageId>
     <Title>CDCavell ASI Backbone In-Memory Storage</Title>
     <Description>In-memory storage helpers for local ASIBackbone testing and samples.</Description>
     <Authors>Christopher D. Cavell</Authors>

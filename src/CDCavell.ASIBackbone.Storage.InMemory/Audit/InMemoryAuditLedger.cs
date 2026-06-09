@@ -1,6 +1,6 @@
-using CDCavell.ASIBackbone.Core.Audit;
+using CDCavell.AsiBackbone.Core.Audit;
 
-namespace CDCavell.ASIBackbone.Storage.InMemory.Audit;
+namespace CDCavell.AsiBackbone.Storage.InMemory.Audit;
 
 /// <summary>
 /// In-memory audit ledger intended for tests, samples, and local validation hosts.

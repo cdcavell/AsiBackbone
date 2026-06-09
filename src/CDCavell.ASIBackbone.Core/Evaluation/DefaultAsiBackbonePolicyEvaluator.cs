@@ -1,9 +1,9 @@
 using System.Collections.ObjectModel;
-using CDCavell.ASIBackbone.Core.Constraints;
-using CDCavell.ASIBackbone.Core.Decisions;
-using CDCavell.ASIBackbone.Core.Results;
+using CDCavell.AsiBackbone.Core.Constraints;
+using CDCavell.AsiBackbone.Core.Decisions;
+using CDCavell.AsiBackbone.Core.Results;
 
-namespace CDCavell.ASIBackbone.Core.Evaluation;
+namespace CDCavell.AsiBackbone.Core.Evaluation;
 
 /// <summary>
 /// Default policy evaluator that runs the active constraint structure and composes the result into a governance decision.

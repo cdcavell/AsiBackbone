@@ -1,7 +1,7 @@
-using CDCavell.ASIBackbone.Core.Constraints;
-using CDCavell.ASIBackbone.Core.Decisions;
+using CDCavell.AsiBackbone.Core.Constraints;
+using CDCavell.AsiBackbone.Core.Decisions;
 
-namespace CDCavell.ASIBackbone.Core.Evaluation;
+namespace CDCavell.AsiBackbone.Core.Evaluation;
 
 /// <summary>
 /// Applies domain- or host-specific decision rules after constraint composition.

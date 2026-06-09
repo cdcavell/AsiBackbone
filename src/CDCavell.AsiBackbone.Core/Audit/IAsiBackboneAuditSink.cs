@@ -1,4 +1,4 @@
-namespace CDCavell.ASIBackbone.Core.Audit;
+namespace CDCavell.AsiBackbone.Core.Audit;
 
 /// <summary>
 /// Receives audit residue produced by the governance spine.

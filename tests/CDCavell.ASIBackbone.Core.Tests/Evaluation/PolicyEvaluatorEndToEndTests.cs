@@ -1,12 +1,12 @@
-using CDCavell.ASIBackbone.Core.Actors;
-using CDCavell.ASIBackbone.Core.Audit;
-using CDCavell.ASIBackbone.Core.Constraints;
-using CDCavell.ASIBackbone.Core.Decisions;
-using CDCavell.ASIBackbone.Core.Evaluation;
-using CDCavell.ASIBackbone.Storage.InMemory.Audit;
+using CDCavell.AsiBackbone.Core.Actors;
+using CDCavell.AsiBackbone.Core.Audit;
+using CDCavell.AsiBackbone.Core.Constraints;
+using CDCavell.AsiBackbone.Core.Decisions;
+using CDCavell.AsiBackbone.Core.Evaluation;
+using CDCavell.AsiBackbone.Storage.InMemory.Audit;
 using Xunit;
 
-namespace CDCavell.ASIBackbone.Core.Tests.Evaluation;
+namespace CDCavell.AsiBackbone.Core.Tests.Evaluation;
 
 /// <summary>
 /// End-to-end proof that Core primitives compose without a database or web host:

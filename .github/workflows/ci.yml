@@ -100,7 +100,6 @@ jobs:
             echo "Packing $project"
             dotnet pack "$project" \
               --configuration "$CONFIGURATION" \
-              --no-build \
               --output "$PACKAGE_OUTPUT" \
               /p:ContinuousIntegrationBuild=true
           done

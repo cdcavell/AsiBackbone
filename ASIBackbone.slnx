@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/CDCavell.ASIBackbone.Core/CDCavell.ASIBackbone.Core.csproj" />
+    <Project Path="src/CDCavell.ASIBackbone.Storage.InMemory/CDCavell.ASIBackbone.Storage.InMemory.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/CDCavell.ASIBackbone.Core.Tests/CDCavell.ASIBackbone.Core.Tests.csproj" />

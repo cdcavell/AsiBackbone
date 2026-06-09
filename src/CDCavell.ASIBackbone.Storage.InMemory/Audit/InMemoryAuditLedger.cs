@@ -1,3 +1,4 @@
+using CDCavell.AsiBackbone.Core.Audit;
 using CDCavell.ASIBackbone.Core.Audit;
 
 namespace CDCavell.ASIBackbone.Storage.InMemory.Audit;
@@ -39,7 +40,7 @@ public sealed class InMemoryAuditLedger : IAsiBackboneAuditSink
     ValueTask IAsiBackboneAuditSink.WriteAsync(
         IAsiBackboneAuditResidue residue,
         CancellationToken cancellationToken)
-    {
+        {
         return WriteCore(residue, cancellationToken);
     }
 

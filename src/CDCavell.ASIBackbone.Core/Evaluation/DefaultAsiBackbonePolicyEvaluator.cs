@@ -77,7 +77,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
         TContext context,
         List<OperationReason> denials,
         List<OperationReason> warnings)
-    {
+        {
         return denials.Count > 0
             ? GovernanceDecision.Deny(
                 denials,

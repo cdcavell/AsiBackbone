@@ -186,7 +186,7 @@ public sealed class PolicyEvaluatorEndToEndTests
         DocumentApprovalContext context,
         GovernanceDecision decision)
     {
-        AuditResidue residue = AuditResidue.Create(
+        var residue = AuditResidue.Create(
             actor: context.Actor,
             operationName: context.OperationName,
             outcome: decision.Outcome.ToString(),
@@ -333,6 +333,8 @@ public sealed class PolicyEvaluatorEndToEndTests
 
             GovernanceDecision decision = context.Risk switch
             {
+                DocumentRisk.Low => composedDecision,
+                DocumentRisk.Elevated => composedDecision,
                 DocumentRisk.High => GovernanceDecision.RequireAcknowledgment(
                     "decision.acknowledgment_required",
                     "High-risk document approvals require acknowledgment before execution.",

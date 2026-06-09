@@ -1,15 +1,9 @@
 <Solution>
   <Folder Name="/src/">
-    <Project Path="src/CDCavell.AsiBackbone.Core/CDCavell.AsiBackbone.Core.csproj" />
-    <Project Path="src/CDCavell.AsiBackbone.EntityFrameworkCore/CDCavell.AsiBackbone.EntityFrameworkCore.csproj">
-      <Build Solution="Debug|*" Project="false" />
-    </Project>
+    <Project Path="src/CDCavell.AsiBackbone.Core/CDCavell.AsiBackbone.Core.csproj" DisplayName="CDCavell.ASIBackbone.Core" />
     <Project Path="src/CDCavell.ASIBackbone.Storage.InMemory/CDCavell.ASIBackbone.Storage.InMemory.csproj" />
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="tests/CDCavell.AsiBackbone.Core.Tests/CDCavell.AsiBackbone.Core.Tests.csproj" />
-    <Project Path="tests/CDCavell.AsiBackbone.EntityFrameworkCore.Tests/CDCavell.AsiBackbone.EntityFrameworkCore.Tests.csproj">
-      <Build Solution="Debug|*" Project="false" />
-    </Project>
+    <Project Path="tests/CDCavell.AsiBackbone.Core.Tests/CDCavell.AsiBackbone.Core.Tests.csproj" DisplayName="CDCavell.ASIBackbone.Core.Tests" />
   </Folder>
 </Solution>

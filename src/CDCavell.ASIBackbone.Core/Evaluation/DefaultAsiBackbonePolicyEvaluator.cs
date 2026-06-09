@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using CDCavell.ASIBackbone.Core.Constraints;
 using CDCavell.ASIBackbone.Core.Decisions;
 using CDCavell.ASIBackbone.Core.Results;
@@ -11,7 +12,7 @@ namespace CDCavell.ASIBackbone.Core.Evaluation;
 public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePolicyEvaluator<TContext>
     where TContext : IAsiBackboneConstraintEvaluationContext
 {
-    private readonly IReadOnlyList<IAsiBackboneConstraint<TContext>> constraints;
+    private readonly ReadOnlyCollection<IAsiBackboneConstraint<TContext>> constraints;
     private readonly IAsiBackboneDecisionPolicy<TContext>? decisionPolicy;
 
     /// <summary>
@@ -25,7 +26,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
     {
         ArgumentNullException.ThrowIfNull(constraints);
 
-        this.constraints = Array.AsReadOnly([.. constraints]);
+        IList<IAsiBackboneConstraint<TContext>> list =
+            constraints as IList<IAsiBackboneConstraint<TContext>> ?? [.. constraints];
+
+        this.constraints = new ReadOnlyCollection<IAsiBackboneConstraint<TContext>>(list);
         this.decisionPolicy = decisionPolicy;
     }
 
@@ -62,40 +66,31 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
 
         GovernanceDecision composedDecision = Compose(context, denials, warnings);
 
-        if (decisionPolicy is null)
-        {
-            return composedDecision;
-        }
-
-        return await decisionPolicy
+        return decisionPolicy is null
+            ? composedDecision
+            : await decisionPolicy
             .ApplyAsync(context, composedDecision, Array.AsReadOnly([.. results]), cancellationToken)
             .ConfigureAwait(false);
     }
 
     private static GovernanceDecision Compose(
         TContext context,
-        IReadOnlyList<OperationReason> denials,
-        IReadOnlyList<OperationReason> warnings)
-    {
-        if (denials.Count > 0)
+        List<OperationReason> denials,
+        List<OperationReason> warnings)
         {
-            return GovernanceDecision.Deny(
+        return denials.Count > 0
+            ? GovernanceDecision.Deny(
                 denials,
                 correlationId: context.CorrelationId,
                 policyVersion: context.PolicyVersion,
-                policyHash: context.PolicyHash);
-        }
-
-        if (warnings.Count > 0)
-        {
-            return GovernanceDecision.Warning(
+                policyHash: context.PolicyHash)
+            : warnings.Count > 0
+            ? GovernanceDecision.Warning(
                 warnings,
                 correlationId: context.CorrelationId,
                 policyVersion: context.PolicyVersion,
-                policyHash: context.PolicyHash);
-        }
-
-        return GovernanceDecision.Allow(
+                policyHash: context.PolicyHash)
+            : GovernanceDecision.Allow(
             correlationId: context.CorrelationId,
             policyVersion: context.PolicyVersion,
             policyHash: context.PolicyHash);

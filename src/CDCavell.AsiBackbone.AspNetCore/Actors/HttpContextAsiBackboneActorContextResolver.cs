@@ -52,6 +52,7 @@ public sealed class HttpContextAsiBackboneActorContextResolver : IAsiBackboneHtt
             AsiBackboneActorType.System => AsiBackboneActorContext.System,
             AsiBackboneActorType.Agent => AsiBackboneActorContext.Agent(actorId, displayName),
             AsiBackboneActorType.Human => AsiBackboneActorContext.Human(actorId, displayName),
+            AsiBackboneActorType.Unknown => AsiBackboneActorContext.Human(actorId, displayName),
             _ => AsiBackboneActorContext.Human(actorId, displayName),
         };
     }

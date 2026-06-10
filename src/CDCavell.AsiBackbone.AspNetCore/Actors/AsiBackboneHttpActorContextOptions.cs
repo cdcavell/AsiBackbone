@@ -36,12 +36,12 @@ public sealed class AsiBackboneHttpActorContextOptions
     /// <summary>
     /// Gets or sets the claim types used to resolve a stable actor identifier.
     /// </summary>
-    public IList<string> ActorIdClaimTypes { get; set; } = DefaultActorIdClaimTypes.ToList();
+    public IList<string> ActorIdClaimTypes { get; set; } = [.. DefaultActorIdClaimTypes];
 
     /// <summary>
     /// Gets or sets the claim types used to resolve an optional actor display name.
     /// </summary>
-    public IList<string> DisplayNameClaimTypes { get; set; } = DefaultDisplayNameClaimTypes.ToList();
+    public IList<string> DisplayNameClaimTypes { get; set; } = [.. DefaultDisplayNameClaimTypes];
 
     /// <summary>
     /// Gets or sets the claim type used to resolve an actor type.

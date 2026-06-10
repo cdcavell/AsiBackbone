@@ -1,4 +1,3 @@
-using CDCavell.AsiBackbone.AspNetCore;
 using Xunit;
 
 namespace CDCavell.AsiBackbone.AspNetCore.Tests;
@@ -11,6 +10,6 @@ public sealed class AssemblyMarkerTests
     [Fact]
     public void AssemblyMarkerTypeIsAvailable()
     {
-        Assert.Equal("AssemblyMarker", typeof(AssemblyMarker).Name);
+        Assert.Equal("AssemblyMarker", nameof(AssemblyMarker));
     }
 }

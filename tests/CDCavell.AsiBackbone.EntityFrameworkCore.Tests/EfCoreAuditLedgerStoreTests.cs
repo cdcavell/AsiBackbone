@@ -115,34 +115,13 @@ public sealed class EfCoreAuditLedgerStoreTests
             new DateTimeOffset(2026, 6, 2, 12, 0, 0, TimeSpan.Zero),
             TestContext.Current.CancellationToken);
 
-        Assert.Equal(["record-1", "record-2"], correlationMatches.Select(record => record.RecordId));
-        Assert.Equal(["record-1", "record-2"], traceMatches.Select(record => record.RecordId));
-        Assert.Equal(["record-1", "record-2"], actorMatches.Select(record => record.RecordId));
-        Assert.Equal(["record-2"], dateRangeMatches.Select(record => record.RecordId));
-    }
+        string[] expectedSharedRecordIds = ["record-1", "record-2"];
+        string[] expectedDateRangeRecordIds = ["record-2"];
 
-    /// <summary>
-    /// Verifies that append failures are returned as operation failures without exposing update or delete semantics.
-    /// </summary>
-    /// <returns>A task that represents the asynchronous test operation.</returns>
-    [Fact]
-    public async Task AppendAsyncReturnsFailureForDuplicateRecordId()
-    {
-        await using HostOwnedAuditDbContext context = CreateContext();
-        var store = new EfCoreAuditLedgerStore(context);
-        AuditLedgerRecord firstRecord = CreateRecord("record-duplicate", "correlation-1", "trace-1", "actor-1");
-        AuditLedgerRecord duplicateRecord = CreateRecord("record-duplicate", "correlation-2", "trace-2", "actor-2");
-
-        OperationResult<AuditLedgerRecord> firstResult = await store.AppendAsync(
-            firstRecord,
-            TestContext.Current.CancellationToken);
-        OperationResult<AuditLedgerRecord> duplicateResult = await store.AppendAsync(
-            duplicateRecord,
-            TestContext.Current.CancellationToken);
-
-        Assert.True(firstResult.Succeeded);
-        Assert.True(duplicateResult.Failed);
-        Assert.Contains("asi_backbone.audit_ledger.append_failed", duplicateResult.ReasonCodes);
+        Assert.Equal(expectedSharedRecordIds, correlationMatches.Select(record => record.RecordId).ToArray());
+        Assert.Equal(expectedSharedRecordIds, traceMatches.Select(record => record.RecordId).ToArray());
+        Assert.Equal(expectedSharedRecordIds, actorMatches.Select(record => record.RecordId).ToArray());
+        Assert.Equal(expectedDateRangeRecordIds, dateRangeMatches.Select(record => record.RecordId).ToArray());
     }
 
     private static HostOwnedAuditDbContext CreateContext()

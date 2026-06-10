@@ -34,13 +34,13 @@ public sealed class HttpContextAsiBackboneActorContextResolver : IAsiBackboneHtt
 
         if (user?.Identity?.IsAuthenticated != true)
         {
-            return ResolveUnauthenticatedActor();
+            return ResolveUnauthenticatedActor;
         }
 
         string? actorId = FindFirstNonEmptyClaimValue(user, options.ActorIdClaimTypes);
         if (string.IsNullOrWhiteSpace(actorId))
         {
-            return ResolveUnauthenticatedActor();
+            return ResolveUnauthenticatedActor;
         }
 
         string? displayName = FindFirstNonEmptyClaimValue(user, options.DisplayNameClaimTypes);
@@ -52,23 +52,21 @@ public sealed class HttpContextAsiBackboneActorContextResolver : IAsiBackboneHtt
             AsiBackboneActorType.System => AsiBackboneActorContext.System,
             AsiBackboneActorType.Agent => AsiBackboneActorContext.Agent(actorId, displayName),
             AsiBackboneActorType.Human => AsiBackboneActorContext.Human(actorId, displayName),
+            AsiBackboneActorType.Unknown => AsiBackboneActorContext.Unknown,
             _ => AsiBackboneActorContext.Human(actorId, displayName),
         };
     }
 
-    private IAsiBackboneActorContext ResolveUnauthenticatedActor()
-    {
-        return string.IsNullOrWhiteSpace(options.UnauthenticatedDisplayName)
+    private IAsiBackboneActorContext ResolveUnauthenticatedActor => string.IsNullOrWhiteSpace(options.UnauthenticatedDisplayName)
             ? AsiBackboneActorContext.Unknown
             : AsiBackboneActorContext.Human(
                 AsiBackboneActorContext.UnknownActorId,
                 options.UnauthenticatedDisplayName,
                 isAuthenticated: false);
-    }
 
     private AsiBackboneActorType ResolveActorType(ClaimsPrincipal user)
     {
-        string? actorTypeValue = FindFirstNonEmptyClaimValue(user, [options.ActorTypeClaimType]);
+        string? actorTypeValue = FindFirstNonEmptyClaimValue(user, new[] { options.ActorTypeClaimType });
 
         return Enum.TryParse(actorTypeValue, ignoreCase: true, out AsiBackboneActorType actorType)
             ? actorType

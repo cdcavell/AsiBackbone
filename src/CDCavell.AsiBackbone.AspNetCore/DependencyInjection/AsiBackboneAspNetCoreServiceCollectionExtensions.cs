@@ -1,5 +1,4 @@
 using CDCavell.AsiBackbone.AspNetCore.Actors;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CDCavell.AsiBackbone.AspNetCore.DependencyInjection;

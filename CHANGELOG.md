@@ -6,26 +6,36 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+## [0.2.0-alpha.1] - 2026-06-10
+
 ### Added
 
-* Added branch-focused unit tests for `AuditLedgerRecord.FromResidue`.
-* Added branch-focused unit tests for `DefaultAsiBackbonePolicyEvaluator<TContext>`.
 * Added EF Core `ModelBuilder` extension support for host-owned persistence integration.
 * Added `ApplyAsiBackboneConfigurations(this ModelBuilder modelBuilder)` for applying AsiBackbone EF Core model contributions from a consuming application's `DbContext`.
 * Added tests proving the extension can be called from a host-owned `DbContext`.
 * Added argument validation for null `ModelBuilder` usage.
 * Added provider-neutral EF Core persistence entities and configurations for audit ledger records, reason codes, metadata, handshake requests, and handshake acknowledgments.
+* Added an EF Core-backed audit ledger store for append-oriented accountability persistence through a host-owned `DbContext`.
 * Added EF Core tests proving host-owned DbContext integration, model metadata, keys, relationships, indexes, enum conversion, and basic persistence behavior.
+* Added SQLite-backed EF Core integration tests proving relational schema creation, persistence/readback, and query behavior without package-owned migrations.
+* Added EF Core host ownership and migration guidance documentation.
+* Added package-specific README files for the EF Core and in-memory storage packages.
 
 ### Fixed
 
 * Updated EF Core documentation samples to show host applications calling the extension from `OnModelCreating`.
+* Aligned EF Core documentation with the implemented `CDCavell.AsiBackbone.EntityFrameworkCore` package name.
+* Normalized EF Core configuration folder and file paths.
+* Updated the root README to describe the current 0.2 persistence package status.
+* Cleared the EF Core change tracker after audit ledger append failures so failed append entities do not remain tracked in the host-owned context.
+* Updated shared version metadata for `0.2.0-alpha.1` package output.
 
 ### Notes
 
 * The EF Core integration preserves host ownership of the `DbContext`, database provider, connection string, migrations, deployment process, and schema lifecycle.
 * AsiBackbone contributes model configuration; the consuming application remains the persistence composition root.
 * Wired the configurations through the existing `ApplyAsiBackboneConfigurations` `ModelBuilder` extension.
+* The in-memory storage package remains non-durable and intended only for tests, samples, and local validation hosts.
 
 ## [0.1.0-alpha.2] - 2026-06-09
 
@@ -35,6 +45,8 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 * Added a decision policy extension point for raising composed decisions to deferred, acknowledgment-required, or escalation-recommended outcomes.
 * Added an audit sink contract for writing audit residue without requiring a database or web host.
 * Added an in-memory audit ledger project for local validation, samples, and tests.
+* Added branch-focused unit tests for `AuditLedgerRecord.FromResidue`.
+* Added branch-focused unit tests for `DefaultAsiBackbonePolicyEvaluator<TContext>`.
 * Added end-to-end policy evaluator tests covering allow, deny, warning, acknowledgment-required, escalation-recommended, deferred, and not-applicable constraint scenarios.
 * Added policy evaluator pipeline documentation with a minimal in-memory usage example.
 

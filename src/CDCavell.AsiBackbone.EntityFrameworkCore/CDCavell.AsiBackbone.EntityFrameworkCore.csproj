@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <PackageId>CDCavell.AsiBackbone.EntityFrameworkCore</PackageId>
     <Title>CDCavell ASI Backbone Entity Framework Core</Title>
-    <Description>Entity Framework Core integration scaffold for the ASI Backbone framework.</Description>
+    <Description>Entity Framework Core integration for host-owned ASI Backbone accountability persistence.</Description>
     <Authors>Christopher D. Cavell</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -15,7 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="../../README.md" Pack="true" PackagePath="/" />
+    <None Include="README.md" Pack="true" PackagePath="/" />
   </ItemGroup>
 
   <ItemGroup>

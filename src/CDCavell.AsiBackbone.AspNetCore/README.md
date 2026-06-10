@@ -5,7 +5,30 @@ ASP.NET Core host integration scaffold for ASI Backbone governance primitives.
 This package is intended to act as a thin web-host adapter around `CDCavell.AsiBackbone.Core`.
 
 > [!IMPORTANT]
-> This scaffold does not currently provide concrete middleware, endpoint mapping, Problem Details integration, authentication integration, or policy enforcement. Those features should be added through follow-up implementation issues.
+> This package provides service registration options only at this stage. It does not currently provide concrete middleware, endpoint mapping, Problem Details integration, authentication integration, or policy enforcement. Those features should be added through follow-up implementation issues.
+
+## Service registration
+
+Register the ASP.NET Core integration package from a plain ASP.NET Core host through `IServiceCollection`.
+
+```csharp
+using CDCavell.AsiBackbone.AspNetCore.DependencyInjection;
+
+builder.Services.AddAsiBackboneAspNetCore();
+```
+
+Host applications may configure the first integration options explicitly.
+
+```csharp
+builder.Services.AddAsiBackboneAspNetCore(options =>
+{
+    options.IncludeRouteValues = true;
+    options.IncludeEndpointMetadata = true;
+    options.CorrelationIdHeaderName = "X-Correlation-ID";
+});
+```
+
+The registration is intentionally narrow. It does not register persistence, EF Core, authentication handlers, MVC, Razor Pages, Minimal API endpoints, middleware, policy evaluators, or host-specific authorization behavior.
 
 ## Current boundary
 

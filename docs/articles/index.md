@@ -20,3 +20,6 @@ Start with [Getting Started](getting-started.md), then use the navigation menu t
 
 * [EF Core Host Ownership and Migration Guidance](ef-core-host-ownership-and-migrations.md)  
   Explains how host applications own the EF Core `DbContext`, provider, connection string, migrations, schema deployment, and operational lifecycle while applying ASI Backbone model configurations.
+
+* [ASP.NET Core Integration Boundary](aspnetcore-integration-boundary.md)  
+  Defines the intended web-host adapter boundary for the future ASP.NET Core package, including service registration, middleware, endpoint mapping, current-actor seams, HTTP outcome mapping, and compatibility with both plain ASP.NET Core and NetCoreApplicationTemplate hosts.

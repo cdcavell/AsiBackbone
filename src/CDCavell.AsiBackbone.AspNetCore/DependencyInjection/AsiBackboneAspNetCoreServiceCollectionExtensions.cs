@@ -37,7 +37,7 @@ public static class AsiBackboneAspNetCoreServiceCollectionExtensions
         configure(options);
         options.Validate();
 
-        services.AddOptions<AsiBackboneAspNetCoreOptions>()
+        _ = services.AddOptions<AsiBackboneAspNetCoreOptions>()
             .Configure(configure)
             .Validate(static options => !string.IsNullOrWhiteSpace(options.CorrelationIdHeaderName), "CorrelationIdHeaderName must be configured.")
             .ValidateOnStart();

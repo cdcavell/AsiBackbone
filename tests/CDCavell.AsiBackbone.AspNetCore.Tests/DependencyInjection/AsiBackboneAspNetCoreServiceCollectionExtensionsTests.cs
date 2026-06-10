@@ -12,7 +12,7 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
     {
         ServiceCollection services = new();
 
-        services.AddAsiBackboneAspNetCore();
+        _ = services.AddAsiBackboneAspNetCore();
 
         using ServiceProvider provider = services.BuildServiceProvider();
         AsiBackboneAspNetCoreOptions options = provider.GetRequiredService<IOptions<AsiBackboneAspNetCoreOptions>>().Value;
@@ -27,7 +27,7 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
     {
         ServiceCollection services = new();
 
-        services.AddAsiBackboneAspNetCore(options =>
+        _ = services.AddAsiBackboneAspNetCore(options =>
         {
             options.IncludeRouteValues = false;
             options.IncludeEndpointMetadata = false;
@@ -47,7 +47,7 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
     {
         IServiceCollection? services = null;
 
-        Assert.Throws<ArgumentNullException>(() => services!.AddAsiBackboneAspNetCore());
+        _ = Assert.Throws<ArgumentNullException>(() => services!.AddAsiBackboneAspNetCore());
     }
 
     [Fact]
@@ -55,7 +55,7 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
     {
         ServiceCollection services = new();
 
-        Assert.Throws<ArgumentNullException>(() => services.AddAsiBackboneAspNetCore(null!));
+        _ = Assert.Throws<ArgumentNullException>(() => services.AddAsiBackboneAspNetCore(null!));
     }
 
     [Theory]

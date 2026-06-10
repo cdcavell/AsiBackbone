@@ -36,4 +36,36 @@ public interface IAsiBackboneAuditLedgerStore
     ValueTask<IReadOnlyList<AuditLedgerRecord>> FindByCorrelationIdAsync(
         string correlationId,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Finds audit ledger records associated with a trace identifier.
+    /// </summary>
+    /// <param name="traceId">The trace identifier.</param>
+    /// <param name="cancellationToken">A token that can cancel the lookup operation.</param>
+    /// <returns>The matching audit ledger records.</returns>
+    ValueTask<IReadOnlyList<AuditLedgerRecord>> FindByTraceIdAsync(
+        string traceId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Finds audit ledger records associated with an actor identifier.
+    /// </summary>
+    /// <param name="actorId">The actor identifier.</param>
+    /// <param name="cancellationToken">A token that can cancel the lookup operation.</param>
+    /// <returns>The matching audit ledger records.</returns>
+    ValueTask<IReadOnlyList<AuditLedgerRecord>> FindByActorIdAsync(
+        string actorId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Finds audit ledger records recorded within the inclusive UTC date range.
+    /// </summary>
+    /// <param name="recordedFromUtc">The inclusive lower recorded UTC bound.</param>
+    /// <param name="recordedToUtc">The inclusive upper recorded UTC bound.</param>
+    /// <param name="cancellationToken">A token that can cancel the lookup operation.</param>
+    /// <returns>The matching audit ledger records.</returns>
+    ValueTask<IReadOnlyList<AuditLedgerRecord>> FindByRecordedUtcRangeAsync(
+        DateTimeOffset recordedFromUtc,
+        DateTimeOffset recordedToUtc,
+        CancellationToken cancellationToken = default);
 }

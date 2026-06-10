@@ -1,6 +1,6 @@
 # Core Policy Evaluator Pipeline
 
-This article documents the first host-neutral policy evaluation loop for `CDCavell.ASIBackbone.Core`.
+This article documents the first host-neutral policy evaluation loop for `CDCavell.AsiBackbone.Core`.
 
 The evaluator proves the initial governance spine without requiring ASP.NET Core, Entity Framework Core, a database, a web host, robotics integration, or an AI model runtime.
 
@@ -19,10 +19,10 @@ The initial alpha ownership model is:
 
 | Area | Responsibility |
 | --- | --- |
-| `CDCavell.ASIBackbone.Core` | Policy evaluator contracts, the default evaluator, decision composition, constraint contracts, decisions, audit residue, and audit sink contracts. |
-| `CDCavell.ASIBackbone.Storage.InMemory` | In-process audit ledger support for tests, samples, and local validation hosts. |
-| Future `CDCavell.ASIBackbone.AspNetCore` | HTTP adaptation, current actor resolution, request-to-context mapping, and service registration. |
-| Future `CDCavell.ASIBackbone.Storage.EntityFrameworkCore` | Durable persistence integration while preserving host-owned `DbContext` and database lifecycle. |
+| `CDCavell.AsiBackbone.Core` | Policy evaluator contracts, the default evaluator, decision composition, constraint contracts, decisions, audit residue, and audit sink contracts. |
+| `CDCavell.AsiBackbone.Storage.InMemory` | In-process audit ledger support for tests, samples, and local validation hosts. |
+| Future `CDCavell.AsiBackbone.AspNetCore` | HTTP adaptation, current actor resolution, request-to-context mapping, and service registration. |
+| Future `CDCavell.AsiBackbone.Storage.EntityFrameworkCore` | Durable persistence integration while preserving host-owned `DbContext` and database lifecycle. |
 
 A future package split may move shared contracts into a dedicated abstractions package. For this alpha slice, the contracts remain in Core so the evaluator can be proven without widening the release branch into a larger package restructuring.
 

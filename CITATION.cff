@@ -2,9 +2,9 @@ cff-version: 1.2.0
 message: "If you use this software, please cite it using the metadata below."
 title: "ASI Backbone"
 version: "0.1.0-alpha.2"
-date-released: "2026-06-04"
-repository-code: "https://github.com/cdcavell/ASIBackbone"
-url: "https://cdcavell.github.io/ASIBackbone/"
+date-released: "2026-06-09"
+repository-code: "https://github.com/cdcavell/AsiBackbone"
+url: "https://cdcavell.github.io/AsiBackbone/"
 type: software
 license: MIT
 identifiers:
@@ -15,7 +15,7 @@ authors:
   - family-names: "Cavell"
     given-names: "Christopher D."
     orcid: "https://orcid.org/0009-0002-2113-0245"
-abstract: "ASIBackbone is a .NET package-family project providing framework-neutral governance primitives for consequential software decision flow, including actor context, constraint evaluation, governance decisions, audit residue, and acknowledgment handshakes."
+abstract: "AsiBackbone is a .NET package-family project providing framework-neutral governance primitives for consequential software decision flow, including actor context, constraint evaluation, governance decisions, audit residue, and acknowledgment handshakes."
 keywords:
   - asi-backbone
   - dotnet

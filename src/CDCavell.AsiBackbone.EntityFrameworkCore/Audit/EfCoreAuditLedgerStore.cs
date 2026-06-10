@@ -288,13 +288,16 @@ public sealed class EfCoreAuditLedgerStore : IAsiBackboneAuditLedgerStore
 
     private static IReadOnlyDictionary<string, string> DeserializeMetadata(string? json)
     {
-        Dictionary<string, string>? metadata = string.IsNullOrWhiteSpace(json)
-            ? []
-            : JsonSerializer.Deserialize<Dictionary<string, string>>(json, JsonOptions);
+        if (string.IsNullOrWhiteSpace(json))
+        {
+            return new ReadOnlyDictionary<string, string>(new Dictionary<string, string>(StringComparer.Ordinal));
+        }
+
+        Dictionary<string, string>? metadata = JsonSerializer.Deserialize<Dictionary<string, string>>(json, JsonOptions);
 
         return metadata is null || metadata.Count == 0
             ? new ReadOnlyDictionary<string, string>(new Dictionary<string, string>(StringComparer.Ordinal))
-            : new ReadOnlyDictionary<string, string>(metadata);
+            : new ReadOnlyDictionary<string, string>(new Dictionary<string, string>(metadata, StringComparer.Ordinal));
     }
 
     private sealed class EntityAuditResidue : IAsiBackboneAuditResidue

@@ -17,3 +17,6 @@ Start with [Getting Started](getting-started.md), then use the navigation menu t
 
 * [EF Core Integration Boundary](ef-core-integration-boundary.md)  
   Defines the intended boundary for the future EF Core storage package, including host-owned `DbContext`, migration ownership, provider-neutral configuration, and `ModelBuilder` extension expectations.
+
+* [EF Core Host Ownership and Migration Guidance](ef-core-host-ownership-and-migrations.md)  
+  Explains how host applications own the EF Core `DbContext`, provider, connection string, migrations, schema deployment, and operational lifecycle while applying ASI Backbone model configurations.

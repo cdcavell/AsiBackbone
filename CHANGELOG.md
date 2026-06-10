@@ -4,6 +4,29 @@ All notable changes to this project are documented in this file.
 
 This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/) and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+* Added branch-focused unit tests for `AuditLedgerRecord.FromResidue`.
+* Added branch-focused unit tests for `DefaultAsiBackbonePolicyEvaluator<TContext>`.
+* Added EF Core `ModelBuilder` extension support for host-owned persistence integration.
+* Added `ApplyAsiBackboneConfigurations(this ModelBuilder modelBuilder)` for applying AsiBackbone EF Core model contributions from a consuming application's `DbContext`.
+* Added tests proving the extension can be called from a host-owned `DbContext`.
+* Added argument validation for null `ModelBuilder` usage.
+* Added provider-neutral EF Core persistence entities and configurations for audit ledger records, reason codes, metadata, handshake requests, and handshake acknowledgments.
+* Added EF Core tests proving host-owned DbContext integration, model metadata, keys, relationships, indexes, enum conversion, and basic persistence behavior.
+
+### Fixed
+
+* Updated EF Core documentation samples to show host applications calling the extension from `OnModelCreating`.
+
+### Notes
+
+* The EF Core integration preserves host ownership of the `DbContext`, database provider, connection string, migrations, deployment process, and schema lifecycle.
+* AsiBackbone contributes model configuration; the consuming application remains the persistence composition root.
+* Wired the configurations through the existing `ApplyAsiBackboneConfigurations` `ModelBuilder` extension.
+
 ## [0.1.0-alpha.2] - 2026-06-09
 
 ### Added

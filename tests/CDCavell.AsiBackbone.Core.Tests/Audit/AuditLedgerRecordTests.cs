@@ -401,6 +401,64 @@ public sealed class AuditLedgerRecordTests
             AuditLedgerRecord.FromResidue(residue));
     }
 
+    /// <summary>
+    /// Verifies that null reason-code collections are normalized to an empty read-only collection.
+    /// </summary>
+    [Fact]
+    public void FromResidueWithNullReasonCodesHasNoReasonCodes()
+    {
+        TestAuditResidue residue = CreateValidResidue();
+        residue.ReasonCodes = null!;
+
+        var record = AuditLedgerRecord.FromResidue(residue);
+
+        Assert.False(record.HasReasonCodes);
+        Assert.Empty(record.ReasonCodes);
+    }
+
+    /// <summary>
+    /// Verifies that ledger-supplied metadata is retained when residue metadata is null.
+    /// </summary>
+    [Fact]
+    public void FromResidueUsesLedgerMetadataWhenResidueMetadataIsNull()
+    {
+        TestAuditResidue residue = CreateValidResidue();
+        residue.Metadata = null!;
+
+        var record = AuditLedgerRecord.FromResidue(
+            residue,
+            metadata: new Dictionary<string, string>
+            {
+                [" ledger-key "] = " ledger-value "
+            });
+
+        Assert.True(record.HasMetadata);
+        _ = Assert.Single(record.Metadata);
+        Assert.Equal("ledger-value", record.Metadata["ledger-key"]);
+    }
+
+    /// <summary>
+    /// Verifies that optional residue fields normalize whitespace to null.
+    /// </summary>
+    [Fact]
+    public void FromResidueNormalizesOptionalResidueFieldsToNull()
+    {
+        TestAuditResidue residue = CreateValidResidue();
+        residue.ActorDisplayName = " ";
+        residue.CorrelationId = "";
+        residue.TraceId = "\t";
+        residue.PolicyVersion = " ";
+        residue.PolicyHash = "";
+
+        var record = AuditLedgerRecord.FromResidue(residue);
+
+        Assert.Null(record.ActorDisplayName);
+        Assert.Null(record.CorrelationId);
+        Assert.Null(record.TraceId);
+        Assert.Null(record.PolicyVersion);
+        Assert.Null(record.PolicyHash);
+    }
+
     private static TestAuditResidue CreateValidResidue()
     {
         return new TestAuditResidue

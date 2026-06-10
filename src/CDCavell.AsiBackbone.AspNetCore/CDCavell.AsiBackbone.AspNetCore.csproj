@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PackageId>CDCavell.AsiBackbone.AspNetCore</PackageId>
+    <Title>CDCavell ASI Backbone ASP.NET Core</Title>
+    <Description>ASP.NET Core host integration scaffold for ASI Backbone governance primitives.</Description>
+    <Authors>Christopher D. Cavell</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>asi;backbone;governance;architecture;aspnetcore;web;host-integration</PackageTags>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CDCavell.AsiBackbone.Core\CDCavell.AsiBackbone.Core.csproj" />
+  </ItemGroup>
+
+</Project>

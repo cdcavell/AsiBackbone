@@ -41,8 +41,135 @@ public sealed class IAsiBackboneAuditLedgerStoreTests
     }
 
     /// <summary>
-    /// Verifies that an implementation of <see cref="IAsiBackboneAuditLedgerStore"/> allows looking up records by their correlation ID. This test uses a simple in-memory implementation of the interface to validate the expected behavior of the contract, ensuring that multiple records with the same correlation ID can be retrieved correctly.
+    /// Verifies that an implementation of <see cref="IAsiBackboneAuditLedgerStore"/> allows looking up records by their correlation ID.
     /// </summary>
+    /// <returns>A task that represents the asynchronous test operation.</returns>
+    [Fact]
+    public async Task ContractAllowsLookupByCorrelationId()
+    {
+        IAsiBackboneAuditLedgerStore store = new TestAuditLedgerStore();
+        AuditLedgerRecord firstRecord = CreateRecord("record-1", "correlation-123", "trace-1", "actor-1");
+        AuditLedgerRecord secondRecord = CreateRecord("record-2", "correlation-123", "trace-2", "actor-2");
+        AuditLedgerRecord thirdRecord = CreateRecord("record-3", "correlation-456", "trace-3", "actor-3");
+
+        _ = await store.AppendAsync(firstRecord, TestContext.Current.CancellationToken);
+        _ = await store.AppendAsync(secondRecord, TestContext.Current.CancellationToken);
+        _ = await store.AppendAsync(thirdRecord, TestContext.Current.CancellationToken);
+
+        IReadOnlyList<AuditLedgerRecord> found = await store.FindByCorrelationIdAsync(
+            "correlation-123",
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal([firstRecord, secondRecord], found);
+    }
+
+    /// <summary>
+    /// Verifies that an implementation of <see cref="IAsiBackboneAuditLedgerStore"/> allows looking up records by their trace ID.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous test operation.</returns>
+    [Fact]
+    public async Task ContractAllowsLookupByTraceId()
+    {
+        IAsiBackboneAuditLedgerStore store = new TestAuditLedgerStore();
+        AuditLedgerRecord firstRecord = CreateRecord("record-1", "correlation-1", "trace-123", "actor-1");
+        AuditLedgerRecord secondRecord = CreateRecord("record-2", "correlation-2", "trace-123", "actor-2");
+        AuditLedgerRecord thirdRecord = CreateRecord("record-3", "correlation-3", "trace-456", "actor-3");
+
+        _ = await store.AppendAsync(firstRecord, TestContext.Current.CancellationToken);
+        _ = await store.AppendAsync(secondRecord, TestContext.Current.CancellationToken);
+        _ = await store.AppendAsync(thirdRecord, TestContext.Current.CancellationToken);
+
+        IReadOnlyList<AuditLedgerRecord> found = await store.FindByTraceIdAsync(
+            "trace-123",
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal([firstRecord, secondRecord], found);
+    }
+
+    /// <summary>
+    /// Verifies that an implementation of <see cref="IAsiBackboneAuditLedgerStore"/> allows looking up records by their actor ID.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous test operation.</returns>
+    [Fact]
+    public async Task ContractAllowsLookupByActorId()
+    {
+        IAsiBackboneAuditLedgerStore store = new TestAuditLedgerStore();
+        AuditLedgerRecord firstRecord = CreateRecord("record-1", "correlation-1", "trace-1", "actor-123");
+        AuditLedgerRecord secondRecord = CreateRecord("record-2", "correlation-2", "trace-2", "actor-123");
+        AuditLedgerRecord thirdRecord = CreateRecord("record-3", "correlation-3", "trace-3", "actor-456");
+
+        _ = await store.AppendAsync(firstRecord, TestContext.Current.CancellationToken);
+        _ = await store.AppendAsync(secondRecord, TestContext.Current.CancellationToken);
+        _ = await store.AppendAsync(thirdRecord, TestContext.Current.CancellationToken);
+
+        IReadOnlyList<AuditLedgerRecord> found = await store.FindByActorIdAsync(
+            "actor-123",
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal([firstRecord, secondRecord], found);
+    }
+
+    /// <summary>
+    /// Verifies that an implementation of <see cref="IAsiBackboneAuditLedgerStore"/> allows looking up records by recorded UTC range.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous test operation.</returns>
+    [Fact]
+    public async Task ContractAllowsLookupByRecordedUtcRange()
+    {
+        IAsiBackboneAuditLedgerStore store = new TestAuditLedgerStore();
+        AuditLedgerRecord firstRecord = CreateRecord(
+            "record-1",
+            "correlation-1",
+            "trace-1",
+            "actor-1",
+            new DateTimeOffset(2026, 6, 1, 0, 0, 0, TimeSpan.Zero));
+        AuditLedgerRecord secondRecord = CreateRecord(
+            "record-2",
+            "correlation-2",
+            "trace-2",
+            "actor-2",
+            new DateTimeOffset(2026, 6, 2, 0, 0, 0, TimeSpan.Zero));
+        AuditLedgerRecord thirdRecord = CreateRecord(
+            "record-3",
+            "correlation-3",
+            "trace-3",
+            "actor-3",
+            new DateTimeOffset(2026, 6, 3, 0, 0, 0, TimeSpan.Zero));
+
+        _ = await store.AppendAsync(firstRecord, TestContext.Current.CancellationToken);
+        _ = await store.AppendAsync(secondRecord, TestContext.Current.CancellationToken);
+        _ = await store.AppendAsync(thirdRecord, TestContext.Current.CancellationToken);
+
+        IReadOnlyList<AuditLedgerRecord> found = await store.FindByRecordedUtcRangeAsync(
+            new DateTimeOffset(2026, 6, 1, 12, 0, 0, TimeSpan.Zero),
+            new DateTimeOffset(2026, 6, 2, 12, 0, 0, TimeSpan.Zero),
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal([secondRecord], found);
+    }
+
+    private static AuditLedgerRecord CreateRecord(
+        string recordId,
+        string correlationId,
+        string traceId,
+        string actorId,
+        DateTimeOffset? recordedUtc = null)
+    {
+        var actor = new AsiBackboneActorContext(actorId, AsiBackboneActorType.User, null);
+        var residue = AuditResidue.Create(
+            actor,
+            "system.sync",
+            "Allowed",
+            eventId: $"event-{recordId}",
+            correlationId: correlationId,
+            traceId: traceId);
+
+        return AuditLedgerRecord.FromResidue(
+            residue,
+            recordId: recordId,
+            recordedUtc: recordedUtc);
+    }
+
     private sealed class TestAuditLedgerStore : IAsiBackboneAuditLedgerStore
     {
         private readonly Dictionary<string, AuditLedgerRecord> records = new(StringComparer.Ordinal);
@@ -71,8 +198,37 @@ public sealed class IAsiBackboneAuditLedgerStoreTests
             string correlationId,
             CancellationToken cancellationToken = default)
         {
+            return FindAsync(record => string.Equals(record.CorrelationId, correlationId, StringComparison.Ordinal));
+        }
+
+        public ValueTask<IReadOnlyList<AuditLedgerRecord>> FindByTraceIdAsync(
+            string traceId,
+            CancellationToken cancellationToken = default)
+        {
+            return FindAsync(record => string.Equals(record.TraceId, traceId, StringComparison.Ordinal));
+        }
+
+        public ValueTask<IReadOnlyList<AuditLedgerRecord>> FindByActorIdAsync(
+            string actorId,
+            CancellationToken cancellationToken = default)
+        {
+            return FindAsync(record => string.Equals(record.ActorId, actorId, StringComparison.Ordinal));
+        }
+
+        public ValueTask<IReadOnlyList<AuditLedgerRecord>> FindByRecordedUtcRangeAsync(
+            DateTimeOffset recordedFromUtc,
+            DateTimeOffset recordedToUtc,
+            CancellationToken cancellationToken = default)
+        {
+            return FindAsync(record => record.RecordedUtc >= recordedFromUtc && record.RecordedUtc <= recordedToUtc);
+        }
+
+        private ValueTask<IReadOnlyList<AuditLedgerRecord>> FindAsync(Func<AuditLedgerRecord, bool> predicate)
+        {
             IReadOnlyList<AuditLedgerRecord> matches = records.Values
-                .Where(record => string.Equals(record.CorrelationId, correlationId, StringComparison.Ordinal))
+                .Where(predicate)
+                .OrderBy(record => record.RecordedUtc)
+                .ThenBy(record => record.RecordId)
                 .ToArray();
 
             return ValueTask.FromResult(matches);

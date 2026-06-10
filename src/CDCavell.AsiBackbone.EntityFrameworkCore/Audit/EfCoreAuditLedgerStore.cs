@@ -69,6 +69,8 @@ public sealed class EfCoreAuditLedgerStore : IAsiBackboneAuditLedgerStore
         }
         catch (DbUpdateException ex)
         {
+            dbContext.ChangeTracker.Clear();
+
             return OperationResult.Failure<AuditLedgerRecord>(
                 "asi_backbone.audit_ledger.append_failed",
                 ex.Message);

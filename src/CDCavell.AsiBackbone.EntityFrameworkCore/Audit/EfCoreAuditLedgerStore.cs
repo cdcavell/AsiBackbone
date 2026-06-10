@@ -40,7 +40,7 @@ public sealed class EfCoreAuditLedgerStore : IAsiBackboneAuditLedgerStore
         ArgumentNullException.ThrowIfNull(record);
         cancellationToken.ThrowIfCancellationRequested();
 
-        var entity = ToEntity(record);
+        AsiBackboneAuditLedgerRecordEntity entity = ToEntity(record);
 
         _ = await dbContext
             .Set<AsiBackboneAuditLedgerRecordEntity>()
@@ -216,28 +216,26 @@ public sealed class EfCoreAuditLedgerStore : IAsiBackboneAuditLedgerStore
         Guid auditLedgerRecordId,
         IReadOnlyList<string> reasonCodes)
     {
-        return reasonCodes
+        return [.. reasonCodes
             .Select((reasonCode, index) => new AsiBackboneAuditLedgerReasonCodeEntity
             {
                 AuditLedgerRecordId = auditLedgerRecordId,
                 Sequence = index,
                 ReasonCode = reasonCode
-            })
-            .ToArray();
+            })];
     }
 
     private static AsiBackboneAuditLedgerMetadataEntity[] ToMetadataEntities(
         Guid auditLedgerRecordId,
         IReadOnlyDictionary<string, string> metadata)
     {
-        return metadata
+        return [.. metadata
             .Select(item => new AsiBackboneAuditLedgerMetadataEntity
             {
                 AuditLedgerRecordId = auditLedgerRecordId,
                 MetadataKey = item.Key,
                 MetadataValue = item.Value
-            })
-            .ToArray();
+            })];
     }
 
     private static AuditLedgerRecord[] ToRecords(IEnumerable<AsiBackboneAuditLedgerRecordEntity> entities)
@@ -300,62 +298,45 @@ public sealed class EfCoreAuditLedgerStore : IAsiBackboneAuditLedgerStore
             : new ReadOnlyDictionary<string, string>(new Dictionary<string, string>(metadata, StringComparer.Ordinal));
     }
 
-    private sealed class EntityAuditResidue : IAsiBackboneAuditResidue
+    private sealed class EntityAuditResidue(
+        string eventId,
+        DateTimeOffset occurredUtc,
+        string actorId,
+        AsiBackboneActorType actorType,
+        string? actorDisplayName,
+        string operationName,
+        string outcome,
+        IReadOnlyList<string> reasonCodes,
+        string? correlationId,
+        string? traceId,
+        string? policyVersion,
+        string? policyHash,
+        IReadOnlyDictionary<string, string> metadata) : IAsiBackboneAuditResidue
     {
-        public EntityAuditResidue(
-            string eventId,
-            DateTimeOffset occurredUtc,
-            string actorId,
-            AsiBackboneActorType actorType,
-            string? actorDisplayName,
-            string operationName,
-            string outcome,
-            IReadOnlyList<string> reasonCodes,
-            string? correlationId,
-            string? traceId,
-            string? policyVersion,
-            string? policyHash,
-            IReadOnlyDictionary<string, string> metadata)
-        {
-            EventId = eventId;
-            OccurredUtc = occurredUtc;
-            ActorId = actorId;
-            ActorType = actorType;
-            ActorDisplayName = actorDisplayName;
-            OperationName = operationName;
-            Outcome = outcome;
-            ReasonCodes = reasonCodes;
-            CorrelationId = correlationId;
-            TraceId = traceId;
-            PolicyVersion = policyVersion;
-            PolicyHash = policyHash;
-            Metadata = metadata;
-        }
+        public string EventId { get; } = eventId;
 
-        public string EventId { get; }
+        public DateTimeOffset OccurredUtc { get; } = occurredUtc;
 
-        public DateTimeOffset OccurredUtc { get; }
+        public string ActorId { get; } = actorId;
 
-        public string ActorId { get; }
+        public AsiBackboneActorType ActorType { get; } = actorType;
 
-        public AsiBackboneActorType ActorType { get; }
+        public string? ActorDisplayName { get; } = actorDisplayName;
 
-        public string? ActorDisplayName { get; }
+        public string OperationName { get; } = operationName;
 
-        public string OperationName { get; }
+        public string Outcome { get; } = outcome;
 
-        public string Outcome { get; }
+        public IReadOnlyList<string> ReasonCodes { get; } = reasonCodes;
 
-        public IReadOnlyList<string> ReasonCodes { get; }
+        public string? CorrelationId { get; } = correlationId;
 
-        public string? CorrelationId { get; }
+        public string? TraceId { get; } = traceId;
 
-        public string? TraceId { get; }
+        public string? PolicyVersion { get; } = policyVersion;
 
-        public string? PolicyVersion { get; }
+        public string? PolicyHash { get; } = policyHash;
 
-        public string? PolicyHash { get; }
-
-        public IReadOnlyDictionary<string, string> Metadata { get; }
+        public IReadOnlyDictionary<string, string> Metadata { get; } = metadata;
     }
 }

@@ -1,3 +1,5 @@
+using CDCavell.AsiBackbone.AspNetCore.Actors;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CDCavell.AsiBackbone.AspNetCore.DependencyInjection;
@@ -41,6 +43,24 @@ public static class AsiBackboneAspNetCoreServiceCollectionExtensions
             .Configure(configure)
             .Validate(static options => !string.IsNullOrWhiteSpace(options.CorrelationIdHeaderName), "CorrelationIdHeaderName must be configured.")
             .ValidateOnStart();
+
+        _ = services.AddOptions<AsiBackboneHttpActorContextOptions>()
+            .Validate(static options =>
+            {
+                try
+                {
+                    options.Validate();
+                    return true;
+                }
+                catch (InvalidOperationException)
+                {
+                    return false;
+                }
+            }, "HTTP actor context options must be valid.")
+            .ValidateOnStart();
+
+        _ = services.AddHttpContextAccessor();
+        _ = services.AddScoped<IAsiBackboneHttpActorContextResolver, HttpContextAsiBackboneActorContextResolver>();
 
         return services;
     }

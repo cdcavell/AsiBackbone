@@ -5,7 +5,7 @@ ASP.NET Core host integration scaffold for ASI Backbone governance primitives.
 This package is intended to act as a thin web-host adapter around `CDCavell.AsiBackbone.Core`.
 
 > [!IMPORTANT]
-> This package provides thin host adapters only. It does not currently provide concrete middleware, endpoint mapping, Problem Details integration, authentication integration, or policy enforcement. Those features should be added through follow-up implementation issues.
+> This package provides thin host adapters only. It does not currently provide concrete middleware, endpoint mapping, authentication integration, policy enforcement, persistence, or execution-gateway behavior. HTTP result mapping helpers are explicit adapters and do not enforce decisions automatically.
 
 ## Service registration
 
@@ -59,6 +59,59 @@ AuditResidue residue = correlation.CreateAuditResidue(
 ```
 
 Use `AsiBackboneHttpRequestCorrelation.ToEvaluationContext(...)` when a web host needs to carry the resolved correlation identifier and safe request metadata into a framework-neutral Core policy evaluation context.
+
+## HTTP result mapping
+
+`AsiBackboneHttpResultMappingExtensions` maps Core `GovernanceDecision` and `OperationResult` instances into ASP.NET Core `IResult` responses through explicit helpers.
+
+```csharp
+using CDCavell.AsiBackbone.AspNetCore.Results;
+using CDCavell.AsiBackbone.Core.Decisions;
+
+GovernanceDecision decision = GovernanceDecision.Deny(
+    "policy.denied",
+    "Internal policy detail for audit only.",
+    correlationId: "request-123");
+
+return decision.ToHttpResult();
+```
+
+Default governance decision mapping:
+
+| Core outcome | Default HTTP behavior |
+| --- | --- |
+| `Allowed` | `200 OK` JSON response. |
+| `Warning` | `200 OK` JSON response with retained reason codes. |
+| `Denied` | `403 Forbidden` Problem Details response. |
+| `Deferred` | `202 Accepted` Problem Details response. |
+| `AcknowledgmentRequired` | `428 Precondition Required` Problem Details response. |
+| `EscalationRecommended` | `409 Conflict` Problem Details response. |
+
+Default operation-result mapping:
+
+| Core result | Default HTTP behavior |
+| --- | --- |
+| Success | `200 OK` JSON response. |
+| Failure | `400 Bad Request` Problem Details response. |
+
+Reason codes and correlation identifiers are preserved by default when available. Reason messages, trace identifiers, policy versions, and policy hashes are not exposed by default because those values may reveal sensitive policy internals or diagnostic details.
+
+Hosts can opt into broader detail only when appropriate:
+
+```csharp
+using CDCavell.AsiBackbone.AspNetCore.Results;
+
+AsiBackboneHttpResultMappingOptions mappingOptions = new()
+{
+    IncludeReasonMessages = true,
+    IncludeTraceId = true,
+    IncludePolicyMetadata = true,
+};
+
+return decision.ToHttpResult(mappingOptions);
+```
+
+Status-code policy remains host-overridable through `AsiBackboneHttpResultMappingOptions`. Hosts that intentionally mask denial or scanner traffic with alternate status codes should configure their own mapping rather than relying on the defaults.
 
 ## Current boundary
 

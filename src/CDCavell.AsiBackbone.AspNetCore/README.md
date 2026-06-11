@@ -5,7 +5,7 @@ ASP.NET Core host integration scaffold for ASI Backbone governance primitives.
 This package is intended to act as a thin web-host adapter around `CDCavell.AsiBackbone.Core`.
 
 > [!IMPORTANT]
-> This package provides thin host adapters only. It does not currently provide concrete middleware, endpoint mapping, authentication integration, policy enforcement, persistence, or execution-gateway behavior. HTTP result mapping helpers are explicit adapters and do not enforce decisions automatically.
+> This package provides thin host adapters only. It does not currently provide concrete middleware, endpoint mapping, authentication integration, policy enforcement, persistence, or execution-gateway behavior. HTTP result mapping and acknowledgment challenge helpers are explicit adapters and do not enforce decisions automatically.
 
 ## Service registration
 
@@ -112,6 +112,43 @@ return decision.ToHttpResult(mappingOptions);
 ```
 
 Status-code policy remains host-overridable through `AsiBackboneHttpResultMappingOptions`. Hosts that intentionally mask denial or scanner traffic with alternate status codes should configure their own mapping rather than relying on the defaults.
+
+## Acknowledgment challenge flow
+
+`IAsiBackboneAcknowledgmentChallengeService` provides a host-friendly bridge for Core `AcknowledgmentRequired` decisions. It builds an `AsiBackboneAcknowledgmentChallenge` that MVC, Razor Pages, Minimal APIs, a SPA, or another UI layer can render without the package taking a dependency on that stack.
+
+```csharp
+using CDCavell.AsiBackbone.AspNetCore.Handshakes;
+using CDCavell.AsiBackbone.Core.Decisions;
+
+GovernanceDecision decision = GovernanceDecision.RequireAcknowledgment(
+    "risk.high",
+    "Manual acknowledgment is required before execution.",
+    correlationId: "request-123");
+
+AsiBackboneAcknowledgmentChallenge challenge = acknowledgmentChallengeService.CreateChallenge(
+    actor,
+    "PublishEpisode",
+    decision);
+```
+
+The challenge preserves safe round-trip fields such as handshake identifier, operation name, reason code, required acknowledgment code/text, risk level, risk category, and correlation identifier. Trace identifiers and policy metadata are hidden by default and can be enabled through `AsiBackboneAcknowledgmentChallengeOptions` only when the host intentionally wants to expose those diagnostics.
+
+Hosts can round-trip a submitted acknowledgment response back into Core handshake models:
+
+```csharp
+AsiBackboneAcknowledgmentChallengeResult result = acknowledgmentChallengeService.HandleResponse(
+    challenge,
+    actor,
+    new AsiBackboneAcknowledgmentChallengeRequest
+    {
+        HandshakeId = challenge.HandshakeId,
+        AcknowledgmentCode = challenge.RequiredAcknowledgmentCode,
+        Acknowledged = true,
+    });
+```
+
+A successful challenge result contains a Core `LiabilityHandshakeAcknowledgment`. Failed responses return an `OperationResult` with a reason code, such as a handshake mismatch or acknowledgment-code mismatch. The package does not persist challenge state; hosts decide whether to store the Core handshake request, serialize it into protected state, or associate it with an existing workflow.
 
 ## Current boundary
 

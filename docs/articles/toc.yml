@@ -28,5 +28,8 @@
 - name: Plain ASP.NET Core Host Sample
   href: plain-aspnetcore-host-sample.md
 
+- name: NetCoreApplicationTemplate Host Validation
+  href: netcoreapplicationtemplate-host-validation.md
+
 - name: Core Alpha Readiness Review
   href: core-alpha-readiness-review.md

@@ -1,6 +1,7 @@
 using CDCavell.AsiBackbone.AspNetCore.Actors;
 using CDCavell.AsiBackbone.AspNetCore.Correlation;
 using CDCavell.AsiBackbone.AspNetCore.DependencyInjection;
+using CDCavell.AsiBackbone.AspNetCore.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -60,6 +61,26 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
         using IServiceScope scope = provider.CreateScope();
 
         _ = scope.ServiceProvider.GetRequiredService<IAsiBackboneHttpRequestCorrelationResolver>();
+    }
+
+    [Fact]
+    public void AddAsiBackboneAspNetCoreRegistersResultMappingOptions()
+    {
+        ServiceCollection services = new();
+
+        _ = services.AddAsiBackboneAspNetCore();
+
+        using ServiceProvider provider = services.BuildServiceProvider();
+        AsiBackboneHttpResultMappingOptions options = provider.GetRequiredService<IOptions<AsiBackboneHttpResultMappingOptions>>().Value;
+
+        Assert.Equal(StatusCodes.Status200OK, options.SuccessStatusCode);
+        Assert.Equal(StatusCodes.Status403Forbidden, options.DeniedStatusCode);
+        Assert.Equal(StatusCodes.Status202Accepted, options.DeferredStatusCode);
+        Assert.Equal(StatusCodes.Status428PreconditionRequired, options.AcknowledgmentRequiredStatusCode);
+        Assert.Equal(StatusCodes.Status409Conflict, options.EscalationRecommendedStatusCode);
+        Assert.False(options.IncludeReasonMessages);
+        Assert.False(options.IncludeTraceId);
+        Assert.False(options.IncludePolicyMetadata);
     }
 
     [Fact]

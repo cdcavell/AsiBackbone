@@ -1,5 +1,6 @@
 using CDCavell.AsiBackbone.AspNetCore.Actors;
 using CDCavell.AsiBackbone.AspNetCore.Correlation;
+using CDCavell.AsiBackbone.AspNetCore.Results;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CDCavell.AsiBackbone.AspNetCore.DependencyInjection;
@@ -68,6 +69,21 @@ public static class AsiBackboneAspNetCoreServiceCollectionExtensions
                     return false;
                 }
             }, "HTTP actor context options must be valid.")
+            .ValidateOnStart();
+
+        _ = services.AddOptions<AsiBackboneHttpResultMappingOptions>()
+            .Validate(static options =>
+            {
+                try
+                {
+                    options.Validate();
+                    return true;
+                }
+                catch (InvalidOperationException)
+                {
+                    return false;
+                }
+            }, "HTTP result mapping options must be valid.")
             .ValidateOnStart();
 
         _ = services.AddHttpContextAccessor();

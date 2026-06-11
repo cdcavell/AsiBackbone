@@ -5,6 +5,9 @@
     <Project Path="src/CDCavell.AsiBackbone.EntityFrameworkCore/CDCavell.AsiBackbone.EntityFrameworkCore.csproj" />
     <Project Path="src/CDCavell.AsiBackbone.Storage.InMemory/CDCavell.AsiBackbone.Storage.InMemory.csproj" />
   </Folder>
+  <Folder Name="/samples/">
+    <Project Path="samples/PlainAspNetCoreHost/CDCavell.AsiBackbone.Samples.PlainAspNetCoreHost.csproj" />
+  </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/CDCavell.AsiBackbone.AspNetCore.Tests/CDCavell.AsiBackbone.AspNetCore.Tests.csproj" />
     <Project Path="tests/CDCavell.AsiBackbone.Core.Tests/CDCavell.AsiBackbone.Core.Tests.csproj" />

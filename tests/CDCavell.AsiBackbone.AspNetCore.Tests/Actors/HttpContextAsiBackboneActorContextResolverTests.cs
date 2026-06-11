@@ -284,9 +284,10 @@ public sealed class HttpContextAsiBackboneActorContextResolverTests
     [InlineData("blank")]
     public void ActorOptionsRejectInvalidActorIdentifierClaimTypes(string? mode)
     {
-        AsiBackboneHttpActorContextOptions options = new();
-
-        options.ActorIdClaimTypes = mode is null ? null! : mode == "empty" ? [] : [" ", ""];
+        AsiBackboneHttpActorContextOptions options = new()
+        {
+            ActorIdClaimTypes = mode is null ? null! : mode == "empty" ? [] : [" ", ""]
+        };
 
         InvalidOperationException exception = Assert.Throws<InvalidOperationException>(options.Validate);
 

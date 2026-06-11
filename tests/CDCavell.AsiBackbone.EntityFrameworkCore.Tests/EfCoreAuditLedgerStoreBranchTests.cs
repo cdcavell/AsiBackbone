@@ -69,36 +69,6 @@ public sealed class EfCoreAuditLedgerStoreBranchTests
     }
 
     [Fact]
-    public async Task FindByRecordIdAsyncHandlesMissingJsonPayloadsAsEmptyCollections()
-    {
-        await using HostOwnedAuditDbContext context = CreateInMemoryContext();
-        var store = new EfCoreAuditLedgerStore(context);
-
-        _ = context.AuditLedgerRecords.Add(new AsiBackboneAuditLedgerRecordEntity
-        {
-            RecordId = "manual-record",
-            EventId = "manual-event",
-            OccurredUtc = new DateTimeOffset(2026, 6, 1, 0, 0, 0, TimeSpan.Zero),
-            RecordedUtc = new DateTimeOffset(2026, 6, 1, 1, 0, 0, TimeSpan.Zero),
-            ActorId = "manual-actor",
-            ActorType = AsiBackboneActorType.Service,
-            OperationName = "manual.operation",
-            Outcome = "Allowed",
-            ReasonCodesJson = null!,
-            MetadataJson = null!,
-        });
-        _ = await context.SaveChangesAsync(TestContext.Current.CancellationToken);
-
-        AuditLedgerRecord? found = await store.FindByRecordIdAsync(
-            "manual-record",
-            TestContext.Current.CancellationToken);
-
-        Assert.NotNull(found);
-        Assert.Empty(found.ReasonCodes);
-        Assert.Empty(found.Metadata);
-    }
-
-    [Fact]
     public async Task FindByRecordIdAsyncHandlesEmptyJsonPayloadsAsEmptyCollections()
     {
         await using HostOwnedAuditDbContext context = CreateInMemoryContext();

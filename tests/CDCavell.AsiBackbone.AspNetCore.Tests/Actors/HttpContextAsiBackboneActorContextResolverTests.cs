@@ -286,18 +286,7 @@ public sealed class HttpContextAsiBackboneActorContextResolverTests
     {
         AsiBackboneHttpActorContextOptions options = new();
 
-        if (mode is null)
-        {
-            options.ActorIdClaimTypes = null!;
-        }
-        else if (mode == "empty")
-        {
-            options.ActorIdClaimTypes = [];
-        }
-        else
-        {
-            options.ActorIdClaimTypes = [" ", ""];
-        }
+        options.ActorIdClaimTypes = mode is null ? null! : mode == "empty" ? [] : [" ", ""];
 
         InvalidOperationException exception = Assert.Throws<InvalidOperationException>(options.Validate);
 

@@ -82,6 +82,7 @@ public static class AsiBackboneHttpResultMappingExtensions
             GovernanceDecisionOutcome.Deferred => options.DeferredStatusCode,
             GovernanceDecisionOutcome.AcknowledgmentRequired => options.AcknowledgmentRequiredStatusCode,
             GovernanceDecisionOutcome.EscalationRecommended => options.EscalationRecommendedStatusCode,
+            _ => options.OperationFailureStatusCode,
         };
     }
 
@@ -158,6 +159,7 @@ public static class AsiBackboneHttpResultMappingExtensions
             GovernanceDecisionOutcome.Deferred => "Governance decision deferred execution.",
             GovernanceDecisionOutcome.AcknowledgmentRequired => "Governance decision requires acknowledgment.",
             GovernanceDecisionOutcome.EscalationRecommended => "Governance decision recommends escalation.",
+            _ => "Governance decision did not allow immediate execution.",
         };
     }
 

@@ -55,6 +55,33 @@ public sealed class AsiBackboneAspNetCoreOptionsBranchTests
     }
 
     [Fact]
+    public void CorrelationIdHeaderNameSetterReplacesConfiguredHeaderNames()
+    {
+        var options = new AsiBackboneAspNetCoreOptions
+        {
+            CorrelationIdHeaderNames = ["X-First", "X-Second"],
+        };
+
+        options.CorrelationIdHeaderName = "X-Replacement";
+
+        Assert.Equal("X-Replacement", options.CorrelationIdHeaderName);
+        Assert.Equal(["X-Replacement"], options.CorrelationIdHeaderNames);
+    }
+
+    [Fact]
+    public void ValidateAcceptsHeaderNamesWhenAtLeastOneConfiguredHeaderIsNotBlank()
+    {
+        var options = new AsiBackboneAspNetCoreOptions
+        {
+            CorrelationIdHeaderNames = [" ", "X-Correlation-ID"],
+        };
+
+        Exception? exception = Record.Exception(options.Validate);
+
+        Assert.Null(exception);
+    }
+
+    [Fact]
     public void ValidateRejectsNullCorrelationHeaderNames()
     {
         var options = new AsiBackboneAspNetCoreOptions

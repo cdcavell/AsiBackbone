@@ -4,7 +4,44 @@ All notable changes to this project are documented in this file.
 
 This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/) and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.3.0-alpha.1] - 2026-06-11
+
+### Added
+
+* Added the initial `CDCavell.AsiBackbone.AspNetCore` alpha integration package.
+* Added ASP.NET Core service registration extensions through `AddAsiBackboneAspNetCore(...)`.
+* Added configurable ASP.NET Core integration options with startup validation.
+* Added an HTTP actor context adapter for resolving Core-compatible actor context from `HttpContext.User`.
+* Added configurable claim mapping for actor identifiers, display names, and actor type.
+* Added safe unauthenticated actor handling without throwing during normal request flow.
+* Added ASP.NET Core request correlation support for resolving correlation identifiers, trace identifiers, and safe request metadata.
+* Added audit enrichment helpers for creating Core audit residue from HTTP request correlation data.
+* Added HTTP result mapping helpers for Core `GovernanceDecision` and `OperationResult` values.
+* Added host-overridable HTTP result mapping options for allowed, warning, denied, deferred, acknowledgment-required, escalation-recommended, and failed operation outcomes.
+* Added Problem Details-style responses for non-success governance and operation outcomes.
+* Added safe default response behavior that preserves reason codes and correlation identifiers while hiding reason messages, trace identifiers, policy versions, and policy hashes unless explicitly enabled.
+* Added ASP.NET Core acknowledgment challenge models and service support for Core `AcknowledgmentRequired` governance decisions.
+* Added acknowledgment challenge response handling that round-trips accepted or rejected responses into Core `LiabilityHandshakeAcknowledgment` values.
+* Added tests for service registration, actor context resolution, request correlation, audit enrichment, HTTP result mapping, and acknowledgment challenge handling.
+
+### Documentation
+
+* Added ASP.NET Core integration boundary documentation.
+* Added ASP.NET Core package README guidance for service registration, request correlation, audit enrichment, HTTP result mapping, and acknowledgment challenge usage.
+* Documented the package as a thin web-host adapter around Core governance primitives.
+* Documented that hosts remain responsible for authentication, authorization, persistence, routing, UI rendering, endpoint exposure, and operational execution.
+
+### Boundaries
+
+* The ASP.NET Core package keeps Core framework-neutral and free of ASP.NET Core dependencies.
+* The ASP.NET Core package does not register EF Core, persistence stores, authentication handlers, MVC, Razor Pages, Minimal API endpoints, middleware enforcement, policy evaluators, or NetCoreApplicationTemplate dependencies by default.
+* HTTP result mapping and acknowledgment challenge helpers are explicit host adapters and do not enforce decisions automatically.
+* Hosts choose how to render, store, protect, and round-trip acknowledgment challenge state.
+
+### Notes
+
+* This alpha release establishes the first web-host integration layer for the AsiBackbone package family.
+* The implementation is intentionally adapter-focused: it translates ASP.NET Core request context into Core governance language and translates Core outcomes into HTTP-friendly shapes when explicitly used by the host.
 
 ## [0.2.0-alpha.1] - 2026-06-10
 

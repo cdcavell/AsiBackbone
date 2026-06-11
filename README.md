@@ -6,9 +6,20 @@
 [![.NET](https://img.shields.io/badge/.NET-10.0-purple)](https://dotnet.microsoft.com/)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE.txt)
 [![GitHub Release](https://img.shields.io/github/v/release/cdcavell/AsiBackbone?include_prerelease=true&sort=semver&display_name=tag&label=release)](https://github.com/cdcavell/AsiBackbone/releases)
-[![NuGet Core](https://img.shields.io/nuget/v/CDCavell.AsiBackbone.Core?label=Core)](https://www.nuget.org/packages/CDCavell.AsiBackbone.Core)
-[![NuGet Downloads](https://img.shields.io/nuget/dt/CDCavell.AsiBackbone.Core?label=Core%20downloads)](https://www.nuget.org/packages/CDCavell.AsiBackbone.Core)
 [![Zenodo DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.20546032-blue)](https://doi.org/10.5281/zenodo.20546032)
+
+### NuGet Packages:
+[![NuGet Core](https://img.shields.io/nuget/v/CDCavell.AsiBackbone.Core?label=Core)](https://www.nuget.org/packages/CDCavell.AsiBackbone.Core)
+[![NuGet Core Downloads](https://img.shields.io/nuget/dt/CDCavell.AsiBackbone.Core?label=Core%20downloads)](https://www.nuget.org/packages/CDCavell.AsiBackbone.Core)
+
+[![NuGet AspNetCore](https://img.shields.io/nuget/v/CDCavell.AsiBackbone.AspNetCore?label=AspNetCore)](https://www.nuget.org/packages/CDCavell.AsiBackbone.AspNetCore)
+[![NuGet AspNetCore Downloads](https://img.shields.io/nuget/dt/CDCavell.AsiBackbone.AspNetCore?label=AspNetCore%20downloads)](https://www.nuget.org/packages/CDCavell.AsiBackbone.AspNetCore)
+
+[![NuGet Storage.InMemory](https://img.shields.io/nuget/v/CDCavell.AsiBackbone.Storage.InMemory?label=Storage.InMemory)](https://www.nuget.org/packages/CDCavell.AsiBackbone.Storage.InMemory)
+[![NuGet Storage.InMemory Downloads](https://img.shields.io/nuget/dt/CDCavell.AsiBackbone.Storage.InMemory?label=Storage.InMemory%20downloads)](https://www.nuget.org/packages/CDCavell.AsiBackbone.Storage.InMemory)
+
+[![NuGet EntityFrameworkCore](https://img.shields.io/nuget/v/CDCavell.AsiBackbone.EntityFrameworkCore?label=EntityFrameworkCore)](https://www.nuget.org/packages/CDCavell.AsiBackbone.EntityFrameworkCore)
+[![NuGet EntityFrameworkCore Downloads](https://img.shields.io/nuget/dt/CDCavell.AsiBackbone.EntityFrameworkCore?label=EntityFrameworkCore%20downloads)](https://www.nuget.org/packages/CDCavell.AsiBackbone.EntityFrameworkCore)
 
 Governance-oriented domain abstractions and host integration packages for the ASI Backbone framework.
 
@@ -25,7 +36,7 @@ The Core package does **not** require ASP.NET Core, Entity Framework Core, NetCo
 
 Early alpha package family.
 
-The repository has completed the initial Core foundation work and now includes optional persistence packages for in-memory validation and EF Core host-owned persistence. Planned follow-up milestones include ASP.NET Core integration, samples and host validation, signing support, gateway integrations, robotics examples, and stable release packaging.
+The repository has completed the initial Core foundation work and now includes optional persistence packages for in-memory validation, EF Core host-owned persistence and ASP.NET Core integration. Planned follow-up milestones include samples and host validation, signing support, gateway integrations, robotics examples, and stable release packaging.
 
 ## Project Direction
 

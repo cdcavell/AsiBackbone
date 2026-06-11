@@ -158,4 +158,51 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
 
         Assert.Contains("correlation identifier header name", exception.Message, StringComparison.Ordinal);
     }
+
+    [Fact]
+    public void ActorContextOptionsRegistrationRejectsInvalidConfiguredOptions()
+    {
+        ServiceCollection services = new();
+        _ = services.AddAsiBackboneAspNetCore();
+        _ = services.Configure<AsiBackboneHttpActorContextOptions>(options => options.ActorIdClaimTypes = []);
+
+        OptionsValidationException exception = Assert.Throws<OptionsValidationException>(() =>
+            ResolveOptions<AsiBackboneHttpActorContextOptions>(services));
+
+        Assert.Contains("HTTP actor context options", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ResultMappingOptionsRegistrationRejectsInvalidConfiguredOptions()
+    {
+        ServiceCollection services = new();
+        _ = services.AddAsiBackboneAspNetCore();
+        _ = services.Configure<AsiBackboneHttpResultMappingOptions>(options => options.DeniedStatusCode = 99);
+
+        OptionsValidationException exception = Assert.Throws<OptionsValidationException>(() =>
+            ResolveOptions<AsiBackboneHttpResultMappingOptions>(services));
+
+        Assert.Contains("HTTP result mapping options", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void AcknowledgmentChallengeOptionsRegistrationRejectsInvalidConfiguredOptions()
+    {
+        ServiceCollection services = new();
+        _ = services.AddAsiBackboneAspNetCore();
+        _ = services.Configure<AsiBackboneAcknowledgmentChallengeOptions>(options => options.RequiredAcknowledgmentText = " ");
+
+        OptionsValidationException exception = Assert.Throws<OptionsValidationException>(() =>
+            ResolveOptions<AsiBackboneAcknowledgmentChallengeOptions>(services));
+
+        Assert.Contains("Acknowledgment challenge options", exception.Message, StringComparison.Ordinal);
+    }
+
+    private static TOptions ResolveOptions<TOptions>(IServiceCollection services)
+        where TOptions : class
+    {
+        using ServiceProvider provider = services.BuildServiceProvider();
+
+        return provider.GetRequiredService<IOptions<TOptions>>().Value;
+    }
 }

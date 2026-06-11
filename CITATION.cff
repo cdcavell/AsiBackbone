@@ -1,8 +1,8 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it using the metadata below."
 title: "ASI Backbone"
-version: "0.2.0-alpha.1"
-date-released: "2026-06-10"
+version: "0.3.0-alpha.1"
+date-released: "2026-06-11"
 repository-code: "https://github.com/cdcavell/AsiBackbone"
 url: "https://cdcavell.github.io/AsiBackbone/"
 type: software

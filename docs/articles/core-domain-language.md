@@ -2,10 +2,10 @@
 
 This article defines the initial domain language for `CDCavell.AsiBackbone.Core` and the host-neutral package boundary that the rest of the AsiBackbone package family builds on.
 
-`CDCavell.AsiBackbone.Core` is the framework-neutral foundation for the AsiBackbone package family. Its purpose is to define shared primitives for governing consequential software actions through explicit policy, constraint, acknowledgment, audit, and capability boundaries.
+In this software project, **ASI** means **Accountable Systems Infrastructure**. `CDCavell.AsiBackbone.Core` is the framework-neutral foundation for the AsiBackbone package family. Its purpose is to define shared primitives for governing consequential software actions through explicit policy, constraint, acknowledgment, audit, and capability boundaries.
 
 > [!IMPORTANT]
-> AsiBackbone is governance infrastructure around intelligent or decision-producing systems. It is not a completed ASI implementation, not an AI model package, and not proof of artificial superintelligence.
+> AsiBackbone is governance infrastructure around intelligent or decision-producing systems. It is not a completed artificial superintelligence implementation, not an AI model package, and not proof of artificial superintelligence.
 
 ## Core technical lane
 
@@ -27,6 +27,14 @@ Intent or request
 Core defines the language and primitive contracts for this lane. It does not decide how a host persists records, exposes HTTP endpoints, wires middleware, or connects to an AI model.
 
 ## Domain terms
+
+### Accountable Systems Infrastructure
+
+Accountable Systems Infrastructure is the project meaning of ASI in this repository.
+
+It describes infrastructure that helps software systems make consequential actions more accountable by routing proposed intent through policy evaluation, constraint checks, acknowledgment workflows, audit receipts, capability-scoped grants, and gateway boundaries before host execution.
+
+This term keeps the package grounded as governance infrastructure rather than an intelligence engine.
 
 ### Governance spine
 
@@ -65,7 +73,7 @@ Governance decisions may defer, require acknowledgment, or recommend escalation 
 
 The active policy structure is the set of constraints in force for a decision at a specific moment.
 
-This term maps the ASI Backbone software model to the broader structure-conditioned collapse language: a request should not collapse into any possible action whatsoever. It should collapse only into the outcomes allowed by the active policy structure.
+This term maps the AsiBackbone software model to the broader structure-conditioned collapse language: a request should not collapse into any possible action whatsoever. It should collapse only into the outcomes allowed by the active policy structure.
 
 In software terms, the active policy structure should be explainable through policy version, policy hash, reason codes, and audit residue.
 
@@ -243,18 +251,19 @@ The current and planned package ownership model is:
 
 ## Alignment boundary
 
-AsiBackbone documentation may reference the ASI Backbone concept and the Eden/ASI framework as conceptual inspiration. It should remain careful about claims.
+AsiBackbone documentation may reference the broader Eden/Backbone framework as conceptual inspiration. It should remain careful about claims.
 
 Safe language:
 
-* AsiBackbone is inspired by the ASI Backbone framework.
+* ASI means Accountable Systems Infrastructure in this repository.
+* AsiBackbone stands for Accountable Systems Infrastructure Backbone.
 * AsiBackbone implements governance-oriented software primitives.
 * AsiBackbone helps structure consequential decision flow through constraints, acknowledgment, audit, and capability boundaries.
 * AsiBackbone can surround intelligent or decision-producing systems with accountable execution infrastructure.
 
 Avoid language such as:
 
-* AsiBackbone implements ASI.
+* AsiBackbone implements artificial superintelligence.
 * AsiBackbone proves the Eden Hypothesis.
 * AsiBackbone is an AI model.
 * AsiBackbone replaces AI safety governance, legal review, or organizational accountability.

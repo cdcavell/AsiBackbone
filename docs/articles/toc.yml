@@ -12,8 +12,8 @@
 
 - name: Scenarios
   items:
-  - name: AI Agent Gateway
-    href: scenarios/ai-agent-gateway.md
+    - name: AI Agent Gateway
+      href: scenarios/ai-agent-gateway.md
 
 - name: Core Domain Language
   href: core-domain-language.md

@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using CDCavell.AsiBackbone.Core.Handshakes;
 
 namespace CDCavell.AsiBackbone.AspNetCore.Handshakes;
@@ -8,9 +7,6 @@ namespace CDCavell.AsiBackbone.AspNetCore.Handshakes;
 /// </summary>
 public sealed class AsiBackboneAcknowledgmentChallenge
 {
-    private static readonly IReadOnlyDictionary<string, string> EmptyMetadata =
-        new ReadOnlyDictionary<string, string>(new Dictionary<string, string>(StringComparer.Ordinal));
-
     private AsiBackboneAcknowledgmentChallenge(
         LiabilityHandshakeRequest handshakeRequest,
         string handshakeId,
@@ -148,7 +144,7 @@ public sealed class AsiBackboneAcknowledgmentChallenge
             options.IncludeTraceId ? request.TraceId : null,
             options.IncludePolicyMetadata ? request.PolicyVersion : null,
             options.IncludePolicyMetadata ? request.PolicyHash : null,
-            NormalizeMetadata(request.Metadata));
+            request.Metadata);
     }
 
     private static string? NormalizeOptional(string? value)
@@ -156,28 +152,5 @@ public sealed class AsiBackboneAcknowledgmentChallenge
         return string.IsNullOrWhiteSpace(value)
             ? null
             : value.Trim();
-    }
-
-    private static IReadOnlyDictionary<string, string> NormalizeMetadata(IReadOnlyDictionary<string, string>? metadata)
-    {
-        if (metadata is null || metadata.Count == 0)
-        {
-            return EmptyMetadata;
-        }
-
-        Dictionary<string, string> normalizedMetadata = new(StringComparer.Ordinal);
-        foreach (KeyValuePair<string, string> item in metadata)
-        {
-            if (string.IsNullOrWhiteSpace(item.Key))
-            {
-                continue;
-            }
-
-            normalizedMetadata[item.Key.Trim()] = item.Value?.Trim() ?? string.Empty;
-        }
-
-        return normalizedMetadata.Count == 0
-            ? EmptyMetadata
-            : new ReadOnlyDictionary<string, string>(normalizedMetadata);
     }
 }

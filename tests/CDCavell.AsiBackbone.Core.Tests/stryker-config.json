@@ -4,6 +4,8 @@
     "project": "CDCavell.AsiBackbone.Core.csproj",
     "target-framework": "net10.0",
     "configuration": "Release",
+    "test-runner": "mtp",
+    "coverage-analysis": "off",
     "reporters": [
       "html",
       "cleartext"

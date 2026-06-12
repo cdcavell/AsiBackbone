@@ -1,8 +1,8 @@
 # Core Policy Evaluator Pipeline
 
-This article documents the first host-neutral policy evaluation loop for `CDCavell.AsiBackbone.Core`.
+This article documents the host-neutral policy evaluation loop for `CDCavell.AsiBackbone.Core`.
 
-The evaluator proves the initial governance spine without requiring ASP.NET Core, Entity Framework Core, a database, a web host, robotics integration, or an AI model runtime.
+The Core evaluator proves the governance spine without requiring ASP.NET Core, Entity Framework Core, a database, a web host, robotics integration, or an AI model runtime.
 
 ```text
 intent or request
@@ -15,14 +15,14 @@ intent or request
 
 ## Ownership model
 
-The initial alpha ownership model is:
+The current alpha ownership model is:
 
 | Area | Responsibility |
 | --- | --- |
 | `CDCavell.AsiBackbone.Core` | Policy evaluator contracts, the default evaluator, decision composition, constraint contracts, decisions, audit residue, and audit sink contracts. |
 | `CDCavell.AsiBackbone.Storage.InMemory` | In-process audit ledger support for tests, samples, and local validation hosts. |
-| Future `CDCavell.AsiBackbone.AspNetCore` | HTTP adaptation, current actor resolution, request-to-context mapping, and service registration. |
-| Future `CDCavell.AsiBackbone.Storage.EntityFrameworkCore` | Durable persistence integration while preserving host-owned `DbContext` and database lifecycle. |
+| `CDCavell.AsiBackbone.AspNetCore` | Thin HTTP host adapters for service registration, current actor resolution, request correlation, audit enrichment, HTTP result mapping, and acknowledgment challenge helpers. |
+| `CDCavell.AsiBackbone.EntityFrameworkCore` | EF Core model configuration and durable accountability persistence while preserving host-owned `DbContext`, provider, migrations, and database lifecycle. |
 
 A future package split may move shared contracts into a dedicated abstractions package. For this alpha slice, the contracts remain in Core so the evaluator can be proven without widening the release branch into a larger package restructuring.
 
@@ -90,7 +90,7 @@ This evaluator does not execute the governed action. It decides whether the acti
 
 Execution still belongs to the host or gateway layer. That boundary keeps Core as governance infrastructure rather than an execution engine.
 
-The initial implementation deliberately avoids:
+The Core evaluator itself deliberately avoids:
 
 * ASP.NET Core middleware
 * Entity Framework Core persistence

@@ -49,10 +49,17 @@ dotnet reportgenerator \
   -filefilters:"-**/bin/**;-**/obj/**;-**/*.g.cs"
 ```
 
-Run the initial Core mutation analysis from the repository root:
+Run the initial Core mutation analysis from the Core test-project folder:
 
 ```bash
-dotnet stryker --config-file ./stryker/stryker-core-config.json
+cd ./tests/CDCavell.AsiBackbone.Core.Tests
+dotnet tool run dotnet-stryker -- --config-file stryker-config.json
+```
+
+The Core mutation report is written to:
+
+```text
+artifacts/mutation-report/core
 ```
 
 ## Interpreting mutation results

@@ -9,30 +9,37 @@
 [![GitHub Release](https://img.shields.io/github/v/release/cdcavell/AsiBackbone?include_prerelease=true&sort=semver&display_name=tag&label=release)](https://github.com/cdcavell/AsiBackbone/releases)
 [![Zenodo DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.20546032-blue)](https://doi.org/10.5281/zenodo.20546032)
 
-### NuGet Packages
 
-[![NuGet Core](https://img.shields.io/nuget/v/CDCavell.AsiBackbone.Core?label=Core)](https://www.nuget.org/packages/CDCavell.AsiBackbone.Core)
-[![NuGet Core Downloads](https://img.shields.io/nuget/dt/CDCavell.AsiBackbone.Core?label=Core%20downloads)](https://www.nuget.org/packages/CDCavell.AsiBackbone.Core)
+## Accountable Systems Infrastructure for governed .NET decision flow.
 
-[![NuGet AspNetCore](https://img.shields.io/nuget/v/CDCavell.AsiBackbone.AspNetCore?label=AspNetCore)](https://www.nuget.org/packages/CDCavell.AsiBackbone.AspNetCore)
-[![NuGet AspNetCore Downloads](https://img.shields.io/nuget/dt/CDCavell.AsiBackbone.AspNetCore?label=AspNetCore%20downloads)](https://www.nuget.org/packages/CDCavell.AsiBackbone.AspNetCore)
+AsiBackbone is a .NET package family for building an accountable governance spine around consequential software actions.
 
-[![NuGet Storage.InMemory](https://img.shields.io/nuget/v/CDCavell.AsiBackbone.Storage.InMemory?label=Storage.InMemory)](https://www.nuget.org/packages/CDCavell.AsiBackbone.Storage.InMemory)
-[![NuGet Storage.InMemory Downloads](https://img.shields.io/nuget/dt/CDCavell.AsiBackbone.Storage.InMemory?label=Storage.InMemory%20downloads)](https://www.nuget.org/packages/CDCavell.AsiBackbone.Storage.InMemory)
+AI systems, agents, services, and applications may produce recommendations, requests, or actions. AsiBackbone provides the infrastructure around those decisions: policy evaluation, acknowledgment workflows, audit residue, capability boundaries, and host-controlled execution.
 
-[![NuGet EntityFrameworkCore](https://img.shields.io/nuget/v/CDCavell.AsiBackbone.EntityFrameworkCore?label=EntityFrameworkCore)](https://www.nuget.org/packages/CDCavell.AsiBackbone.EntityFrameworkCore)
-[![NuGet EntityFrameworkCore Downloads](https://img.shields.io/nuget/dt/CDCavell.AsiBackbone.EntityFrameworkCore?label=EntityFrameworkCore%20downloads)](https://www.nuget.org/packages/CDCavell.AsiBackbone.EntityFrameworkCore)
+In this software project, **ASI** means **Accountable Systems Infrastructure**.
 
-`CDCavell.AsiBackbone` is a .NET package family for building an **Accountable Systems Infrastructure Backbone** around consequential software actions.
+> AI may provide the intellect. AsiBackbone provides the accountable spine.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. The package name uses `AsiBackbone` to preserve stable .NET identifiers, while the documentation frames the acronym as governance infrastructure rather than artificial superintelligence.
+## What is AsiBackbone?
 
-It helps a host application evaluate intent before execution, apply policy constraints, require acknowledgment when needed, preserve audit residue, and optionally scope follow-on execution through capability tokens.
+AsiBackbone helps a host application evaluate intent before execution, apply policy constraints, require acknowledgment when needed, preserve audit records, and optionally scope follow-on execution through short-lived capability tokens.
+
+It is designed for systems where consequential actions need to be governed, explained, audited, and constrained before the host application executes them.
 
 AsiBackbone should be understood as **governance infrastructure**, not an intelligence engine.
 
 > [!IMPORTANT]
 > These packages do **not** implement artificial superintelligence, host AI models, train AI models, control robots, or prove the Eden/Backbone framework. They provide framework-neutral building blocks and host integration seams for governing consequential actions in software systems.
+
+### Packages
+
+| Package | NuGet | Downloads |
+| :--- | :--- | :--- |
+| Core | [![NuGet Core](https://img.shields.io/nuget/v/CDCavell.AsiBackbone.Core?label=Release)](https://www.nuget.org/packages/CDCavell.AsiBackbone.Core) | [![NuGet Core Downloads](https://img.shields.io/nuget/dt/CDCavell.AsiBackbone.Core?label=Downloads)](https://www.nuget.org/packages/CDCavell.AsiBackbone.Core) |
+| AspNetCore | [![NuGet AspNetCore](https://img.shields.io/nuget/v/CDCavell.AsiBackbone.AspNetCore?label=Release)](https://www.nuget.org/packages/CDCavell.AsiBackbone.AspNetCore) | [![NuGet AspNetCore Downloads](https://img.shields.io/nuget/dt/CDCavell.AsiBackbone.AspNetCore?label=Downloads)](https://www.nuget.org/packages/CDCavell.AsiBackbone.AspNetCore) |
+| Storage.InMemory | [![NuGet Storage.InMemory](https://img.shields.io/nuget/v/CDCavell.AsiBackbone.Storage.InMemory?label=Release)](https://www.nuget.org/packages/CDCavell.AsiBackbone.Storage.InMemory) | [![NuGet Storage.InMemory Downloads](https://img.shields.io/nuget/dt/CDCavell.AsiBackbone.Storage.InMemory?label=Downloads)](https://www.nuget.org/packages/CDCavell.AsiBackbone.Storage.InMemory) |
+| EntityFrameworkCore | [![NuGet EntityFrameworkCore](https://img.shields.io/nuget/v/CDCavell.AsiBackbone.EntityFrameworkCore?label=Release)](https://www.nuget.org/packages/CDCavell.AsiBackbone.EntityFrameworkCore) | [![NuGet EntityFrameworkCore Downloads](https://img.shields.io/nuget/dt/CDCavell.AsiBackbone.EntityFrameworkCore?label=Downloads)](https://www.nuget.org/packages/CDCavell.AsiBackbone.EntityFrameworkCore) |
+
 
 ## What problem does this solve?
 
@@ -107,7 +114,7 @@ The host application remains responsible for execution behavior and operational 
 
 Early alpha package family.
 
-The repository has completed the initial Core foundation work and now includes optional persistence packages for in-memory validation, EF Core host-owned persistence, and ASP.NET Core integration. Planned follow-up milestones include samples and host validation, signing support, gateway integrations, robotics examples, and stable release packaging.
+The repository has completed the initial Core foundation work and now includes optional persistence packages for in-memory validation, EF Core host-owned persistence, ASP.NET Core integration, samples and host validation. Planned follow-up milestones include signing support, gateway integrations, robotics examples, and stable release packaging.
 
 ## Project Direction
 

@@ -22,6 +22,23 @@ Good signals include:
 
 AsiBackbone may be too much for low-risk CRUD screens, simple role checks, unconstrained internal tools, or applications that only need ordinary logging.
 
+## Enterprise adoption signals
+
+Different enterprise readers may evaluate the package from different angles:
+
+| Reader | Likely question |
+| --- | --- |
+| Senior developer | Can I adopt this without losing control of my application architecture? |
+| System engineer | Where does this sit in the operational flow, and what does it record? |
+| Enterprise architect | Does this create a reusable governance vocabulary across systems? |
+| Platform engineering team | Can this become part of an internal service template or paved-road pattern? |
+| AI integration architect | Can this sit between AI-generated intent and host-owned execution? |
+| Security or compliance lead | Does this help preserve decision evidence before consequential execution? |
+
+These roles do not need different product claims. They need clear boundaries, practical integration seams, and documentation that explains what the host still owns.
+
+See [Enterprise Adoption Personas](enterprise-adoption-personas.md) for a role-oriented view.
+
 ## Why not ad hoc authorization checks?
 
 Ad hoc authorization checks usually answer a narrow question: can this actor perform this operation?
@@ -67,6 +84,43 @@ Potential flow:
 
 This keeps the agent from becoming the execution authority. The host remains the boundary owner.
 
+### Human approval before AI tool execution
+
+Some AI tool paths should pause until a human accepts or rejects the risk of execution.
+
+A focused approval flow is:
+
+1. AI proposes an action.
+2. Host builds policy context.
+3. AsiBackbone evaluates policy.
+4. Decision requires acknowledgment.
+5. Human accepts or rejects.
+6. Host decides whether to execute.
+
+This keeps the approval step connected to reason codes, policy version, audit residue, and the host-owned execution boundary.
+
+### High-risk administrative actions
+
+Administrative systems often contain sensitive actions that deserve more structure than ordinary authorization.
+
+Examples include account-status changes, sensitive workflow approvals, data export review, policy exception requests, and administrative configuration changes.
+
+AsiBackbone can help centralize the decision language around these actions while allowing the application to keep its own UI, storage, authentication, and operational rules.
+
+### Sensitive data access requests
+
+Some systems need to evaluate purpose, actor context, resource classification, region, policy version, and risk before protected information is returned or routed.
+
+AsiBackbone can provide a decision boundary before the host continues through its own data path. The host remains responsible for identity, authorization, retrieval, presentation, masking, retention, and compliance review.
+
+### Deployment or infrastructure change gates
+
+A platform team may want a policy gate before a host performs a deployment, maintenance, or configuration action.
+
+Examples include promoting a release, running a maintenance job, applying a configuration update, or triggering external automation.
+
+AsiBackbone should not be treated as the deployment engine. It can evaluate whether the host should allow, deny, defer, require acknowledgment, or escalate before the host calls its own automation system.
+
 ### Human-in-the-loop consequential workflows
 
 Some operations should pause until a human acknowledges risk, responsibility, or intent.
@@ -87,22 +141,6 @@ Enterprise services often need traceable decision flow across service boundaries
 AsiBackbone may help when a microservice must preserve reason codes, policy versions and hashes, correlation IDs, actor context, risk category, decision metadata, and audit residue suitable for later review.
 
 The package does not guarantee regulatory compliance, but it can provide a consistent governance model that regulated hosts can adapt to their own compliance program.
-
-### Automated infrastructure or deployment gating
-
-A platform team may want a policy gate before a host performs an infrastructure or deployment action.
-
-Examples include promoting a deployment, running a privileged automation job, applying a configuration change, or triggering a maintenance workflow.
-
-AsiBackbone should not be treated as the deployment engine. It can evaluate whether the host should allow, deny, defer, require acknowledgment, or escalate before the host calls its own automation system.
-
-### Administrative approval workflows
-
-Administrative systems often contain sensitive actions that deserve more structure than ordinary authorization.
-
-Examples include role changes, account recovery actions, sensitive data access approvals, policy override requests, and manual exception handling.
-
-AsiBackbone can help centralize the decision language around these actions while allowing the application to keep its own UI, storage, authentication, and operational rules.
 
 ### Simulated external-command validation
 
@@ -142,6 +180,12 @@ Useful starting points:
 
 - [Getting Started](getting-started.md) for project orientation and the basic decision-flow model.
 - [Why AsiBackbone?](why-asi-backbone.md) for the practical benefits overview.
+- [Enterprise Adoption Personas](enterprise-adoption-personas.md) for role-oriented enterprise evaluation guidance.
+- [AI Agent Gateway](scenarios/ai-agent-gateway.md) for AI-proposed tool governance.
+- [Human Approval Before AI Tool Execution](scenarios/human-approval-before-ai-tool-execution.md) for acknowledgment-required AI tool paths.
+- [High-Risk Administrative Action](scenarios/high-risk-administrative-action.md) for governed administrative workflows.
+- [Sensitive Data Access Request](scenarios/sensitive-data-access-request.md) for protected information access decisions.
+- [Deployment or Infrastructure Change Gate](scenarios/deployment-or-infrastructure-change-gate.md) for platform and operations gating.
 - [Policy Evaluator Pipeline](policy-evaluator-pipeline.md) for the core evaluation path.
 - [ASP.NET Core Integration Boundary](aspnetcore-integration-boundary.md) for host integration boundaries.
 - [Plain ASP.NET Core Host Sample](plain-aspnetcore-host-sample.md) for the canonical in-repository validation sample.

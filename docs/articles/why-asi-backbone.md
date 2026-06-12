@@ -69,6 +69,10 @@ AsiBackbone may be useful for:
 - Platform engineering workflows that need clear allow/deny/defer/escalate decisions before external execution.
 - Applications that need capability-scoped grants instead of broad, long-lived authority.
 
+These groups often include senior developers, system engineers, enterprise architects, platform engineering teams, AI integration architects, and security-conscious engineering teams. The package is intended to support those roles without making assumptions about their host framework, identity model, database ownership, deployment process, or operational controls.
+
+See [Enterprise Adoption Personas](enterprise-adoption-personas.md) for a role-oriented view of how different enterprise readers may evaluate the package.
+
 ## When not to use it
 
 AsiBackbone is probably not the right fit when:
@@ -129,5 +133,7 @@ That conceptual inspiration is useful, but the package boundary remains practica
 - [Getting Started](getting-started.md)
 - [Core Domain Language](core-domain-language.md)
 - [Policy Evaluator Pipeline](policy-evaluator-pipeline.md)
+- [Enterprise Adoption Personas](enterprise-adoption-personas.md)
+- [Adoption and Target Use Cases](use-cases.md)
 - [EF Core Integration Boundary](ef-core-integration-boundary.md)
 - [Plain ASP.NET Core Host Sample](plain-aspnetcore-host-sample.md)

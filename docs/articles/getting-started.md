@@ -2,10 +2,10 @@
 
 This guide explains the current direction of the AsiBackbone repository and how to begin working with the project.
 
-AsiBackbone is an early alpha .NET package family for governance-oriented decision flow. The foundation package is `CDCavell.AsiBackbone.Core`, with optional integration packages for in-memory validation, EF Core host-owned persistence, and ASP.NET Core host integration.
+In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is an early alpha .NET package family for governance-oriented decision flow. The foundation package is `CDCavell.AsiBackbone.Core`, with optional integration packages for in-memory validation, EF Core host-owned persistence, and ASP.NET Core host integration.
 
 > [!IMPORTANT]
-> This project does not implement artificial superintelligence. It provides governance-oriented software building blocks inspired by the ASI Backbone framework.
+> This project does not implement artificial superintelligence. It provides Accountable Systems Infrastructure: governance-oriented software building blocks inspired by broader Backbone framework concepts.
 
 ## Current status
 
@@ -84,7 +84,7 @@ DocFX will build the documentation and serve it locally. Use the local URL print
 
 ## Project orientation
 
-AsiBackbone should be understood as a governance spine.
+AsiBackbone should be understood as a governance spine for Accountable Systems Infrastructure.
 
 A typical AsiBackbone-style flow is:
 
@@ -310,8 +310,8 @@ When adding documentation, keep the distinction clear between:
 
 * Implemented package behavior
 * Planned package behavior
-* Conceptual ASI Backbone framing
-* Eden/ASI theoretical background
+* Accountable Systems Infrastructure framing
+* Broader Eden/Backbone theoretical background
 * Structural analogy
 * Testable or operational software claims
 

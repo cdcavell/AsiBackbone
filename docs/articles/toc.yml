@@ -20,6 +20,8 @@
   items:
     - name: AI Agent Gateway
       href: scenarios/ai-agent-gateway.md
+    - name: Robotics Operational Gateway
+      href: scenarios/robotics-operational-gateway.md
 
 - name: Core Domain Language
   href: core-domain-language.md

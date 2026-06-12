@@ -21,30 +21,30 @@ Examples include account-status changes, approval of sensitive workflow steps, p
 
 ```mermaid
 sequenceDiagram
-    participant Actor as Requesting actor
-    participant Host as Host application
-    participant Backbone as AsiBackbone evaluator
-    participant Ack as Acknowledgment flow
-    participant Audit as Audit sink or ledger
-    participant Operation as Host-owned operation
+    participant Actor as "Requesting actor"
+    participant Host as "Host application"
+    participant Backbone as "AsiBackbone evaluator"
+    participant Ack as "Acknowledgment flow"
+    participant Audit as "Audit sink or ledger"
+    participant Operation as "Host owned operation"
 
     Actor->>Host: Requests administrative action
     Host->>Host: Build policy context from actor, action, target, risk, and metadata
     Host->>Backbone: EvaluateAsync(context)
     Backbone-->>Host: GovernanceDecision
-    alt Denied Deferred or EscalationRecommended
+    alt Denied, deferred, or escalation recommended
         Host->>Audit: Persist decision residue
         Host-->>Actor: Return governed outcome without execution
-    else AcknowledgmentRequired
+    else Acknowledgment required
         Host->>Ack: Present acknowledgment challenge
         Ack-->>Host: Accepted or rejected response
         Host->>Audit: Persist decision and acknowledgment residue
         opt Accepted and host policy permits execution
-            Host->>Operation: Execute host-owned operation
+            Host->>Operation: Execute host owned operation
         end
-    else Allowed or Warning
+    else Allowed or warning
         Host->>Audit: Persist decision residue
-        Host->>Operation: Execute host-owned operation
+        Host->>Operation: Execute host owned operation
     end
 ```
 

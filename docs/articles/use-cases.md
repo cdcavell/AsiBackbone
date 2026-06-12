@@ -22,6 +22,23 @@ Good signals include:
 
 AsiBackbone may be too much for low-risk CRUD screens, simple role checks, unconstrained internal tools, or applications that only need ordinary logging.
 
+## Enterprise adoption signals
+
+Different enterprise readers may evaluate the package from different angles:
+
+| Reader | Likely question |
+| --- | --- |
+| Senior developer | Can I adopt this without losing control of my application architecture? |
+| System engineer | Where does this sit in the operational flow, and what does it record? |
+| Enterprise architect | Does this create a reusable governance vocabulary across systems? |
+| Platform engineering team | Can this become part of an internal service template or paved-road pattern? |
+| AI integration architect | Can this sit between AI-generated intent and host-owned execution? |
+| Security or compliance lead | Does this help preserve decision evidence before consequential execution? |
+
+These roles do not need different product claims. They need clear boundaries, practical integration seams, and documentation that explains what the host still owns.
+
+See [Enterprise Adoption Personas](enterprise-adoption-personas.md) for a role-oriented view.
+
 ## Why not ad hoc authorization checks?
 
 Ad hoc authorization checks usually answer a narrow question: can this actor perform this operation?
@@ -142,6 +159,7 @@ Useful starting points:
 
 - [Getting Started](getting-started.md) for project orientation and the basic decision-flow model.
 - [Why AsiBackbone?](why-asi-backbone.md) for the practical benefits overview.
+- [Enterprise Adoption Personas](enterprise-adoption-personas.md) for role-oriented enterprise evaluation guidance.
 - [Policy Evaluator Pipeline](policy-evaluator-pipeline.md) for the core evaluation path.
 - [ASP.NET Core Integration Boundary](aspnetcore-integration-boundary.md) for host integration boundaries.
 - [Plain ASP.NET Core Host Sample](plain-aspnetcore-host-sample.md) for the canonical in-repository validation sample.

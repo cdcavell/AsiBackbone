@@ -1,7 +1,7 @@
 {
   "title": "ASI Backbone",
   "upload_type": "software",
-  "description": "A ",
+  "description": "AsiBackbone is a .NET package-family project providing framework-neutral governance primitives for consequential software decision flow, including actor context, constraint evaluation, governance decisions, audit residue, and acknowledgment handshakes.",
   "creators": [
     {
       "name": "Cavell, Christopher D.",
@@ -11,11 +11,16 @@
   "license": "MIT",
   "access_right": "open",
   "keywords": [
-    "aspnetcore",
+    "asi-backbone",
     "dotnet",
-    "security",
     "software-architecture",
-    "dotnet-new-template"
+    "governance",
+    "decision-flow",
+    "constraint-evaluation",
+    "audit-residue",
+    "acknowledgment",
+    "responsible-ai",
+    "package-development"
   ],
   "related_identifiers": [
     {
@@ -26,7 +31,7 @@
     },
     {
       "identifier": "https://github.com/cdcavell/NetCoreApplicationTemplate",
-      "relation": "isSupplementTo",
+      "relation": "isRelatedTo",
       "scheme": "url",
       "resource_type": "software"
     },

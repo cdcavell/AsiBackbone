@@ -9,7 +9,7 @@
       "cleartext"
     ],
     "report-file-name": "index",
-    "output": "../../artifacts/mutation-report/core",
+    "report-dir": "../../artifacts/mutation-report/core",
     "thresholds": {
       "high": 80,
       "low": 60,

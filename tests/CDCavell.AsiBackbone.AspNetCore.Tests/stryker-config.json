@@ -4,6 +4,7 @@
     "project": "CDCavell.AsiBackbone.AspNetCore.csproj",
     "target-framework": "net10.0",
     "configuration": "Release",
+    "test-runner": "mtp",
     "coverage-analysis": "off",
     "test-case-filter": "FullyQualifiedName~CDCavell.AsiBackbone.AspNetCore.Tests.Handshakes.AsiBackboneAcknowledgmentChallenge",
     "reporters": [

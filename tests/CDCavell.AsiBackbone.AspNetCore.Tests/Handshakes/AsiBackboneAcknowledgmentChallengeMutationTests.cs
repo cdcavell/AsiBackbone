@@ -1,6 +1,7 @@
 using CDCavell.AsiBackbone.AspNetCore.Handshakes;
 using CDCavell.AsiBackbone.Core.Actors;
 using CDCavell.AsiBackbone.Core.Decisions;
+using CDCavell.AsiBackbone.Core.Handshakes;
 using Microsoft.Extensions.Options;
 using Xunit;
 
@@ -113,6 +114,116 @@ public sealed class AsiBackboneAcknowledgmentChallengeMutationTests
         Assert.False(result.Rejected);
         Assert.Null(result.Acknowledgment);
         Assert.Contains("acknowledgment.challenge.code_mismatch", result.Result.ReasonCodes);
+    }
+
+    [Fact]
+    public void FromHandshakeRequestNormalizesMetadataKeysAndValues()
+    {
+        var actor = AsiBackboneActorContext.Human("user-123");
+        var decision = GovernanceDecision.RequireAcknowledgment("ack.required", "Acknowledgment required.");
+        var request = LiabilityHandshakeRequest.FromDecision(
+            actor,
+            "RunOperation",
+            decision,
+            "CONFIRM",
+            "Confirm responsibility.",
+            LiabilityHandshakeRiskLevel.Medium,
+            metadata: new Dictionary<string, string>
+            {
+                [" source "] = " web ",
+                ["   "] = "ignored",
+                ["empty-value"] = "   "
+            });
+
+        var challenge =
+            AsiBackboneAcknowledgmentChallenge.FromHandshakeRequest(request);
+
+        Assert.Equal(2, challenge.Metadata.Count);
+        Assert.Equal("web", challenge.Metadata["source"]);
+        Assert.Equal(string.Empty, challenge.Metadata["empty-value"]);
+        Assert.False(challenge.Metadata.ContainsKey("   "));
+    }
+
+    [Fact]
+    public void FromHandshakeRequestUsesEmptyMetadataWhenMetadataIsNullOrEmpty()
+    {
+        var actor = AsiBackboneActorContext.Human("user-123");
+        var decision = GovernanceDecision.RequireAcknowledgment("ack.required", "Acknowledgment required.");
+        var request = LiabilityHandshakeRequest.FromDecision(
+            actor,
+            "RunOperation",
+            decision,
+            "CONFIRM",
+            "Confirm responsibility.",
+            LiabilityHandshakeRiskLevel.Medium);
+
+        var challenge =
+            AsiBackboneAcknowledgmentChallenge.FromHandshakeRequest(request);
+
+        Assert.Empty(challenge.Metadata);
+    }
+
+    [Fact]
+    public void FromHandshakeRequestIncludesOptionalTraceAndPolicyMetadataWhenEnabled()
+    {
+        var actor = AsiBackboneActorContext.Human("user-123");
+        var decision = GovernanceDecision.RequireAcknowledgment(
+            "ack.required",
+            "Acknowledgment required.",
+            correlationId: "correlation-123",
+            traceId: "trace-123",
+            policyVersion: "v1",
+            policyHash: "hash-123");
+
+        var request = LiabilityHandshakeRequest.FromDecision(
+            actor,
+            "RunOperation",
+            decision,
+            "CONFIRM",
+            "Confirm responsibility.",
+            LiabilityHandshakeRiskLevel.Medium);
+
+        var options = new AsiBackboneAcknowledgmentChallengeOptions
+        {
+            IncludeTraceId = true,
+            IncludePolicyMetadata = true
+        };
+
+        var challenge =
+            AsiBackboneAcknowledgmentChallenge.FromHandshakeRequest(request, options);
+
+        Assert.Equal("trace-123", challenge.TraceId);
+        Assert.Equal("v1", challenge.PolicyVersion);
+        Assert.Equal("hash-123", challenge.PolicyHash);
+    }
+
+    [Fact]
+    public void FromHandshakeRequestRejectsNullRequest()
+    {
+        _ = Assert.Throws<ArgumentNullException>(() =>
+            AsiBackboneAcknowledgmentChallenge.FromHandshakeRequest(null!));
+    }
+
+    [Fact]
+    public void FromHandshakeRequestRejectsInvalidOptions()
+    {
+        var actor = AsiBackboneActorContext.Human("user-123");
+        var decision = GovernanceDecision.RequireAcknowledgment("ack.required", "Acknowledgment required.");
+        var request = LiabilityHandshakeRequest.FromDecision(
+            actor,
+            "RunOperation",
+            decision,
+            "CONFIRM",
+            "Confirm responsibility.",
+            LiabilityHandshakeRiskLevel.Medium);
+
+        var options = new AsiBackboneAcknowledgmentChallengeOptions
+        {
+            RequiredAcknowledgmentCode = " "
+        };
+
+        _ = Assert.Throws<InvalidOperationException>(() =>
+            AsiBackboneAcknowledgmentChallenge.FromHandshakeRequest(request, options));
     }
 
     private static DefaultAsiBackboneAcknowledgmentChallengeService CreateService(

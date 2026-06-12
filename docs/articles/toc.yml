@@ -23,6 +23,14 @@
   items:
     - name: AI Agent Gateway
       href: scenarios/ai-agent-gateway.md
+    - name: Human Approval Before AI Tool Execution
+      href: scenarios/human-approval-before-ai-tool-execution.md
+    - name: High-Risk Administrative Action
+      href: scenarios/high-risk-administrative-action.md
+    - name: Sensitive Data Access Request
+      href: scenarios/sensitive-data-access-request.md
+    - name: Deployment or Infrastructure Change Gate
+      href: scenarios/deployment-or-infrastructure-change-gate.md
     - name: Robotics Operational Gateway
       href: scenarios/robotics-operational-gateway.md
 

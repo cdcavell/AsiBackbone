@@ -10,12 +10,15 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 * Added Stryker.NET as a local .NET tool for mutation-analysis validation.
 * Added an initial Core test-project Stryker configuration for evaluator and policy-pipeline mutation testing.
+* Added an ASP.NET Core test-project Stryker configuration for acknowledgment challenge mutation testing.
+* Added mutation-focused ASP.NET Core acknowledgment challenge tests covering safe-default challenge shaping and response conversion.
 * Added a Quality Reports landing page for coverage and mutation-analysis reports.
 * Added Quality to the DocFX top navigation.
 
 ### Changed
 
 * Updated the documentation publishing workflow to generate and publish the Core mutation report alongside the existing coverage report.
+* Updated the release/manual quality workflow to generate separate Core and ASP.NET Core mutation reports.
 * Updated DocFX content configuration so the Quality Reports landing page is included in the documentation site.
 
 ### Documentation
@@ -139,7 +142,6 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 * Normalized EF Core configuration folder and file paths.
 * Updated the root README to describe the current 0.2 persistence package status.
 * Cleared the EF Core change tracker after audit ledger append failures so failed append entities do not remain tracked in the host-owned context.
-* Updated shared version metadata for `0.2.0-alpha.1` package output.
 
 ### Notes
 

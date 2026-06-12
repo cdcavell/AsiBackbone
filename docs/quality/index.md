@@ -15,18 +15,19 @@ For a governance package, both views matter. Coverage helps show that policy, ac
 
 ### Coverage Report
 
-[Open Coverage Report](../coverage/index.html)
+- [Open Coverage Report](../coverage/index.html)
 
 The coverage report is generated from the test suite using Coverlet and ReportGenerator. It is published with the documentation site when the documentation workflow runs successfully.
 
 ### Mutation Analysis
 
-[Open Mutation Analysis](../mutation/index.html)
+- [Open Core Mutation Analysis](../mutation/core/index.html)
+- [Open ASP.NET Core Mutation Analysis](../mutation/aspnetcore/index.html)
 
-The mutation analysis report is generated with Stryker.NET for targeted governance behavior. The initial scope focuses on Core evaluator and policy-pipeline behavior, including denial precedence, decision outcome selection, reason-code preservation, and related edge cases.
+The mutation analysis reports are generated with Stryker.NET for targeted governance behavior. The Core report focuses on evaluator and policy-pipeline behavior, including denial precedence, decision outcome selection, reason-code preservation, and related edge cases. The ASP.NET Core report focuses on acknowledgment challenge round-trip behavior, including safe-default challenge shaping, correlation preservation, and conversion of host acknowledgment responses back into Core acknowledgment language.
 
 > [!NOTE]
-> If a report link is unavailable, the related workflow may not have generated that report yet. Generate the reports locally or rerun the documentation workflow after the report-producing steps are configured.
+> If a report link is unavailable, the related workflow may not have generated that report yet. Generate the reports locally or rerun the **Publish Quality Reports** workflow after the report-producing steps are configured.
 
 ## Local validation
 

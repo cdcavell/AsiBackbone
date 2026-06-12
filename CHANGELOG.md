@@ -4,6 +4,19 @@ All notable changes to this project are documented in this file.
 
 This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/) and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Documentation
+
+* Clarified that ASI means **Accountable Systems Infrastructure** within the AsiBackbone software project.
+* Updated the README, documentation index, Getting Started guide, Why AsiBackbone article, and Core domain language article to frame AsiBackbone as governance infrastructure rather than artificial superintelligence.
+* Added Accountable Systems Infrastructure to the core domain language and alignment guidance.
+
+### Boundary Notes
+
+* Reinforced that AsiBackbone does not implement artificial superintelligence, host or train AI models, control robots, or prove the Eden/Backbone framework.
+* Clarified that broader Eden/Backbone concepts may inspire the package while implementation claims remain limited to practical software governance.
+
 ## [0.4.0-alpha.1] - 2026-06-11
 
 ### Samples and Host Validation

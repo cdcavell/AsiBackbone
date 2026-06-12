@@ -10,6 +10,11 @@
 - name: Adoption and Target Use Cases
   href: use-cases.md
 
+- name: Scenarios
+  items:
+  - name: AI Agent Gateway
+    href: scenarios/ai-agent-gateway.md
+
 - name: Core Domain Language
   href: core-domain-language.md
 

@@ -24,7 +24,8 @@
           "**/toc.yml",
           "articles/**/*.md",
           "quality/**/*.md",
-          "api/**/*.yml"
+          "api/**/*.yml",
+          "mutation/**/*.md"
         ]
       }
     ],

@@ -23,6 +23,7 @@
           "index.md",
           "**/toc.yml",
           "articles/**/*.md",
+          "quality/**/*.md",
           "api/**/*.yml"
         ]
       }

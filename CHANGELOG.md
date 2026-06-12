@@ -6,6 +6,18 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ## [Unreleased]
 
+### Added
+
+* Added Stryker.NET as a local .NET tool for mutation-analysis validation.
+* Added an initial Core test-project Stryker configuration for evaluator and policy-pipeline mutation testing.
+* Added a Quality Reports landing page for coverage and mutation-analysis reports.
+* Added Quality to the DocFX top navigation.
+
+### Changed
+
+* Updated the documentation publishing workflow to generate and publish the Core mutation report alongside the existing coverage report.
+* Updated DocFX content configuration so the Quality Reports landing page is included in the documentation site.
+
 ### Documentation
 
 * Clarified that ASI means **Accountable Systems Infrastructure** within the AsiBackbone software project.

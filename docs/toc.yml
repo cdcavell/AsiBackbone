@@ -4,9 +4,8 @@
 - name: API Reference
   href: api/
 
-- name: Test Coverage
-  href: coverage/
+- name: Quality
+  href: quality/
 
 - name: Repository
   href: https://github.com/cdcavell/AsiBackbone
-

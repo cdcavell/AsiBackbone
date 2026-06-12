@@ -68,6 +68,12 @@ jobs:
             -assemblyfilters:"-*.Tests" `
             -filefilters:"-**/bin/**;-**/obj/**;-**/*.g.cs"
 
+      - name: Generate Core mutation report
+        shell: pwsh
+        working-directory: tests/CDCavell.AsiBackbone.Core.Tests
+        run: |
+          dotnet tool run dotnet-stryker -- --config-file stryker-config.json
+
       - name: Build DocFX site
         run: dotnet tool run docfx -- docs/docfx.json
 
@@ -76,6 +82,14 @@ jobs:
         run: |
           New-Item -ItemType Directory -Path "./docs/_site/coverage" -Force | Out-Null
           Copy-Item -Path "./artifacts/coverage-report/*" -Destination "./docs/_site/coverage" -Recurse -Force
+
+      - name: Copy mutation report to DocFX output
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path "./docs/_site/mutation" -Force | Out-Null
+          if (Test-Path "./artifacts/mutation-report/core") {
+            Copy-Item -Path "./artifacts/mutation-report/core/*" -Destination "./docs/_site/mutation" -Recurse -Force
+          }
 
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5

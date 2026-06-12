@@ -27,8 +27,8 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 * [API Reference](https://cdcavell.github.io/AsiBackbone/api/CDCavell.AsiBackbone.Core.html)
   Generated API documentation for public types.
 
-* [Test Coverage](coverage/)
-  Generated test coverage report when available.
+* [Quality Reports](quality/)
+  Landing page for coverage and mutation-analysis reports when generated.
 
 * [Repository](https://github.com/cdcavell/AsiBackbone)
   Source code, issues, pull requests, and release history.

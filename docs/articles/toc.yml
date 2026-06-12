@@ -10,6 +10,9 @@
 - name: Adoption and Target Use Cases
   href: use-cases.md
 
+- name: Government and Regulated Systems
+  href: government-and-regulated-systems.md
+
 - name: Scenarios
   items:
     - name: AI Agent Gateway

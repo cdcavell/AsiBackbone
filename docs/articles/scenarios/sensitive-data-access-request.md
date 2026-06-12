@@ -21,30 +21,30 @@ This scenario applies to systems where access depends on more than identity alon
 
 ```mermaid
 sequenceDiagram
-    participant Actor as Requesting actor
-    participant Host as Host application
-    participant Backbone as AsiBackbone evaluator
-    participant Ack as Acknowledgment flow
-    participant Audit as Audit sink or ledger
-    participant Data as Host-owned data path
+    participant Actor as "Requesting actor"
+    participant Host as "Host application"
+    participant Backbone as "AsiBackbone evaluator"
+    participant Ack as "Acknowledgment flow"
+    participant Audit as "Audit sink or ledger"
+    participant Data as "Host owned data path"
 
     Actor->>Host: Requests protected information
     Host->>Host: Build policy context from actor, purpose, resource, and risk
     Host->>Backbone: EvaluateAsync(context)
     Backbone-->>Host: GovernanceDecision
-    alt Denied Deferred or EscalationRecommended
+    alt Denied, deferred, or escalation recommended
         Host->>Audit: Persist decision residue
         Host-->>Actor: Return governed outcome without continuing
-    else AcknowledgmentRequired
+    else Acknowledgment required
         Host->>Ack: Present acknowledgment challenge
         Ack-->>Host: Accepted or rejected response
         Host->>Audit: Persist decision and acknowledgment residue
         opt Accepted and host policy permits access
-            Host->>Data: Continue through host-owned data path
+            Host->>Data: Continue through host owned data path
         end
-    else Allowed or Warning
+    else Allowed or warning
         Host->>Audit: Persist decision residue
-        Host->>Data: Continue through host-owned data path
+        Host->>Data: Continue through host owned data path
     end
 ```
 

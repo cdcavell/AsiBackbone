@@ -19,7 +19,7 @@ env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   CONFIGURATION: Release
   PACKAGE_OUTPUT: artifacts/packages
-  SMOKE_WORK_ROOT: artifacts/external-consumer-smoke
+  SMOKE_WORK_ROOT: ${{ runner.temp }}/asi-backbone-external-consumer-smoke
 
 jobs:
   external-consumer-smoke:

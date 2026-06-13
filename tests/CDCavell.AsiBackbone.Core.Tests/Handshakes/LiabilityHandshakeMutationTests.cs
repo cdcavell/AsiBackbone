@@ -20,7 +20,7 @@ public sealed class LiabilityHandshakeMutationTests
             OperationReason.Create("decision.first", "First decision reason."),
             OperationReason.Create("decision.second", "Second decision reason.")
         ];
-        GovernanceDecision decision = GovernanceDecision.Deny(
+        var decision = GovernanceDecision.Deny(
             reasons,
             correlationId: " corr-123 ",
             traceId: " trace-456 ",
@@ -31,7 +31,7 @@ public sealed class LiabilityHandshakeMutationTests
             [" region "] = " us-la "
         };
 
-        LiabilityHandshakeRequest request = LiabilityHandshakeRequest.FromDecision(
+        var request = LiabilityHandshakeRequest.FromDecision(
             actor,
             " document.approve ",
             decision,
@@ -67,7 +67,7 @@ public sealed class LiabilityHandshakeMutationTests
     public void AcknowledgmentUsesRespondingActorAndRequestHandshakeBoundary()
     {
         IAsiBackboneActorContext requestActor = AsiBackboneActorContext.Human("request-user", "Request User");
-        LiabilityHandshakeRequest request = LiabilityHandshakeRequest.Create(
+        var request = LiabilityHandshakeRequest.Create(
             requestActor,
             "document.approve",
             "decision.ack.required",
@@ -80,7 +80,7 @@ public sealed class LiabilityHandshakeMutationTests
             traceId: " trace-777 ");
         IAsiBackboneActorContext respondingActor = AsiBackboneActorContext.Service(" service-456 ", " Approval Service ");
 
-        LiabilityHandshakeAcknowledgment acknowledgment = LiabilityHandshakeAcknowledgment.Accept(
+        var acknowledgment = LiabilityHandshakeAcknowledgment.Accept(
             request,
             respondingActor,
             acknowledgmentId: " ack-777 ",

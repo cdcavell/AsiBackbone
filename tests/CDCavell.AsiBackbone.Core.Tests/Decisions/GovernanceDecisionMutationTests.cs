@@ -107,7 +107,7 @@ public sealed class GovernanceDecisionMutationTests
             OperationReason.Create("policy.second", "Second policy failure.")
         ];
 
-        GovernanceDecision decision = GovernanceDecision.Deny(sourceReasons);
+        var decision = GovernanceDecision.Deny(sourceReasons);
 
         sourceReasons.Add(OperationReason.Create("policy.third", "Third policy failure."));
 
@@ -132,7 +132,7 @@ public sealed class GovernanceDecisionMutationTests
             OperationReason.Create("warning.second", "Second warning.")
         ];
 
-        GovernanceDecision decision = GovernanceDecision.Warning(sourceReasons);
+        var decision = GovernanceDecision.Warning(sourceReasons);
 
         sourceReasons.Clear();
 

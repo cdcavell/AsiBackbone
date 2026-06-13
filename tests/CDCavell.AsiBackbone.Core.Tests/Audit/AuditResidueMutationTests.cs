@@ -15,7 +15,7 @@ public sealed class AuditResidueMutationTests
     public void FromDecisionCopiesDecisionTracePolicyMetadataAndDoesNotAliasMetadata()
     {
         IAsiBackboneActorContext actor = AsiBackboneActorContext.Human(" user-123 ", " Chris ");
-        GovernanceDecision decision = GovernanceDecision.RequireAcknowledgment(
+        var decision = GovernanceDecision.RequireAcknowledgment(
             "decision.ack.required",
             "Acknowledgment is required.",
             correlationId: " corr-123 ",
@@ -28,7 +28,7 @@ public sealed class AuditResidueMutationTests
             ["risk"] = " high "
         };
 
-        AuditResidue residue = AuditResidue.FromDecision(
+        var residue = AuditResidue.FromDecision(
             actor,
             " document.approve ",
             decision,
@@ -60,11 +60,11 @@ public sealed class AuditResidueMutationTests
     public void FromConstraintCopiesFullTracePolicyDataAndMetadata()
     {
         IAsiBackboneActorContext actor = AsiBackboneActorContext.Service(" service-123 ");
-        ConstraintEvaluationResult constraintResult = ConstraintEvaluationResult.Deny(
+        var constraintResult = ConstraintEvaluationResult.Deny(
             "constraint.denied",
             "Constraint denied the operation.");
 
-        AuditResidue residue = AuditResidue.FromConstraint(
+        var residue = AuditResidue.FromConstraint(
             actor,
             " external.call ",
             constraintResult,

@@ -251,8 +251,8 @@ internal static class SmokeHost
                 return Results.Problem("The external consumer smoke-test ledger append failed.");
             }
 
-            IReadOnlyList<AuditLedgerRecord> efLedgerRecords = await ledgerStore
-                .FindByCorrelationIdAsync(correlationId, cancellationToken)
+            AuditLedgerRecord? efLedgerRecord = await ledgerStore
+                .FindByRecordIdAsync(appendResult.Value.RecordId, cancellationToken)
                 .ConfigureAwait(false);
 
             return Results.Ok(new SmokeDecisionResponse(
@@ -263,7 +263,7 @@ internal static class SmokeHost
                 CorrelationId: correlationId,
                 AuditEventId: residue.EventId,
                 LedgerRecordId: appendResult.Value.RecordId,
-                EfLedgerRecordCount: efLedgerRecords.Count));
+                EfLedgerRecordCount: efLedgerRecord is null ? 0 : 1));
         });
 
         return app;

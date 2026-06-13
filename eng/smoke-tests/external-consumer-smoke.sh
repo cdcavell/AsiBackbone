@@ -4,7 +4,7 @@ set -euo pipefail
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 configuration="${CONFIGURATION:-Release}"
 package_output="${PACKAGE_OUTPUT:-artifacts/packages}"
-work_root="${SMOKE_WORK_ROOT:-artifacts/external-consumer-smoke}"
+work_root="${SMOKE_WORK_ROOT:-${RUNNER_TEMP:-/tmp}/asi-backbone-external-consumer-smoke}"
 
 make_absolute_path() {
   local path="$1"
@@ -17,7 +17,6 @@ make_absolute_path() {
 }
 
 package_output="$(make_absolute_path "$package_output")"
-work_root="$(make_absolute_path "$work_root")"
 
 core_project="$repo_root/src/CDCavell.AsiBackbone.Core/CDCavell.AsiBackbone.Core.csproj"
 package_version="${SMOKE_PACKAGE_VERSION:-$(dotnet msbuild "$core_project" -getProperty:Version -nologo | tr -d '\r' | awk 'NF { print; exit }')}"

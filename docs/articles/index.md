@@ -9,6 +9,9 @@ Start with [Getting Started](getting-started.md), then use the navigation menu t
 * [Core Domain Language and Alpha Boundary](core-domain-language.md)
   Defines the Core terminology for governance spine, constraints, collapse boundary, audit residue, actor context, decision results, operation results, acknowledgment, capability tokens, and gateway boundaries.
 
+* [Governance Tool Comparisons](governance-tool-comparisons.md)
+  Compares Azure Policy, Open Policy Agent (OPA), Microsoft Agent Governance Toolkit, and AsiBackbone as complementary governance layers without positioning any tool as a replacement for the others.
+
 * [Equations and Toy Models](equations-and-toy-models.md)
   Explains the conceptual progression from `Λ(t)` to `Λ(τ)` to `ΛS(x, τ)` and maps the Eden/ASI collapse notation into practical AsiBackbone software terms: active policy structure, allowed decision states, acknowledgment, audit residue, and gateway-safe execution.
 

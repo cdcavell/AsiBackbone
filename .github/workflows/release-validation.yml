@@ -1,0 +1,108 @@
+name: Stable Release Validation
+
+on:
+  workflow_dispatch:
+
+  pull_request:
+    branches:
+      - main
+
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: stable-release-validation-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  SOLUTION_PATH: AsiBackbone.slnx
+  CONFIGURATION: Release
+  PACKAGE_OUTPUT: artifacts/release-validation-packages
+
+jobs:
+  stable-release-validation:
+    name: Restore, build, test, docs, pack, and smoke
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@9a946fdbd5fb07b82b2f5a4466058b876ab72bb2 # v5
+        with:
+          global-json-file: global.json
+
+      - name: Display .NET information
+        run: dotnet --info
+
+      - name: Restore dependencies
+        run: dotnet restore "$SOLUTION_PATH"
+
+      - name: Build solution
+        run: dotnet build "$SOLUTION_PATH" --configuration "$CONFIGURATION" --no-restore /p:ContinuousIntegrationBuild=true
+
+      - name: Verify formatting
+        run: dotnet format "$SOLUTION_PATH" --verify-no-changes --verbosity minimal
+
+      - name: Run tests
+        run: >
+          dotnet test "$SOLUTION_PATH"
+          --configuration "$CONFIGURATION"
+          --no-restore
+          --no-build
+          --verbosity normal
+          /p:ContinuousIntegrationBuild=true
+
+      - name: Restore .NET tools
+        run: dotnet tool restore
+
+      - name: Build DocFX site
+        run: dotnet tool run docfx -- docs/docfx.json
+
+      - name: Pack packages
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mkdir -p "$PACKAGE_OUTPUT"
+
+          mapfile -t package_projects < <(find ./src -name '*.csproj' -type f | sort)
+
+          if [ "${#package_projects[@]}" -eq 0 ]; then
+            echo "No package projects were found under ./src."
+            exit 1
+          fi
+
+          for project in "${package_projects[@]}"; do
+            echo "Packing $project"
+            dotnet pack "$project" \
+              --configuration "$CONFIGURATION" \
+              --output "$PACKAGE_OUTPUT" \
+              /p:ContinuousIntegrationBuild=true
+          done
+
+      - name: Run external consumer smoke test
+        shell: bash
+        run: bash ./eng/smoke-tests/external-consumer-smoke.sh
+
+      - name: Run stable package integration smoke test
+        shell: bash
+        run: bash ./eng/smoke-tests/stable-package-integration-smoke.sh
+
+      - name: Upload package artifacts
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: asi-backbone-release-validation-packages
+          path: ${{ env.PACKAGE_OUTPUT }}/*.nupkg
+          if-no-files-found: error

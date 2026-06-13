@@ -42,3 +42,7 @@ jobs:
       - name: Run external consumer smoke test
         shell: bash
         run: bash ./eng/smoke-tests/external-consumer-smoke.sh
+
+      - name: Run stable package integration smoke tests
+        shell: bash
+        run: bash ./eng/smoke-tests/stable-package-integration-smoke.sh

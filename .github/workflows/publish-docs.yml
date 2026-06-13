@@ -19,6 +19,7 @@ concurrency:
 env:
   CONFIGURATION: Release
   SOLUTION_FILE: './AsiBackbone.slnx'
+  PAGES_BASE_URL: 'https://cdcavell.github.io/ASIBackbone'
 
 jobs:
   build-docs:
@@ -68,6 +69,38 @@ jobs:
             -assemblyfilters:"-*.Tests" `
             -filefilters:"-**/bin/**;-**/obj/**;-**/*.g.cs"
 
+      - name: Preserve deployed mutation reports
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          preserve_root="./artifacts/preserved-pages"
+          mkdir -p "$preserve_root"
+
+          for report in core aspnetcore; do
+            report_url="${PAGES_BASE_URL%/}/mutation/${report}/"
+
+            echo "Attempting to preserve deployed mutation report from $report_url"
+
+            if wget \
+              --recursive \
+              --level=2 \
+              --page-requisites \
+              --no-parent \
+              --no-host-directories \
+              --cut-dirs=1 \
+              --directory-prefix "$preserve_root" \
+              "$report_url"; then
+              echo "Preserved deployed mutation report: $report"
+            else
+              echo "No deployed mutation report found for: $report"
+            fi
+          done
+
+          if [ -d "$preserve_root/mutation" ]; then
+            find "$preserve_root/mutation" -maxdepth 3 -type f | sort
+          fi
+
       - name: Build DocFX site
         run: dotnet tool run docfx -- docs/docfx.json
 
@@ -76,6 +109,23 @@ jobs:
         run: |
           New-Item -ItemType Directory -Path "./docs/_site/coverage" -Force | Out-Null
           Copy-Item -Path "./artifacts/coverage-report/*" -Destination "./docs/_site/coverage" -Recurse -Force
+
+      - name: Restore deployed mutation reports to DocFX output
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          preserved_mutation="./artifacts/preserved-pages/mutation"
+          output_mutation="./docs/_site/mutation"
+
+          if [ -d "$preserved_mutation" ] && find "$preserved_mutation" -type f | grep -q .; then
+            mkdir -p "$output_mutation"
+            cp -a "$preserved_mutation/." "$output_mutation/"
+            echo "Restored preserved mutation reports to $output_mutation"
+            find "$output_mutation" -maxdepth 3 -type f | sort
+          else
+            echo "No preserved mutation reports found to restore."
+          fi
 
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5

@@ -59,6 +59,23 @@ AsiBackbone follows Semantic Versioning expectations after stabilization:
 
 Before `1.0.0`, alpha or preview packages may still make breaking changes as the API is shaped. Those changes should remain visible in the changelog and release notes.
 
+## Assembly version policy
+
+For the stable `1.x` package line, AsiBackbone keeps `AssemblyVersion` fixed at `1.0.0.0` for compatible minor and patch releases. NuGet package `Version`, `FileVersion`, and `InformationalVersion` continue to move with each package release.
+
+This separates the package release identity from the binary assembly identity. Package versions communicate the SemVer release to NuGet consumers. `FileVersion` and `InformationalVersion` communicate the concrete build/product version. `AssemblyVersion` is reserved for the compatible major line and should change only when the project intentionally creates a new binary identity, such as a future `2.0.0` release or another intentional binary-compatibility break.
+
+Expected stable-line behavior:
+
+| Release | Package `Version` | `AssemblyVersion` | `FileVersion` | `InformationalVersion` |
+| --- | --- | --- | --- | --- |
+| `1.0.0` | `1.0.0` | `1.0.0.0` | `1.0.0.0` | `1.0.0+...` |
+| `1.0.1` | `1.0.1` | `1.0.0.0` | `1.0.1.0` | `1.0.1+...` |
+| `1.1.0` | `1.1.0` | `1.0.0.0` | `1.1.0.0` | `1.1.0+...` |
+| `2.0.0` | `2.0.0` | `2.0.0.0` | `2.0.0.0` | `2.0.0+...` |
+
+Before cutting `1.0.0`, the release-readiness checklist should verify that `AssemblyVersion`, `FileVersion`, `InformationalVersion`, package metadata, release notes, and repository tags match this policy.
+
 ## Durable artifact and schema-version policy
 
 Stable persisted or exported governance artifacts should carry an explicit schema/version field when they may be stored or consumed outside the running process. See [Schema Versioning](schema-versioning.md) for artifact-specific guidance.
@@ -88,5 +105,6 @@ Before cutting a stable `1.0.0` release, the release readiness checklist should 
 - public APIs for stable packages are reviewed for naming, namespace, dependency direction, and extension-point clarity;
 - breaking changes found during review are resolved before release or captured for a future major version;
 - stable serialized artifacts have documented schema-version behavior;
+- the `AssemblyVersion` strategy is resolved and reflected in build metadata;
 - preview/provider packages are not implied to be part of the stable Core contract;
 - the changelog and release notes include the compatibility promise and migration guidance where needed.

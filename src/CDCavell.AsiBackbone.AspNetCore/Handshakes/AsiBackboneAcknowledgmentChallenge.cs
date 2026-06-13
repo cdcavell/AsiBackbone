@@ -23,6 +23,8 @@ public sealed class AsiBackboneAcknowledgmentChallenge
         string? policyHash,
         IReadOnlyDictionary<string, string> metadata)
     {
+        // Defensive validation for internal construction invariants.
+        // Public inputs are validated through FromHandshakeRequest and LiabilityHandshakeRequest.
         ArgumentNullException.ThrowIfNull(handshakeRequest);
         ArgumentException.ThrowIfNullOrWhiteSpace(handshakeId);
         ArgumentException.ThrowIfNullOrWhiteSpace(operationName);

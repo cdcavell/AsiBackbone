@@ -3,8 +3,21 @@ set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 configuration="${CONFIGURATION:-Release}"
-package_output="${PACKAGE_OUTPUT:-$repo_root/artifacts/packages}"
-work_root="${SMOKE_WORK_ROOT:-$repo_root/artifacts/external-consumer-smoke}"
+package_output="${PACKAGE_OUTPUT:-artifacts/packages}"
+work_root="${SMOKE_WORK_ROOT:-artifacts/external-consumer-smoke}"
+
+make_absolute_path() {
+  local path="$1"
+
+  if [[ "$path" = /* ]]; then
+    printf '%s\n' "$path"
+  else
+    printf '%s/%s\n' "$repo_root" "$path"
+  fi
+}
+
+package_output="$(make_absolute_path "$package_output")"
+work_root="$(make_absolute_path "$work_root")"
 
 core_project="$repo_root/src/CDCavell.AsiBackbone.Core/CDCavell.AsiBackbone.Core.csproj"
 package_version="${SMOKE_PACKAGE_VERSION:-$(dotnet msbuild "$core_project" -getProperty:Version -nologo | tr -d '\r' | awk 'NF { print; exit }')}"
@@ -31,7 +44,7 @@ for project in "${package_projects[@]}"; do
     --output "$package_output" \
     /p:ContinuousIntegrationBuild=true
   echo
- done
+done
 
 cat > "$work_root/NuGet.config" <<NUGETCONFIG
 <?xml version="1.0" encoding="utf-8"?>

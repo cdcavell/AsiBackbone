@@ -19,7 +19,7 @@ concurrency:
 env:
   CONFIGURATION: Release
   SOLUTION_FILE: './AsiBackbone.slnx'
-  PAGES_BASE_URL: 'https://cdcavell.github.io/ASIBackbone'
+  PAGES_BASE_URL: 'https://cdcavell.github.io/AsiBackbone'
 
 jobs:
   build-docs:

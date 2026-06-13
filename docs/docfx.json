@@ -24,8 +24,7 @@
           "**/toc.yml",
           "articles/**/*.md",
           "quality/**/*.md",
-          "api/**/*.yml",
-          "mutation/**/*.md"
+          "api/**/*.yml"
         ]
       }
     ],
@@ -33,7 +32,8 @@
       {
         "files": [
           "images/**",
-          "examples/**"
+          "examples/**",
+          "mutation/**"
         ]
       }
     ],

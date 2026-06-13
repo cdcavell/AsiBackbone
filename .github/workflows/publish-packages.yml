@@ -34,7 +34,7 @@ concurrency:
 
 jobs:
   pack-packages:
-    name: Pack packages
+    name: Validate and pack packages
     runs-on: ubuntu-latest
 
     steps:
@@ -64,6 +64,24 @@ jobs:
 
       - name: Build solution
         run: dotnet build "${{ env.SOLUTION_PATH }}" --configuration "${{ env.CONFIGURATION }}" --no-restore /p:ContinuousIntegrationBuild=true
+
+      - name: Verify formatting
+        run: dotnet format "${{ env.SOLUTION_PATH }}" --verify-no-changes --verbosity minimal
+
+      - name: Run tests
+        run: >
+          dotnet test "${{ env.SOLUTION_PATH }}"
+          --configuration "${{ env.CONFIGURATION }}"
+          --no-restore
+          --no-build
+          --verbosity normal
+          /p:ContinuousIntegrationBuild=true
+
+      - name: Restore .NET tools
+        run: dotnet tool restore
+
+      - name: Build DocFX site
+        run: dotnet tool run docfx -- docs/docfx.json
 
       - name: Pack packages
         shell: bash

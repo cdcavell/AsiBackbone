@@ -9,7 +9,7 @@ The practical guidance is simple:
 | Azure resource-plane governance, compliance assessment, and remediation | Azure Policy |
 | A mature, language-neutral policy decision engine | Open Policy Agent |
 | Governance around autonomous AI agent tool calls, delegation, identity, sandboxing, and agent operations | Microsoft Agent Governance Toolkit |
-| Actor-accountable consequential-action governance inside a .NET application, including acknowledgment, capability grants, audit residue, and gateway execution boundaries | AsiBackbone |
+| Actor-accountable consequential-action governance inside a .NET application, including acknowledgment, capability grants, audit residue, durable outbox, lifecycle events, and gateway execution boundaries | AsiBackbone |
 
 > [!IMPORTANT]
 > In this repository, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is not an artificial superintelligence implementation, AI model host, AI training framework, legal-compliance guarantee, or replacement for cloud governance, policy decision engines, agent runtimes, or security platforms.
@@ -115,10 +115,28 @@ Use it when the application needs to:
 - preserve reason codes, policy version, policy hash, correlation identifiers, actor context, and operation metadata;
 - require an acknowledgment or responsibility handshake before consequential execution;
 - issue a short-lived capability grant for tightly scoped follow-on execution;
-- leave durable audit residue, with signing or signature metadata where the host or integration package supports it;
+- leave durable audit residue and optional outbox-backed lifecycle events, with signing or signature metadata where the host or integration package supports it;
 - enforce a gateway boundary before external systems, administrative workflows, AI tools, or simulated/physical operations are executed by host-owned code.
 
 AsiBackbone does not need to replace Azure Policy, OPA, or Agent Governance Toolkit. It can complement them by giving .NET applications a native accountability surface around the moment where intent becomes host action.
+
+## Observability and governance emission providers
+
+AsiBackbone 1.1.0 roadmap extends the governance spine with observability, durable outbox, and governance emission provider patterns. These providers should be understood as downstream emission or enrichment surfaces, not as replacements for the core decision pipeline.
+
+The intended boundary is:
+
+```text
+AsiBackbone Core
+  Produces decision records, acknowledgment state, capability grants,
+  lifecycle events, audit residue, and outbox entries.
+
+Optional providers
+  Emit or enrich those records through OpenTelemetry, Azure Monitor,
+  Event Hubs, Purview, SIEM tools, or other governance platforms.
+```
+
+Core remains vendor-neutral. Provider-specific packages depend on Core; Core does not depend on Azure Monitor, Event Hubs, Purview, OpenTelemetry exporters, or any specific compliance platform.
 
 ## What each tool should not be asked to do
 
@@ -147,6 +165,10 @@ AsiBackbone
   Governs the .NET application's consequential action boundary with actor context,
   acknowledgment, reason codes, durable audit residue, optional capability grants,
   and gateway-safe execution.
+
+Optional emission providers
+  Export or enrich AsiBackbone audit/lifecycle events through OpenTelemetry,
+  Azure Monitor, Event Hubs, Purview, SIEM, or other downstream systems.
 ```
 
 This keeps each tool in its strongest lane.

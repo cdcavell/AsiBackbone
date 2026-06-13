@@ -23,6 +23,7 @@ The coverage report is generated from the test suite using Coverlet and ReportGe
 
 - [Open Core Mutation Analysis](../mutation/core/index.html)
 - [Open ASP.NET Core Mutation Analysis](../mutation/aspnetcore/index.html)
+- [Core Test Triage](core-test-triage.md)
 
 The mutation analysis reports are generated with Stryker.NET for targeted governance behavior. The Core report focuses on evaluator and policy-pipeline behavior, including denial precedence, decision outcome selection, reason-code preservation, and related edge cases. The ASP.NET Core report focuses on acknowledgment challenge round-trip behavior, including safe-default challenge shaping, correlation preservation, and conversion of host acknowledgment responses back into Core acknowledgment language.
 
@@ -74,4 +75,4 @@ Surviving mutants should be classified as:
 - acceptable gap to document for a later issue;
 - intentional behavior that should be protected by a stronger test.
 
-For Issue #121, the highest-value review area is Core evaluator behavior: deny-wins composition, decision outcomes, reason-code preservation, policy version/hash behavior where applicable, audit receipt boundaries, and null/default edge cases.
+For Issue #134, see [Core Test Triage](core-test-triage.md) for the focused Core survivor-triage pass covering `Evaluation`, `Decisions`, `Audit`, and `Handshakes`.

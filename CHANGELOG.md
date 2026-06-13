@@ -4,6 +4,63 @@ All notable changes to this project are documented in this file.
 
 This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/) and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0-alpha.3] - 2026-06-13
+
+### Added
+
+* Added an external consumer smoke-test workflow for package ergonomics validation.
+* Added `eng/smoke-tests/external-consumer-smoke.sh` to pack local package artifacts, generate a clean temporary xUnit consumer project, install AsiBackbone packages from a local NuGet source, and run HTTP-based smoke assertions.
+* Added external consumer validation for:
+
+  * Core + ASP.NET Core adapter registration through `AddAsiBackboneAspNetCore()`.
+  * host-owned `DbContext` integration for the EF Core audit ledger path.
+  * in-memory audit storage for minimal non-durable hosts.
+  * allow, deny, and acknowledgment-required HTTP decision flows.
+* Added external consumer smoke-test documentation under Quality Reports.
+* Added the external consumer smoke test to quality documentation navigation.
+* Added focused Core mutation-survivor triage documentation covering evaluator, decision, audit, and handshake behavior.
+* Added mutation-focused Core tests for:
+
+  * deny-wins evaluator composition and reason aggregation.
+  * warning-only evaluator composition.
+  * full constraint-result visibility to decision policy.
+  * cancellation between evaluator constraints.
+  * non-allow governance decision factory propagation.
+  * read-only decision reason snapshots.
+  * audit residue trace, policy, metadata, and actor propagation.
+  * liability handshake request and acknowledgment boundary behavior.
+* Added governance tool comparison documentation comparing Azure Policy, Open Policy Agent, Microsoft Agent Governance Toolkit, and AsiBackbone as complementary governance layers.
+
+### Changed
+
+* Updated quality documentation to include external consumer smoke-test guidance.
+* Updated quality documentation to link Core test triage from the Quality Reports index.
+* Updated the external consumer smoke-test workflow to run on pull requests, pushes to `main`, and manual dispatch.
+* Updated the external consumer smoke-test script to run the generated consumer project outside the repository tree, preventing inheritance of repository Central Package Management settings.
+* Updated the external consumer smoke-test script to normalize package output paths before use.
+* Updated PR validation expectations to include the external consumer package smoke test as a required confidence check.
+
+### Fixed
+
+* Fixed CI formatting failures in Core mutation-focused test files.
+* Fixed external consumer smoke-test path resolution so generated project paths remain valid after directory changes.
+* Fixed external consumer smoke-test package installation failures caused by generated projects inheriting repository `Directory.Packages.props` settings.
+
+### Validation
+
+* Confirmed the Release test suite passes with 385 tests, 0 failed, and 0 skipped after formatting cleanup.
+* Added package-shaped validation that verifies a clean consumer-style host can wire AsiBackbone packages without project references.
+* Verified the smoke-test design exercises allow, deny, and acknowledgment-required flows through HTTP.
+* Verified host-owned persistence boundaries remain explicit for the EF Core ledger path.
+
+### Boundary Notes
+
+* The external consumer smoke test is a package-consumer ergonomics check, not a production host template.
+* The generated smoke project intentionally avoids repository project references.
+* EF Core persistence remains host-owned: the host supplies the `DbContext`, provider, connection string, schema lifecycle, and migration strategy.
+* In-memory audit storage remains non-durable and intended for tests, samples, and local validation.
+* AsiBackbone remains Accountable Systems Infrastructure and governance spine infrastructure, not an intelligence engine, AI model host, or artificial superintelligence implementation.
+
 ## [0.4.0-alpha.2] - 2026-06-12
 
 ### Added

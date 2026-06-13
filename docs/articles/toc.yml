@@ -4,6 +4,9 @@
 - name: Getting Started
   href: getting-started.md
 
+- name: 1.0.0 Quickstart
+  href: quickstart-100.md
+
 - name: Why AsiBackbone?
   href: why-asi-backbone.md
 

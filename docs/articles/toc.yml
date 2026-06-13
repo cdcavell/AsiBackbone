@@ -55,6 +55,9 @@
 - name: API Compatibility and SemVer
   href: api-compatibility-and-semver.md
 
+- name: Privacy and Signing Boundaries
+  href: privacy-and-signing-boundaries.md
+
 - name: Alpha Package Boundary
   href: alpha-package-boundary.md
 

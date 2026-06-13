@@ -183,6 +183,7 @@ Those later provider packages should not be treated as required for the `1.0.0` 
 ## Next steps
 
 - Read [API Compatibility and SemVer](api-compatibility-and-semver.md) for the stable-release compatibility promise.
+- Read [Privacy and Signing Boundaries](privacy-and-signing-boundaries.md) for metadata, identifier, signing-ready field, and host-responsibility guidance.
 - Read [Policy Evaluator Pipeline](policy-evaluator-pipeline.md) for the decision-evaluation model.
 - Read [ASP.NET Core Integration Boundary](aspnetcore-integration-boundary.md) for web-host adapter expectations.
 - Read [Schema Versioning](schema-versioning.md) for durable artifact schema guidance.

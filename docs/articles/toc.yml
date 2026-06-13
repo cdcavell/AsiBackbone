@@ -49,6 +49,9 @@
 - name: Schema Versioning
   href: schema-versioning.md
 
+- name: API Compatibility and SemVer
+  href: api-compatibility-and-semver.md
+
 - name: Alpha Package Boundary
   href: alpha-package-boundary.md
 

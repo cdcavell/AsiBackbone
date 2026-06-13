@@ -147,3 +147,16 @@ Unit tests should cover:
 - handshake request and acknowledgment behavior.
 
 Review status: Complete, pending final `dotnet test`.
+
+## Stable-release readiness checklist
+
+Before cutting a stable `1.0.0` release, the release readiness review should also confirm:
+
+- the stable API review in [issue #13](https://github.com/cdcavell/AsiBackbone/issues/13) is complete or intentionally deferred with follow-up issues;
+- the [API Compatibility and Semantic Versioning](api-compatibility-and-semver.md) statement is published and linked from documentation navigation;
+- the stable package list is identified before release notes are finalized;
+- preview, provider-specific, gateway, signing, robotics, telemetry, and cloud-emission packages are not implied to be part of the stable Core contract unless they complete their own stable API review;
+- stable persisted or exported artifacts have schema-version guidance where needed;
+- breaking changes found during review are resolved before `1.0.0` or captured for a later major version.
+
+Review status: Pending stable release review.

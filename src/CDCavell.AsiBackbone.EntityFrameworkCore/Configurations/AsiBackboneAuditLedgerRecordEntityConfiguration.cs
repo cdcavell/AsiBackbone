@@ -11,6 +11,7 @@ public sealed class AsiBackboneAuditLedgerRecordEntityConfiguration
     : IEntityTypeConfiguration<AsiBackboneAuditLedgerRecordEntity>
 {
     private const int IdentifierMaxLength = 128;
+    private const int SchemaVersionMaxLength = 64;
     private const int DisplayNameMaxLength = 256;
     private const int OperationNameMaxLength = 256;
     private const int OutcomeMaxLength = 128;
@@ -42,6 +43,10 @@ public sealed class AsiBackboneAuditLedgerRecordEntityConfiguration
         _ = builder.Property(record => record.RecordId)
             .IsRequired()
             .HasMaxLength(IdentifierMaxLength);
+
+        _ = builder.Property(record => record.SchemaVersion)
+            .IsRequired()
+            .HasMaxLength(SchemaVersionMaxLength);
 
         _ = builder.Property(record => record.EventId)
             .IsRequired()
@@ -116,6 +121,8 @@ public sealed class AsiBackboneAuditLedgerRecordEntityConfiguration
 
         _ = builder.HasIndex(record => record.RecordId)
             .IsUnique();
+
+        _ = builder.HasIndex(record => record.SchemaVersion);
 
         _ = builder.HasIndex(record => record.EventId);
 

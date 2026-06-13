@@ -46,6 +46,9 @@
 - name: Policy Evaluator Pipeline
   href: policy-evaluator-pipeline.md
 
+- name: Schema Versioning
+  href: schema-versioning.md
+
 - name: Alpha Package Boundary
   href: alpha-package-boundary.md
 

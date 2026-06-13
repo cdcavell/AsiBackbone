@@ -189,6 +189,7 @@ public sealed class EfCoreAuditLedgerStore : IAsiBackboneAuditLedgerStore
         return new AsiBackboneAuditLedgerRecordEntity
         {
             RecordId = record.RecordId,
+            SchemaVersion = record.SchemaVersion,
             EventId = record.EventId,
             OccurredUtc = record.OccurredUtc,
             RecordedUtc = record.RecordedUtc,
@@ -276,7 +277,8 @@ public sealed class EfCoreAuditLedgerStore : IAsiBackboneAuditLedgerStore
             entity.RecordHash,
             entity.SignatureKeyId,
             entity.SignatureAlgorithm,
-            entity.SignatureValue);
+            entity.SignatureValue,
+            schemaVersion: entity.SchemaVersion);
     }
 
     private static string[] DeserializeReasonCodes(string? json)

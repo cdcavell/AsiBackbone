@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using CDCavell.AsiBackbone.Core.Actors;
+using CDCavell.AsiBackbone.Core.Serialization;
 
 namespace CDCavell.AsiBackbone.Core.Audit;
 
@@ -17,6 +18,7 @@ public sealed class AuditLedgerRecord : IAsiBackboneAuditResidue
 
     private AuditLedgerRecord(
         string recordId,
+        string? schemaVersion,
         string eventId,
         DateTimeOffset occurredUtc,
         DateTimeOffset recordedUtc,
@@ -47,6 +49,7 @@ public sealed class AuditLedgerRecord : IAsiBackboneAuditResidue
         ArgumentException.ThrowIfNullOrWhiteSpace(outcome);
 
         RecordId = recordId.Trim();
+        SchemaVersion = AsiBackboneSchemaVersions.Normalize(schemaVersion);
         EventId = eventId.Trim();
         OccurredUtc = occurredUtc.ToUniversalTime();
         RecordedUtc = recordedUtc.ToUniversalTime();
@@ -75,6 +78,11 @@ public sealed class AuditLedgerRecord : IAsiBackboneAuditResidue
     /// Gets the stable audit ledger record identifier.
     /// </summary>
     public string RecordId { get; }
+
+    /// <summary>
+    /// Gets the schema version for the serialized audit ledger record shape.
+    /// </summary>
+    public string SchemaVersion { get; }
 
     /// <inheritdoc />
     public string EventId { get; }
@@ -185,12 +193,14 @@ public sealed class AuditLedgerRecord : IAsiBackboneAuditResidue
         string? signatureKeyId = null,
         string? signatureAlgorithm = null,
         string? signatureValue = null,
-        IReadOnlyDictionary<string, string>? metadata = null)
+        IReadOnlyDictionary<string, string>? metadata = null,
+        string? schemaVersion = null)
     {
         ArgumentNullException.ThrowIfNull(residue);
 
         return new AuditLedgerRecord(
             NormalizeIdentifier(recordId),
+            schemaVersion,
             residue.EventId,
             residue.OccurredUtc,
             recordedUtc ?? DateTimeOffset.UtcNow,

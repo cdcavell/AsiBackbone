@@ -37,9 +37,7 @@ public sealed class CorePackageBoundaryTests
         Assert.Empty(projectReferences);
 
         string[] packageReferences = GetIncludes(project, "PackageReference");
-        string[] forbiddenReferences = packageReferences
-            .Where(IsForbiddenCoreDependency)
-            .ToArray();
+        string[] forbiddenReferences = [.. packageReferences.Where(IsForbiddenCoreDependency)];
 
         Assert.Empty(forbiddenReferences);
     }
@@ -69,14 +67,12 @@ public sealed class CorePackageBoundaryTests
         foreach (KeyValuePair<string, string[]> expected in expectedReferencesByProject)
         {
             XDocument project = LoadProject(expected.Key);
-            string[] actualReferences = GetIncludes(project, "ProjectReference")
+            string[] actualReferences = [.. GetIncludes(project, "ProjectReference")
                 .Select(NormalizePath)
-                .Order(StringComparer.Ordinal)
-                .ToArray();
-            string[] expectedReferences = expected.Value
+                .Order(StringComparer.Ordinal)];
+            string[] expectedReferences = [.. expected.Value
                 .Select(NormalizePath)
-                .Order(StringComparer.Ordinal)
-                .ToArray();
+                .Order(StringComparer.Ordinal)];
 
             Assert.Equal(expectedReferences, actualReferences);
         }
@@ -98,12 +94,11 @@ public sealed class CorePackageBoundaryTests
 
     private static string[] GetIncludes(XDocument project, string elementName)
     {
-        return project
+        return [.. project
             .Descendants(elementName)
             .Select(element => element.Attribute("Include")?.Value)
             .Where(value => !string.IsNullOrWhiteSpace(value))
-            .Select(value => value!)
-            .ToArray();
+            .Select(value => value!)];
     }
 
     private static DirectoryInfo FindRepositoryRoot()

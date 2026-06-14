@@ -1,6 +1,9 @@
 - name: Quality Reports
   href: index.md
 
+- name: Mutation Coverage Scope
+  href: mutation-coverage-scope.md
+
 - name: Core Test Triage
   href: core-test-triage.md
 

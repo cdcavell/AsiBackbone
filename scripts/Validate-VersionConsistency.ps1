@@ -176,6 +176,24 @@ if (Test-Path -LiteralPath $citationPath -PathType Leaf) {
     }
 }
 
+$zenodoPath = Resolve-RepositoryPath '.zenodo.json'
+if (Test-Path -LiteralPath $zenodoPath -PathType Leaf) {
+    try {
+        $zenodo = Get-Content -LiteralPath $zenodoPath -Raw | ConvertFrom-Json
+        $zenodoVersion = $zenodo.version
+
+        if ([string]::IsNullOrWhiteSpace($zenodoVersion)) {
+            Add-Failure '.zenodo.json version metadata was not found.'
+        }
+        else {
+            Assert-Equal $zenodoVersion $ExpectedVersion '.zenodo.json version metadata'
+        }
+    }
+    catch {
+        Add-Failure ".zenodo.json could not be parsed as JSON. $($_.Exception.Message)"
+    }
+}
+
 if (-not [string]::IsNullOrWhiteSpace($TagName)) {
     $tagMatch = [regex]::Match($TagName, '^v(?<version>\d+\.\d+\.\d+(?:-[0-9A-Za-z][0-9A-Za-z.-]*)?)$')
     if (-not $tagMatch.Success) {

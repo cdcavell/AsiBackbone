@@ -11,6 +11,7 @@ public sealed class AsiBackboneHandshakeRequestEntityConfiguration
     : IEntityTypeConfiguration<AsiBackboneHandshakeRequestEntity>
 {
     private const int IdentifierMaxLength = 128;
+    private const int SchemaVersionMaxLength = 64;
     private const int DisplayNameMaxLength = 256;
     private const int OperationNameMaxLength = 256;
     private const int ActorTypeMaxLength = 64;
@@ -43,6 +44,10 @@ public sealed class AsiBackboneHandshakeRequestEntityConfiguration
         _ = builder.Property(request => request.HandshakeId)
             .IsRequired()
             .HasMaxLength(IdentifierMaxLength);
+
+        _ = builder.Property(request => request.SchemaVersion)
+            .IsRequired()
+            .HasMaxLength(SchemaVersionMaxLength);
 
         _ = builder.Property(request => request.ActorId)
             .IsRequired()
@@ -96,6 +101,8 @@ public sealed class AsiBackboneHandshakeRequestEntityConfiguration
 
         _ = builder.HasIndex(request => request.HandshakeId)
             .IsUnique();
+
+        _ = builder.HasIndex(request => request.SchemaVersion);
 
         _ = builder.HasIndex(request => request.ActorId);
 

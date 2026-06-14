@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CDCavell.AsiBackbone.Core.Actors;
 using CDCavell.AsiBackbone.Core.Decisions;
+using CDCavell.AsiBackbone.Core.Serialization;
 
 namespace CDCavell.AsiBackbone.Core.Handshakes;
 
@@ -15,6 +16,7 @@ public sealed class LiabilityHandshakeRequest
 
     private LiabilityHandshakeRequest(
         string handshakeId,
+        string? schemaVersion,
         string actorId,
         AsiBackboneActorType actorType,
         string? actorDisplayName,
@@ -40,6 +42,7 @@ public sealed class LiabilityHandshakeRequest
         ArgumentException.ThrowIfNullOrWhiteSpace(requiredAcknowledgmentText);
 
         HandshakeId = handshakeId.Trim();
+        SchemaVersion = AsiBackboneSchemaVersions.Normalize(schemaVersion);
         ActorId = actorId.Trim();
         ActorType = actorType;
         ActorDisplayName = NormalizeOptional(actorDisplayName);
@@ -61,6 +64,11 @@ public sealed class LiabilityHandshakeRequest
     /// Gets the stable handshake identifier.
     /// </summary>
     public string HandshakeId { get; }
+
+    /// <summary>
+    /// Gets the schema version for the serialized handshake request shape.
+    /// </summary>
+    public string SchemaVersion { get; }
 
     /// <summary>
     /// Gets the stable actor identifier associated with the handshake.
@@ -159,6 +167,7 @@ public sealed class LiabilityHandshakeRequest
     /// <param name="policyVersion">Optional policy version.</param>
     /// <param name="policyHash">Optional policy hash.</param>
     /// <param name="metadata">Optional host-provided metadata.</param>
+    /// <param name="schemaVersion">Optional schema version for serialized or persisted handshake records.</param>
     /// <returns>A liability handshake request.</returns>
     public static LiabilityHandshakeRequest Create(
         IAsiBackboneActorContext actor,
@@ -174,12 +183,14 @@ public sealed class LiabilityHandshakeRequest
         string? traceId = null,
         string? policyVersion = null,
         string? policyHash = null,
-        IReadOnlyDictionary<string, string>? metadata = null)
+        IReadOnlyDictionary<string, string>? metadata = null,
+        string? schemaVersion = null)
     {
         ArgumentNullException.ThrowIfNull(actor);
 
         return new LiabilityHandshakeRequest(
             NormalizeIdentifier(handshakeId),
+            schemaVersion,
             actor.ActorId,
             actor.ActorType,
             actor.DisplayName,
@@ -209,6 +220,7 @@ public sealed class LiabilityHandshakeRequest
     /// <param name="riskCategory">Optional host-defined risk category.</param>
     /// <param name="handshakeId">Optional handshake identifier. When omitted, a new identifier is generated.</param>
     /// <param name="metadata">Optional host-provided metadata.</param>
+    /// <param name="schemaVersion">Optional schema version for serialized or persisted handshake records.</param>
     /// <returns>A liability handshake request.</returns>
     public static LiabilityHandshakeRequest FromDecision(
         IAsiBackboneActorContext actor,
@@ -219,7 +231,8 @@ public sealed class LiabilityHandshakeRequest
         LiabilityHandshakeRiskLevel riskLevel = LiabilityHandshakeRiskLevel.Unspecified,
         string? riskCategory = null,
         string? handshakeId = null,
-        IReadOnlyDictionary<string, string>? metadata = null)
+        IReadOnlyDictionary<string, string>? metadata = null,
+        string? schemaVersion = null)
     {
         ArgumentNullException.ThrowIfNull(decision);
 
@@ -245,7 +258,8 @@ public sealed class LiabilityHandshakeRequest
             decision.TraceId,
             decision.PolicyVersion,
             decision.PolicyHash,
-            metadata);
+            metadata,
+            schemaVersion);
     }
 
     private static string NormalizeIdentifier(string? identifier)

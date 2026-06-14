@@ -1,11 +1,11 @@
 # CDCavell.AsiBackbone.EntityFrameworkCore
 
-Entity Framework Core integration for ASI Backbone accountability persistence.
+Entity Framework Core model configuration and host-owned persistence helpers for Accountable Systems Infrastructure records.
 
 This package contributes provider-neutral EF Core model configuration, persistence entities, and an EF Core-backed audit ledger store while preserving host ownership of the application database.
 
 > [!IMPORTANT]
-> This package does not provide or require a package-owned `DbContext`, database provider, connection string, migration set, or schema deployment workflow. The host application owns those concerns.
+> This package does not provide or require a package-owned `DbContext`, database provider, connection string, migration set, schema deployment workflow, tamper-evident storage, signing provider, or compliance guarantee. The host application owns those concerns.
 
 ## What this package provides
 
@@ -74,6 +74,6 @@ Provider-specific behavior belongs in the host application. For example, SQLite 
 
 ## Boundary
 
-Use this package when you want durable ASI Backbone accountability records in a host-owned EF Core database.
+Use this package when you want ASI Backbone accountability records persisted through a host-owned EF Core database.
 
-Do not use this package as an AI model host, ASP.NET Core middleware package, migration owner, signing system, or database provider abstraction.
+Do not use this package as an AI model host, ASP.NET Core middleware package, migration owner, signing system, tamper-evident ledger provider, compliance system, or database provider abstraction.

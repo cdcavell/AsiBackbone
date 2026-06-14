@@ -214,7 +214,7 @@ else {
                 }
             }
 
-            $unexpectedTags = $actualTags | Where-Object { $expectedPackage.Tags -notcontains $_ }
+            $unexpectedTags = @($actualTags | Where-Object { $expectedPackage.Tags -notcontains $_ })
             if ($unexpectedTags.Count -gt 0) {
                 Add-Failure "$($package.Name) contains unexpected tags: $($unexpectedTags -join ', ')"
             }
@@ -254,8 +254,8 @@ else {
         }
     }
 
-    $expectedPackageNames = $expectedPackages | ForEach-Object { "$($_.Id).$ExpectedVersion.nupkg" }
-    $unexpectedPackages = $packages | Where-Object { $expectedPackageNames -notcontains $_.Name }
+    $expectedPackageNames = @($expectedPackages | ForEach-Object { "$($_.Id).$ExpectedVersion.nupkg" })
+    $unexpectedPackages = @($packages | Where-Object { $expectedPackageNames -notcontains $_.Name })
     foreach ($unexpectedPackage in $unexpectedPackages) {
         Add-Failure "Unexpected package artifact was found: $($unexpectedPackage.Name)"
     }

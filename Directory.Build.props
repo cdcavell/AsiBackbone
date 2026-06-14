@@ -36,6 +36,7 @@
 
     <RepositoryUrl>https://github.com/cdcavell/AsiBackbone</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://cdcavell.github.io/AsiBackbone/</PackageProjectUrl>
   </PropertyGroup>
 
   <PropertyGroup>

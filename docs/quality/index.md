@@ -24,9 +24,12 @@ The coverage report is generated from the test suite using Coverlet and ReportGe
 
 - [Open Core Mutation Analysis](../mutation/core/index.html)
 - [Open ASP.NET Core Mutation Analysis](../mutation/aspnetcore/index.html)
+- [Mutation Coverage Scope and Deferrals](mutation-coverage-scope.md)
 - [Core Test Triage](core-test-triage.md)
 
 The mutation analysis reports are generated with Stryker.NET for targeted governance behavior. The Core report focuses on evaluator and policy-pipeline behavior, including denial precedence, decision outcome selection, reason-code preservation, and related edge cases. The ASP.NET Core report focuses on acknowledgment challenge round-trip behavior, including safe-default challenge shaping, correlation preservation, and conversion of host acknowledgment responses back into Core acknowledgment language.
+
+The current pre-`1.0.0` mutation boundary and accepted `1.x` expansion deferrals are documented in [Mutation Coverage Scope and Deferrals](mutation-coverage-scope.md). This keeps integration-layer gaps visible without expanding the stable release gates beyond the current validated scope.
 
 ### External Consumer Smoke Test
 

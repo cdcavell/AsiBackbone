@@ -2,7 +2,7 @@
 
 This guide explains the current direction of the AsiBackbone repository and how to begin working with the project.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is an early alpha .NET package family for governance-oriented decision flow. The foundation package is `CDCavell.AsiBackbone.Core`, with optional integration packages for in-memory validation, EF Core host-owned persistence, and ASP.NET Core host integration.
+In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a stable `1.0.0` .NET package family for governance-oriented decision flow. The foundation package is `CDCavell.AsiBackbone.Core`, with optional integration packages for in-memory validation, EF Core host-owned persistence, and ASP.NET Core host integration.
 
 > [!IMPORTANT]
 > This project does not implement artificial superintelligence. It provides Accountable Systems Infrastructure: governance-oriented software building blocks inspired by broader Backbone framework concepts.
@@ -11,7 +11,7 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 
 The repository has completed the initial Core foundation work and now includes optional packages for in-memory validation, EF Core host-owned persistence, and ASP.NET Core host integration.
 
-The current implemented alpha package lineup is:
+The implemented stable `1.0.0` package lineup is:
 
 ```text
 CDCavell.AsiBackbone.Core
@@ -20,7 +20,7 @@ CDCavell.AsiBackbone.EntityFrameworkCore
 CDCavell.AsiBackbone.AspNetCore
 ```
 
-Planned or later package areas remain separate from the current implemented lineup:
+Planned or later package areas remain separate from the implemented stable lineup:
 
 ```text
 CDCavell.AsiBackbone.Signing
@@ -215,7 +215,7 @@ A capability token should be:
 
 A gateway pattern applies policy and capability checks before a request reaches an external or consequential system.
 
-Early examples should focus on safe software scenarios:
+Examples should focus on safe software scenarios first:
 
 * Document approval
 * External API execution
@@ -273,7 +273,7 @@ Future package areas may include:
 * `CDCavell.AsiBackbone.Samples`
 * `CDCavell.AsiBackbone.Robotics`
 
-Package names may be adjusted before stable release.
+Planned package names are not part of the `1.0.0` stable contract unless a future release explicitly ships them as stable packages.
 
 ## Relationship to NetCoreApplicationTemplate
 
@@ -308,8 +308,10 @@ That foundation now supports integration packages that build on Core while prese
 
 When adding documentation, keep the distinction clear between:
 
-* Implemented package behavior
-* Planned package behavior
+* Implemented stable behavior
+* Alpha, preview, or sample behavior
+* Host responsibilities
+* Future provider work
 * Accountable Systems Infrastructure framing
 * Broader Eden/Backbone theoretical background
 * Structural analogy

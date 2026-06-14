@@ -4,6 +4,31 @@ All notable changes to this project are documented in this file.
 
 This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/) and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] - 2026-06-14
+
+### Added
+
+* Finalized the first stable package-family release boundary for `CDCavell.AsiBackbone.Core`, `CDCavell.AsiBackbone.Storage.InMemory`, `CDCavell.AsiBackbone.EntityFrameworkCore`, and `CDCavell.AsiBackbone.AspNetCore`.
+* Added release-ready metadata alignment across `Directory.Build.props`, `CITATION.cff`, `.zenodo.json`, release notes, and version-consistency validation.
+* Added schema-version stamping for durable or exported governance artifacts that require stable migration anchors.
+* Added stable package integration and external consumer smoke-test coverage to validate consumer-style package usage before publication.
+
+### Changed
+
+* Promoted package version metadata from `0.4.0-alpha.3` to `1.0.0` without a preview suffix.
+* Updated citation and Zenodo metadata to describe the `1.0.0` release consistently.
+* Updated documentation that described the package family as alpha so current release-facing pages describe the stable package line instead.
+
+### Validation
+
+* Version-consistency validation now checks central MSBuild version metadata, package project metadata, `CITATION.cff`, `.zenodo.json`, optional release tag metadata, and generated package names when package artifacts are supplied.
+* Release notes, schema-version guidance, API compatibility expectations, privacy/signing boundaries, and known limitations are documented for the `1.0.0` release path.
+
+### Boundary Notes
+
+* `1.0.0` remains Accountable Systems Infrastructure and governance spine infrastructure, not an artificial superintelligence implementation, AI model host, robot controller, legal/compliance guarantee, or tamper-evident ledger provider.
+* Future signing, gateway, cloud observability, and robotics/provider packages remain outside the stable `1.0.0` contract unless separately released as stable.
+
 ## [0.4.0-alpha.3] - 2026-06-13
 
 ### Added

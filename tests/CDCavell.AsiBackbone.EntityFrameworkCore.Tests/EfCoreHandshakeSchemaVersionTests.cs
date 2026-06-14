@@ -21,7 +21,7 @@ public sealed class EfCoreHandshakeSchemaVersionTests
     {
         await using HostOwnedHandshakeDbContext context = CreateContext();
 
-        context.HandshakeRequests.Add(new AsiBackboneHandshakeRequestEntity
+        _ = context.HandshakeRequests.Add(new AsiBackboneHandshakeRequestEntity
         {
             HandshakeId = "handshake-123",
             SchemaVersion = "1.1-test",
@@ -59,7 +59,7 @@ public sealed class EfCoreHandshakeSchemaVersionTests
     {
         await using HostOwnedHandshakeDbContext context = CreateContext();
 
-        context.HandshakeAcknowledgments.Add(new AsiBackboneHandshakeAcknowledgmentEntity
+        _ = context.HandshakeAcknowledgments.Add(new AsiBackboneHandshakeAcknowledgmentEntity
         {
             AcknowledgmentId = "ack-123",
             SchemaVersion = "1.1-test",

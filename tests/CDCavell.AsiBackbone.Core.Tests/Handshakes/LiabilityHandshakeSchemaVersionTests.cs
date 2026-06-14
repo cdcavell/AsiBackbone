@@ -96,7 +96,7 @@ public sealed class LiabilityHandshakeSchemaVersionTests
     {
         string json = JsonSerializer.Serialize(value, JsonOptions);
 
-        using JsonDocument document = JsonDocument.Parse(json);
+        using var document = JsonDocument.Parse(json);
 
         return document.RootElement.GetProperty("schemaVersion").GetString()!;
     }

@@ -1,8 +1,21 @@
 # 1.0.0 Release Notes
 
-These notes describe the first stable release boundary for AsiBackbone. They are written for the `1.0.0` release path and should be reviewed when the final `1.0.0` package version is cut.
+These notes describe the first stable release boundary for AsiBackbone. They are written for the `1.0.0` release and align with the repository version metadata, citation metadata, Zenodo metadata, and `v1.0.0` tag path.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is governance infrastructure for accountable decision flow. It does not implement artificial superintelligence, host AI models, control robots, or guarantee legal or regulatory compliance.
+
+## Release identity
+
+| Field | Value |
+| --- | --- |
+| Package version | `1.0.0` |
+| Release tag | `v1.0.0` |
+| Assembly version | `1.0.0.0` |
+| File version | `1.0.0.0` |
+| Citation version | `1.0.0` |
+| Zenodo metadata version | `1.0.0` |
+
+No preview or `-alpha` suffix is expected for the stable package artifacts.
 
 ## Release summary
 

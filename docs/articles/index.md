@@ -12,6 +12,12 @@ Start with [Getting Started](getting-started.md), then use the navigation menu t
 * [1.0.0 Release Notes](release-notes-100.md)
   Describes the first stable release identity, stable package list, known limitations, and upgrade guidance.
 
+* [Release Readiness Checklist](release-readiness-checklist.md)
+  Provides the final pre-tag checklist for the first stable NuGet package release, including issue status, workflow gates, package metadata inspection, wording boundaries, and non-blocking follow-up tracking.
+
+* [Release Validation](release-validation.md)
+  Documents the release-blocking workflow path for restore, build, formatting, tests, DocFX, package creation, generated NuGet metadata validation, package-consumer smoke tests, and package artifact upload.
+
 * [Governance Tool Comparisons](governance-tool-comparisons.md)
   Compares Azure Policy, Open Policy Agent (OPA), Microsoft Agent Governance Toolkit, and AsiBackbone as complementary governance layers without positioning any tool as a replacement for the others.
 

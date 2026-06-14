@@ -90,6 +90,7 @@ The documentation now includes stable-release guidance for:
 
 - getting started with the implemented package family;
 - the `1.0.0` quickstart path;
+- release readiness and release validation checks;
 - API compatibility and Semantic Versioning expectations;
 - schema versioning for stable serialized and persisted records;
 - privacy and signing boundaries;
@@ -186,7 +187,7 @@ Because alpha packages may have changed before `1.0.0`, consumers should test up
 
 ## Release readiness checklist
 
-Before publishing the final stable release, confirm:
+Before publishing the final stable release, confirm the detailed [1.0.0 Release Readiness Checklist](release-readiness-checklist.md), including:
 
 - stable API review is complete or intentionally deferred with follow-up issues;
 - package versions and release notes agree;
@@ -194,6 +195,7 @@ Before publishing the final stable release, confirm:
 - public documentation links resolve;
 - external consumer smoke tests pass;
 - release artifacts build and pack successfully;
+- generated `.nupkg` metadata validation passes;
 - schema-version guidance is present for stable persisted artifacts;
 - privacy and signing boundaries are documented;
 - known limitations are included in release notes;
@@ -202,6 +204,7 @@ Before publishing the final stable release, confirm:
 ## Related documentation
 
 - [1.0.0 Quickstart](quickstart-100.md)
+- [1.0.0 Release Readiness Checklist](release-readiness-checklist.md)
 - [API Compatibility and SemVer](api-compatibility-and-semver.md)
 - [Schema Versioning](schema-versioning.md)
 - [Privacy and Signing Boundaries](privacy-and-signing-boundaries.md)

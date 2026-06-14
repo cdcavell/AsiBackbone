@@ -2,7 +2,7 @@
 
 Welcome to the ASI Backbone documentation site.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a .NET governance and policy-control framework inspired by broader Eden/Backbone governance concepts, but implemented as practical software infrastructure. The project begins as a **governance spine**, not an intelligence engine. Its purpose is to define practical software patterns for policy evaluation, decision results, acknowledgment workflows, audit receipts, capability-gated execution, and host integration.
+In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a .NET governance and policy-control framework inspired by broader Eden/Backbone governance concepts, but implemented as practical software infrastructure. The project is a **governance spine**, not an intelligence engine. Its purpose is to define practical software patterns for policy evaluation, decision results, acknowledgment workflows, audit receipts, capability-gated execution, and host integration.
 
 > [!IMPORTANT]
 > AsiBackbone does not implement artificial superintelligence. It provides framework-neutral building blocks for governing consequential actions in software systems.
@@ -10,16 +10,22 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 ## Start here
 
 * [Getting Started](articles/getting-started.md)
-  Project orientation, local build instructions, and the current package direction.
+  Project orientation, local build instructions, and the stable package direction.
+
+* [1.0.0 Quickstart](articles/quickstart-100.md)
+  Package-consumer guidance for the first stable release line.
+
+* [1.0.0 Release Notes](articles/release-notes-100.md)
+  Release identity, stable package list, known limitations, and upgrade notes.
 
 * [Core Domain Language](articles/core-domain-language.md)
-  Initial terminology and Core boundary for Accountable Systems Infrastructure, governance spine, constraints, collapse boundary, actor context, decision results, audit residue, acknowledgment, capability tokens, and gateway boundaries.
+  Terminology and Core boundary for Accountable Systems Infrastructure, governance spine, constraints, collapse boundary, actor context, decision results, audit residue, acknowledgment, capability tokens, and gateway boundaries.
 
 * [Equations and Toy Models](articles/equations-and-toy-models.md)
   Explains the conceptual progression from `Λ(t)` to `Λ(τ)` to `ΛS(x, τ)` and maps the Eden/Backbone collapse notation into practical AsiBackbone software terms: active policy structure, allowed decision states, acknowledgment, audit residue, and gateway-safe execution.
 
-* [Alpha Package Boundary](articles/alpha-package-boundary.md)
-  Focused release-boundary guidance for the Core package and integration package boundaries.
+* [Historical Alpha Package Boundary](articles/alpha-package-boundary.md)
+  Historical release-boundary guidance for the original Core package and integration package boundaries.
 
 * [Documentation Articles](articles/)
   Conceptual and implementation documentation for the ASI Backbone package family.
@@ -88,7 +94,7 @@ Suggested sections:
 
 The AsiBackbone package family should remain modular. Consumers should be able to adopt the pieces they need without inheriting unnecessary host assumptions.
 
-The current implemented alpha package lineup is:
+The implemented stable `1.0.0` package lineup is:
 
 ```text
 CDCavell.AsiBackbone.Core
@@ -97,7 +103,7 @@ CDCavell.AsiBackbone.EntityFrameworkCore
 CDCavell.AsiBackbone.AspNetCore
 ```
 
-Planned or later package areas remain separate from the current implemented lineup:
+Planned or later package areas remain separate from the implemented stable lineup:
 
 ```text
 CDCavell.AsiBackbone.Signing
@@ -105,11 +111,11 @@ CDCavell.AsiBackbone.Samples
 CDCavell.AsiBackbone.Robotics
 ```
 
-Package names may still be adjusted before stable release, but documentation should use the public alpha package IDs shown above unless a future release changes them.
+Planned package names are not part of the `1.0.0` stable contract unless a future release explicitly ships them as stable packages.
 
 ## CDCavell.AsiBackbone.Core
 
-Current package.
+Stable package.
 
 `CDCavell.AsiBackbone.Core` is the dependency-light foundation package. It defines shared contracts, domain abstractions, result primitives, and framework-neutral language used by the rest of the package family.
 
@@ -144,7 +150,7 @@ Potential responsibilities if later added:
 
 ## CDCavell.AsiBackbone.AspNetCore
 
-Current package.
+Stable package.
 
 `CDCavell.AsiBackbone.AspNetCore` provides ASP.NET Core host integration seams while keeping Core framework-neutral. It adapts HTTP request context into AsiBackbone governance language and helps hosts map governance outcomes to HTTP-friendly responses when explicitly used by the application.
 
@@ -162,9 +168,9 @@ The host application remains responsible for authentication, authorization, endp
 
 ## CDCavell.AsiBackbone.Storage.InMemory
 
-Current package.
+Stable package.
 
-`CDCavell.AsiBackbone.Storage.InMemory` provides non-durable in-memory storage helpers for local validation, samples, and tests. It supports early integration validation without requiring a database and should not be used as durable production storage.
+`CDCavell.AsiBackbone.Storage.InMemory` provides non-durable in-memory storage helpers for local validation, samples, and tests. It supports integration validation without requiring a database and should not be used as durable production storage.
 
 Primary responsibilities:
 
@@ -176,7 +182,7 @@ Primary responsibilities:
 
 ## CDCavell.AsiBackbone.EntityFrameworkCore
 
-Current package.
+Stable package.
 
 `CDCavell.AsiBackbone.EntityFrameworkCore` provides EF Core model configuration and persistence integration through a host-owned `DbContext`. AsiBackbone contributes model configuration and storage helpers while the consuming application owns the database provider, connection string, migrations, deployment, and schema lifecycle.
 
@@ -222,7 +228,7 @@ Potential samples:
 
 Later integration package.
 
-Robotics should remain a later-stage integration example. The initial project should prove the policy, decision, acknowledgment, audit, capability-token, and gateway patterns before moving toward physical or robotic execution scenarios.
+Robotics should remain a later-stage integration example. The stable `1.0.0` project line proves the policy, decision, acknowledgment, audit, capability-token, and gateway patterns before moving toward physical or robotic execution scenarios.
 
 Primary responsibilities, if later added:
 
@@ -234,7 +240,7 @@ Primary responsibilities, if later added:
 
 ## Project direction
 
-The current alpha implementation path is:
+The stable `1.0.0` implementation path is:
 
 1. Core governance primitives
 2. Policy evaluator pipeline
@@ -248,7 +254,7 @@ The current alpha implementation path is:
 10. Plain ASP.NET Core sample host
 11. Documentation and host-validation guidance
 
-Future work may add signing, gateway integrations, additional samples, robotics examples, and stable release packaging.
+Future work may add signing, gateway integrations, additional samples, robotics examples, and follow-up release packaging.
 
 This gives AsiBackbone a practical software foundation while preserving the broader framework boundary.
 

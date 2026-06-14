@@ -70,7 +70,7 @@
 - name: Privacy and Signing Boundaries
   href: privacy-and-signing-boundaries.md
 
-- name: Alpha Package Boundary
+- name: Historical Alpha Package Boundary
   href: alpha-package-boundary.md
 
 - name: EF Core Integration Boundary
@@ -88,5 +88,5 @@
 - name: NetCoreApplicationTemplate Host Validation
   href: netcoreapplicationtemplate-host-validation.md
 
-- name: Core Alpha Readiness Review
+- name: Historical Core Alpha Readiness Review
   href: core-alpha-readiness-review.md

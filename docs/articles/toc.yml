@@ -19,6 +19,9 @@
 - name: Stable API Review
   href: stable-api-review.md
 
+- name: API Baseline and Boundary Checks
+  href: api-baseline-and-boundary-checks.md
+
 - name: Developer Checklist
   href: developer-checklist.md
 

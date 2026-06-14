@@ -77,6 +77,18 @@ function Assert-Equal {
     }
 }
 
+function Assert-ContainsLiteral {
+    param(
+        [string]$Text,
+        [string]$Expected,
+        [string]$Description
+    )
+
+    if ($Text.IndexOf($Expected, [System.StringComparison]::Ordinal) -lt 0) {
+        Add-Failure "$Description should contain '$Expected'."
+    }
+}
+
 function Get-NuspecElementValue {
     param(
         [System.Xml.XmlElement]$Metadata,
@@ -241,9 +253,7 @@ else {
                 }
 
                 foreach ($requiredReadmeText in $expectedPackage.ReadmeMustContain) {
-                    if ($readme -notlike "*$requiredReadmeText*") {
-                        Add-Failure "Package '$($package.Name)' README should contain '$requiredReadmeText'."
-                    }
+                    Assert-ContainsLiteral $readme $requiredReadmeText "Package '$($package.Name)' README"
                 }
             }
         }

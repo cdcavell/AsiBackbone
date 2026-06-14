@@ -31,14 +31,14 @@ Future signing, key-management, durable outbox, cloud observability/enrichment, 
 
 Do not cut the `v1.0.0` tag until every item in this section is complete for the exact release-candidate commit.
 
-- [ ] PR for issue #14 is merged to `main`.
-- [ ] `CI` passes on `main` after the issue #14 merge.
-- [ ] `Stable Release Validation` passes on `main` after the issue #14 merge.
-- [ ] `External Consumer Smoke Test` passes against the package-shaped artifacts for the release candidate.
-- [ ] `Publish Documentation` passes and the DocFX site reflects the stable `1.0.0` boundary.
-- [ ] `Version Consistency` passes for the release candidate.
-- [ ] No open release-blocking issues remain in the `1.0.0` milestone.
-- [ ] Any intentionally deferred release-critical check is documented in this checklist, the release notes, or a follow-up issue before tagging.
+- [x] PR for issue #14 is merged to `main`.
+- [x] `CI` passes on `main` after the issue #14 merge.
+- [x] `Stable Release Validation` passes on `main` after the issue #14 merge.
+- [x] `External Consumer Smoke Test` passes against the package-shaped artifacts for the release candidate.
+- [x] `Publish Documentation` passes and the DocFX site reflects the stable `1.0.0` boundary.
+- [x] `Version Consistency` passes for the release candidate.
+- [x] No open release-blocking issues remain in the `1.0.0` milestone.
+- [x] Any intentionally deferred release-critical check is documented in this checklist, the release notes, or a follow-up issue before tagging.
 
 ## Local release-candidate validation
 
@@ -103,16 +103,16 @@ CDCavell.AsiBackbone.AspNetCore.1.0.0.nupkg
 
 ## Documentation checklist
 
-- [ ] Root `README.md` describes the project as stable Accountable Systems Infrastructure and does not describe the stable package family as early alpha.
-- [ ] Package README files describe their package-specific boundaries.
-- [ ] `Storage.InMemory` is clearly non-durable and local-validation focused.
-- [ ] EF Core docs preserve host-owned persistence language.
-- [ ] ASP.NET Core docs preserve host-adapter language and do not imply automatic enforcement.
-- [ ] `1.0.0 Release Notes` list the stable package family and known limitations.
-- [ ] `API Compatibility and SemVer` documents the stable package contract and `AssemblyVersion` strategy.
-- [ ] `Schema Versioning` documents the current stable artifact schema and durable-artifact rationale.
-- [ ] `Privacy and Signing Boundaries` bounds signing, privacy, tamper, and compliance claims.
-- [ ] `Release Validation` documents the workflow gates and generated package metadata validation.
+- [x] Root `README.md` describes the project as stable Accountable Systems Infrastructure and does not describe the stable package family as early alpha.
+- [x] Package README files describe their package-specific boundaries.
+- [x] `Storage.InMemory` is clearly non-durable and local-validation focused.
+- [x] EF Core docs preserve host-owned persistence language.
+- [x] ASP.NET Core docs preserve host-adapter language and do not imply automatic enforcement.
+- [x] `1.0.0 Release Notes` list the stable package family and known limitations.
+- [x] `API Compatibility and SemVer` documents the stable package contract and `AssemblyVersion` strategy.
+- [x] `Schema Versioning` documents the current stable artifact schema and durable-artifact rationale.
+- [x] `Privacy and Signing Boundaries` bounds signing, privacy, tamper, and compliance claims.
+- [x] `Release Validation` documents the workflow gates and generated package metadata validation.
 
 ## Public wording checklist
 

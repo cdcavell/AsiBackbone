@@ -1,6 +1,7 @@
 using CDCavell.AsiBackbone.Core.Actors;
 using CDCavell.AsiBackbone.Core.Entities;
 using CDCavell.AsiBackbone.Core.Handshakes;
+using CDCavell.AsiBackbone.Core.Serialization;
 
 namespace CDCavell.AsiBackbone.EntityFrameworkCore.Persistence;
 
@@ -13,6 +14,11 @@ public sealed class AsiBackboneHandshakeRequestEntity : AsiBackboneEntity
     /// Gets or sets the stable handshake identifier.
     /// </summary>
     public string HandshakeId { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the serialized schema version for this handshake request.
+    /// </summary>
+    public string SchemaVersion { get; set; } = AsiBackboneSchemaVersions.StableArtifactsV1;
 
     /// <summary>
     /// Gets or sets the stable actor identifier associated with the handshake.

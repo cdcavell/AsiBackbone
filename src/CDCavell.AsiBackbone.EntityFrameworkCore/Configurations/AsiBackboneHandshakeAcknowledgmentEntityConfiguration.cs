@@ -11,6 +11,7 @@ public sealed class AsiBackboneHandshakeAcknowledgmentEntityConfiguration
     : IEntityTypeConfiguration<AsiBackboneHandshakeAcknowledgmentEntity>
 {
     private const int IdentifierMaxLength = 128;
+    private const int SchemaVersionMaxLength = 64;
     private const int DisplayNameMaxLength = 256;
     private const int ActorTypeMaxLength = 64;
     private const int AcknowledgmentCodeMaxLength = 128;
@@ -37,6 +38,10 @@ public sealed class AsiBackboneHandshakeAcknowledgmentEntityConfiguration
         _ = builder.Property(acknowledgment => acknowledgment.AcknowledgmentId)
             .IsRequired()
             .HasMaxLength(IdentifierMaxLength);
+
+        _ = builder.Property(acknowledgment => acknowledgment.SchemaVersion)
+            .IsRequired()
+            .HasMaxLength(SchemaVersionMaxLength);
 
         _ = builder.Property(acknowledgment => acknowledgment.HandshakeId)
             .IsRequired()
@@ -72,6 +77,8 @@ public sealed class AsiBackboneHandshakeAcknowledgmentEntityConfiguration
 
         _ = builder.HasIndex(acknowledgment => acknowledgment.AcknowledgmentId)
             .IsUnique();
+
+        _ = builder.HasIndex(acknowledgment => acknowledgment.SchemaVersion);
 
         _ = builder.HasIndex(acknowledgment => acknowledgment.HandshakeId);
 

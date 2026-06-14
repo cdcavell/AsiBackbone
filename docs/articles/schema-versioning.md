@@ -6,13 +6,23 @@ AsiBackbone treats persisted or exported governance artifacts as durable contrac
 
 The initial stable artifact schema version is `1.0.0` and is exposed through `AsiBackboneSchemaVersions.StableArtifactsV1`.
 
-The first package-owned stable serialized artifact that carries this version is `AuditLedgerRecord`. It is the persistence-ready audit record shape used by the audit ledger and EF Core storage adapter.
+Package-owned stable serialized artifacts that carry this version include:
+
+- `AuditLedgerRecord`
+- `LiabilityHandshakeRequest`
+- `LiabilityHandshakeAcknowledgment`
+
+The EF Core persistence entities for audit ledger records, handshake requests, and handshake acknowledgments also expose a `SchemaVersion` column so host-owned migrations can preserve the artifact shape that produced each durable row.
 
 ## Default behavior
 
-When an `AuditLedgerRecord` is created without an explicit schema version, the package defaults the record to `AsiBackboneSchemaVersions.StableArtifactsV1`.
+When an `AuditLedgerRecord`, `LiabilityHandshakeRequest`, or `LiabilityHandshakeAcknowledgment` is created without an explicit schema version, the package defaults the record to `AsiBackboneSchemaVersions.StableArtifactsV1`.
 
 Hosts or future package components may provide an explicit schema version when replaying, importing, migrating, or testing alternate artifact shapes. The value is trimmed and preserved.
+
+## Capability token note
+
+The `1.0.0` package does not currently define a package-owned durable capability-token record. Capability-token references are captured as identifiers, such as `CapabilityTokenId`, on schema-stamped audit ledger records when the host supplies them. If a future package adds a durable capability-token artifact, it should carry its own schema discriminator and migration guidance before release.
 
 ## Migration expectation
 

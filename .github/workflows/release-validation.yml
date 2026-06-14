@@ -92,6 +92,10 @@ jobs:
               /p:ContinuousIntegrationBuild=true
           done
 
+      - name: Validate generated NuGet metadata
+        shell: pwsh
+        run: ./scripts/Validate-NuGetPackageMetadata.ps1 -PackageDirectory "$env:PACKAGE_OUTPUT"
+
       - name: Run external consumer smoke test
         shell: bash
         run: bash ./eng/smoke-tests/external-consumer-smoke.sh

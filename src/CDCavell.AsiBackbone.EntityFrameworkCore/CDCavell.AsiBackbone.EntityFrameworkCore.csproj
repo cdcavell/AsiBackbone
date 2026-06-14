@@ -5,12 +5,12 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PackageId>CDCavell.AsiBackbone.EntityFrameworkCore</PackageId>
-    <Title>CDCavell ASI Backbone Entity Framework Core</Title>
-    <Description>Entity Framework Core integration for host-owned ASI Backbone accountability persistence.</Description>
+    <Title>CDCavell AsiBackbone Entity Framework Core</Title>
+    <Description>Entity Framework Core model configuration and host-owned persistence helpers for Accountable Systems Infrastructure audit and acknowledgment records.</Description>
     <Authors>Christopher D. Cavell</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageTags>asi;backbone;governance;architecture;entity-framework-core;efcore;persistence</PackageTags>
+    <PackageTags>accountable-systems-infrastructure;asi-backbone;dotnet;governance;entity-framework-core;efcore;host-owned-persistence;audit-ledger</PackageTags>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
 

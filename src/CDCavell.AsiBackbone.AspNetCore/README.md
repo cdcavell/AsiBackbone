@@ -1,11 +1,11 @@
 # CDCavell.AsiBackbone.AspNetCore
 
-ASP.NET Core host integration scaffold for ASI Backbone governance primitives.
+ASP.NET Core host adapters for Accountable Systems Infrastructure governance primitives.
 
 This package acts as a thin web-host adapter around `CDCavell.AsiBackbone.Core`.
 
 > [!IMPORTANT]
-> This package provides thin host adapters only. It does not currently provide concrete middleware, endpoint mapping, authentication integration, policy enforcement, persistence, or execution-gateway behavior. HTTP result mapping and acknowledgment challenge helpers are explicit adapters and do not enforce decisions automatically.
+> This package provides host adapters only. It does not provide concrete middleware enforcement, endpoint mapping, authentication integration, policy enforcement, persistence, or execution-gateway behavior. HTTP result mapping and acknowledgment challenge helpers are explicit adapters and do not enforce decisions automatically.
 
 ## Service registration
 
@@ -17,7 +17,7 @@ using CDCavell.AsiBackbone.AspNetCore.DependencyInjection;
 builder.Services.AddAsiBackboneAspNetCore();
 ```
 
-Host applications may configure the first integration options explicitly.
+Host applications may configure the integration options explicitly.
 
 ```csharp
 builder.Services.AddAsiBackboneAspNetCore(options =>
@@ -150,9 +150,9 @@ AsiBackboneAcknowledgmentChallengeResult result = acknowledgmentChallengeService
 
 A successful challenge result contains a Core `LiabilityHandshakeAcknowledgment`. Failed responses return an `OperationResult` with a reason code, such as a handshake mismatch or acknowledgment-code mismatch. The package does not persist challenge state; hosts decide whether to store the Core handshake request, serialize it into protected state, or associate it with an existing workflow.
 
-## Current boundary
+## Stable boundary
 
-This package currently provides:
+This package provides:
 
 - ASP.NET Core service registration extensions;
 - configurable HTTP integration options;

@@ -16,6 +16,7 @@ Before cutting a stable release tag, confirm the following checks have passed on
 | Tests | CI, stable release validation, package publish | Confirms the solution test suite passes before packaging or publishing. |
 | Package creation | CI, stable release validation, package publish | Confirms every package project under `src` can be packed. |
 | Package version validation | package publish | Confirms repository and package version metadata align with the tag when publishing from a tag. |
+| NuGet metadata validation | stable release validation, package publish | Confirms generated `.nupkg` metadata, README files, IDs, descriptions, tags, license metadata, project URL, and repository URL align with the stable package boundary. |
 | Documentation build | publish docs, stable release validation, package publish | Confirms DocFX can build the documentation included in the release posture. |
 | External consumer smoke tests | external consumer smoke workflow, stable release validation | Confirms clean consumer-style projects can reference and wire the package family. |
 | CodeQL and dependency review | CI | Confirms configured static/security checks run on pull requests where applicable. |
@@ -27,7 +28,7 @@ The following workflows form the release gate for `1.0.0`:
 - `CI` validates dependency review for pull requests, solution restore/build/test, formatting, package creation, coverage output, and CodeQL analysis.
 - `External Consumer Smoke Test` validates package-consumer wiring through the external consumer and stable package integration smoke scripts.
 - `Publish Documentation` validates the DocFX build used for the documentation site.
-- `Stable Release Validation` provides a single release-candidate gate for restore, build, formatting, tests, DocFX, package creation, and smoke checks.
+- `Stable Release Validation` provides a single release-candidate gate for restore, build, formatting, tests, DocFX, package creation, generated NuGet metadata validation, and smoke checks.
 - `Publish AsiBackbone Packages` repeats release-critical validation before package publish. The publish job depends on the validation-and-pack job, so a failed validation step blocks package publication.
 
 ## Tagging rule
@@ -55,9 +56,10 @@ The workflow validates:
 6. .NET tool restore.
 7. DocFX documentation build.
 8. Package creation for all projects under `src`.
-9. External consumer smoke test.
-10. Stable package integration smoke test.
-11. Package artifact upload.
+9. Generated NuGet package metadata.
+10. External consumer smoke test.
+11. Stable package integration smoke test.
+12. Package artifact upload.
 
 ## Package publish validation
 
@@ -72,10 +74,26 @@ The package publish workflow now performs release-critical validation before pub
 7. Build DocFX documentation.
 8. Pack every package project under `src`.
 9. Validate generated package versions.
-10. Upload package artifacts.
-11. Publish only after the validation-and-pack job succeeds.
+10. Validate generated NuGet metadata.
+11. Upload package artifacts.
+12. Publish only after the validation-and-pack job succeeds.
 
-This keeps package publication behind restore, build, test, documentation, package creation, and version checks.
+This keeps package publication behind restore, build, test, documentation, package creation, version checks, and generated package metadata checks.
+
+## NuGet metadata validation
+
+`Validate-NuGetPackageMetadata.ps1` inspects generated `.nupkg` files rather than only project files. It validates:
+
+- package ID casing;
+- package version;
+- package descriptions;
+- package tags;
+- MIT license metadata;
+- project URL and repository URL metadata;
+- README metadata and packaged README presence;
+- package-specific README wording anchors, such as non-durable storage language for `Storage.InMemory`.
+
+This check is intended to catch release-blocking NuGet metadata mistakes before `1.0.0` is published, because NuGet package metadata for a published version cannot be overwritten.
 
 ## Checks intentionally not owned by the package
 

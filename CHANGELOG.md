@@ -12,16 +12,19 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 * Added release-ready metadata alignment across `Directory.Build.props`, `CITATION.cff`, `.zenodo.json`, release notes, and version-consistency validation.
 * Added schema-version stamping for durable or exported governance artifacts that require stable migration anchors.
 * Added stable package integration and external consumer smoke-test coverage to validate consumer-style package usage before publication.
+* Added generated `.nupkg` metadata validation for package IDs, descriptions, tags, license metadata, project URL, repository URL, and packaged README files.
 
 ### Changed
 
 * Promoted package version metadata from `0.4.0-alpha.3` to `1.0.0` without a preview suffix.
 * Updated citation and Zenodo metadata to describe the `1.0.0` release consistently.
 * Updated documentation that described the package family as alpha so current release-facing pages describe the stable package line instead.
+* Updated NuGet package descriptions and tags to use bounded Accountable Systems Infrastructure wording and package-specific stable roles.
 
 ### Validation
 
 * Version-consistency validation now checks central MSBuild version metadata, package project metadata, `CITATION.cff`, `.zenodo.json`, optional release tag metadata, and generated package names when package artifacts are supplied.
+* NuGet metadata validation now inspects generated package artifacts before stable release validation and package publication continue.
 * Release notes, schema-version guidance, API compatibility expectations, privacy/signing boundaries, and known limitations are documented for the `1.0.0` release path.
 
 ### Boundary Notes

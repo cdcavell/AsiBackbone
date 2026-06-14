@@ -118,6 +118,10 @@ jobs:
 
           ./scripts/Validate-VersionConsistency.ps1 @arguments
 
+      - name: Validate generated NuGet metadata
+        shell: pwsh
+        run: ./scripts/Validate-NuGetPackageMetadata.ps1 -PackageDirectory '${{ env.PACKAGE_OUTPUT }}'
+
       - name: Upload package artifacts
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:

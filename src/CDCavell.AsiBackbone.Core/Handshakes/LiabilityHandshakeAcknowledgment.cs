@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using CDCavell.AsiBackbone.Core.Actors;
+using CDCavell.AsiBackbone.Core.Serialization;
 
 namespace CDCavell.AsiBackbone.Core.Handshakes;
 
@@ -14,6 +15,7 @@ public sealed class LiabilityHandshakeAcknowledgment
 
     private LiabilityHandshakeAcknowledgment(
         string acknowledgmentId,
+        string? schemaVersion,
         string handshakeId,
         string actorId,
         AsiBackboneActorType actorType,
@@ -31,6 +33,7 @@ public sealed class LiabilityHandshakeAcknowledgment
         ArgumentException.ThrowIfNullOrWhiteSpace(acknowledgmentCode);
 
         AcknowledgmentId = acknowledgmentId.Trim();
+        SchemaVersion = AsiBackboneSchemaVersions.Normalize(schemaVersion);
         HandshakeId = handshakeId.Trim();
         ActorId = actorId.Trim();
         ActorType = actorType;
@@ -47,6 +50,11 @@ public sealed class LiabilityHandshakeAcknowledgment
     /// Gets the stable acknowledgment identifier.
     /// </summary>
     public string AcknowledgmentId { get; }
+
+    /// <summary>
+    /// Gets the schema version for the serialized handshake acknowledgment shape.
+    /// </summary>
+    public string SchemaVersion { get; }
 
     /// <summary>
     /// Gets the handshake identifier associated with the acknowledgment.
@@ -117,6 +125,7 @@ public sealed class LiabilityHandshakeAcknowledgment
     /// <param name="acknowledgmentId">Optional acknowledgment identifier. When omitted, a new identifier is generated.</param>
     /// <param name="occurredUtc">Optional response timestamp. When omitted, the current UTC timestamp is used.</param>
     /// <param name="metadata">Optional host-provided metadata.</param>
+    /// <param name="schemaVersion">Optional schema version for serialized or persisted acknowledgment records.</param>
     /// <returns>A liability handshake acknowledgment response.</returns>
     public static LiabilityHandshakeAcknowledgment Create(
         LiabilityHandshakeRequest request,
@@ -124,13 +133,15 @@ public sealed class LiabilityHandshakeAcknowledgment
         bool acknowledged,
         string? acknowledgmentId = null,
         DateTimeOffset? occurredUtc = null,
-        IReadOnlyDictionary<string, string>? metadata = null)
+        IReadOnlyDictionary<string, string>? metadata = null,
+        string? schemaVersion = null)
     {
         ArgumentNullException.ThrowIfNull(request);
         ArgumentNullException.ThrowIfNull(actor);
 
         return new LiabilityHandshakeAcknowledgment(
             NormalizeIdentifier(acknowledgmentId),
+            schemaVersion,
             request.HandshakeId,
             actor.ActorId,
             actor.ActorType,
@@ -151,15 +162,17 @@ public sealed class LiabilityHandshakeAcknowledgment
     /// <param name="acknowledgmentId">Optional acknowledgment identifier. When omitted, a new identifier is generated.</param>
     /// <param name="occurredUtc">Optional response timestamp. When omitted, the current UTC timestamp is used.</param>
     /// <param name="metadata">Optional host-provided metadata.</param>
+    /// <param name="schemaVersion">Optional schema version for serialized or persisted acknowledgment records.</param>
     /// <returns>An accepted liability handshake acknowledgment response.</returns>
     public static LiabilityHandshakeAcknowledgment Accept(
         LiabilityHandshakeRequest request,
         IAsiBackboneActorContext actor,
         string? acknowledgmentId = null,
         DateTimeOffset? occurredUtc = null,
-        IReadOnlyDictionary<string, string>? metadata = null)
+        IReadOnlyDictionary<string, string>? metadata = null,
+        string? schemaVersion = null)
     {
-        return Create(request, actor, acknowledged: true, acknowledgmentId, occurredUtc, metadata);
+        return Create(request, actor, acknowledged: true, acknowledgmentId, occurredUtc, metadata, schemaVersion);
     }
 
     /// <summary>
@@ -170,15 +183,17 @@ public sealed class LiabilityHandshakeAcknowledgment
     /// <param name="acknowledgmentId">Optional acknowledgment identifier. When omitted, a new identifier is generated.</param>
     /// <param name="occurredUtc">Optional response timestamp. When omitted, the current UTC timestamp is used.</param>
     /// <param name="metadata">Optional host-provided metadata.</param>
+    /// <param name="schemaVersion">Optional schema version for serialized or persisted acknowledgment records.</param>
     /// <returns>A rejected liability handshake acknowledgment response.</returns>
     public static LiabilityHandshakeAcknowledgment Reject(
         LiabilityHandshakeRequest request,
         IAsiBackboneActorContext actor,
         string? acknowledgmentId = null,
         DateTimeOffset? occurredUtc = null,
-        IReadOnlyDictionary<string, string>? metadata = null)
+        IReadOnlyDictionary<string, string>? metadata = null,
+        string? schemaVersion = null)
     {
-        return Create(request, actor, acknowledged: false, acknowledgmentId, occurredUtc, metadata);
+        return Create(request, actor, acknowledged: false, acknowledgmentId, occurredUtc, metadata, schemaVersion);
     }
 
     private static string NormalizeIdentifier(string? identifier)

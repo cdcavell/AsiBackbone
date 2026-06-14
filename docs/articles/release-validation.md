@@ -4,6 +4,8 @@ This article documents the release-blocking validation path for the first stable
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. Release validation should confirm that the package family remains practical governance infrastructure and that implementation claims stay within the documented software boundary.
 
+Use [1.0.0 Release Readiness Checklist](release-readiness-checklist.md) as the final pre-tag control sheet that ties these workflow gates to issue status, package metadata inspection, wording boundaries, and non-blocking follow-up tracking.
+
 ## Required checks before tagging `1.0.0`
 
 Before cutting a stable release tag, confirm the following checks have passed on the release candidate commit:
@@ -121,6 +123,7 @@ Deferred checks should be rare for a stable release.
 
 ## Related documentation
 
+- [1.0.0 Release Readiness Checklist](release-readiness-checklist.md)
 - [1.0.0 Release Notes](release-notes-100.md)
 - [Developer Checklist](developer-checklist.md)
 - [API Compatibility and SemVer](api-compatibility-and-semver.md)

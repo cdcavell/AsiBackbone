@@ -125,7 +125,8 @@ None identified in this review.
 
 The following are not required before `1.0.0`, but should remain visible for later milestones:
 
-- consider adding generated public API baseline files after `1.0.0` so future PRs can diff the stable public surface automatically;
+- Core architecture boundary checks are tracked by [API Baseline and Architecture Boundary Checks](api-baseline-and-boundary-checks.md) and should continue to protect Core from integration/provider dependencies;
+- generated public API baseline files remain explicitly deferred to a later `1.x` milestone so the project can choose one stable public API drift process;
 - consider adding package-specific API review notes for future provider packages before those packages become stable;
 - consider adding upgrade notes if any later provider package introduces stable serialized artifacts;
 - keep release notes and package READMEs aligned when new stable packages are added.
@@ -139,6 +140,7 @@ This review does not replace CI, tests, package smoke validation, DocFX validati
 ## Related documentation
 
 - [API Compatibility and SemVer](api-compatibility-and-semver.md)
+- [API Baseline and Architecture Boundary Checks](api-baseline-and-boundary-checks.md)
 - [Schema Versioning](schema-versioning.md)
 - [Privacy and Signing Boundaries](privacy-and-signing-boundaries.md)
 - [Release Validation](release-validation.md)

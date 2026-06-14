@@ -9,14 +9,24 @@ work_root="${STABLE_SMOKE_WORK_ROOT:-${RUNNER_TEMP:-/tmp}/asi-backbone-stable-pa
 make_absolute_path() {
   local path="$1"
 
-  if [[ "$path" = /* ]]; then
+  if [[ "$path" = /* || "$path" =~ ^[A-Za-z]:[\\/].* ]]; then
     printf '%s\n' "$path"
   else
     printf '%s/%s\n' "$repo_root" "$path"
   fi
 }
 
-package_output="$(make_absolute_path "$package_output")"
+to_dotnet_path() {
+  local path="$1"
+
+  if command -v cygpath >/dev/null 2>&1; then
+    cygpath -w "$path"
+  else
+    printf '%s\n' "$path"
+  fi
+}
+
+package_output="$(to_dotnet_path "$(make_absolute_path "$package_output")")"
 
 core_project="$repo_root/src/CDCavell.AsiBackbone.Core/CDCavell.AsiBackbone.Core.csproj"
 package_version="${SMOKE_PACKAGE_VERSION:-$(dotnet msbuild "$core_project" -getProperty:Version -nologo | tr -d '\r' | awk 'NF { print; exit }')}"
@@ -41,7 +51,7 @@ for project in "${package_projects[@]}"; do
   dotnet pack "$project" \
     --configuration "$configuration" \
     --output "$package_output" \
-    /p:ContinuousIntegrationBuild=true
+    -p:ContinuousIntegrationBuild=true
   echo
 done
 

@@ -1,6 +1,6 @@
-# Core Domain Language and Alpha Boundary
+# Core Domain Language
 
-This article defines the initial domain language for `CDCavell.AsiBackbone.Core` and the host-neutral package boundary that the rest of the AsiBackbone package family builds on.
+This article defines the domain language for `CDCavell.AsiBackbone.Core` and the host-neutral package boundary that the rest of the AsiBackbone package family builds on.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. `CDCavell.AsiBackbone.Core` is the framework-neutral foundation for the AsiBackbone package family. Its purpose is to define shared primitives for governing consequential software actions through explicit policy, constraint, acknowledgment, audit, and capability boundaries.
 

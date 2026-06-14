@@ -169,6 +169,14 @@ Use this sequence for the final stable release:
 7. Publish only if the tag-triggered validation-and-pack job succeeds.
 8. Do not manually replace published NuGet packages. If validation fails before publish, fix the release candidate and repeat the release process with documented rationale.
 
+## Accepted mutation coverage deferral
+
+Issue #178 records the accepted pre-`1.0.0` mutation-scope deferral. The current mutation reports remain limited to the Core governance path and the targeted ASP.NET Core acknowledgment challenge adapter path. The expanded gap list and `1.x` follow-up priority are documented in [Mutation Coverage Scope and Deferrals](../quality/mutation-coverage-scope.md).
+
+The accepted `1.0.0` deferral includes correlation helpers outside the targeted challenge path, broader ASP.NET Core result mapping, additional acknowledgment challenge adapters, EF Core persistence edge cases, in-memory storage edge cases, and other integration-layer adapters that remain test-covered or smoke-validated but not mutation-validated.
+
+This deferral is non-blocking while the regular test suite, coverage publication, external consumer smoke tests, stable release validation, generated package validation, and documentation build remain passing. Follow-up mutation expansion should be prioritized for the `1.x` line instead of broadening the pre-tag stable release gate.
+
 ## Non-blocking follow-up tracking
 
 The following items are visible for post-`1.0.0` work and should not silently disappear, but they do not block `1.0.0` unless a new release-critical dependency is discovered.
@@ -176,7 +184,7 @@ The following items are visible for post-`1.0.0` work and should not silently di
 | Follow-up | Status | Release decision |
 | --- | --- | --- |
 | Post-`1.0` public API baseline and architecture boundary checks | Tracked by issue #177. | Non-blocking for `1.0.0` if release notes and API review remain accurate. |
-| Mutation coverage expansion after stabilization | Tracked by issue #178. | Non-blocking for `1.0.0`; existing tests and smoke checks remain release gates. |
+| Mutation coverage expansion after stabilization | Recorded by issue #178 and [Mutation Coverage Scope and Deferrals](../quality/mutation-coverage-scope.md). | Accepted pre-`1.0.0` deferral; non-blocking for `1.0.0`; prioritize Core carry-forward, ASP.NET Core result/correlation, EF Core edge-case, and integration-adapter mutation work in `1.x`. |
 | Separate `CDCavell.AsiBackbone.Abstractions` package | Deferred. | Keep contracts in Core unless a concrete provider dependency problem appears. |
 | Generated public API baseline files | Deferred. | Consider after `1.0.0` to detect unapproved public surface changes. |
 | Architecture tests for package dependency boundaries | Deferred. | Consider after `1.0.0` to guard Core against accidental framework/provider dependencies. |

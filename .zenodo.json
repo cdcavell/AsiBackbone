@@ -31,25 +31,25 @@
     },
     {
       "identifier": "https://github.com/cdcavell/NetCoreApplicationTemplate",
-      "relation": "isRelatedTo",
+      "relation": "references",
       "scheme": "url",
       "resource_type": "software"
     },
     {
       "identifier": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5879563",
-      "relation": "isSupplementTo",
+      "relation": "isDocumentedBy",
       "scheme": "url",
       "resource_type": "publication-workingpaper"
     },
     {
       "identifier": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6321278",
-      "relation": "isSupplementTo",
+      "relation": "isDocumentedBy",
       "scheme": "url",
       "resource_type": "publication-workingpaper"
     },
     {
       "identifier": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6678418",
-      "relation": "isSupplementTo",
+      "relation": "isDocumentedBy",
       "scheme": "url",
       "resource_type": "publication-workingpaper"
     }

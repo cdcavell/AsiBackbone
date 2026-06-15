@@ -148,6 +148,12 @@ $expectedPackages = @(
         Description = 'Entity Framework Core model configuration and host-owned persistence helpers for Accountable Systems Infrastructure audit and acknowledgment records.'
         Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'entity-framework-core', 'efcore', 'host-owned-persistence', 'audit-ledger')
         ReadmeMustContain = @('host-owned', 'does not provide or require a package-owned')
+    },
+    [pscustomobject]@{
+        Id = 'CDCavell.AsiBackbone.OpenTelemetry'
+        Description = 'OpenTelemetry-friendly Accountable Systems Infrastructure governance emission provider for AsiBackbone decision-flow telemetry.'
+        Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'opentelemetry', 'observability', 'audit', 'outbox')
+        ReadmeMustContain = @('provider-neutral', 'OpenTelemetry')
     }
 )
 

@@ -61,6 +61,10 @@ public sealed class CorePackageBoundaryTests
             ["src/CDCavell.AsiBackbone.AspNetCore/CDCavell.AsiBackbone.AspNetCore.csproj"] =
             [
                 "../CDCavell.AsiBackbone.Core/CDCavell.AsiBackbone.Core.csproj"
+            ],
+            ["src/CDCavell.AsiBackbone.OpenTelemetry/CDCavell.AsiBackbone.OpenTelemetry.csproj"] =
+            [
+                "../CDCavell.AsiBackbone.Core/CDCavell.AsiBackbone.Core.csproj"
             ]
         };
 

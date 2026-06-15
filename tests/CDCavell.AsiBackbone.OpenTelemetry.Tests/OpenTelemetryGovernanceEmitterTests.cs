@@ -2,7 +2,6 @@ using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using CDCavell.AsiBackbone.Core.Audit;
 using CDCavell.AsiBackbone.Core.Emissions;
-using CDCavell.AsiBackbone.OpenTelemetry;
 using Xunit;
 
 namespace CDCavell.AsiBackbone.OpenTelemetry.Tests;
@@ -22,7 +21,7 @@ public sealed class OpenTelemetryGovernanceEmitterTests
         using ActivityListener listener = new()
         {
             ShouldListenTo = static source => source.Name == OpenTelemetryGovernanceInstrumentation.ActivitySourceName,
-            Sample = static (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllDataAndRecorded,
+            Sample = static (ref _) => ActivitySamplingResult.AllDataAndRecorded,
             ActivityStopped = stoppedActivities.Add
         };
 
@@ -42,7 +41,7 @@ public sealed class OpenTelemetryGovernanceEmitterTests
         ActivityEvent activityEvent = Assert.Single(activity.Events);
         Assert.Equal(OpenTelemetryGovernanceInstrumentation.DecisionEvaluatedEventName, activityEvent.Name);
 
-        Dictionary<string, object?> tags = activity.TagObjects.ToDictionary(static tag => tag.Key, static tag => tag.Value, StringComparer.Ordinal);
+        var tags = activity.TagObjects.ToDictionary(static tag => tag.Key, static tag => tag.Value, StringComparer.Ordinal);
         Assert.Equal(envelope.EnvelopeId, tags[OpenTelemetryGovernanceAttributes.EnvelopeId]?.ToString());
         Assert.Equal(envelope.CorrelationId, tags[OpenTelemetryGovernanceAttributes.CorrelationId]?.ToString());
         Assert.Equal(envelope.AuditResidueId, tags[OpenTelemetryGovernanceAttributes.AuditResidueId]?.ToString());
@@ -155,7 +154,7 @@ public sealed class OpenTelemetryGovernanceEmitterTests
                 sizeBytes: 197));
     }
 
-    private static IReadOnlyDictionary<string, object?> ToDictionary(ReadOnlySpan<KeyValuePair<string, object?>> tags)
+    private static Dictionary<string, object?> ToDictionary(ReadOnlySpan<KeyValuePair<string, object?>> tags)
     {
         Dictionary<string, object?> result = new(StringComparer.Ordinal);
 

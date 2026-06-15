@@ -55,7 +55,7 @@ public sealed class OpenTelemetryGovernanceEmitter : IAsiBackboneGovernanceEmitt
         ArgumentNullException.ThrowIfNull(envelope);
         cancellationToken.ThrowIfCancellationRequested();
 
-        Stopwatch stopwatch = Stopwatch.StartNew();
+        var stopwatch = Stopwatch.StartNew();
 
         try
         {
@@ -97,7 +97,7 @@ public sealed class OpenTelemetryGovernanceEmitter : IAsiBackboneGovernanceEmitt
         catch (Exception ex)
         {
             double latencyMs = stopwatch.Elapsed.TotalMilliseconds;
-            GovernanceEmissionError error = GovernanceEmissionError.Create(
+            var error = GovernanceEmissionError.Create(
                 "opentelemetry.emission.exception",
                 $"OpenTelemetry governance emission failed with {ex.GetType().Name}.",
                 isRetryable: true,
@@ -145,7 +145,7 @@ public sealed class OpenTelemetryGovernanceEmitter : IAsiBackboneGovernanceEmitt
             _ = activity.SetTag(tag.Key, tag.Value);
         }
 
-        activity.AddEvent(new ActivityEvent(eventName, envelope.OccurredUtc, tags));
+        _ = activity.AddEvent(new ActivityEvent(eventName, envelope.OccurredUtc, tags));
     }
 
     private static ActivityTagsCollection BuildTags(
@@ -154,7 +154,7 @@ public sealed class OpenTelemetryGovernanceEmitter : IAsiBackboneGovernanceEmitt
         string result,
         double latencyMs)
     {
-        ActivityTagsCollection tags = new();
+        ActivityTagsCollection tags = [];
 
         AddTag(tags, OpenTelemetryGovernanceAttributes.EnvelopeId, envelope.EnvelopeId);
         AddTag(tags, OpenTelemetryGovernanceAttributes.SchemaVersion, envelope.SchemaVersion);
@@ -218,10 +218,12 @@ public sealed class OpenTelemetryGovernanceEmitter : IAsiBackboneGovernanceEmitt
         string providerName,
         string result)
     {
-        TagList tags = new();
-        tags.Add(OpenTelemetryGovernanceAttributes.MetricEventType, envelope.EventType.ToString());
-        tags.Add(OpenTelemetryGovernanceAttributes.MetricResult, result);
-        tags.Add(OpenTelemetryGovernanceAttributes.MetricProvider, providerName);
+        TagList tags = new()
+        {
+            { OpenTelemetryGovernanceAttributes.MetricEventType, envelope.EventType.ToString() },
+            { OpenTelemetryGovernanceAttributes.MetricResult, result },
+            { OpenTelemetryGovernanceAttributes.MetricProvider, providerName }
+        };
 
         return tags;
     }

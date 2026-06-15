@@ -64,12 +64,15 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceTests
     public async Task WorkerHonorsConfiguredBatchSize()
     {
         var store = new RecordingGovernanceOutboxStore();
-        var firstEmission = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-        var emitter = new RecordingGovernanceEmitter(envelope =>
+        var firstDelivery = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var emitter = new RecordingGovernanceEmitter(envelope => GovernanceEmissionResult.Delivered("test-sink", envelope.EnvelopeId));
+        store.EntryDelivered += (_, deliveredEntry) =>
         {
-            _ = firstEmission.TrySetResult();
-            return GovernanceEmissionResult.Delivered("test-sink", envelope.EnvelopeId);
-        });
+            if (deliveredEntry.Envelope.EnvelopeId == "envelope-batch-one")
+            {
+                _ = firstDelivery.TrySetResult();
+            }
+        };
         GovernanceOutboxEntry firstEntry = await store.EnqueueAsync(CreateEnvelope("batch-one"), TestContext.Current.CancellationToken);
         GovernanceOutboxEntry secondEntry = await store.EnqueueAsync(CreateEnvelope("batch-two"), TestContext.Current.CancellationToken);
         using ServiceProvider provider = BuildProvider(store, emitter, options =>
@@ -80,7 +83,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceTests
         IHostedService hostedService = Assert.Single(provider.GetServices<IHostedService>());
 
         await hostedService.StartAsync(TestContext.Current.CancellationToken);
-        await firstEmission.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
+        await firstDelivery.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
         await hostedService.StopAsync(TestContext.Current.CancellationToken);
 
         GovernanceOutboxEntry? firstStoredEntry = await store.FindByOutboxEntryIdAsync(firstEntry.OutboxEntryId, TestContext.Current.CancellationToken);
@@ -127,12 +130,9 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceTests
     public async Task StopAsyncCanRunOptionalShutdownDrain()
     {
         var store = new RecordingGovernanceOutboxStore();
-        var emission = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-        var emitter = new RecordingGovernanceEmitter(envelope =>
-        {
-            _ = emission.TrySetResult();
-            return GovernanceEmissionResult.Delivered("test-sink", envelope.EnvelopeId);
-        });
+        var delivery = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var emitter = new RecordingGovernanceEmitter(envelope => GovernanceEmissionResult.Delivered("test-sink", envelope.EnvelopeId));
+        store.EntryDelivered += (_, _) => delivery.TrySetResult();
         GovernanceOutboxEntry entry = await store.EnqueueAsync(CreateEnvelope("shutdown"), TestContext.Current.CancellationToken);
         using ServiceProvider provider = BuildProvider(store, emitter, options =>
         {
@@ -143,7 +143,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceTests
         IHostedService hostedService = Assert.Single(provider.GetServices<IHostedService>());
 
         await hostedService.StartAsync(TestContext.Current.CancellationToken);
-        await emission.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
+        await delivery.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
         await hostedService.StopAsync(TestContext.Current.CancellationToken);
 
         GovernanceOutboxEntry? storedEntry = await store.FindByOutboxEntryIdAsync(entry.OutboxEntryId, TestContext.Current.CancellationToken);
@@ -237,6 +237,8 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceTests
         private readonly ConcurrentDictionary<string, GovernanceOutboxEntry> entries = new(StringComparer.Ordinal);
         private int findPendingCallCount;
 
+        public event EventHandler<GovernanceOutboxEntry>? EntryDelivered;
+
         public event EventHandler<GovernanceOutboxEntry>? EntryFailed;
 
         public int FindPendingCallCount => Volatile.Read(ref findPendingCallCount);
@@ -314,6 +316,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceTests
             GovernanceOutboxEntry entry = await RequireEntryAsync(outboxEntryId, cancellationToken).ConfigureAwait(false);
             GovernanceOutboxEntry updatedEntry = entry.MarkDelivered(result);
             entries[updatedEntry.OutboxEntryId] = updatedEntry;
+            EntryDelivered?.Invoke(this, updatedEntry);
 
             return updatedEntry;
         }

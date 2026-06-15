@@ -24,6 +24,8 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedService(
     /// <inheritdoc />
     public override async Task StopAsync(CancellationToken cancellationToken)
     {
+        await base.StopAsync(cancellationToken).ConfigureAwait(false);
+
         AsiBackboneGovernanceOutboxDrainWorkerOptions options = optionsMonitor.CurrentValue;
 
         if (options.Enabled && options.DrainOnShutdown && !cancellationToken.IsCancellationRequested)
@@ -44,8 +46,6 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedService(
                 logger.LogWarning(ex, "Governance outbox shutdown drain failed.");
             }
         }
-
-        await base.StopAsync(cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc />

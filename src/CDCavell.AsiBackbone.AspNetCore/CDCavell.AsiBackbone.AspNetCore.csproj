@@ -6,11 +6,11 @@
     <Nullable>enable</Nullable>
     <PackageId>CDCavell.AsiBackbone.AspNetCore</PackageId>
     <Title>CDCavell AsiBackbone ASP.NET Core</Title>
-    <Description>ASP.NET Core and generic-host adapters for Accountable Systems Infrastructure actor context, request correlation, HTTP result mapping, acknowledgment challenge flows, and hosted governance outbox draining.</Description>
+    <Description>ASP.NET Core host adapters for Accountable Systems Infrastructure actor context, request correlation, HTTP result mapping, and acknowledgment challenge flows.</Description>
     <Authors>Christopher D. Cavell</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageTags>accountable-systems-infrastructure;asi-backbone;dotnet;governance;aspnetcore;web;host-integration;http;acknowledgment;outbox;hosted-service</PackageTags>
+    <PackageTags>accountable-systems-infrastructure;asi-backbone;dotnet;governance;aspnetcore;web;host-integration;http;acknowledgment</PackageTags>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
 

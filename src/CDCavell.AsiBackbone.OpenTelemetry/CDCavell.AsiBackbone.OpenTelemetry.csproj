@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PackageId>CDCavell.AsiBackbone.OpenTelemetry</PackageId>
+    <Title>CDCavell AsiBackbone OpenTelemetry</Title>
+    <Description>OpenTelemetry-friendly Accountable Systems Infrastructure governance emission provider for AsiBackbone decision-flow telemetry.</Description>
+    <Authors>Christopher D. Cavell</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>accountable-systems-infrastructure;asi-backbone;dotnet;governance;opentelemetry;observability;audit;outbox</PackageTags>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CDCavell.AsiBackbone.Core\CDCavell.AsiBackbone.Core.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Text.Json;
 using CDCavell.AsiBackbone.Core.Emissions;
+using CDCavell.AsiBackbone.Core.Entities;
 using CDCavell.AsiBackbone.Core.Outbox;
 using CDCavell.AsiBackbone.EntityFrameworkCore.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -74,7 +75,7 @@ public sealed class EfCoreGovernanceOutboxStore : IAsiBackboneGovernanceOutboxSt
         else
         {
             persistedEntity.Id = existingEntity.Id;
-            persistedEntity.ConcurrencyStamp = Core.Entities.AsiBackboneEntity.NewConcurrencyStamp();
+            persistedEntity.ConcurrencyStamp = AsiBackboneEntity.NewConcurrencyStamp();
             dbContext.Entry(existingEntity).CurrentValues.SetValues(persistedEntity);
         }
 
@@ -109,13 +110,13 @@ public sealed class EfCoreGovernanceOutboxStore : IAsiBackboneGovernanceOutboxSt
 
         List<AsiBackboneGovernanceOutboxEntryEntity> entities = await OutboxEntries()
             .Where(outboxEntry => outboxEntry.Status == GovernanceEmissionStatus.Pending)
-            .OrderBy(outboxEntry => outboxEntry.CreatedUtc)
-            .ThenBy(outboxEntry => outboxEntry.OutboxEntryId)
-            .Take(normalizedMaxCount)
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
 
-        return ToEntries(entities);
+        return [.. ToEntries(entities)
+            .OrderBy(entry => entry.CreatedUtc)
+            .ThenBy(entry => entry.OutboxEntryId, StringComparer.Ordinal)
+            .Take(normalizedMaxCount)];
     }
 
     /// <inheritdoc />
@@ -129,18 +130,17 @@ public sealed class EfCoreGovernanceOutboxStore : IAsiBackboneGovernanceOutboxSt
 
         List<AsiBackboneGovernanceOutboxEntryEntity> entities = await OutboxEntries()
             .Where(outboxEntry =>
-                (outboxEntry.Status == GovernanceEmissionStatus.Deferred ||
-                 outboxEntry.Status == GovernanceEmissionStatus.Failed ||
-                 outboxEntry.Status == GovernanceEmissionStatus.RetryableFailure) &&
-                outboxEntry.RetryCount < outboxEntry.MaxRetryCount &&
-                (outboxEntry.NextRetryUtc == null || outboxEntry.NextRetryUtc <= normalizedUtcNow))
-            .OrderBy(outboxEntry => outboxEntry.NextRetryUtc ?? outboxEntry.UpdatedUtc)
-            .ThenBy(outboxEntry => outboxEntry.OutboxEntryId)
-            .Take(normalizedMaxCount)
+                outboxEntry.Status == GovernanceEmissionStatus.Deferred ||
+                outboxEntry.Status == GovernanceEmissionStatus.Failed ||
+                outboxEntry.Status == GovernanceEmissionStatus.RetryableFailure)
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
 
-        return ToEntries(entities);
+        return [.. ToEntries(entities)
+            .Where(entry => entry.IsRetryReady(normalizedUtcNow))
+            .OrderBy(entry => entry.NextRetryUtc ?? entry.UpdatedUtc)
+            .ThenBy(entry => entry.OutboxEntryId, StringComparer.Ordinal)
+            .Take(normalizedMaxCount)];
     }
 
     /// <inheritdoc />

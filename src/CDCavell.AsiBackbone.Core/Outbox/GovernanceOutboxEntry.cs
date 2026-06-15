@@ -178,17 +178,7 @@ public sealed class GovernanceOutboxEntry
     /// </summary>
     public bool IsRetryReady(DateTimeOffset utcNow)
     {
-        if (IsDelivered || IsDeadLettered || RetryCount >= MaxRetryCount)
-        {
-            return false;
-        }
-
-        if (Status is not (GovernanceEmissionStatus.Deferred or GovernanceEmissionStatus.Failed or GovernanceEmissionStatus.RetryableFailure))
-        {
-            return false;
-        }
-
-        return NextRetryUtc is null || NextRetryUtc <= utcNow.ToUniversalTime();
+        return !IsDelivered && !IsDeadLettered && RetryCount < MaxRetryCount && Status is GovernanceEmissionStatus.Deferred or GovernanceEmissionStatus.Failed or GovernanceEmissionStatus.RetryableFailure && (NextRetryUtc is null || NextRetryUtc <= utcNow.ToUniversalTime());
     }
 
     /// <summary>
@@ -200,12 +190,9 @@ public sealed class GovernanceOutboxEntry
     {
         ArgumentNullException.ThrowIfNull(result);
 
-        if (!result.IsSuccess)
-        {
-            throw new ArgumentException("Delivered outbox transitions require a successful emission result.", nameof(result));
-        }
-
-        return Copy(
+        return !result.IsSuccess
+            ? throw new ArgumentException("Delivered outbox transitions require a successful emission result.", nameof(result))
+            : Copy(
             GovernanceEmissionStatus.Delivered,
             updatedUtc,
             retryCount: RetryCount,
@@ -221,16 +208,16 @@ public sealed class GovernanceOutboxEntry
     /// Returns a failed or retryable-failure copy of this entry.
     /// </summary>
     public GovernanceOutboxEntry MarkFailed(
-        GovernanceEmissionError error,
+        GovernanceEmissionError governanceEmissionError,
         DateTimeOffset? nextRetryUtc = null,
         DateTimeOffset? updatedUtc = null)
     {
-        ArgumentNullException.ThrowIfNull(error);
+        ArgumentNullException.ThrowIfNull(governanceEmissionError);
 
         int nextRetryCount = RetryCount + 1;
         GovernanceEmissionStatus nextStatus = nextRetryCount >= MaxRetryCount
             ? GovernanceEmissionStatus.DeadLettered
-            : error.IsRetryable
+            : governanceEmissionError.IsRetryable
                 ? GovernanceEmissionStatus.RetryableFailure
                 : GovernanceEmissionStatus.Failed;
 
@@ -239,10 +226,10 @@ public sealed class GovernanceOutboxEntry
             updatedUtc,
             nextRetryCount,
             nextStatus is GovernanceEmissionStatus.DeadLettered ? null : nextRetryUtc,
-            error,
-            error.ProviderName,
+            governanceEmissionError,
+            governanceEmissionError.ProviderName,
             providerRecordId: null,
-            nextStatus is GovernanceEmissionStatus.DeadLettered ? error.Message : null,
+            nextStatus is GovernanceEmissionStatus.DeadLettered ? governanceEmissionError.Message : null,
             Metadata);
     }
 
@@ -250,7 +237,7 @@ public sealed class GovernanceOutboxEntry
     /// Returns a deferred copy of this entry.
     /// </summary>
     public GovernanceOutboxEntry MarkDeferred(
-        GovernanceEmissionError? error = null,
+        GovernanceEmissionError? governanceEmissionError = null,
         DateTimeOffset? nextRetryUtc = null,
         DateTimeOffset? updatedUtc = null)
     {
@@ -259,8 +246,8 @@ public sealed class GovernanceOutboxEntry
             updatedUtc,
             retryCount: RetryCount,
             nextRetryUtc,
-            error,
-            error?.ProviderName,
+            governanceEmissionError,
+            governanceEmissionError?.ProviderName,
             providerRecordId: null,
             deadLetterReason: null,
             metadata: Metadata);
@@ -270,21 +257,21 @@ public sealed class GovernanceOutboxEntry
     /// Returns a dead-lettered copy of this entry.
     /// </summary>
     public GovernanceOutboxEntry MarkDeadLettered(
-        GovernanceEmissionError error,
+        GovernanceEmissionError governanceEmissionError,
         string? deadLetterReason = null,
         DateTimeOffset? updatedUtc = null)
     {
-        ArgumentNullException.ThrowIfNull(error);
+        ArgumentNullException.ThrowIfNull(governanceEmissionError);
 
         return Copy(
             GovernanceEmissionStatus.DeadLettered,
             updatedUtc,
             retryCount: RetryCount,
             nextRetryUtc: null,
-            lastError: error,
-            providerName: error.ProviderName,
+            lastError: governanceEmissionError,
+            providerName: governanceEmissionError.ProviderName,
             providerRecordId: null,
-            deadLetterReason: deadLetterReason ?? error.Message,
+            deadLetterReason: deadLetterReason ?? governanceEmissionError.Message,
             metadata: Metadata);
     }
 

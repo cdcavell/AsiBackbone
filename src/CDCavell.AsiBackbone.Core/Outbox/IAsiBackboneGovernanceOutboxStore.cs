@@ -56,7 +56,7 @@ public interface IAsiBackboneGovernanceOutboxStore
     /// </summary>
     ValueTask<GovernanceOutboxEntry> MarkFailedAsync(
         string outboxEntryId,
-        GovernanceEmissionError error,
+        GovernanceEmissionError governanceEmissionError,
         DateTimeOffset? nextRetryUtc = null,
         CancellationToken cancellationToken = default);
 
@@ -65,7 +65,7 @@ public interface IAsiBackboneGovernanceOutboxStore
     /// </summary>
     ValueTask<GovernanceOutboxEntry> MarkDeadLetteredAsync(
         string outboxEntryId,
-        GovernanceEmissionError error,
+        GovernanceEmissionError governanceEmissionError,
         string? deadLetterReason = null,
         CancellationToken cancellationToken = default);
 }

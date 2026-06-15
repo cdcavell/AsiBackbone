@@ -22,14 +22,11 @@ public sealed class InMemoryGovernanceOutboxStore : IAsiBackboneGovernanceOutbox
         ArgumentNullException.ThrowIfNull(envelope);
         cancellationToken.ThrowIfCancellationRequested();
 
-        GovernanceOutboxEntry entry = GovernanceOutboxEntry.Create(envelope);
+        var entry = GovernanceOutboxEntry.Create(envelope);
 
-        if (!entries.TryAdd(entry.OutboxEntryId, entry))
-        {
-            throw new InvalidOperationException($"Outbox entry '{entry.OutboxEntryId}' already exists.");
-        }
-
-        return ValueTask.FromResult(entry);
+        return !entries.TryAdd(entry.OutboxEntryId, entry)
+            ? throw new InvalidOperationException($"Outbox entry '{entry.OutboxEntryId}' already exists.")
+            : ValueTask.FromResult(entry);
     }
 
     /// <inheritdoc />

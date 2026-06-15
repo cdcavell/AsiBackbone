@@ -21,12 +21,9 @@ public sealed class InMemoryAuditResidueLifecycleStore : IAsiBackboneAuditResidu
         ArgumentNullException.ThrowIfNull(lifecycleEvent);
         cancellationToken.ThrowIfCancellationRequested();
 
-        if (!events.TryAdd(lifecycleEvent.EventId, lifecycleEvent))
-        {
-            throw new InvalidOperationException($"Lifecycle event '{lifecycleEvent.EventId}' already exists.");
-        }
-
-        return ValueTask.FromResult(lifecycleEvent);
+        return !events.TryAdd(lifecycleEvent.EventId, lifecycleEvent)
+            ? throw new InvalidOperationException($"Lifecycle event '{lifecycleEvent.EventId}' already exists.")
+            : ValueTask.FromResult(lifecycleEvent);
     }
 
     /// <inheritdoc />

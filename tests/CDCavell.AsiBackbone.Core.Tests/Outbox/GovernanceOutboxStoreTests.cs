@@ -44,7 +44,7 @@ public sealed class GovernanceOutboxStoreTests
         var lifecycleStore = new InMemoryAuditResidueLifecycleStore();
         var outboxStore = new InMemoryGovernanceOutboxStore();
 
-        AuditResidueLifecycleEvent lifecycleEvent = AuditResidueLifecycleEvent.Create(
+        var lifecycleEvent = AuditResidueLifecycleEvent.Create(
             AuditResidueLifecycleStage.ExternalEmissionQueued,
             "correlation-1",
             auditResidueId: "residue-1",
@@ -59,7 +59,7 @@ public sealed class GovernanceOutboxStoreTests
             GovernanceEmissionEnvelope.FromLifecycleEvent(savedLifecycleEvent),
             TestContext.Current.CancellationToken);
 
-        GovernanceEmissionError error = GovernanceEmissionError.Create(
+        var error = GovernanceEmissionError.Create(
             "provider.unavailable",
             "Provider was unavailable.",
             isRetryable: true,
@@ -96,7 +96,7 @@ public sealed class GovernanceOutboxStoreTests
             TestContext.Current.CancellationToken);
 
         DateTimeOffset retryUtc = new(2026, 6, 15, 15, 0, 0, TimeSpan.Zero);
-        GovernanceEmissionError error = GovernanceEmissionError.Create(
+        var error = GovernanceEmissionError.Create(
             "provider.timeout",
             "Provider timed out.",
             isRetryable: true);
@@ -156,7 +156,7 @@ public sealed class GovernanceOutboxStoreTests
         GovernanceOutboxEntry entry = await outboxStore.EnqueueAsync(
             CreateEnvelope("event-1", "correlation-1"),
             TestContext.Current.CancellationToken);
-        GovernanceEmissionError error = GovernanceEmissionError.Create(
+        var error = GovernanceEmissionError.Create(
             "provider.rejected",
             "Provider rejected the minimized envelope.",
             providerName: "test-provider");

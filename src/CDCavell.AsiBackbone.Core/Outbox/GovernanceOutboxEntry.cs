@@ -174,6 +174,43 @@ public sealed class GovernanceOutboxEntry
     }
 
     /// <summary>
+    /// Restores a durable outbox entry from provider-neutral storage.
+    /// </summary>
+    /// <remarks>
+    /// This factory exists for storage adapters. It does not perform provider emission and does not add any provider dependency to Core.
+    /// </remarks>
+    public static GovernanceOutboxEntry Restore(
+        GovernanceEmissionEnvelope envelope,
+        GovernanceEmissionStatus status,
+        string outboxEntryId,
+        DateTimeOffset createdUtc,
+        DateTimeOffset updatedUtc,
+        int retryCount = 0,
+        int maxRetryCount = DefaultMaxRetryCount,
+        DateTimeOffset? nextRetryUtc = null,
+        GovernanceEmissionError? lastError = null,
+        string? providerName = null,
+        string? providerRecordId = null,
+        string? deadLetterReason = null,
+        IReadOnlyDictionary<string, string>? metadata = null)
+    {
+        return new GovernanceOutboxEntry(
+            outboxEntryId,
+            envelope,
+            status,
+            createdUtc,
+            updatedUtc,
+            retryCount,
+            maxRetryCount,
+            nextRetryUtc,
+            lastError,
+            providerName,
+            providerRecordId,
+            deadLetterReason,
+            NormalizeMetadata(metadata));
+    }
+
+    /// <summary>
     /// Determines whether the entry is ready for retry at the supplied UTC timestamp.
     /// </summary>
     public bool IsRetryReady(DateTimeOffset utcNow)

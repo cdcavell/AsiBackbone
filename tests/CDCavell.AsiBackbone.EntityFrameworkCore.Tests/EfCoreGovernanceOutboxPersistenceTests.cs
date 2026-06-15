@@ -143,9 +143,17 @@ public sealed class EfCoreGovernanceOutboxPersistenceTests
         Assert.NotNull(persistedDeadLettered);
         Assert.Equal("terminal-provider-failure", persistedDeadLettered.DeadLetterReason);
 
-        string[] retryReadyEntryIds = [.. retryReady.Select(entry => entry.OutboxEntryId).Order(StringComparer.Ordinal)];
-        string[] expectedRetryReadyEntryIds = [failed.OutboxEntryId, retryable.OutboxEntryId, deferred.OutboxEntryId]
-            .Order(StringComparer.Ordinal)
+        string[] retryReadyEntryIds = retryReady
+            .Select(entry => entry.OutboxEntryId)
+            .OrderBy(entryId => entryId, StringComparer.Ordinal)
+            .ToArray();
+        string[] expectedRetryReadyEntryIds = new[]
+            {
+                failed.OutboxEntryId,
+                retryable.OutboxEntryId,
+                deferred.OutboxEntryId
+            }
+            .OrderBy(entryId => entryId, StringComparer.Ordinal)
             .ToArray();
 
         Assert.Equal(expectedRetryReadyEntryIds, retryReadyEntryIds);

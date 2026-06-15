@@ -82,6 +82,9 @@
 - name: Governance Emission Contract
   href: governance-emission-contract.md
 
+- name: Durable Audit and Outbox Persistence
+  href: durable-audit-outbox-persistence.md
+
 - name: Audit Residue Observability Schema
   href: audit-residue-observability-schema.md
 

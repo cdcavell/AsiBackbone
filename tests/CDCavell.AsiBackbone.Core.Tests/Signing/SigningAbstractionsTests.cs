@@ -8,9 +8,9 @@ namespace CDCavell.AsiBackbone.Core.Tests.Signing;
 public sealed class SigningAbstractionsTests
 {
     [Fact]
-    public void UnsignedMetadataHasNoSignatureOrKeyReference()
+    public void NoSignatureMetadataHasNoSignatureOrKeyReference()
     {
-        SigningMetadata metadata = SigningMetadata.Unsigned;
+        SigningMetadata metadata = SigningMetadata.NoSignature;
 
         Assert.False(metadata.HasSignature);
         Assert.False(metadata.HasKeyReference);

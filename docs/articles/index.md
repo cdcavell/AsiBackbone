@@ -36,6 +36,9 @@ Start with [Getting Started](getting-started.md), then use the navigation menu t
 * [Purview Governance and Lineage Enrichment Strategy](purview-governance-lineage-enrichment-strategy.md)
   Documents the optional Microsoft Purview governance enrichment strategy, selected summarized enrichment model, PII-safe field mapping, correlation strategy, catalog-noise risks, and Core-neutral provider boundary.
 
+* [Signing-Ready Receipts and Key Handling](signing-ready-receipts-and-key-handling.md)
+  Documents the Core-neutral signing and verification abstractions, signing-ready audit receipt metadata, key identifier/version handling, verification seam, and current unsigned-vs-production-signed wording boundary.
+
 * [DLP and Classification Failure Policy](dlp-classification-failure-policy.md)
   Documents the provider-neutral Core policy model for DLP/classification service outages, timeouts, indeterminate results, blocked/classified results, and risk-based fail-open/fail-closed behavior.
 

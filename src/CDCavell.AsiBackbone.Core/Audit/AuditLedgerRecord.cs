@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CDCavell.AsiBackbone.Core.Actors;
 using CDCavell.AsiBackbone.Core.Serialization;
+using SigningMetadataValue = CDCavell.AsiBackbone.Core.Signing.SigningMetadata;
 
 namespace CDCavell.AsiBackbone.Core.Audit;
 
@@ -55,6 +56,10 @@ public sealed class AuditLedgerRecord : IAsiBackboneAuditResidue
         string? signatureKeyId,
         string? signatureAlgorithm,
         string? signatureValue,
+        string? signingHash,
+        string? signatureKeyVersion,
+        string? signatureProvider,
+        DateTimeOffset? signedUtc,
         IReadOnlyDictionary<string, string> metadata)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(recordId);
@@ -101,161 +106,114 @@ public sealed class AuditLedgerRecord : IAsiBackboneAuditResidue
         SignatureKeyId = NormalizeOptional(signatureKeyId);
         SignatureAlgorithm = NormalizeOptional(signatureAlgorithm);
         SignatureValue = NormalizeOptional(signatureValue);
+        SigningHash = NormalizeOptional(signingHash);
+        SignatureKeyVersion = NormalizeOptional(signatureKeyVersion);
+        SignatureProvider = NormalizeOptional(signatureProvider);
+        SignedUtc = signedUtc?.ToUniversalTime();
+        SigningMetadata = SigningMetadataValue.Create(
+            SigningHash,
+            null,
+            SignatureValue,
+            SignatureAlgorithm,
+            SignatureKeyId,
+            SignatureKeyVersion,
+            SignatureProvider,
+            SignedUtc);
         Metadata = metadata;
     }
 
-    /// <summary>
-    /// Gets the stable audit ledger record identifier.
-    /// </summary>
     public string RecordId { get; }
 
-    /// <summary>
-    /// Gets the schema version for the serialized audit ledger record shape.
-    /// </summary>
     public string SchemaVersion { get; }
 
-    /// <inheritdoc />
     public string EventId { get; }
 
-    /// <inheritdoc />
     public string AuditResidueId { get; }
 
-    /// <inheritdoc />
     public DateTimeOffset OccurredUtc { get; }
 
-    /// <summary>
-    /// Gets the UTC timestamp when the ledger record was created by the host or storage adapter.
-    /// </summary>
     public DateTimeOffset RecordedUtc { get; }
 
-    /// <inheritdoc />
     public string ActorId { get; }
 
-    /// <inheritdoc />
     public AsiBackboneActorType ActorType { get; }
 
-    /// <inheritdoc />
     public string? ActorDisplayName { get; }
 
-    /// <inheritdoc />
     public string OperationName { get; }
 
-    /// <inheritdoc />
     public string Outcome { get; }
 
-    /// <inheritdoc />
     public IReadOnlyList<string> ReasonCodes { get; }
 
-    /// <inheritdoc />
     public string? CorrelationId { get; }
 
-    /// <inheritdoc />
     public string? TraceId { get; }
 
-    /// <inheritdoc />
     public string? SpanId { get; }
 
-    /// <inheritdoc />
     public string? ParentSpanId { get; }
 
-    /// <inheritdoc />
     public long? DecisionLatencyMs { get; }
 
-    /// <inheritdoc />
     public string? ConstraintSetHash { get; }
 
-    /// <inheritdoc />
     public int? ConstraintCount { get; }
 
-    /// <inheritdoc />
     public double? RiskScore { get; }
 
-    /// <inheritdoc />
     public string? PolicyScope { get; }
 
-    /// <inheritdoc />
     public string? TenantHash { get; }
 
-    /// <inheritdoc />
     public string? OrganizationHash { get; }
 
-    /// <inheritdoc />
     public string? EmitterStatus { get; }
 
-    /// <inheritdoc />
     public string? EmitterProvider { get; }
 
-    /// <inheritdoc />
     public long? OutboxSequence { get; }
 
-    /// <inheritdoc />
     public string? GatewayExecutionId { get; }
 
-    /// <inheritdoc />
     public string? DecisionStage { get; }
 
-    /// <inheritdoc />
     public string? PolicyVersion { get; }
 
-    /// <inheritdoc />
     public string? PolicyHash { get; }
 
-    /// <summary>
-    /// Gets the related responsibility or liability handshake identifier, when available.
-    /// </summary>
     public string? HandshakeId { get; }
 
-    /// <summary>
-    /// Gets the related acknowledgment identifier, when available.
-    /// </summary>
     public string? AcknowledgmentId { get; }
 
-    /// <summary>
-    /// Gets the related capability token identifier, when available.
-    /// </summary>
     public string? CapabilityTokenId { get; }
 
-    /// <summary>
-    /// Gets the previous ledger record hash, when supplied by a host or signing package.
-    /// </summary>
     public string? PreviousRecordHash { get; }
 
-    /// <summary>
-    /// Gets this ledger record hash, when supplied by a host or signing package.
-    /// </summary>
     public string? RecordHash { get; }
 
-    /// <summary>
-    /// Gets the signature key identifier, when supplied by a signing package or host.
-    /// </summary>
+    public string? SigningHash { get; }
+
     public string? SignatureKeyId { get; }
 
-    /// <summary>
-    /// Gets the signature algorithm, when supplied by a signing package or host.
-    /// </summary>
+    public string? SignatureKeyVersion { get; }
+
     public string? SignatureAlgorithm { get; }
 
-    /// <summary>
-    /// Gets the signature value, when supplied by a signing package or host.
-    /// </summary>
     public string? SignatureValue { get; }
 
-    /// <inheritdoc />
+    public string? SignatureProvider { get; }
+
+    public DateTimeOffset? SignedUtc { get; }
+
+    public SigningMetadataValue SigningMetadata { get; }
+
     public IReadOnlyDictionary<string, string> Metadata { get; }
 
-    /// <summary>
-    /// Gets a value indicating whether this ledger record contains reason codes.
-    /// </summary>
     public bool HasReasonCodes => ReasonCodes.Count > 0;
 
-    /// <summary>
-    /// Gets a value indicating whether this ledger record contains metadata.
-    /// </summary>
     public bool HasMetadata => Metadata.Count > 0;
 
-    /// <summary>
-    /// Creates a persistent audit ledger record from audit residue.
-    /// </summary>
     public static AuditLedgerRecord FromResidue(
         IAsiBackboneAuditResidue residue,
         string? recordId = null,
@@ -268,6 +226,10 @@ public sealed class AuditLedgerRecord : IAsiBackboneAuditResidue
         string? signatureKeyId = null,
         string? signatureAlgorithm = null,
         string? signatureValue = null,
+        string? signingHash = null,
+        string? signatureKeyVersion = null,
+        string? signatureProvider = null,
+        DateTimeOffset? signedUtc = null,
         IReadOnlyDictionary<string, string>? metadata = null,
         string? schemaVersion = null)
     {
@@ -312,6 +274,10 @@ public sealed class AuditLedgerRecord : IAsiBackboneAuditResidue
             signatureKeyId,
             signatureAlgorithm,
             signatureValue,
+            signingHash,
+            signatureKeyVersion,
+            signatureProvider,
+            signedUtc,
             NormalizeMetadata(residue.Metadata, metadata));
     }
 

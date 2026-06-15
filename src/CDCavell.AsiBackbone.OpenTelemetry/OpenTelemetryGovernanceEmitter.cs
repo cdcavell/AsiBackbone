@@ -71,7 +71,7 @@ public sealed class OpenTelemetryGovernanceEmitter : IAsiBackboneGovernanceEmitt
 
             if (options.EmitActivityEvents)
             {
-                EmitActivity(envelope, eventName, providerName, latencyMs);
+                EmitActivity(envelope, eventName, providerName, options.DefaultActivityName, latencyMs);
             }
 
             if (options.EmitMetrics)
@@ -125,11 +125,12 @@ public sealed class OpenTelemetryGovernanceEmitter : IAsiBackboneGovernanceEmitt
         GovernanceEmissionEnvelope envelope,
         string eventName,
         string providerName,
+        string defaultActivityName,
         double latencyMs)
     {
         ActivityTagsCollection tags = BuildTags(envelope, providerName, GovernanceEmissionStatus.Delivered.ToString(), latencyMs);
         string activityName = string.IsNullOrWhiteSpace(envelope.OperationName)
-            ? OpenTelemetryGovernanceInstrumentation.DefaultActivityName
+            ? defaultActivityName
             : envelope.OperationName;
 
         using Activity? activity = ActivitySource.StartActivity(activityName, ActivityKind.Internal);
@@ -153,7 +154,7 @@ public sealed class OpenTelemetryGovernanceEmitter : IAsiBackboneGovernanceEmitt
         string result,
         double latencyMs)
     {
-        ActivityTagsCollection tags = [];
+        ActivityTagsCollection tags = new();
 
         AddTag(tags, OpenTelemetryGovernanceAttributes.EnvelopeId, envelope.EnvelopeId);
         AddTag(tags, OpenTelemetryGovernanceAttributes.SchemaVersion, envelope.SchemaVersion);
@@ -217,7 +218,7 @@ public sealed class OpenTelemetryGovernanceEmitter : IAsiBackboneGovernanceEmitt
         string providerName,
         string result)
     {
-        TagList tags = [];
+        TagList tags = new();
         tags.Add(OpenTelemetryGovernanceAttributes.MetricEventType, envelope.EventType.ToString());
         tags.Add(OpenTelemetryGovernanceAttributes.MetricResult, result);
         tags.Add(OpenTelemetryGovernanceAttributes.MetricProvider, providerName);

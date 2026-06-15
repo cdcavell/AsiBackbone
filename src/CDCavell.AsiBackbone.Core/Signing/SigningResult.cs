@@ -13,9 +13,9 @@ public sealed class SigningResult
     }
 
     /// <summary>
-    /// Gets an unsigned signing result.
+    /// Gets a signing result with no signature metadata.
     /// </summary>
-    public static SigningResult Unsigned { get; } = new(SigningMetadata.Unsigned);
+    public static SigningResult NoSignature { get; } = new(SigningMetadata.NoSignature);
 
     /// <summary>
     /// Gets the signing metadata returned by the signing provider or host.

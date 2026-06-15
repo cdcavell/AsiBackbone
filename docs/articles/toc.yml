@@ -79,6 +79,9 @@
 - name: Observability and Governance Emission Architecture
   href: observability-and-governance-emission-architecture.md
 
+- name: DLP and Classification Failure Policy
+  href: dlp-classification-failure-policy.md
+
 - name: Governance Emission Contract
   href: governance-emission-contract.md
 

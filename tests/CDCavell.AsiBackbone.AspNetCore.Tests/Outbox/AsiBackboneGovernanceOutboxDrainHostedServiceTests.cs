@@ -32,7 +32,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceTests
         AsiBackboneGovernanceOutboxDrainWorkerOptions options = provider.GetRequiredService<IOptions<AsiBackboneGovernanceOutboxDrainWorkerOptions>>().Value;
         IHostedService hostedService = Assert.Single(provider.GetServices<IHostedService>());
 
-        Assert.IsType<AsiBackboneGovernanceOutboxDrainHostedService>(hostedService);
+        _ = Assert.IsType<AsiBackboneGovernanceOutboxDrainHostedService>(hostedService);
         Assert.True(options.Enabled);
         Assert.Equal(7, options.BatchSize);
         Assert.Equal(TimeSpan.FromSeconds(5), options.PollingInterval);
@@ -67,7 +67,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceTests
         var firstEmission = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var emitter = new RecordingGovernanceEmitter(envelope =>
         {
-            firstEmission.TrySetResult();
+            _ = firstEmission.TrySetResult();
             return GovernanceEmissionResult.Delivered("test-sink", envelope.EnvelopeId);
         });
         GovernanceOutboxEntry firstEntry = await store.EnqueueAsync(CreateEnvelope("batch-one"), TestContext.Current.CancellationToken);
@@ -130,7 +130,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceTests
         var emission = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var emitter = new RecordingGovernanceEmitter(envelope =>
         {
-            emission.TrySetResult();
+            _ = emission.TrySetResult();
             return GovernanceEmissionResult.Delivered("test-sink", envelope.EnvelopeId);
         });
         GovernanceOutboxEntry entry = await store.EnqueueAsync(CreateEnvelope("shutdown"), TestContext.Current.CancellationToken);
@@ -247,7 +247,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceTests
         {
             ArgumentNullException.ThrowIfNull(envelope);
             cancellationToken.ThrowIfCancellationRequested();
-            GovernanceOutboxEntry entry = GovernanceOutboxEntry.Create(envelope);
+            var entry = GovernanceOutboxEntry.Create(envelope);
             entries[entry.OutboxEntryId] = entry;
 
             return ValueTask.FromResult(entry);

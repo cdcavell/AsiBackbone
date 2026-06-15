@@ -30,7 +30,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedService(
 
         if (options.Enabled && options.DrainOnShutdown && !cancellationToken.IsCancellationRequested)
         {
-            using CancellationTokenSource shutdownDrainCancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            using var shutdownDrainCancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             shutdownDrainCancellation.CancelAfter(options.ShutdownDrainTimeout);
 
             try

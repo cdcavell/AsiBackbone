@@ -103,6 +103,7 @@ Provider-specific exception types, HTTP codes, SDK error objects, and backend pa
 | #142 Audit residue telemetry | `GovernanceEmissionEnvelope.FromResidue` copies neutral telemetry, trace, outbox, gateway, and policy fields from audit residue. |
 | #144 OpenTelemetry provider | The OpenTelemetry provider should adapt this contract into spans, events, logs, metrics, and attributes without changing Core semantics. |
 | #145 Event Hubs provider | The Event Hubs provider should adapt this contract into versioned stream messages with stable message properties, outbox-safe retry behavior, and no Core Azure dependency. |
+| #146 Purview enrichment | Purview enrichment should consume minimized envelopes or summaries as optional catalog, classification, lineage, and compliance context without becoming the raw audit store. |
 | #149 Observability architecture docs | This contract is the first implementation seam described by the observability and governance emission architecture direction. |
 
 ## Privacy and minimization rules

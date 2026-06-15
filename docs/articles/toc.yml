@@ -85,6 +85,9 @@
 - name: Event Hubs Governance Emission Provider Design
   href: event-hubs-governance-emission-provider-design.md
 
+- name: Purview Governance and Lineage Enrichment Strategy
+  href: purview-governance-lineage-enrichment-strategy.md
+
 - name: DLP and Classification Failure Policy
   href: dlp-classification-failure-policy.md
 

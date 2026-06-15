@@ -75,12 +75,12 @@ public sealed class EfCoreAuditResidueLifecycleStore : IAsiBackboneAuditResidueL
 
         List<AsiBackboneAuditResidueLifecycleEventEntity> entities = await LifecycleEvents()
             .Where(lifecycleEvent => lifecycleEvent.CorrelationId == normalizedCorrelationId)
-            .OrderBy(lifecycleEvent => lifecycleEvent.OccurredUtc)
-            .ThenBy(lifecycleEvent => lifecycleEvent.EventId)
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
 
-        return ToLifecycleEvents(entities);
+        return [.. ToLifecycleEvents(entities)
+            .OrderBy(lifecycleEvent => lifecycleEvent.OccurredUtc)
+            .ThenBy(lifecycleEvent => lifecycleEvent.EventId, StringComparer.Ordinal)];
     }
 
     /// <inheritdoc />
@@ -94,12 +94,12 @@ public sealed class EfCoreAuditResidueLifecycleStore : IAsiBackboneAuditResidueL
 
         List<AsiBackboneAuditResidueLifecycleEventEntity> entities = await LifecycleEvents()
             .Where(lifecycleEvent => lifecycleEvent.AuditResidueId == normalizedAuditResidueId)
-            .OrderBy(lifecycleEvent => lifecycleEvent.OccurredUtc)
-            .ThenBy(lifecycleEvent => lifecycleEvent.EventId)
             .ToListAsync(cancellationToken)
             .ConfigureAwait(false);
 
-        return ToLifecycleEvents(entities);
+        return [.. ToLifecycleEvents(entities)
+            .OrderBy(lifecycleEvent => lifecycleEvent.OccurredUtc)
+            .ThenBy(lifecycleEvent => lifecycleEvent.EventId, StringComparer.Ordinal)];
     }
 
     private IQueryable<AsiBackboneAuditResidueLifecycleEventEntity> LifecycleEvents()

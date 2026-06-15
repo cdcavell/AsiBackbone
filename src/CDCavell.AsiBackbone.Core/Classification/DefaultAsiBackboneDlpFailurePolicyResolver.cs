@@ -3,18 +3,13 @@ namespace CDCavell.AsiBackbone.Core.Classification;
 /// <summary>
 /// Default provider-neutral resolver for DLP or classification failure behavior.
 /// </summary>
-public sealed class DefaultAsiBackboneDlpFailurePolicyResolver : IAsiBackboneDlpFailurePolicyResolver
+/// <remarks>
+/// Initializes a new instance of the <see cref="DefaultAsiBackboneDlpFailurePolicyResolver" /> class.
+/// </remarks>
+/// <param name="options">Optional policy options. When omitted, conservative defaults are used.</param>
+public sealed class DefaultAsiBackboneDlpFailurePolicyResolver(DlpFailurePolicyOptions? options = null) : IAsiBackboneDlpFailurePolicyResolver
 {
-    private readonly DlpFailurePolicyOptions options;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DefaultAsiBackboneDlpFailurePolicyResolver" /> class.
-    /// </summary>
-    /// <param name="options">Optional policy options. When omitted, conservative defaults are used.</param>
-    public DefaultAsiBackboneDlpFailurePolicyResolver(DlpFailurePolicyOptions? options = null)
-    {
-        this.options = options ?? new DlpFailurePolicyOptions();
-    }
+    private readonly DlpFailurePolicyOptions options = options ?? new DlpFailurePolicyOptions();
 
     /// <inheritdoc />
     public ValueTask<DlpFailurePolicyResolution> ResolveAsync(

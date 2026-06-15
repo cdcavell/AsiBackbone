@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Globalization;
 using CDCavell.AsiBackbone.Core.Decisions;
 using CDCavell.AsiBackbone.Core.Results;
 
@@ -77,7 +78,7 @@ public sealed class DlpFailurePolicyResolution
             throw new ArgumentOutOfRangeException(nameof(behavior), behavior, "DLP failure behavior must be defined.");
         }
 
-        OperationReason reason = OperationReason.Create(
+        var reason = OperationReason.Create(
             DlpFailureReasonCodes.GetFor(context.FailureKind),
             BuildMessage(context),
             BuildReasonMetadata(context, behavior));
@@ -165,17 +166,18 @@ public sealed class DlpFailurePolicyResolution
 
         if (!string.IsNullOrWhiteSpace(context.IntentCategory))
         {
-            metadata["dlp.intent_category"] = context.IntentCategory!;
+            metadata["dlp.intent_category"] = context.IntentCategory;
         }
 
         if (!string.IsNullOrWhiteSpace(context.Environment))
         {
-            metadata["dlp.environment"] = context.Environment!;
+            metadata["dlp.environment"] = context.Environment;
         }
 
         if (context.Timeout.HasValue)
         {
-            metadata["dlp.timeout_ms"] = context.Timeout.Value.TotalMilliseconds.ToString("0");
+            metadata["dlp.timeout_ms"] = context.Timeout.Value.TotalMilliseconds
+                .ToString("0", CultureInfo.InvariantCulture);
         }
 
         return metadata.Count == 0

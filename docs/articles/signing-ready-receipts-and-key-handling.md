@@ -9,6 +9,8 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 > [!IMPORTANT]
 > The current Core package is **signing-ready**, not a production tamper-evidence implementation. Production tamper evidence requires a concrete signing provider, protected key management, verification policy, durable storage guarantees, retention policy, and operational procedures outside this Core seam.
 
+For production posture, setup guidance, verification-failure behavior, audit-chain wording, capability-token validation, and security non-goals, see [Cryptographic Security Posture and Production Guidance](cryptographic-security-posture.md).
+
 ## Purpose
 
 AsiBackbone audit residue, audit ledger records, capability-token references, outbox entries, and downstream governance emission envelopes need a stable way to carry signing metadata without forcing Core to depend on one key provider.
@@ -66,6 +68,7 @@ The Core tests use fake signer and verifier implementations to prove the seam wi
 
 ## Related documentation
 
+- [Cryptographic Security Posture and Production Guidance](cryptographic-security-posture.md)
 - [Privacy and Signing Boundaries](privacy-and-signing-boundaries.md)
 - [Governance Emission Contract](governance-emission-contract.md)
 - [Durable Audit and Outbox Persistence](durable-audit-outbox-persistence.md)

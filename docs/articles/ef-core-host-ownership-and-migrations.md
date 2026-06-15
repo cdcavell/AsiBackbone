@@ -47,6 +47,12 @@ public sealed class ApplicationDbContext : DbContext
     public DbSet<AsiBackboneAuditLedgerRecordEntity> AsiBackboneAuditLedgerRecords =>
         Set<AsiBackboneAuditLedgerRecordEntity>();
 
+    public DbSet<AsiBackboneGovernanceOutboxEntryEntity> AsiBackboneGovernanceOutboxEntries =>
+        Set<AsiBackboneGovernanceOutboxEntryEntity>();
+
+    public DbSet<AsiBackboneAuditResidueLifecycleEventEntity> AsiBackboneAuditResidueLifecycleEvents =>
+        Set<AsiBackboneAuditResidueLifecycleEventEntity>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -102,6 +108,39 @@ Those command paths are examples only. The actual projects, migration assembly, 
 
 ASI Backbone should not ship required migrations for the host database because doing so would implicitly choose a provider, schema lifecycle, naming convention, deployment model, and operational policy for the host.
 
+## Durable governance outbox tables
+
+The EF Core adapter now includes durable local storage for provider-neutral governance outbox entries and audit residue lifecycle events. The durable tables are intended to prove local persistence before optional downstream provider emission is attempted.
+
+The host migration generated from `ApplyAsiBackboneConfigurations()` should include, among the existing audit ledger and handshake tables:
+
+- `AsiBackboneGovernanceOutboxEntries`
+- `AsiBackboneAuditResidueLifecycleEvents`
+
+`AsiBackboneGovernanceOutboxEntries` stores the minimized governance emission envelope plus operational delivery state, including status, retry count, max retry count, next retry UTC, delivered UTC, provider name, provider record ID, last provider-neutral error fields, dead-letter reason, and safe metadata JSON.
+
+`AsiBackboneAuditResidueLifecycleEvents` stores append-oriented lifecycle progress such as decision evaluated, external emission queued, delivered, failed, or dead-lettered. These rows let hosts correlate the local outbox with original audit residue without rewriting the original decision residue.
+
+## Durable outbox and downstream providers
+
+The EF Core adapter is durable storage. It is not a telemetry exporter, SIEM integration, Event Hubs producer, Azure Monitor provider, Purview integration, robotics adapter, or AI model host.
+
+A recommended production flow is:
+
+1. Create provider-neutral audit residue or lifecycle event in Core.
+2. Persist the lifecycle event through `IAsiBackboneAuditResidueLifecycleStore`.
+3. Enqueue the governance emission envelope through `IAsiBackboneGovernanceOutboxStore`.
+4. Let a downstream provider drain pending or retry-ready entries.
+5. Mark entries as delivered, failed/retryable, deferred, or dead-lettered based on provider-neutral results.
+
+This keeps provider failures from erasing accountability records and keeps Core independent of OpenTelemetry, Azure Monitor, Event Hubs, Purview, SIEM, robotics, AI model, or cloud-provider SDK dependencies.
+
+## Privacy and retention notes
+
+The EF Core tables should store minimized governance metadata, not raw prompts, protected content, raw secrets, raw tokens, or provider SDK payloads. Use content hashes, stable IDs, schema versions, policy versions, policy hashes, trace IDs, correlation IDs, lifecycle stages, and safe diagnostic metadata instead of sensitive source payloads.
+
+Hosts should define retention, encryption, archival, deletion, and access-control policies that match their environment. Durable outbox storage improves local accountability, but it is not by itself a compliance guarantee, tamper-evident ledger, signing system, or legal hold process.
+
 ## What ASI Backbone adds to the host model
 
 The EF Core package contributes provider-neutral mappings for ASI Backbone accountability records, including:
@@ -113,8 +152,10 @@ The EF Core package contributes provider-neutral mappings for ASI Backbone accou
 - handshake request metadata
 - handshake acknowledgments
 - handshake acknowledgment metadata
+- governance outbox entries
+- audit residue lifecycle events
 
-These records are part of the governance spine. They are intended to preserve durable accountability snapshots such as actor identity, actor type, operation name, outcome, reason codes, metadata, correlation ID, trace ID, policy version, policy hash, handshake identifiers, and acknowledgment identifiers.
+These records are part of the governance spine. They are intended to preserve durable accountability snapshots such as actor identity, actor type, operation name, outcome, reason codes, metadata, correlation ID, trace ID, policy version, policy hash, handshake identifiers, acknowledgment identifiers, outbox status, retry posture, lifecycle stage, and provider-neutral delivery diagnostics.
 
 ## What the package does not do automatically
 
@@ -127,6 +168,8 @@ The EF Core package does not automatically:
 - run migrations
 - deploy schema changes
 - configure backup, retention, archival, or encryption policy
+- emit rows to downstream providers
+- drain the outbox on a schedule
 - replace the host application's existing persistence architecture
 - require NetCoreApplicationTemplate
 
@@ -159,6 +202,8 @@ When integrating ASI Backbone EF Core persistence, the host application should d
 5. How migrations are reviewed, deployed, rolled back, and audited.
 6. How accountability records are retained, archived, protected, or purged.
 7. Whether provider-specific conversions or conventions are needed.
+8. Which background service, hosted worker, or provider package drains the governance outbox.
+9. How failed, deferred, retryable, and dead-lettered entries are monitored and escalated.
 
 The ASI Backbone package should remain a clean integration layer inside that host-owned plan.
 

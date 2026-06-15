@@ -32,7 +32,7 @@ public sealed class NoOpGovernanceEmitter : IAsiBackboneGovernanceEmitter
         ArgumentNullException.ThrowIfNull(envelope);
         cancellationToken.ThrowIfCancellationRequested();
 
-        GovernanceEmissionResult result = GovernanceEmissionResult.Delivered(
+        var result = GovernanceEmissionResult.Delivered(
             ProviderName,
             providerRecordId: envelope.EnvelopeId,
             DeliveredMetadata);

@@ -18,6 +18,10 @@ public sealed class AsiBackboneAuditLedgerRecordEntityConfiguration
     private const int ActorTypeMaxLength = 64;
     private const int CorrelationMaxLength = 128;
     private const int PolicyVersionMaxLength = 128;
+    private const int PolicyScopeMaxLength = 256;
+    private const int StatusMaxLength = 128;
+    private const int ProviderMaxLength = 128;
+    private const int StageMaxLength = 128;
     private const int HashMaxLength = 512;
     private const int SignatureKeyIdMaxLength = 128;
     private const int SignatureAlgorithmMaxLength = 128;
@@ -50,6 +54,9 @@ public sealed class AsiBackboneAuditLedgerRecordEntityConfiguration
 
         _ = builder.Property(record => record.EventId)
             .IsRequired()
+            .HasMaxLength(IdentifierMaxLength);
+
+        _ = builder.Property(record => record.AuditResidueId)
             .HasMaxLength(IdentifierMaxLength);
 
         _ = builder.Property(record => record.OccurredUtc)
@@ -86,6 +93,36 @@ public sealed class AsiBackboneAuditLedgerRecordEntityConfiguration
 
         _ = builder.Property(record => record.TraceId)
             .HasMaxLength(CorrelationMaxLength);
+
+        _ = builder.Property(record => record.SpanId)
+            .HasMaxLength(CorrelationMaxLength);
+
+        _ = builder.Property(record => record.ParentSpanId)
+            .HasMaxLength(CorrelationMaxLength);
+
+        _ = builder.Property(record => record.ConstraintSetHash)
+            .HasMaxLength(HashMaxLength);
+
+        _ = builder.Property(record => record.PolicyScope)
+            .HasMaxLength(PolicyScopeMaxLength);
+
+        _ = builder.Property(record => record.TenantHash)
+            .HasMaxLength(HashMaxLength);
+
+        _ = builder.Property(record => record.OrganizationHash)
+            .HasMaxLength(HashMaxLength);
+
+        _ = builder.Property(record => record.EmitterStatus)
+            .HasMaxLength(StatusMaxLength);
+
+        _ = builder.Property(record => record.EmitterProvider)
+            .HasMaxLength(ProviderMaxLength);
+
+        _ = builder.Property(record => record.GatewayExecutionId)
+            .HasMaxLength(IdentifierMaxLength);
+
+        _ = builder.Property(record => record.DecisionStage)
+            .HasMaxLength(StageMaxLength);
 
         _ = builder.Property(record => record.PolicyVersion)
             .HasMaxLength(PolicyVersionMaxLength);
@@ -126,6 +163,8 @@ public sealed class AsiBackboneAuditLedgerRecordEntityConfiguration
 
         _ = builder.HasIndex(record => record.EventId);
 
+        _ = builder.HasIndex(record => record.AuditResidueId);
+
         _ = builder.HasIndex(record => record.OccurredUtc);
 
         _ = builder.HasIndex(record => record.RecordedUtc);
@@ -142,9 +181,27 @@ public sealed class AsiBackboneAuditLedgerRecordEntityConfiguration
 
         _ = builder.HasIndex(record => record.TraceId);
 
+        _ = builder.HasIndex(record => record.SpanId);
+
         _ = builder.HasIndex(record => record.PolicyVersion);
 
         _ = builder.HasIndex(record => record.PolicyHash);
+
+        _ = builder.HasIndex(record => record.PolicyScope);
+
+        _ = builder.HasIndex(record => record.TenantHash);
+
+        _ = builder.HasIndex(record => record.OrganizationHash);
+
+        _ = builder.HasIndex(record => record.EmitterStatus);
+
+        _ = builder.HasIndex(record => record.EmitterProvider);
+
+        _ = builder.HasIndex(record => record.OutboxSequence);
+
+        _ = builder.HasIndex(record => record.GatewayExecutionId);
+
+        _ = builder.HasIndex(record => record.DecisionStage);
 
         _ = builder.HasIndex(record => record.HandshakeId);
 

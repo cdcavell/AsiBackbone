@@ -20,6 +20,7 @@ public sealed class AuditLedgerRecord : IAsiBackboneAuditResidue
         string recordId,
         string? schemaVersion,
         string eventId,
+        string? auditResidueId,
         DateTimeOffset occurredUtc,
         DateTimeOffset recordedUtc,
         string actorId,
@@ -30,6 +31,20 @@ public sealed class AuditLedgerRecord : IAsiBackboneAuditResidue
         IReadOnlyList<string> reasonCodes,
         string? correlationId,
         string? traceId,
+        string? spanId,
+        string? parentSpanId,
+        long? decisionLatencyMs,
+        string? constraintSetHash,
+        int? constraintCount,
+        double? riskScore,
+        string? policyScope,
+        string? tenantHash,
+        string? organizationHash,
+        string? emitterStatus,
+        string? emitterProvider,
+        long? outboxSequence,
+        string? gatewayExecutionId,
+        string? decisionStage,
         string? policyVersion,
         string? policyHash,
         string? handshakeId,
@@ -51,6 +66,7 @@ public sealed class AuditLedgerRecord : IAsiBackboneAuditResidue
         RecordId = recordId.Trim();
         SchemaVersion = AsiBackboneSchemaVersions.Normalize(schemaVersion);
         EventId = eventId.Trim();
+        AuditResidueId = NormalizeOptional(auditResidueId) ?? EventId;
         OccurredUtc = occurredUtc.ToUniversalTime();
         RecordedUtc = recordedUtc.ToUniversalTime();
         ActorId = actorId.Trim();
@@ -61,6 +77,20 @@ public sealed class AuditLedgerRecord : IAsiBackboneAuditResidue
         ReasonCodes = reasonCodes;
         CorrelationId = NormalizeOptional(correlationId);
         TraceId = NormalizeOptional(traceId);
+        SpanId = NormalizeOptional(spanId);
+        ParentSpanId = NormalizeOptional(parentSpanId);
+        DecisionLatencyMs = NormalizeNonNegative(decisionLatencyMs, nameof(decisionLatencyMs));
+        ConstraintSetHash = NormalizeOptional(constraintSetHash);
+        ConstraintCount = NormalizeNonNegative(constraintCount, nameof(constraintCount));
+        RiskScore = NormalizeRiskScore(riskScore);
+        PolicyScope = NormalizeOptional(policyScope);
+        TenantHash = NormalizeOptional(tenantHash);
+        OrganizationHash = NormalizeOptional(organizationHash);
+        EmitterStatus = NormalizeOptional(emitterStatus);
+        EmitterProvider = NormalizeOptional(emitterProvider);
+        OutboxSequence = NormalizeNonNegative(outboxSequence, nameof(outboxSequence));
+        GatewayExecutionId = NormalizeOptional(gatewayExecutionId);
+        DecisionStage = NormalizeOptional(decisionStage);
         PolicyVersion = NormalizeOptional(policyVersion);
         PolicyHash = NormalizeOptional(policyHash);
         HandshakeId = NormalizeOptional(handshakeId);
@@ -86,6 +116,9 @@ public sealed class AuditLedgerRecord : IAsiBackboneAuditResidue
 
     /// <inheritdoc />
     public string EventId { get; }
+
+    /// <inheritdoc />
+    public string AuditResidueId { get; }
 
     /// <inheritdoc />
     public DateTimeOffset OccurredUtc { get; }
@@ -118,6 +151,48 @@ public sealed class AuditLedgerRecord : IAsiBackboneAuditResidue
 
     /// <inheritdoc />
     public string? TraceId { get; }
+
+    /// <inheritdoc />
+    public string? SpanId { get; }
+
+    /// <inheritdoc />
+    public string? ParentSpanId { get; }
+
+    /// <inheritdoc />
+    public long? DecisionLatencyMs { get; }
+
+    /// <inheritdoc />
+    public string? ConstraintSetHash { get; }
+
+    /// <inheritdoc />
+    public int? ConstraintCount { get; }
+
+    /// <inheritdoc />
+    public double? RiskScore { get; }
+
+    /// <inheritdoc />
+    public string? PolicyScope { get; }
+
+    /// <inheritdoc />
+    public string? TenantHash { get; }
+
+    /// <inheritdoc />
+    public string? OrganizationHash { get; }
+
+    /// <inheritdoc />
+    public string? EmitterStatus { get; }
+
+    /// <inheritdoc />
+    public string? EmitterProvider { get; }
+
+    /// <inheritdoc />
+    public long? OutboxSequence { get; }
+
+    /// <inheritdoc />
+    public string? GatewayExecutionId { get; }
+
+    /// <inheritdoc />
+    public string? DecisionStage { get; }
 
     /// <inheritdoc />
     public string? PolicyVersion { get; }
@@ -200,8 +275,9 @@ public sealed class AuditLedgerRecord : IAsiBackboneAuditResidue
 
         return new AuditLedgerRecord(
             NormalizeIdentifier(recordId),
-            schemaVersion,
+            schemaVersion ?? residue.SchemaVersion,
             residue.EventId,
+            residue.AuditResidueId,
             residue.OccurredUtc,
             recordedUtc ?? DateTimeOffset.UtcNow,
             residue.ActorId,
@@ -212,6 +288,20 @@ public sealed class AuditLedgerRecord : IAsiBackboneAuditResidue
             NormalizeReasonCodes(residue.ReasonCodes),
             residue.CorrelationId,
             residue.TraceId,
+            residue.SpanId,
+            residue.ParentSpanId,
+            residue.DecisionLatencyMs,
+            residue.ConstraintSetHash,
+            residue.ConstraintCount,
+            residue.RiskScore,
+            residue.PolicyScope,
+            residue.TenantHash,
+            residue.OrganizationHash,
+            residue.EmitterStatus,
+            residue.EmitterProvider,
+            residue.OutboxSequence,
+            residue.GatewayExecutionId,
+            residue.DecisionStage,
             residue.PolicyVersion,
             residue.PolicyHash,
             handshakeId,
@@ -237,6 +327,29 @@ public sealed class AuditLedgerRecord : IAsiBackboneAuditResidue
         return string.IsNullOrWhiteSpace(value)
             ? null
             : value.Trim();
+    }
+
+    private static long? NormalizeNonNegative(long? value, string parameterName)
+    {
+        return value < 0
+            ? throw new ArgumentOutOfRangeException(parameterName, value, "Value must be greater than or equal to zero.")
+            : value;
+    }
+
+    private static int? NormalizeNonNegative(int? value, string parameterName)
+    {
+        return value < 0
+            ? throw new ArgumentOutOfRangeException(parameterName, value, "Value must be greater than or equal to zero.")
+            : value;
+    }
+
+    private static double? NormalizeRiskScore(double? riskScore)
+    {
+        return riskScore is null
+            ? null
+            : double.IsNaN(riskScore.Value) || double.IsInfinity(riskScore.Value) || riskScore.Value < 0
+            ? throw new ArgumentOutOfRangeException(nameof(riskScore), riskScore, "Risk score must be a finite value greater than or equal to zero.")
+            : riskScore;
     }
 
     private static ReadOnlyCollection<string> NormalizeReasonCodes(IEnumerable<string>? reasonCodes)

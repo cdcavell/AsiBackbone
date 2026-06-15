@@ -1,4 +1,5 @@
 using CDCavell.AsiBackbone.Core.Actors;
+using CDCavell.AsiBackbone.Core.Serialization;
 
 namespace CDCavell.AsiBackbone.Core.Audit;
 
@@ -11,6 +12,19 @@ public interface IAsiBackboneAuditResidue
     /// Gets the stable audit event identifier.
     /// </summary>
     string EventId { get; }
+
+    /// <summary>
+    /// Gets the stable audit residue identifier when available.
+    /// </summary>
+    /// <remarks>
+    /// Existing residue implementations may use <see cref="EventId" /> as the residue identifier.
+    /// </remarks>
+    string? AuditResidueId => EventId;
+
+    /// <summary>
+    /// Gets the serialized schema version for the audit residue shape.
+    /// </summary>
+    string SchemaVersion => AsiBackboneSchemaVersions.StableArtifactsV1;
 
     /// <summary>
     /// Gets the UTC timestamp when the audited event occurred.
@@ -56,6 +70,76 @@ public interface IAsiBackboneAuditResidue
     /// Gets the trace identifier associated with the event, when supplied by the host.
     /// </summary>
     string? TraceId { get; }
+
+    /// <summary>
+    /// Gets the span identifier associated with the event, when supplied by the host or observability adapter.
+    /// </summary>
+    string? SpanId => null;
+
+    /// <summary>
+    /// Gets the parent span identifier associated with the event, when supplied by the host or observability adapter.
+    /// </summary>
+    string? ParentSpanId => null;
+
+    /// <summary>
+    /// Gets the decision latency in milliseconds, when supplied by the host.
+    /// </summary>
+    long? DecisionLatencyMs => null;
+
+    /// <summary>
+    /// Gets the hash of the evaluated constraint set, when supplied by the host.
+    /// </summary>
+    string? ConstraintSetHash => null;
+
+    /// <summary>
+    /// Gets the number of constraints evaluated for the decision, when supplied by the host.
+    /// </summary>
+    int? ConstraintCount => null;
+
+    /// <summary>
+    /// Gets the host-defined risk score associated with the decision, when supplied by the host.
+    /// </summary>
+    double? RiskScore => null;
+
+    /// <summary>
+    /// Gets the policy scope associated with the decision, when supplied by the host.
+    /// </summary>
+    string? PolicyScope => null;
+
+    /// <summary>
+    /// Gets the privacy-preserving tenant hash associated with the decision, when supplied by the host.
+    /// </summary>
+    string? TenantHash => null;
+
+    /// <summary>
+    /// Gets the privacy-preserving organization hash associated with the decision, when supplied by the host.
+    /// </summary>
+    string? OrganizationHash => null;
+
+    /// <summary>
+    /// Gets the provider-neutral emitter status, when supplied by the host or outbox provider.
+    /// </summary>
+    string? EmitterStatus => null;
+
+    /// <summary>
+    /// Gets the provider-neutral emitter provider name, when supplied by the host or outbox provider.
+    /// </summary>
+    string? EmitterProvider => null;
+
+    /// <summary>
+    /// Gets the outbox sequence associated with the event, when supplied by the host or outbox provider.
+    /// </summary>
+    long? OutboxSequence => null;
+
+    /// <summary>
+    /// Gets the gateway execution identifier associated with the event, when supplied by the host or gateway provider.
+    /// </summary>
+    string? GatewayExecutionId => null;
+
+    /// <summary>
+    /// Gets the provider-neutral decision stage associated with the event, when supplied by the host.
+    /// </summary>
+    string? DecisionStage => null;
 
     /// <summary>
     /// Gets the policy version associated with the event, when supplied by the host.

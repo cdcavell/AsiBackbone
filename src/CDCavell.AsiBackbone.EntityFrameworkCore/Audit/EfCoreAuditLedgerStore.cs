@@ -191,6 +191,7 @@ public sealed class EfCoreAuditLedgerStore : IAsiBackboneAuditLedgerStore
             RecordId = record.RecordId,
             SchemaVersion = record.SchemaVersion,
             EventId = record.EventId,
+            AuditResidueId = record.AuditResidueId,
             OccurredUtc = record.OccurredUtc,
             RecordedUtc = record.RecordedUtc,
             ActorId = record.ActorId,
@@ -201,6 +202,20 @@ public sealed class EfCoreAuditLedgerStore : IAsiBackboneAuditLedgerStore
             ReasonCodesJson = JsonSerializer.Serialize(record.ReasonCodes, JsonOptions),
             CorrelationId = record.CorrelationId,
             TraceId = record.TraceId,
+            SpanId = record.SpanId,
+            ParentSpanId = record.ParentSpanId,
+            DecisionLatencyMs = record.DecisionLatencyMs,
+            ConstraintSetHash = record.ConstraintSetHash,
+            ConstraintCount = record.ConstraintCount,
+            RiskScore = record.RiskScore,
+            PolicyScope = record.PolicyScope,
+            TenantHash = record.TenantHash,
+            OrganizationHash = record.OrganizationHash,
+            EmitterStatus = record.EmitterStatus,
+            EmitterProvider = record.EmitterProvider,
+            OutboxSequence = record.OutboxSequence,
+            GatewayExecutionId = record.GatewayExecutionId,
+            DecisionStage = record.DecisionStage,
             PolicyVersion = record.PolicyVersion,
             PolicyHash = record.PolicyHash,
             HandshakeId = record.HandshakeId,
@@ -253,6 +268,8 @@ public sealed class EfCoreAuditLedgerStore : IAsiBackboneAuditLedgerStore
 
         var residue = new EntityAuditResidue(
             entity.EventId,
+            entity.AuditResidueId,
+            entity.SchemaVersion,
             entity.OccurredUtc,
             entity.ActorId,
             entity.ActorType,
@@ -262,6 +279,20 @@ public sealed class EfCoreAuditLedgerStore : IAsiBackboneAuditLedgerStore
             Array.AsReadOnly(reasonCodes),
             entity.CorrelationId,
             entity.TraceId,
+            entity.SpanId,
+            entity.ParentSpanId,
+            entity.DecisionLatencyMs,
+            entity.ConstraintSetHash,
+            entity.ConstraintCount,
+            entity.RiskScore,
+            entity.PolicyScope,
+            entity.TenantHash,
+            entity.OrganizationHash,
+            entity.EmitterStatus,
+            entity.EmitterProvider,
+            entity.OutboxSequence,
+            entity.GatewayExecutionId,
+            entity.DecisionStage,
             entity.PolicyVersion,
             entity.PolicyHash,
             metadata);
@@ -304,6 +335,8 @@ public sealed class EfCoreAuditLedgerStore : IAsiBackboneAuditLedgerStore
 
     private sealed class EntityAuditResidue(
         string eventId,
+        string? auditResidueId,
+        string schemaVersion,
         DateTimeOffset occurredUtc,
         string actorId,
         AsiBackboneActorType actorType,
@@ -313,11 +346,29 @@ public sealed class EfCoreAuditLedgerStore : IAsiBackboneAuditLedgerStore
         IReadOnlyList<string> reasonCodes,
         string? correlationId,
         string? traceId,
+        string? spanId,
+        string? parentSpanId,
+        long? decisionLatencyMs,
+        string? constraintSetHash,
+        int? constraintCount,
+        double? riskScore,
+        string? policyScope,
+        string? tenantHash,
+        string? organizationHash,
+        string? emitterStatus,
+        string? emitterProvider,
+        long? outboxSequence,
+        string? gatewayExecutionId,
+        string? decisionStage,
         string? policyVersion,
         string? policyHash,
         IReadOnlyDictionary<string, string> metadata) : IAsiBackboneAuditResidue
     {
         public string EventId { get; } = eventId;
+
+        public string? AuditResidueId { get; } = auditResidueId;
+
+        public string SchemaVersion { get; } = schemaVersion;
 
         public DateTimeOffset OccurredUtc { get; } = occurredUtc;
 
@@ -336,6 +387,34 @@ public sealed class EfCoreAuditLedgerStore : IAsiBackboneAuditLedgerStore
         public string? CorrelationId { get; } = correlationId;
 
         public string? TraceId { get; } = traceId;
+
+        public string? SpanId { get; } = spanId;
+
+        public string? ParentSpanId { get; } = parentSpanId;
+
+        public long? DecisionLatencyMs { get; } = decisionLatencyMs;
+
+        public string? ConstraintSetHash { get; } = constraintSetHash;
+
+        public int? ConstraintCount { get; } = constraintCount;
+
+        public double? RiskScore { get; } = riskScore;
+
+        public string? PolicyScope { get; } = policyScope;
+
+        public string? TenantHash { get; } = tenantHash;
+
+        public string? OrganizationHash { get; } = organizationHash;
+
+        public string? EmitterStatus { get; } = emitterStatus;
+
+        public string? EmitterProvider { get; } = emitterProvider;
+
+        public long? OutboxSequence { get; } = outboxSequence;
+
+        public string? GatewayExecutionId { get; } = gatewayExecutionId;
+
+        public string? DecisionStage { get; } = decisionStage;
 
         public string? PolicyVersion { get; } = policyVersion;
 

@@ -79,6 +79,9 @@
 - name: Observability and Governance Emission Architecture
   href: observability-and-governance-emission-architecture.md
 
+- name: Audit Residue Observability Schema
+  href: audit-residue-observability-schema.md
+
 - name: Historical Alpha Package Boundary
   href: alpha-package-boundary.md
 

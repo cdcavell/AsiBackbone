@@ -30,6 +30,9 @@ Start with [Getting Started](getting-started.md), then use the navigation menu t
 * [Governance Emission Contract](governance-emission-contract.md)
   Defines the provider-neutral emission contract between Core governance artifacts, durable local audit/outbox persistence, and optional downstream providers.
 
+* [Durable Audit and Outbox Persistence](durable-audit-outbox-persistence.md)
+  Documents the provider-neutral local persistence seam for audit residue lifecycle events and governance emission outbox entries before optional provider delivery.
+
 * [Audit Residue Observability Schema](audit-residue-observability-schema.md)
   Documents the provider-neutral telemetry, traceability, outbox, emission, and PII-safe identifier fields added to audit residue for observability and governance emission providers.
 

@@ -31,6 +31,8 @@ Core defines provider-neutral contracts and models only:
 | `IAsiBackboneAuditResidueLifecycleStore` | Neutral lifecycle event store for append-only audit residue lifecycle events. |
 | `IAsiBackboneGovernanceOutboxStore` | Neutral outbox store for pending governance emission envelopes. |
 | `GovernanceOutboxEntry` | Neutral outbox entry state model with status, retry count, last error, next retry time, provider identifiers, and dead-letter reason. |
+| `AsiBackboneGovernanceOutboxDrain` | Provider-neutral drain path that hands pending or retry-ready outbox entries to an `IAsiBackboneGovernanceEmitter` and persists the resulting state transition. |
+| `NoOpGovernanceEmitter` | No-op test/dev emitter that acknowledges envelopes as delivered without sending data to an external provider. |
 
 Core does not reference Azure Monitor, Event Hubs, Purview, OpenTelemetry, SIEM SDKs, robotics packages, AI model packages, or cloud-provider SDKs.
 
@@ -44,6 +46,23 @@ Core does not reference Azure Monitor, Event Hubs, Purview, OpenTelemetry, SIEM 
 | `InMemoryGovernanceOutboxStore` | Stores governance outbox entries in memory for tests, samples, and local development. |
 
 These stores are intentionally not durable across process restarts. Production hosts should use EF Core or another host-owned durable storage adapter.
+
+## No-op drain proof path
+
+The no-op drain path exists to prove the outbox handoff before a real provider is added:
+
+```text
+GovernanceEmissionEnvelope
+  -> IAsiBackboneGovernanceOutboxStore
+  -> AsiBackboneGovernanceOutboxDrain
+  -> NoOpGovernanceEmitter
+  -> GovernanceEmissionResult.Delivered
+  -> delivered outbox state
+```
+
+`NoOpGovernanceEmitter` is not a production emission provider. It is a local validation seam for tests, samples, and smoke flows that need to prove pending -> delivered behavior without OpenTelemetry, Azure Monitor, Event Hubs, Purview, SIEM, or another external service.
+
+The drain path also normalizes retryable, deferred, failed, and terminal provider-neutral results back into outbox state so the local accountability record is preserved when provider handoff does not succeed.
 
 ## Outbox status model
 
@@ -78,7 +97,7 @@ Recommended sequence:
 1. Save the audit residue or lifecycle event locally.
 2. Create a `GovernanceEmissionEnvelope`.
 3. Enqueue the envelope into `IAsiBackboneGovernanceOutboxStore`.
-4. Attempt optional provider emission.
+4. Attempt optional provider emission through `AsiBackboneGovernanceOutboxDrain`.
 5. Mark the outbox entry delivered, failed, retryable, deferred, or dead-lettered.
 
 This avoids losing the local accountability record when external sinks are unavailable.

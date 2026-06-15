@@ -88,6 +88,9 @@
 - name: Durable Audit and Outbox Persistence
   href: durable-audit-outbox-persistence.md
 
+- name: Hosted Governance Outbox Drain
+  href: hosted-governance-outbox-drain.md
+
 - name: Audit Residue Observability Schema
   href: audit-residue-observability-schema.md
 

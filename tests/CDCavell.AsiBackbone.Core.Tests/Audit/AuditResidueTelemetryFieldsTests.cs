@@ -87,7 +87,7 @@ public sealed class AuditResidueTelemetryFieldsTests
         Assert.Equal(42, residue.DecisionLatencyMs);
         Assert.Equal("constraint-hash", residue.ConstraintSetHash);
         Assert.Equal(7, residue.ConstraintCount);
-        Assert.Equal(0.75, residue.RiskScore);
+        Assert.Equal(0.75, residue.RiskScore.GetValueOrDefault());
         Assert.Equal("regional-policy", residue.PolicyScope);
         Assert.Equal("tenant-hash", residue.TenantHash);
         Assert.Equal("org-hash", residue.OrganizationHash);
@@ -127,8 +127,6 @@ public sealed class AuditResidueTelemetryFieldsTests
     public void FromDecisionPreservesCorrelationAndCarriesTelemetryFieldsIntoLedgerRecord()
     {
         var decision = GovernanceDecision.Allow(
-            "policy.allowed",
-            "Allowed by policy.",
             correlationId: "correlation-123",
             traceId: "trace-456",
             policyVersion: "v1",
@@ -167,7 +165,7 @@ public sealed class AuditResidueTelemetryFieldsTests
         Assert.Equal(12, record.DecisionLatencyMs);
         Assert.Equal("constraint-hash", record.ConstraintSetHash);
         Assert.Equal(3, record.ConstraintCount);
-        Assert.Equal(0.2, record.RiskScore);
+        Assert.Equal(0.2, record.RiskScore.GetValueOrDefault());
         Assert.Equal("district", record.PolicyScope);
         Assert.Equal("tenant-hash", record.TenantHash);
         Assert.Equal("org-hash", record.OrganizationHash);

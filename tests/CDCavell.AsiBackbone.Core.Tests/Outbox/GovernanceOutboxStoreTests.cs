@@ -1,5 +1,6 @@
 using CDCavell.AsiBackbone.Core.Audit;
 using CDCavell.AsiBackbone.Core.Emissions;
+using CDCavell.AsiBackbone.Core.Outbox;
 using CDCavell.AsiBackbone.Storage.InMemory.Audit;
 using CDCavell.AsiBackbone.Storage.InMemory.Outbox;
 using Xunit;

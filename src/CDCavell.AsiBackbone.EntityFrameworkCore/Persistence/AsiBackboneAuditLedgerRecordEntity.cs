@@ -25,6 +25,11 @@ public sealed class AsiBackboneAuditLedgerRecordEntity : AsiBackboneEntity
     public string EventId { get; set; } = string.Empty;
 
     /// <summary>
+    /// Gets or sets the stable audit residue identifier.
+    /// </summary>
+    public string? AuditResidueId { get; set; }
+
+    /// <summary>
     /// Gets or sets the UTC timestamp when the audited event occurred.
     /// </summary>
     public DateTimeOffset OccurredUtc { get; set; }
@@ -73,6 +78,76 @@ public sealed class AsiBackboneAuditLedgerRecordEntity : AsiBackboneEntity
     /// Gets or sets the trace identifier associated with the event, when supplied by the host.
     /// </summary>
     public string? TraceId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the span identifier associated with the event, when supplied by the host or observability adapter.
+    /// </summary>
+    public string? SpanId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the parent span identifier associated with the event, when supplied by the host or observability adapter.
+    /// </summary>
+    public string? ParentSpanId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the decision latency in milliseconds, when supplied by the host.
+    /// </summary>
+    public long? DecisionLatencyMs { get; set; }
+
+    /// <summary>
+    /// Gets or sets the hash of the evaluated constraint set, when supplied by the host.
+    /// </summary>
+    public string? ConstraintSetHash { get; set; }
+
+    /// <summary>
+    /// Gets or sets the number of evaluated constraints, when supplied by the host.
+    /// </summary>
+    public int? ConstraintCount { get; set; }
+
+    /// <summary>
+    /// Gets or sets the host-defined risk score associated with the decision, when supplied by the host.
+    /// </summary>
+    public double? RiskScore { get; set; }
+
+    /// <summary>
+    /// Gets or sets the policy scope associated with the decision, when supplied by the host.
+    /// </summary>
+    public string? PolicyScope { get; set; }
+
+    /// <summary>
+    /// Gets or sets the privacy-preserving tenant hash associated with the decision, when supplied by the host.
+    /// </summary>
+    public string? TenantHash { get; set; }
+
+    /// <summary>
+    /// Gets or sets the privacy-preserving organization hash associated with the decision, when supplied by the host.
+    /// </summary>
+    public string? OrganizationHash { get; set; }
+
+    /// <summary>
+    /// Gets or sets the provider-neutral emitter status, when supplied by the host or outbox provider.
+    /// </summary>
+    public string? EmitterStatus { get; set; }
+
+    /// <summary>
+    /// Gets or sets the provider-neutral emitter provider name, when supplied by the host or outbox provider.
+    /// </summary>
+    public string? EmitterProvider { get; set; }
+
+    /// <summary>
+    /// Gets or sets the outbox sequence associated with the event, when supplied by the host or outbox provider.
+    /// </summary>
+    public long? OutboxSequence { get; set; }
+
+    /// <summary>
+    /// Gets or sets the gateway execution identifier associated with the event, when supplied by the host or gateway provider.
+    /// </summary>
+    public string? GatewayExecutionId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the provider-neutral decision stage associated with the event, when supplied by the host.
+    /// </summary>
+    public string? DecisionStage { get; set; }
 
     /// <summary>
     /// Gets or sets the policy version associated with the event, when supplied by the host.

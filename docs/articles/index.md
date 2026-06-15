@@ -33,6 +33,9 @@ Start with [Getting Started](getting-started.md), then use the navigation menu t
 * [Event Hubs Governance Emission Provider Design](event-hubs-governance-emission-provider-design.md)
   Documents the optional Event Hubs streaming provider design, versioned envelope mapping, Managed Identity configuration direction, durable outbox interaction, retry/dead-letter behavior, and no-live-Azure test seams.
 
+* [Purview Governance and Lineage Enrichment Strategy](purview-governance-lineage-enrichment-strategy.md)
+  Documents the optional Microsoft Purview governance enrichment strategy, selected summarized enrichment model, PII-safe field mapping, correlation strategy, catalog-noise risks, and Core-neutral provider boundary.
+
 * [DLP and Classification Failure Policy](dlp-classification-failure-policy.md)
   Documents the provider-neutral Core policy model for DLP/classification service outages, timeouts, indeterminate results, blocked/classified results, and risk-based fail-open/fail-closed behavior.
 

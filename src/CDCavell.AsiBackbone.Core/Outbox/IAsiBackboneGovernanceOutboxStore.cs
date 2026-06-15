@@ -1,0 +1,71 @@
+using CDCavell.AsiBackbone.Core.Emissions;
+
+namespace CDCavell.AsiBackbone.Core.Outbox;
+
+/// <summary>
+/// Defines a provider-neutral durable outbox store for governance emission envelopes.
+/// </summary>
+public interface IAsiBackboneGovernanceOutboxStore
+{
+    /// <summary>
+    /// Enqueues a provider-neutral governance emission envelope before optional downstream provider delivery is attempted.
+    /// </summary>
+    ValueTask<GovernanceOutboxEntry> EnqueueAsync(
+        GovernanceEmissionEnvelope envelope,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Saves an updated outbox entry state.
+    /// </summary>
+    ValueTask<GovernanceOutboxEntry> SaveAsync(
+        GovernanceOutboxEntry entry,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Finds an outbox entry by its stable identifier.
+    /// </summary>
+    ValueTask<GovernanceOutboxEntry?> FindByOutboxEntryIdAsync(
+        string outboxEntryId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Finds pending outbox entries ordered for delivery.
+    /// </summary>
+    ValueTask<IReadOnlyList<GovernanceOutboxEntry>> FindPendingAsync(
+        int maxCount = 100,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Finds retry-ready outbox entries ordered for delivery.
+    /// </summary>
+    ValueTask<IReadOnlyList<GovernanceOutboxEntry>> FindRetryReadyAsync(
+        DateTimeOffset utcNow,
+        int maxCount = 100,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Marks an outbox entry as delivered using a provider-neutral emission result.
+    /// </summary>
+    ValueTask<GovernanceOutboxEntry> MarkDeliveredAsync(
+        string outboxEntryId,
+        GovernanceEmissionResult result,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Marks an outbox entry as failed or retryable failed using provider-neutral error information.
+    /// </summary>
+    ValueTask<GovernanceOutboxEntry> MarkFailedAsync(
+        string outboxEntryId,
+        GovernanceEmissionError error,
+        DateTimeOffset? nextRetryUtc = null,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Marks an outbox entry as dead-lettered.
+    /// </summary>
+    ValueTask<GovernanceOutboxEntry> MarkDeadLetteredAsync(
+        string outboxEntryId,
+        GovernanceEmissionError error,
+        string? deadLetterReason = null,
+        CancellationToken cancellationToken = default);
+}

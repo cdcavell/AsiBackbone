@@ -82,6 +82,9 @@
 - name: OpenTelemetry Governance Emission Provider
   href: opentelemetry-governance-emission-provider.md
 
+- name: Event Hubs Governance Emission Provider Design
+  href: event-hubs-governance-emission-provider-design.md
+
 - name: DLP and Classification Failure Policy
   href: dlp-classification-failure-policy.md
 

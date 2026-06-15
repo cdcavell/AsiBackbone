@@ -12,6 +12,12 @@ Start with [Getting Started](getting-started.md), then use the navigation menu t
 * [1.0.0 Release Notes](release-notes-100.md)
   Describes the first stable release identity, stable package list, known limitations, and upgrade guidance.
 
+* [1.1.0 Release Notes](release-notes-110.md)
+  Describes the additive `1.1.0` observability, durable outbox, governance emission provider, OpenTelemetry, DLP/classification, signing-ready, and provider-deferral release boundary.
+
+* [Upgrade Guide: 1.0.0 to 1.1.0](upgrade-100-to-110.md)
+  Explains how existing `1.0.0` consumers can adopt `1.1.0` incrementally, including durable outbox storage, hosted drain wiring, OpenTelemetry provider usage, Azure Monitor exporter guidance, and accepted deferrals.
+
 * [Release Readiness Checklist](release-readiness-checklist.md)
   Provides the final pre-tag checklist for the first stable NuGet package release, including issue status, workflow gates, package metadata inspection, wording boundaries, and non-blocking follow-up tracking.
 

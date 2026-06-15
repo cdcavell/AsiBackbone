@@ -10,6 +10,12 @@
 - name: 1.0.0 Release Notes
   href: release-notes-100.md
 
+- name: 1.1.0 Release Notes
+  href: release-notes-110.md
+
+- name: "Upgrade Guide: 1.0.0 to 1.1.0"
+  href: upgrade-100-to-110.md
+
 - name: Release Readiness Checklist
   href: release-readiness-checklist.md
 

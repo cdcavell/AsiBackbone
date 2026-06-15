@@ -5,7 +5,7 @@ ASP.NET Core host adapters for Accountable Systems Infrastructure governance pri
 This package acts as a thin web-host adapter around `CDCavell.AsiBackbone.Core`.
 
 > [!IMPORTANT]
-> This package provides host adapters only. It does not provide concrete middleware enforcement, endpoint mapping, authentication integration, policy enforcement, persistence, or execution-gateway behavior. HTTP result mapping and acknowledgment challenge helpers are explicit adapters and do not enforce decisions automatically.
+> This package provides host adapters only. It does not provide concrete middleware enforcement, endpoint mapping, authentication integration, policy enforcement, persistence, provider exporters, or execution-gateway behavior. HTTP result mapping, acknowledgment challenge helpers, and hosted outbox drain integration are explicit adapters and do not enforce decisions automatically.
 
 ## Service registration
 
@@ -30,7 +30,29 @@ builder.Services.AddAsiBackboneAspNetCore(options =>
 });
 ```
 
-The registration is intentionally narrow. It does not register persistence, EF Core, authentication handlers, MVC, Razor Pages, Minimal API endpoints, middleware, policy evaluators, or host-specific authorization behavior.
+The base registration is intentionally narrow. It does not register persistence, EF Core, authentication handlers, MVC, Razor Pages, Minimal API endpoints, middleware, policy evaluators, or host-specific authorization behavior.
+
+## Hosted governance outbox drain
+
+`AddAsiBackboneGovernanceOutboxDrainWorker` registers a host-owned background worker that runs the provider-neutral Core `AsiBackboneGovernanceOutboxDrain` through dependency injection.
+
+```csharp
+using CDCavell.AsiBackbone.AspNetCore.DependencyInjection;
+using CDCavell.AsiBackbone.Core.Emissions;
+using CDCavell.AsiBackbone.Core.Outbox;
+using CDCavell.AsiBackbone.Storage.InMemory.Outbox;
+
+builder.Services.AddSingleton<IAsiBackboneGovernanceOutboxStore, InMemoryGovernanceOutboxStore>();
+builder.Services.AddSingleton<IAsiBackboneGovernanceEmitter>(NoOpGovernanceEmitter.Instance);
+
+builder.Services.AddAsiBackboneGovernanceOutboxDrainWorker(options =>
+{
+    options.BatchSize = 25;
+    options.PollingInterval = TimeSpan.FromSeconds(15);
+});
+```
+
+The worker resolves the drain from a scoped service provider so host-owned durable stores can depend on scoped infrastructure such as EF Core `DbContext` instances. Production hosts should avoid duplicate active drain workers against the same durable outbox unless their store implements leasing, row claiming, partitioning, or provider-side idempotency.
 
 ## Request correlation and audit enrichment
 
@@ -161,7 +183,8 @@ This package provides:
 - request correlation to Core evaluation context mapping;
 - audit enrichment helpers;
 - HTTP and Problem Details result mapping helpers;
-- acknowledgment challenge creation and response handling helpers.
+- acknowledgment challenge creation and response handling helpers;
+- hosted governance outbox drain registration and scheduling options.
 
 This package avoids:
 
@@ -169,9 +192,10 @@ This package avoids:
 - database provider assumptions;
 - direct dependencies on NetCoreApplicationTemplate;
 - authentication-provider assumptions;
+- provider exporter dependencies;
 - middleware enforcement;
 - endpoint mapping;
 - robotics or physical execution dependencies;
 - AI model hosting, training, inference, or orchestration.
 
-See `docs/articles/aspnetcore-integration-boundary.md` for the implemented design boundary.
+See `docs/articles/aspnetcore-integration-boundary.md` and `docs/articles/hosted-governance-outbox-drain.md` for the implemented design boundary.

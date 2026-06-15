@@ -42,20 +42,20 @@ public sealed class OpenTelemetryGovernanceEmitterTests
         ActivityEvent activityEvent = Assert.Single(activity.Events);
         Assert.Equal(OpenTelemetryGovernanceInstrumentation.DecisionEvaluatedEventName, activityEvent.Name);
 
-        Dictionary<string, object?> tags = activity.Tags.ToDictionary(static tag => tag.Key, static tag => tag.Value, StringComparer.Ordinal);
-        Assert.Equal(envelope.EnvelopeId, tags[OpenTelemetryGovernanceAttributes.EnvelopeId]);
-        Assert.Equal(envelope.CorrelationId, tags[OpenTelemetryGovernanceAttributes.CorrelationId]);
-        Assert.Equal(envelope.AuditResidueId, tags[OpenTelemetryGovernanceAttributes.AuditResidueId]);
-        Assert.Equal(envelope.PolicyVersion, tags[OpenTelemetryGovernanceAttributes.PolicyVersion]);
-        Assert.Equal(envelope.PolicyHash, tags[OpenTelemetryGovernanceAttributes.PolicyHash]);
-        Assert.Equal(envelope.TraceId, tags[OpenTelemetryGovernanceAttributes.TraceId]);
-        Assert.Equal(envelope.SpanId, tags[OpenTelemetryGovernanceAttributes.SpanId]);
-        Assert.Equal(envelope.ParentSpanId, tags[OpenTelemetryGovernanceAttributes.ParentSpanId]);
-        Assert.Equal(envelope.GatewayExecutionId, tags[OpenTelemetryGovernanceAttributes.GatewayExecutionId]);
-        Assert.Equal(envelope.SchemaVersion, tags[OpenTelemetryGovernanceAttributes.SchemaVersion]);
-        Assert.Equal(envelope.EmitterStatus, tags[OpenTelemetryGovernanceAttributes.EmitterStatus]);
-        Assert.Equal(envelope.LifecycleStage?.ToString(), tags[OpenTelemetryGovernanceAttributes.LifecycleStage]);
-        Assert.Equal(envelope.LifecycleStageSequence?.ToString(System.Globalization.CultureInfo.InvariantCulture), tags[OpenTelemetryGovernanceAttributes.LifecycleStageSequence]);
+        Dictionary<string, object?> tags = activity.TagObjects.ToDictionary(static tag => tag.Key, static tag => tag.Value, StringComparer.Ordinal);
+        Assert.Equal(envelope.EnvelopeId, tags[OpenTelemetryGovernanceAttributes.EnvelopeId]?.ToString());
+        Assert.Equal(envelope.CorrelationId, tags[OpenTelemetryGovernanceAttributes.CorrelationId]?.ToString());
+        Assert.Equal(envelope.AuditResidueId, tags[OpenTelemetryGovernanceAttributes.AuditResidueId]?.ToString());
+        Assert.Equal(envelope.PolicyVersion, tags[OpenTelemetryGovernanceAttributes.PolicyVersion]?.ToString());
+        Assert.Equal(envelope.PolicyHash, tags[OpenTelemetryGovernanceAttributes.PolicyHash]?.ToString());
+        Assert.Equal(envelope.TraceId, tags[OpenTelemetryGovernanceAttributes.TraceId]?.ToString());
+        Assert.Equal(envelope.SpanId, tags[OpenTelemetryGovernanceAttributes.SpanId]?.ToString());
+        Assert.Equal(envelope.ParentSpanId, tags[OpenTelemetryGovernanceAttributes.ParentSpanId]?.ToString());
+        Assert.Equal(envelope.GatewayExecutionId, tags[OpenTelemetryGovernanceAttributes.GatewayExecutionId]?.ToString());
+        Assert.Equal(envelope.SchemaVersion, tags[OpenTelemetryGovernanceAttributes.SchemaVersion]?.ToString());
+        Assert.Equal(envelope.EmitterStatus, tags[OpenTelemetryGovernanceAttributes.EmitterStatus]?.ToString());
+        Assert.Equal(envelope.LifecycleStage?.ToString(), tags[OpenTelemetryGovernanceAttributes.LifecycleStage]?.ToString());
+        Assert.Equal(envelope.LifecycleStageSequence?.ToString(System.Globalization.CultureInfo.InvariantCulture), tags[OpenTelemetryGovernanceAttributes.LifecycleStageSequence]?.ToString());
     }
 
     /// <summary>
@@ -117,8 +117,8 @@ public sealed class OpenTelemetryGovernanceEmitterTests
 
         Assert.Equal(GovernanceEmissionStatus.RetryableFailure, result.Status);
         Assert.True(result.ShouldRetry);
-        Assert.NotNull(result.Error);
-        Assert.Equal("opentelemetry.emission.exception", result.Error.Code);
+        GovernanceEmissionError error = Assert.IsType<GovernanceEmissionError>(result.Error);
+        Assert.Equal("opentelemetry.emission.exception", error.Code);
         Assert.Equal(OpenTelemetryGovernanceInstrumentation.ProviderName, result.ProviderName);
     }
 

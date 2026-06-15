@@ -17,6 +17,31 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedService(
     IOptionsMonitor<AsiBackboneGovernanceOutboxDrainWorkerOptions> optionsMonitor,
     ILogger<AsiBackboneGovernanceOutboxDrainHostedService> logger) : BackgroundService
 {
+    private static readonly Action<ILogger, Exception?> LogShutdownDrainCanceled = LoggerMessage.Define(
+        LogLevel.Debug,
+        new EventId(19801, nameof(LogShutdownDrainCanceled)),
+        "Governance outbox shutdown drain was canceled.");
+
+    private static readonly Action<ILogger, Exception?> LogShutdownDrainFailed = LoggerMessage.Define(
+        LogLevel.Warning,
+        new EventId(19802, nameof(LogShutdownDrainFailed)),
+        "Governance outbox shutdown drain failed.");
+
+    private static readonly Action<ILogger, Exception?> LogWorkerDisabled = LoggerMessage.Define(
+        LogLevel.Debug,
+        new EventId(19803, nameof(LogWorkerDisabled)),
+        "Governance outbox drain worker is disabled.");
+
+    private static readonly Action<ILogger, int, Exception?> LogDrainAttempted = LoggerMessage.Define<int>(
+        LogLevel.Debug,
+        new EventId(19804, nameof(LogDrainAttempted)),
+        "Governance outbox drain attempted {DrainedCount} entries.");
+
+    private static readonly Action<ILogger, Exception?> LogWorkerFailed = LoggerMessage.Define(
+        LogLevel.Warning,
+        new EventId(19805, nameof(LogWorkerFailed)),
+        "Governance outbox drain worker failed before the next polling interval.");
+
     private readonly IServiceScopeFactory scopeFactory = scopeFactory ?? throw new ArgumentNullException(nameof(scopeFactory));
     private readonly IOptionsMonitor<AsiBackboneGovernanceOutboxDrainWorkerOptions> optionsMonitor = optionsMonitor ?? throw new ArgumentNullException(nameof(optionsMonitor));
     private readonly ILogger<AsiBackboneGovernanceOutboxDrainHostedService> logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -39,11 +64,11 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedService(
             }
             catch (OperationCanceledException) when (shutdownDrainCancellation.IsCancellationRequested)
             {
-                logger.LogDebug("Governance outbox shutdown drain was canceled.");
+                LogShutdownDrainCanceled(logger, null);
             }
             catch (Exception ex)
             {
-                logger.LogWarning(ex, "Governance outbox shutdown drain failed.");
+                LogShutdownDrainFailed(logger, ex);
             }
         }
     }
@@ -55,7 +80,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedService(
 
         if (!startupOptions.Enabled)
         {
-            logger.LogDebug("Governance outbox drain worker is disabled.");
+            LogWorkerDisabled(logger, null);
             return;
         }
 
@@ -72,7 +97,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedService(
             try
             {
                 int drainedCount = await DrainOnceAsync(options, stoppingToken).ConfigureAwait(false);
-                logger.LogDebug("Governance outbox drain attempted {DrainedCount} entries.", drainedCount);
+                LogDrainAttempted(logger, drainedCount, null);
                 await DelayAsync(options.PollingInterval, stoppingToken).ConfigureAwait(false);
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
@@ -81,7 +106,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedService(
             }
             catch (Exception ex)
             {
-                logger.LogWarning(ex, "Governance outbox drain worker failed before the next polling interval.");
+                LogWorkerFailed(logger, ex);
                 await DelayAsync(options.FailureDelay, stoppingToken).ConfigureAwait(false);
             }
         }

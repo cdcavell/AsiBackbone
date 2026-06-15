@@ -82,6 +82,9 @@
 - name: Privacy and Signing Boundaries
   href: privacy-and-signing-boundaries.md
 
+- name: Production Wording and Alpha Limitations
+  href: production-wording-and-alpha-limitations.md
+
 - name: Observability and Governance Emission Architecture
   href: observability-and-governance-emission-architecture.md
 

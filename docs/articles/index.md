@@ -27,6 +27,9 @@ Start with [Getting Started](getting-started.md), then use the navigation menu t
 * [Observability and Governance Emission Architecture](observability-and-governance-emission-architecture.md)
   Documents the `1.1.0` observability, outbox, and governance emission architecture direction, including Core-neutral provider seams, durable local/outbox persistence, OpenTelemetry, Azure Monitor, Event Hubs, Purview enrichment, DLP/classification failure behavior, signing limitations, and phased package boundaries.
 
+* [Audit Residue Observability Schema](audit-residue-observability-schema.md)
+  Documents the provider-neutral telemetry, traceability, outbox, emission, and PII-safe identifier fields added to audit residue for observability and governance emission providers.
+
 * [Historical Alpha Package Boundary](alpha-package-boundary.md)
   Documents the original `0.1.0-alpha.1` boundary for `CDCavell.AsiBackbone.Core`, including what belongs in Core and what belongs in integration packages.
 

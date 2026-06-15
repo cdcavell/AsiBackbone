@@ -32,7 +32,7 @@ AsiBackbone should be understood as **governance infrastructure**, not an intell
 
 ## Stable package family
 
-The `1.1.0` stable release covers the implemented package family below.
+The `1.0.0` stable release covers the currently published stable package family below. The `1.1.0` release notes document the additive observability, durable outbox, and governance emission provider boundary being prepared for the next minor release.
 
 | Package | NuGet | Downloads |
 | :--- | :--- | :--- |
@@ -40,9 +40,8 @@ The `1.1.0` stable release covers the implemented package family below.
 | AspNetCore | [![NuGet AspNetCore](https://img.shields.io/nuget/v/CDCavell.AsiBackbone.AspNetCore?label=Release)](https://www.nuget.org/packages/CDCavell.AsiBackbone.AspNetCore) | [![NuGet AspNetCore Downloads](https://img.shields.io/nuget/dt/CDCavell.AsiBackbone.AspNetCore?label=Downloads)](https://www.nuget.org/packages/CDCavell.AsiBackbone.AspNetCore) |
 | Storage.InMemory | [![NuGet Storage.InMemory](https://img.shields.io/nuget/v/CDCavell.AsiBackbone.Storage.InMemory?label=Release)](https://www.nuget.org/packages/CDCavell.AsiBackbone.Storage.InMemory) | [![NuGet Storage.InMemory Downloads](https://img.shields.io/nuget/dt/CDCavell.AsiBackbone.Storage.InMemory?label=Downloads)](https://www.nuget.org/packages/CDCavell.AsiBackbone.Storage.InMemory) |
 | EntityFrameworkCore | [![NuGet EntityFrameworkCore](https://img.shields.io/nuget/v/CDCavell.AsiBackbone.EntityFrameworkCore?label=Release)](https://www.nuget.org/packages/CDCavell.AsiBackbone.EntityFrameworkCore) | [![NuGet EntityFrameworkCore Downloads](https://img.shields.io/nuget/dt/CDCavell.AsiBackbone.EntityFrameworkCore?label=Downloads)](https://www.nuget.org/packages/CDCavell.AsiBackbone.EntityFrameworkCore) |
-| OpenTelemetry | [![NuGet OpenTelemetry](https://img.shields.io/nuget/v/CDCavell.AsiBackbone.OpenTelemetry?label=Release)](https://www.nuget.org/packages/CDCavell.AsiBackbone.OpenTelemetry) | [![NuGet OpenTelemetry Downloads](https://img.shields.io/nuget/dt/CDCavell.AsiBackbone.OpenTelemetry?label=Downloads)](https://www.nuget.org/packages/CDCavell.AsiBackbone.OpenTelemetry) |
 
-Future Event Hubs, Purview, Azure-specific, signing-provider, gateway, robotics, or immutable-storage packages are not part of the `1.1.0` stable contract unless separately released as stable packages.
+Future OpenTelemetry, Event Hubs, Purview, Azure-specific, signing-provider, gateway, robotics, or immutable-storage packages are not part of the `1.0.0` stable contract unless separately released as stable packages.
 
 ## What problem does this solve?
 
@@ -87,7 +86,7 @@ Core benefits include:
 | Audit residue | Decisions can preserve reason codes, policy version, policy hash, correlation ID, timestamp, and metadata. |
 | Durable outbox baseline | Governance events can be preserved locally before optional downstream provider emission. |
 | Capability-scoped execution | Follow-on execution can be represented as a short-lived, scoped permission grant. |
-| OpenTelemetry projection | Governance envelopes can be projected into host-configured OpenTelemetry pipelines without binding Core to a cloud provider. |
+| OpenTelemetry projection | Governance envelopes can be projected into host-configured OpenTelemetry pipelines without binding Core to a cloud provider when the optional provider package is adopted. |
 | Host-owned integration | Applications keep ownership of the web host, persistence lifecycle, migrations, deployment, exporter configuration, and execution behavior. |
 | Framework-neutral core | Core primitives can be used without requiring ASP.NET Core, EF Core, NetCoreApplicationTemplate, AI packages, robotics dependencies, or observability providers. |
 
@@ -122,31 +121,31 @@ The host application remains responsible for execution behavior and operational 
 
 ## Current status
 
-Stable `1.1.0` package family.
+Stable `1.0.0` package family.
 
-The repository includes the Core foundation, in-memory validation storage, EF Core host-owned audit/outbox persistence, ASP.NET Core integration, hosted governance outbox drain support, OpenTelemetry governance emission provider, samples, release validation, and host-validation documentation. Planned follow-up milestones may include concrete signing providers, Event Hubs or Purview provider packages, gateway integrations, robotics examples, and future provider packages after their own package-boundary reviews.
+The repository includes the Core foundation, in-memory validation storage, EF Core host-owned persistence, ASP.NET Core integration, samples, release validation, and host-validation documentation. Planned follow-up release documentation for `1.1.0` covers durable outbox persistence, hosted governance outbox drain support, OpenTelemetry governance emission provider usage, concrete signing-provider deferrals, Event Hubs or Purview provider strategy, gateway integrations, robotics examples, and future provider packages after their own package-boundary reviews.
 
 ## Package roles
 
 ### CDCavell.AsiBackbone.Core
 
-Defines framework-neutral domain abstractions and primitives, including provider-neutral governance emission, durable outbox, DLP/classification policy, and signing-ready metadata seams.
+Defines framework-neutral domain abstractions and primitives. `1.1.0` release guidance documents additive provider-neutral governance emission, durable outbox, DLP/classification policy, and signing-ready metadata seams.
 
 ### CDCavell.AsiBackbone.Storage.InMemory
 
-Provides non-durable in-memory storage helpers for local validation, samples, tests, lifecycle stores, and outbox proof paths. It should not be used as durable production storage.
+Provides non-durable in-memory storage helpers for local validation, samples, and tests. `1.1.0` release guidance documents additional lifecycle and outbox proof paths. It should not be used as durable production storage.
 
 ### CDCavell.AsiBackbone.EntityFrameworkCore
 
-Provides EF Core model contributions and audit ledger, audit residue lifecycle, and durable governance outbox persistence integration. The host application owns the `DbContext`, provider, connection string, migrations, deployment, retention, and schema lifecycle.
+Provides EF Core model contributions and audit ledger persistence integration. The host application owns the `DbContext`, provider, connection string, migrations, deployment, retention, and schema lifecycle. `1.1.0` release guidance documents durable audit lifecycle and governance outbox persistence.
 
 ### CDCavell.AsiBackbone.AspNetCore
 
-Provides ASP.NET Core host integration seams for service registration, request correlation, audit enrichment, HTTP result mapping, acknowledgment challenge helpers, and hosted outbox drain integration.
+Provides ASP.NET Core host integration seams for service registration, request correlation, audit enrichment, HTTP result mapping, and acknowledgment challenge helpers. `1.1.0` release guidance documents hosted outbox drain integration.
 
 ### CDCavell.AsiBackbone.OpenTelemetry
 
-Provides the concrete OpenTelemetry governance emission provider. It projects provider-neutral governance envelopes into `ActivitySource` activity events, stable `asibackbone.*` tags, and `Meter` metrics. Exporters such as Azure Monitor remain host-configured.
+`1.1.0` release guidance documents the optional OpenTelemetry governance emission provider package. It projects provider-neutral governance envelopes into `ActivitySource` activity events, stable `asibackbone.*` tags, and `Meter` metrics. Exporters such as Azure Monitor remain host-configured.
 
 ## Documentation
 

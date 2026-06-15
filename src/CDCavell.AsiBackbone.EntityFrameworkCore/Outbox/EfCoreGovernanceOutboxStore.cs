@@ -39,7 +39,7 @@ public sealed class EfCoreGovernanceOutboxStore : IAsiBackboneGovernanceOutboxSt
         ArgumentNullException.ThrowIfNull(envelope);
         cancellationToken.ThrowIfCancellationRequested();
 
-        GovernanceOutboxEntry entry = GovernanceOutboxEntry.Create(envelope);
+        var entry = GovernanceOutboxEntry.Create(envelope);
 
         _ = await dbContext
             .Set<AsiBackboneGovernanceOutboxEntryEntity>()
@@ -279,7 +279,7 @@ public sealed class EfCoreGovernanceOutboxStore : IAsiBackboneGovernanceOutboxSt
                 entity.EnvelopePayloadSizeBytes,
                 DeserializeMetadata(entity.EnvelopePayloadMetadataJson));
 
-        GovernanceEmissionEnvelope envelope = GovernanceEmissionEnvelope.Create(
+        var envelope = GovernanceEmissionEnvelope.Create(
             entity.EnvelopeEventType,
             entity.EnvelopeEventId,
             entity.EnvelopeOccurredUtc,

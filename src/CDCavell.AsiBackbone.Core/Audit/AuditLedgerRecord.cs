@@ -331,37 +331,25 @@ public sealed class AuditLedgerRecord : IAsiBackboneAuditResidue
 
     private static long? NormalizeNonNegative(long? value, string parameterName)
     {
-        if (value < 0)
-        {
-            throw new ArgumentOutOfRangeException(parameterName, value, "Value must be greater than or equal to zero.");
-        }
-
-        return value;
+        return value < 0
+            ? throw new ArgumentOutOfRangeException(parameterName, value, "Value must be greater than or equal to zero.")
+            : value;
     }
 
     private static int? NormalizeNonNegative(int? value, string parameterName)
     {
-        if (value < 0)
-        {
-            throw new ArgumentOutOfRangeException(parameterName, value, "Value must be greater than or equal to zero.");
-        }
-
-        return value;
+        return value < 0
+            ? throw new ArgumentOutOfRangeException(parameterName, value, "Value must be greater than or equal to zero.")
+            : value;
     }
 
     private static double? NormalizeRiskScore(double? riskScore)
     {
-        if (riskScore is null)
-        {
-            return null;
-        }
-
-        if (double.IsNaN(riskScore.Value) || double.IsInfinity(riskScore.Value) || riskScore.Value < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(riskScore), riskScore, "Risk score must be a finite value greater than or equal to zero.");
-        }
-
-        return riskScore;
+        return riskScore is null
+            ? null
+            : double.IsNaN(riskScore.Value) || double.IsInfinity(riskScore.Value) || riskScore.Value < 0
+            ? throw new ArgumentOutOfRangeException(nameof(riskScore), riskScore, "Risk score must be a finite value greater than or equal to zero.")
+            : riskScore;
     }
 
     private static ReadOnlyCollection<string> NormalizeReasonCodes(IEnumerable<string>? reasonCodes)

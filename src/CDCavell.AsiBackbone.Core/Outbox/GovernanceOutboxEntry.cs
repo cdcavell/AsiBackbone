@@ -1,0 +1,353 @@
+using System.Collections.ObjectModel;
+using CDCavell.AsiBackbone.Core.Emissions;
+
+namespace CDCavell.AsiBackbone.Core.Outbox;
+
+/// <summary>
+/// Represents a provider-neutral durable outbox entry for a governance emission envelope.
+/// </summary>
+/// <remarks>
+/// Outbox entries are intended to be persisted before optional downstream provider delivery is attempted.
+/// </remarks>
+public sealed class GovernanceOutboxEntry
+{
+    private const int DefaultMaxRetryCount = 5;
+
+    private static readonly IReadOnlyDictionary<string, string> EmptyMetadata =
+        new ReadOnlyDictionary<string, string>(
+            new Dictionary<string, string>(StringComparer.Ordinal));
+
+    private GovernanceOutboxEntry(
+        string outboxEntryId,
+        GovernanceEmissionEnvelope envelope,
+        GovernanceEmissionStatus status,
+        DateTimeOffset createdUtc,
+        DateTimeOffset updatedUtc,
+        int retryCount,
+        int maxRetryCount,
+        DateTimeOffset? nextRetryUtc,
+        GovernanceEmissionError? lastError,
+        string? providerName,
+        string? providerRecordId,
+        string? deadLetterReason,
+        IReadOnlyDictionary<string, string> metadata)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(outboxEntryId);
+        ArgumentNullException.ThrowIfNull(envelope);
+
+        if (!Enum.IsDefined(status))
+        {
+            throw new ArgumentOutOfRangeException(nameof(status), status, "Outbox status must be defined.");
+        }
+
+        if (retryCount < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(retryCount), retryCount, "Retry count must be greater than or equal to zero.");
+        }
+
+        if (maxRetryCount < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(maxRetryCount), maxRetryCount, "Maximum retry count must be greater than or equal to zero.");
+        }
+
+        OutboxEntryId = outboxEntryId.Trim();
+        Envelope = envelope;
+        Status = status;
+        CreatedUtc = createdUtc.ToUniversalTime();
+        UpdatedUtc = updatedUtc.ToUniversalTime();
+        RetryCount = retryCount;
+        MaxRetryCount = maxRetryCount;
+        NextRetryUtc = nextRetryUtc?.ToUniversalTime();
+        LastError = lastError;
+        ProviderName = NormalizeOptional(providerName);
+        ProviderRecordId = NormalizeOptional(providerRecordId);
+        DeadLetterReason = NormalizeOptional(deadLetterReason);
+        Metadata = metadata;
+    }
+
+    /// <summary>
+    /// Gets the stable outbox entry identifier.
+    /// </summary>
+    public string OutboxEntryId { get; }
+
+    /// <summary>
+    /// Gets the provider-neutral governance emission envelope being persisted for delivery.
+    /// </summary>
+    public GovernanceEmissionEnvelope Envelope { get; }
+
+    /// <summary>
+    /// Gets the current provider-neutral outbox status.
+    /// </summary>
+    public GovernanceEmissionStatus Status { get; }
+
+    /// <summary>
+    /// Gets the UTC timestamp when the outbox entry was created.
+    /// </summary>
+    public DateTimeOffset CreatedUtc { get; }
+
+    /// <summary>
+    /// Gets the UTC timestamp when the outbox entry was last updated.
+    /// </summary>
+    public DateTimeOffset UpdatedUtc { get; }
+
+    /// <summary>
+    /// Gets the number of failed or deferred delivery attempts recorded for this entry.
+    /// </summary>
+    public int RetryCount { get; }
+
+    /// <summary>
+    /// Gets the maximum retry count before the entry should transition to dead-lettered.
+    /// </summary>
+    public int MaxRetryCount { get; }
+
+    /// <summary>
+    /// Gets the next UTC retry timestamp, when retry scheduling is active.
+    /// </summary>
+    public DateTimeOffset? NextRetryUtc { get; }
+
+    /// <summary>
+    /// Gets the last provider-neutral emission error, when available.
+    /// </summary>
+    public GovernanceEmissionError? LastError { get; }
+
+    /// <summary>
+    /// Gets the provider name associated with the most recent attempt, when available.
+    /// </summary>
+    public string? ProviderName { get; }
+
+    /// <summary>
+    /// Gets the provider-side record identifier, when delivery returned one and it is safe to store.
+    /// </summary>
+    public string? ProviderRecordId { get; }
+
+    /// <summary>
+    /// Gets the dead-letter reason, when the entry has reached a terminal dead-letter state.
+    /// </summary>
+    public string? DeadLetterReason { get; }
+
+    /// <summary>
+    /// Gets minimized provider-neutral outbox metadata.
+    /// </summary>
+    public IReadOnlyDictionary<string, string> Metadata { get; }
+
+    /// <summary>
+    /// Gets a value indicating whether this entry was delivered successfully.
+    /// </summary>
+    public bool IsDelivered => Status is GovernanceEmissionStatus.Delivered;
+
+    /// <summary>
+    /// Gets a value indicating whether this entry has reached a terminal dead-letter state.
+    /// </summary>
+    public bool IsDeadLettered => Status is GovernanceEmissionStatus.DeadLettered;
+
+    /// <summary>
+    /// Gets a value indicating whether metadata is present.
+    /// </summary>
+    public bool HasMetadata => Metadata.Count > 0;
+
+    /// <summary>
+    /// Creates a pending durable governance outbox entry.
+    /// </summary>
+    public static GovernanceOutboxEntry Create(
+        GovernanceEmissionEnvelope envelope,
+        string? outboxEntryId = null,
+        DateTimeOffset? createdUtc = null,
+        int maxRetryCount = DefaultMaxRetryCount,
+        IReadOnlyDictionary<string, string>? metadata = null)
+    {
+        DateTimeOffset timestamp = createdUtc ?? DateTimeOffset.UtcNow;
+
+        return new GovernanceOutboxEntry(
+            NormalizeIdentifier(outboxEntryId),
+            envelope,
+            GovernanceEmissionStatus.Pending,
+            timestamp,
+            timestamp,
+            retryCount: 0,
+            maxRetryCount,
+            nextRetryUtc: null,
+            lastError: null,
+            providerName: null,
+            providerRecordId: null,
+            deadLetterReason: null,
+            NormalizeMetadata(metadata));
+    }
+
+    /// <summary>
+    /// Determines whether the entry is ready for retry at the supplied UTC timestamp.
+    /// </summary>
+    public bool IsRetryReady(DateTimeOffset utcNow)
+    {
+        return !IsDelivered && !IsDeadLettered && RetryCount < MaxRetryCount && Status is GovernanceEmissionStatus.Deferred or GovernanceEmissionStatus.Failed or GovernanceEmissionStatus.RetryableFailure && (NextRetryUtc is null || NextRetryUtc <= utcNow.ToUniversalTime());
+    }
+
+    /// <summary>
+    /// Returns a delivered copy of this entry.
+    /// </summary>
+    public GovernanceOutboxEntry MarkDelivered(
+        GovernanceEmissionResult result,
+        DateTimeOffset? updatedUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(result);
+
+        return !result.IsSuccess
+            ? throw new ArgumentException("Delivered outbox transitions require a successful emission result.", nameof(result))
+            : Copy(
+            GovernanceEmissionStatus.Delivered,
+            updatedUtc,
+            retryCount: RetryCount,
+            nextRetryUtc: null,
+            lastError: null,
+            providerName: result.ProviderName,
+            providerRecordId: result.ProviderRecordId,
+            deadLetterReason: null,
+            metadata: MergeMetadata(Metadata, result.Metadata));
+    }
+
+    /// <summary>
+    /// Returns a failed or retryable-failure copy of this entry.
+    /// </summary>
+    public GovernanceOutboxEntry MarkFailed(
+        GovernanceEmissionError governanceEmissionError,
+        DateTimeOffset? nextRetryUtc = null,
+        DateTimeOffset? updatedUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(governanceEmissionError);
+
+        int nextRetryCount = RetryCount + 1;
+        GovernanceEmissionStatus nextStatus = nextRetryCount >= MaxRetryCount
+            ? GovernanceEmissionStatus.DeadLettered
+            : governanceEmissionError.IsRetryable
+                ? GovernanceEmissionStatus.RetryableFailure
+                : GovernanceEmissionStatus.Failed;
+
+        return Copy(
+            nextStatus,
+            updatedUtc,
+            nextRetryCount,
+            nextStatus is GovernanceEmissionStatus.DeadLettered ? null : nextRetryUtc,
+            governanceEmissionError,
+            governanceEmissionError.ProviderName,
+            providerRecordId: null,
+            nextStatus is GovernanceEmissionStatus.DeadLettered ? governanceEmissionError.Message : null,
+            Metadata);
+    }
+
+    /// <summary>
+    /// Returns a deferred copy of this entry.
+    /// </summary>
+    public GovernanceOutboxEntry MarkDeferred(
+        GovernanceEmissionError? governanceEmissionError = null,
+        DateTimeOffset? nextRetryUtc = null,
+        DateTimeOffset? updatedUtc = null)
+    {
+        return Copy(
+            GovernanceEmissionStatus.Deferred,
+            updatedUtc,
+            retryCount: RetryCount,
+            nextRetryUtc,
+            governanceEmissionError,
+            governanceEmissionError?.ProviderName,
+            providerRecordId: null,
+            deadLetterReason: null,
+            metadata: Metadata);
+    }
+
+    /// <summary>
+    /// Returns a dead-lettered copy of this entry.
+    /// </summary>
+    public GovernanceOutboxEntry MarkDeadLettered(
+        GovernanceEmissionError governanceEmissionError,
+        string? deadLetterReason = null,
+        DateTimeOffset? updatedUtc = null)
+    {
+        ArgumentNullException.ThrowIfNull(governanceEmissionError);
+
+        return Copy(
+            GovernanceEmissionStatus.DeadLettered,
+            updatedUtc,
+            retryCount: RetryCount,
+            nextRetryUtc: null,
+            lastError: governanceEmissionError,
+            providerName: governanceEmissionError.ProviderName,
+            providerRecordId: null,
+            deadLetterReason: deadLetterReason ?? governanceEmissionError.Message,
+            metadata: Metadata);
+    }
+
+    private GovernanceOutboxEntry Copy(
+        GovernanceEmissionStatus status,
+        DateTimeOffset? updatedUtc,
+        int retryCount,
+        DateTimeOffset? nextRetryUtc,
+        GovernanceEmissionError? lastError,
+        string? providerName,
+        string? providerRecordId,
+        string? deadLetterReason,
+        IReadOnlyDictionary<string, string> metadata)
+    {
+        return new GovernanceOutboxEntry(
+            OutboxEntryId,
+            Envelope,
+            status,
+            CreatedUtc,
+            updatedUtc ?? DateTimeOffset.UtcNow,
+            retryCount,
+            MaxRetryCount,
+            nextRetryUtc,
+            lastError,
+            providerName,
+            providerRecordId,
+            deadLetterReason,
+            metadata);
+    }
+
+    private static string NormalizeIdentifier(string? identifier)
+    {
+        return string.IsNullOrWhiteSpace(identifier)
+            ? Guid.NewGuid().ToString("N")
+            : identifier.Trim();
+    }
+
+    private static string? NormalizeOptional(string? value)
+    {
+        return string.IsNullOrWhiteSpace(value)
+            ? null
+            : value.Trim();
+    }
+
+    private static IReadOnlyDictionary<string, string> MergeMetadata(
+        IReadOnlyDictionary<string, string> originalMetadata,
+        IReadOnlyDictionary<string, string> resultMetadata)
+    {
+        return NormalizeMetadata(originalMetadata, resultMetadata);
+    }
+
+    private static IReadOnlyDictionary<string, string> NormalizeMetadata(
+        params IReadOnlyDictionary<string, string>?[] metadataSets)
+    {
+        Dictionary<string, string> normalizedMetadata = new(StringComparer.Ordinal);
+
+        foreach (IReadOnlyDictionary<string, string>? metadata in metadataSets)
+        {
+            if (metadata is null || metadata.Count == 0)
+            {
+                continue;
+            }
+
+            foreach (KeyValuePair<string, string> item in metadata)
+            {
+                if (string.IsNullOrWhiteSpace(item.Key))
+                {
+                    continue;
+                }
+
+                normalizedMetadata[item.Key.Trim()] = item.Value?.Trim() ?? string.Empty;
+            }
+        }
+
+        return normalizedMetadata.Count == 0
+            ? EmptyMetadata
+            : new ReadOnlyDictionary<string, string>(normalizedMetadata);
+    }
+}

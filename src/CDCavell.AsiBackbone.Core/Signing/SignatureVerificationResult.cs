@@ -58,9 +58,9 @@ public sealed class SignatureVerificationResult
     /// <summary>
     /// Creates a result indicating that no signature metadata was available to verify.
     /// </summary>
-    public static SignatureVerificationResult Unsigned(string? failureMessage = null)
+    public static SignatureVerificationResult MissingSignature(string? failureMessage = null)
     {
-        return new SignatureVerificationResult(false, "Unsigned", "signature.missing", failureMessage);
+        return new SignatureVerificationResult(false, "MissingSignature", "signature.missing", failureMessage);
     }
 
     private static string? NormalizeOptional(string? value)

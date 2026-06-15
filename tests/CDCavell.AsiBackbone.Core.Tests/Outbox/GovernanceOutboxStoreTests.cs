@@ -68,7 +68,7 @@ public sealed class GovernanceOutboxStoreTests
             entry.OutboxEntryId,
             error,
             nextRetryUtc: DateTimeOffset.UtcNow.AddMinutes(5),
-            TestContext.Current.CancellationToken);
+            cancellationToken: TestContext.Current.CancellationToken);
 
         AuditResidueLifecycleEvent? storedLifecycleEvent = await lifecycleStore.FindByEventIdAsync(
             "lifecycle-1",

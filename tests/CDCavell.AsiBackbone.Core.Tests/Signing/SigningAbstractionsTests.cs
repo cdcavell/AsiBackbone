@@ -57,7 +57,7 @@ public sealed class SigningAbstractionsTests
             keyId: "dev-key",
             keyVersion: "2026-06");
 
-        SigningResult result = await signer.SignAsync(request);
+        SigningResult result = await signer.SignAsync(request, TestContext.Current.CancellationToken);
 
         Assert.True(result.IsSigned);
         Assert.Equal("audit-hash-123", result.Metadata.SigningHash);
@@ -72,7 +72,7 @@ public sealed class SigningAbstractionsTests
     [Fact]
     public async Task FakeVerifierValidatesProviderNeutralSigningMetadata()
     {
-        SigningMetadata metadata = SigningMetadata.Create(
+        var metadata = SigningMetadata.Create(
             signingHash: "audit-hash-123",
             hashAlgorithm: "custom-hash",
             signature: "fake-signature:audit-hash-123",
@@ -84,7 +84,7 @@ public sealed class SigningAbstractionsTests
         IAsiBackboneSignatureVerificationService verifier = new FakeVerificationService();
         var request = new SignatureVerificationRequest("audit-hash-123", metadata);
 
-        SignatureVerificationResult result = await verifier.VerifyAsync(request);
+        SignatureVerificationResult result = await verifier.VerifyAsync(request, TestContext.Current.CancellationToken);
 
         Assert.True(result.IsValid);
         Assert.Equal("Verified", result.Status);
@@ -96,7 +96,7 @@ public sealed class SigningAbstractionsTests
     {
         var actor = AsiBackboneActorContext.Service("system-1", "System");
         DateTimeOffset signedUtc = new(2026, 6, 15, 9, 30, 0, TimeSpan.FromHours(-5));
-        AuditResidue residue = AuditResidue.Create(
+        var residue = AuditResidue.Create(
             actor,
             "gateway.execute",
             "Allowed",
@@ -104,7 +104,7 @@ public sealed class SigningAbstractionsTests
             policyVersion: "policy-v1",
             policyHash: "policy-hash");
 
-        AuditLedgerRecord record = AuditLedgerRecord.FromResidue(
+        var record = AuditLedgerRecord.FromResidue(
             residue,
             capabilityTokenId: " capability-token-1 ",
             recordHash: " record-hash ",
@@ -137,7 +137,7 @@ public sealed class SigningAbstractionsTests
             ArgumentNullException.ThrowIfNull(request);
             cancellationToken.ThrowIfCancellationRequested();
 
-            SigningMetadata metadata = SigningMetadata.Create(
+            var metadata = SigningMetadata.Create(
                 signingHash: request.SigningHash,
                 hashAlgorithm: request.HashAlgorithm,
                 signature: $"fake-signature:{request.SigningHash}",

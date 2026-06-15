@@ -3,6 +3,7 @@
     <Project Path="src/CDCavell.AsiBackbone.AspNetCore/CDCavell.AsiBackbone.AspNetCore.csproj" />
     <Project Path="src/CDCavell.AsiBackbone.Core/CDCavell.AsiBackbone.Core.csproj" />
     <Project Path="src/CDCavell.AsiBackbone.EntityFrameworkCore/CDCavell.AsiBackbone.EntityFrameworkCore.csproj" />
+    <Project Path="src/CDCavell.AsiBackbone.OpenTelemetry/CDCavell.AsiBackbone.OpenTelemetry.csproj" />
     <Project Path="src/CDCavell.AsiBackbone.Storage.InMemory/CDCavell.AsiBackbone.Storage.InMemory.csproj" />
   </Folder>
   <Folder Name="/samples/">
@@ -12,5 +13,6 @@
     <Project Path="tests/CDCavell.AsiBackbone.AspNetCore.Tests/CDCavell.AsiBackbone.AspNetCore.Tests.csproj" />
     <Project Path="tests/CDCavell.AsiBackbone.Core.Tests/CDCavell.AsiBackbone.Core.Tests.csproj" />
     <Project Path="tests/CDCavell.AsiBackbone.EntityFrameworkCore.Tests/CDCavell.AsiBackbone.EntityFrameworkCore.Tests.csproj" />
+    <Project Path="tests/CDCavell.AsiBackbone.OpenTelemetry.Tests/CDCavell.AsiBackbone.OpenTelemetry.Tests.csproj" />
   </Folder>
 </Solution>

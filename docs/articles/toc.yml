@@ -79,6 +79,9 @@
 - name: Observability and Governance Emission Architecture
   href: observability-and-governance-emission-architecture.md
 
+- name: OpenTelemetry Governance Emission Provider
+  href: opentelemetry-governance-emission-provider.md
+
 - name: DLP and Classification Failure Policy
   href: dlp-classification-failure-policy.md
 

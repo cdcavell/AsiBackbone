@@ -367,12 +367,9 @@ public sealed class GovernanceEmissionEnvelope
 
     private static long? NormalizeNonNegative(long? value, string parameterName)
     {
-        if (value < 0)
-        {
-            throw new ArgumentOutOfRangeException(parameterName, value, "Value must be greater than or equal to zero.");
-        }
-
-        return value;
+        return value < 0
+            ? throw new ArgumentOutOfRangeException(parameterName, value, "Value must be greater than or equal to zero.")
+            : value;
     }
 
     private static IReadOnlyDictionary<string, string> NormalizeMetadata(

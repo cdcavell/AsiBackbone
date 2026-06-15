@@ -96,12 +96,9 @@ public sealed class GovernanceEmissionPayload
 
     private static long? NormalizeSizeBytes(long? sizeBytes)
     {
-        if (sizeBytes < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(sizeBytes), sizeBytes, "Payload size must be greater than or equal to zero.");
-        }
-
-        return sizeBytes;
+        return sizeBytes < 0
+            ? throw new ArgumentOutOfRangeException(nameof(sizeBytes), sizeBytes, "Payload size must be greater than or equal to zero.")
+            : sizeBytes;
     }
 
     private static IReadOnlyDictionary<string, string> NormalizeMetadata(

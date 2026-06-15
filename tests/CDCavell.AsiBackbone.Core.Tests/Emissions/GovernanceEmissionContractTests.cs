@@ -59,7 +59,7 @@ public sealed class GovernanceEmissionContractTests
     [Fact]
     public void FromResiduePreservesCorrelationTracePolicyAndTelemetryFields()
     {
-        GovernanceEmissionPayload payload = GovernanceEmissionPayload.Create(
+        var payload = GovernanceEmissionPayload.Create(
             "audit-residue",
             schemaVersion: "1.1-test",
             contentType: "application/json",
@@ -70,7 +70,7 @@ public sealed class GovernanceEmissionContractTests
                 ["classification"] = "minimized"
             });
 
-        AuditResidue residue = AuditResidue.Create(
+        var residue = AuditResidue.Create(
             AsiBackboneActorContext.Service(" service-123 "),
             " document.approve ",
             " Allowed ",
@@ -130,7 +130,7 @@ public sealed class GovernanceEmissionContractTests
     [Fact]
     public void FromLifecycleEventPreservesLifecycleStageAndCorrelation()
     {
-        AuditResidueLifecycleEvent lifecycleEvent = AuditResidueLifecycleEvent.Create(
+        var lifecycleEvent = AuditResidueLifecycleEvent.Create(
             AuditResidueLifecycleStage.ExternalEmissionFailed,
             " correlation-123 ",
             auditResidueId: " residue-123 ",
@@ -143,7 +143,7 @@ public sealed class GovernanceEmissionContractTests
                 ["attempt"] = "1"
             });
 
-        GovernanceEmissionEnvelope envelope = GovernanceEmissionEnvelope.FromLifecycleEvent(
+        var envelope = GovernanceEmissionEnvelope.FromLifecycleEvent(
             lifecycleEvent,
             envelopeId: " envelope-123 ",
             metadata: new Dictionary<string, string>
@@ -171,19 +171,19 @@ public sealed class GovernanceEmissionContractTests
     [Fact]
     public void ResultFactoriesMapProviderNeutralStatuses()
     {
-        GovernanceEmissionResult delivered = GovernanceEmissionResult.Delivered(
+        var delivered = GovernanceEmissionResult.Delivered(
             providerName: "file",
             providerRecordId: "provider-record-123");
-        GovernanceEmissionResult deferred = GovernanceEmissionResult.Deferred(
+        var deferred = GovernanceEmissionResult.Deferred(
             retryAfterUtc: new DateTimeOffset(2026, 6, 15, 15, 0, 0, TimeSpan.FromHours(-5)));
-        GovernanceEmissionError retryError = GovernanceEmissionError.Create(
+        var retryError = GovernanceEmissionError.Create(
             "provider.timeout",
             "Provider timed out.",
             isRetryable: true,
             providerName: "siem",
             providerErrorCode: "timeout");
-        GovernanceEmissionResult retryableFailure = GovernanceEmissionResult.RetryableFailure(retryError);
-        GovernanceEmissionResult deadLettered = GovernanceEmissionResult.DeadLettered(
+        var retryableFailure = GovernanceEmissionResult.RetryableFailure(retryError);
+        var deadLettered = GovernanceEmissionResult.DeadLettered(
             GovernanceEmissionError.Create("provider.rejected", "Provider rejected the minimized envelope."));
 
         Assert.True(delivered.IsSuccess);
@@ -214,7 +214,7 @@ public sealed class GovernanceEmissionContractTests
     public async Task EmitterContractAcceptsEnvelopeAndReturnsResult()
     {
         var emitter = new CapturingGovernanceEmitter();
-        GovernanceEmissionEnvelope envelope = GovernanceEmissionEnvelope.Create(
+        var envelope = GovernanceEmissionEnvelope.Create(
             GovernanceEmissionEventType.Outbox,
             eventId: "outbox-123",
             correlationId: "correlation-123");

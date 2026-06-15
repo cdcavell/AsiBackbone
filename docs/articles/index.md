@@ -27,6 +27,9 @@ Start with [Getting Started](getting-started.md), then use the navigation menu t
 * [Observability and Governance Emission Architecture](observability-and-governance-emission-architecture.md)
   Documents the `1.1.0` observability, outbox, and governance emission architecture direction, including Core-neutral provider seams, durable local/outbox persistence, OpenTelemetry, Azure Monitor, Event Hubs, Purview enrichment, DLP/classification failure behavior, signing limitations, and phased package boundaries.
 
+* [OpenTelemetry Governance Emission Provider](opentelemetry-governance-emission-provider.md)
+  Documents the concrete `CDCavell.AsiBackbone.OpenTelemetry` provider package, envelope-to-activity/metric mappings, Azure Monitor-through-exporter guidance, and decision -> outbox -> drain -> OpenTelemetry flow.
+
 * [DLP and Classification Failure Policy](dlp-classification-failure-policy.md)
   Documents the provider-neutral Core policy model for DLP/classification service outages, timeouts, indeterminate results, blocked/classified results, and risk-based fail-open/fail-closed behavior.
 

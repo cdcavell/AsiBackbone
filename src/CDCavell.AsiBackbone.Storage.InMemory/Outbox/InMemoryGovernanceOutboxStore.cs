@@ -114,16 +114,16 @@ public sealed class InMemoryGovernanceOutboxStore : IAsiBackboneGovernanceOutbox
     /// <inheritdoc />
     public async ValueTask<GovernanceOutboxEntry> MarkFailedAsync(
         string outboxEntryId,
-        GovernanceEmissionError error,
+        GovernanceEmissionError governanceEmissionError,
         DateTimeOffset? nextRetryUtc = null,
         CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(outboxEntryId);
-        ArgumentNullException.ThrowIfNull(error);
+        ArgumentNullException.ThrowIfNull(governanceEmissionError);
         cancellationToken.ThrowIfCancellationRequested();
 
         GovernanceOutboxEntry entry = await RequireEntryAsync(outboxEntryId, cancellationToken).ConfigureAwait(false);
-        GovernanceOutboxEntry updatedEntry = entry.MarkFailed(error, nextRetryUtc);
+        GovernanceOutboxEntry updatedEntry = entry.MarkFailed(governanceEmissionError, nextRetryUtc);
 
         entries[updatedEntry.OutboxEntryId] = updatedEntry;
 
@@ -133,16 +133,16 @@ public sealed class InMemoryGovernanceOutboxStore : IAsiBackboneGovernanceOutbox
     /// <inheritdoc />
     public async ValueTask<GovernanceOutboxEntry> MarkDeadLetteredAsync(
         string outboxEntryId,
-        GovernanceEmissionError error,
+        GovernanceEmissionError governanceEmissionError,
         string? deadLetterReason = null,
         CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(outboxEntryId);
-        ArgumentNullException.ThrowIfNull(error);
+        ArgumentNullException.ThrowIfNull(governanceEmissionError);
         cancellationToken.ThrowIfCancellationRequested();
 
         GovernanceOutboxEntry entry = await RequireEntryAsync(outboxEntryId, cancellationToken).ConfigureAwait(false);
-        GovernanceOutboxEntry updatedEntry = entry.MarkDeadLettered(error, deadLetterReason);
+        GovernanceOutboxEntry updatedEntry = entry.MarkDeadLettered(governanceEmissionError, deadLetterReason);
 
         entries[updatedEntry.OutboxEntryId] = updatedEntry;
 

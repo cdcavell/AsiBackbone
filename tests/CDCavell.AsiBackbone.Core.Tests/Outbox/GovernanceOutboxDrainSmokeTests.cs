@@ -131,14 +131,9 @@ public sealed class GovernanceOutboxDrainSmokeTests
             });
     }
 
-    private sealed class ResultEmitter : IAsiBackboneGovernanceEmitter
+    private sealed class ResultEmitter(GovernanceEmissionResult result) : IAsiBackboneGovernanceEmitter
     {
-        private readonly GovernanceEmissionResult result;
-
-        public ResultEmitter(GovernanceEmissionResult result)
-        {
-            this.result = result;
-        }
+        private readonly GovernanceEmissionResult result = result;
 
         public ValueTask<GovernanceEmissionResult> EmitAsync(
             GovernanceEmissionEnvelope envelope,

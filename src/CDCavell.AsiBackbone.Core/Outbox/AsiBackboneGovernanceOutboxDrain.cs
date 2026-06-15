@@ -8,23 +8,17 @@ namespace CDCavell.AsiBackbone.Core.Outbox;
 /// <remarks>
 /// This drain path is provider-neutral. It is suitable for tests, samples, local validation, and host-owned workers that need to hand persisted outbox entries to an optional downstream emitter without coupling Core to a provider SDK.
 /// </remarks>
-public sealed class AsiBackboneGovernanceOutboxDrain
+/// <remarks>
+/// Initializes a new instance of the <see cref="AsiBackboneGovernanceOutboxDrain" /> class.
+/// </remarks>
+/// <param name="outboxStore">The provider-neutral outbox store.</param>
+/// <param name="emitter">The provider-neutral governance emitter.</param>
+public sealed class AsiBackboneGovernanceOutboxDrain(
+    IAsiBackboneGovernanceOutboxStore outboxStore,
+    IAsiBackboneGovernanceEmitter emitter)
 {
-    private readonly IAsiBackboneGovernanceOutboxStore outboxStore;
-    private readonly IAsiBackboneGovernanceEmitter emitter;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AsiBackboneGovernanceOutboxDrain" /> class.
-    /// </summary>
-    /// <param name="outboxStore">The provider-neutral outbox store.</param>
-    /// <param name="emitter">The provider-neutral governance emitter.</param>
-    public AsiBackboneGovernanceOutboxDrain(
-        IAsiBackboneGovernanceOutboxStore outboxStore,
-        IAsiBackboneGovernanceEmitter emitter)
-    {
-        this.outboxStore = outboxStore ?? throw new ArgumentNullException(nameof(outboxStore));
-        this.emitter = emitter ?? throw new ArgumentNullException(nameof(emitter));
-    }
+    private readonly IAsiBackboneGovernanceOutboxStore outboxStore = outboxStore ?? throw new ArgumentNullException(nameof(outboxStore));
+    private readonly IAsiBackboneGovernanceEmitter emitter = emitter ?? throw new ArgumentNullException(nameof(emitter));
 
     /// <summary>
     /// Drains pending and retry-ready outbox entries through the configured emitter.
@@ -100,7 +94,7 @@ public sealed class AsiBackboneGovernanceOutboxDrain
         }
         catch (Exception ex)
         {
-            GovernanceEmissionError error = GovernanceEmissionError.Create(
+            var governanceEmissionError = GovernanceEmissionError.Create(
                 "emission.exception",
                 $"Governance emission threw {ex.GetType().Name} during outbox drain.",
                 isRetryable: true,
@@ -108,7 +102,7 @@ public sealed class AsiBackboneGovernanceOutboxDrain
 
             return await outboxStore.MarkFailedAsync(
                 entry.OutboxEntryId,
-                error,
+                governanceEmissionError,
                 nextRetryUtc: drainUtc.AddMinutes(1),
                 cancellationToken)
                 .ConfigureAwait(false);
@@ -136,22 +130,22 @@ public sealed class AsiBackboneGovernanceOutboxDrain
 
         if (result.Status is GovernanceEmissionStatus.DeadLettered)
         {
-            GovernanceEmissionError error = result.Error ?? GovernanceEmissionError.Create(
+            GovernanceEmissionError governanceEmissionError = result.Error ?? GovernanceEmissionError.Create(
                 "emission.deadlettered",
                 "Governance emission returned a dead-lettered result.",
                 providerName: result.ProviderName);
 
             return await outboxStore.MarkDeadLetteredAsync(
                 entry.OutboxEntryId,
-                error,
-                error.Message,
+                governanceEmissionError,
+                governanceEmissionError.Message,
                 cancellationToken)
                 .ConfigureAwait(false);
         }
 
         if (result.Status is GovernanceEmissionStatus.Deferred or GovernanceEmissionStatus.Pending)
         {
-            GovernanceEmissionError? error = result.Error ?? (result.Status is GovernanceEmissionStatus.Pending
+            GovernanceEmissionError? governanceEmissionError = result.Error ?? (result.Status is GovernanceEmissionStatus.Pending
                 ? GovernanceEmissionError.Create(
                     "emission.pending",
                     "Governance emission remained pending after the outbox drain attempt.",
@@ -160,7 +154,7 @@ public sealed class AsiBackboneGovernanceOutboxDrain
                 : null);
 
             GovernanceOutboxEntry deferredEntry = entry.MarkDeferred(
-                error,
+                governanceEmissionError,
                 result.RetryAfterUtc ?? drainUtc.AddMinutes(1),
                 drainUtc);
 

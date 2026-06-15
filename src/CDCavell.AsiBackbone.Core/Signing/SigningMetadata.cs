@@ -37,9 +37,9 @@ public sealed class SigningMetadata
     }
 
     /// <summary>
-    /// Gets unsigned metadata with no hash, key reference, signature, provider, or signed timestamp.
+    /// Gets metadata with no hash, key reference, signature, provider, or signed timestamp.
     /// </summary>
-    public static SigningMetadata Unsigned { get; } = new(
+    public static SigningMetadata NoSignature { get; } = new(
         null,
         null,
         null,

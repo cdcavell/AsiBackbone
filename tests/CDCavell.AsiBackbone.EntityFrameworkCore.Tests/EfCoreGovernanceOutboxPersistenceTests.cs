@@ -143,18 +143,16 @@ public sealed class EfCoreGovernanceOutboxPersistenceTests
         Assert.NotNull(persistedDeadLettered);
         Assert.Equal("terminal-provider-failure", persistedDeadLettered.DeadLetterReason);
 
-        string[] retryReadyEntryIds = retryReady
+        string[] retryReadyEntryIds = [.. retryReady
             .Select(entry => entry.OutboxEntryId)
-            .OrderBy(entryId => entryId, StringComparer.Ordinal)
-            .ToArray();
-        string[] expectedRetryReadyEntryIds = new[]
+            .OrderBy(entryId => entryId, StringComparer.Ordinal)];
+        string[] expectedRetryReadyEntryIds = [.. new[]
             {
                 failed.OutboxEntryId,
                 retryable.OutboxEntryId,
                 deferred.OutboxEntryId
             }
-            .OrderBy(entryId => entryId, StringComparer.Ordinal)
-            .ToArray();
+            .OrderBy(entryId => entryId, StringComparer.Ordinal)];
 
         Assert.Equal(expectedRetryReadyEntryIds, retryReadyEntryIds);
     }
@@ -205,8 +203,8 @@ public sealed class EfCoreGovernanceOutboxPersistenceTests
         Assert.Equal(AuditResidueLifecycleStage.ExternalEmissionQueued, found.Stage);
         Assert.Equal("trace-lifecycle-1", found.TraceId);
         Assert.Equal("test", found.Metadata["source"]);
-        Assert.Equal(["lifecycle-1", "lifecycle-2"], correlationMatches.Select(match => match.EventId).ToArray());
-        Assert.Equal(["lifecycle-1", "lifecycle-2"], auditResidueMatches.Select(match => match.EventId).ToArray());
+        Assert.Equal(["lifecycle-1", "lifecycle-2"], [.. correlationMatches.Select(match => match.EventId)]);
+        Assert.Equal(["lifecycle-1", "lifecycle-2"], [.. auditResidueMatches.Select(match => match.EventId)]);
     }
 
     private static async Task<SqliteConnection> OpenConnectionAsync()

@@ -30,6 +30,9 @@ Start with [Getting Started](getting-started.md), then use the navigation menu t
 * [OpenTelemetry Governance Emission Provider](opentelemetry-governance-emission-provider.md)
   Documents the concrete `CDCavell.AsiBackbone.OpenTelemetry` provider package, envelope-to-activity/metric mappings, Azure Monitor-through-exporter guidance, and decision -> outbox -> drain -> OpenTelemetry flow.
 
+* [Event Hubs Governance Emission Provider Design](event-hubs-governance-emission-provider-design.md)
+  Documents the optional Event Hubs streaming provider design, versioned envelope mapping, Managed Identity configuration direction, durable outbox interaction, retry/dead-letter behavior, and no-live-Azure test seams.
+
 * [DLP and Classification Failure Policy](dlp-classification-failure-policy.md)
   Documents the provider-neutral Core policy model for DLP/classification service outages, timeouts, indeterminate results, blocked/classified results, and risk-based fail-open/fail-closed behavior.
 

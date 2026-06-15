@@ -165,6 +165,28 @@ Core defines audit-oriented primitives without requiring a specific storage prov
 
 A persistent audit ledger record is the storage-ready snapshot of audit residue. Core defines the record shape and storage contract. Concrete persistence, database mappings, migrations, signing, retention, and archival behavior belong to host applications or integration packages.
 
+### Audit residue lifecycle event
+
+An audit residue lifecycle event is an append-only progress record linked to the original decision context.
+
+The original audit residue can remain unchanged while later stages record separate progress, such as acknowledgment completion, capability-token issuance, gateway execution, outbox queuing, or provider delivery.
+
+The Core lifecycle stages are provider-neutral:
+
+* `DecisionEvaluated`
+* `AcknowledgmentRequested`
+* `AcknowledgmentCompleted`
+* `CapabilityTokenIssued`
+* `GatewayExecutionStarted`
+* `GatewayExecutionCompleted`
+* `GatewayExecutionDenied`
+* `ExternalEmissionQueued`
+* `ExternalEmissionDelivered`
+* `ExternalEmissionFailed`
+* `ExternalEmissionDeadLettered`
+
+Each lifecycle event should carry a `CorrelationId` and may carry an `AuditResidueId` when the original residue or ledger record is available. This lets file, database, OpenTelemetry, SIEM, Azure, and future provider paths record partial progress without rewriting the original decision record.
+
 ### Acknowledgment and responsibility handshake
 
 Some consequential actions should require acknowledgment before execution.
@@ -213,6 +235,7 @@ The Core boundary establishes language and primitives, not a full integration st
 * reason code primitives
 * acknowledgment or responsibility-handshake abstractions
 * audit residue abstractions
+* audit residue lifecycle stage and event primitives
 * capability-token abstractions
 * policy version and policy hash fields
 * correlation ID support

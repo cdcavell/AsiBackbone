@@ -275,7 +275,7 @@ public static class GovernanceArtifactSigner
         CanonicalPayload payload,
         string? hashAlgorithm)
     {
-        return SignedGovernanceArtifact<TArtifact>.Unsigned(
+        return SignedGovernanceArtifacts.WithoutSignature(
             artifact,
             payload,
             CanonicalPayloadHasher.ComputeHash(payload, hashAlgorithm));
@@ -287,7 +287,7 @@ public static class GovernanceArtifactSigner
         string? hashAlgorithm,
         IReadOnlyDictionary<string, string>? metadata)
     {
-        return SignedGovernanceArtifact<TArtifact>.SigningReady(
+        return SignedGovernanceArtifacts.SigningReady(
             artifact,
             payload,
             CanonicalPayloadHasher.ComputeHash(payload, hashAlgorithm),
@@ -312,7 +312,7 @@ public static class GovernanceArtifactSigner
             .SignAsync(CreateSigningRequest(hash, keyId, keyVersion, metadata), cancellationToken)
             .ConfigureAwait(false);
 
-        return SignedGovernanceArtifact<TArtifact>.FromSigningMetadata(
+        return SignedGovernanceArtifacts.FromSigningMetadata(
             artifact,
             payload,
             hash,

@@ -219,9 +219,8 @@ public sealed class GovernanceArtifactPersistenceAnalyzerTests
         string trustedPlatformAssemblies = (string?)AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES")
             ?? throw new InvalidOperationException("Trusted platform assemblies were not available for analyzer test compilation.");
 
-        return trustedPlatformAssemblies
+        return [.. trustedPlatformAssemblies
             .Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries)
-            .Select(path => MetadataReference.CreateFromFile(path))
-            .ToArray();
+            .Select(path => MetadataReference.CreateFromFile(path))];
     }
 }

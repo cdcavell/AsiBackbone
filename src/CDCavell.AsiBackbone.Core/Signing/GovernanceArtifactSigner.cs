@@ -259,7 +259,7 @@ public static class GovernanceArtifactSigner
     {
         ArgumentNullException.ThrowIfNull(canonicalHash);
 
-        SigningMetadata signingReadyMetadata = canonicalHash.ToSigningMetadata(metadata);
+        var signingReadyMetadata = canonicalHash.ToSigningMetadata(metadata);
 
         return new SigningRequest(
             canonicalHash.HashValue,

@@ -34,4 +34,9 @@ public static class CanonicalArtifactTypes
     /// Identifies a provider-neutral capability-token grant payload.
     /// </summary>
     public const string CapabilityTokenGrant = "asibackbone.capability-token-grant";
+
+    /// <summary>
+    /// Identifies a provider-neutral audit integrity chain link payload.
+    /// </summary>
+    public const string AuditIntegrityLink = "asibackbone.audit-integrity-link";
 }

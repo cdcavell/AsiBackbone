@@ -57,6 +57,9 @@ Start with [Getting Started](getting-started.md), then use the navigation menu t
 * [Key Rotation and Retired-Key Verification](key-rotation-and-retired-key-verification.md)
   Documents required key metadata, key lifecycle states, retired-key verification behavior, compromised-key response, and verification policy mappings.
 
+* [Capability Grant Hardening](capability-grant-hardening.md)
+  Documents scoped grant metadata, proof validation, execution-boundary checks, bounded-use storage expectations, and failure behavior for high-risk workflows.
+
 * [Cryptographic Security Posture and Production Guidance](cryptographic-security-posture.md)
   Documents signing-ready versus signed, verified, chained, and externally anchored records; production key-management guidance; local signer limits; host responsibilities; audit/outbox signing examples; capability-token validation; and security non-goals.
 

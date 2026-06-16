@@ -95,8 +95,13 @@ public sealed class GovernanceArtifactPersistenceAnalyzer : DiagnosticAnalyzer
             : operation;
     }
 
-    private static bool IsArtifactProducerOperation(IOperation operation)
+    private static bool IsArtifactProducerOperation(IOperation? operation)
     {
+        if (operation is null)
+        {
+            return false;
+        }
+
         operation = UnwrapAwait(operation);
 
         while (operation is IConversionOperation conversionOperation)

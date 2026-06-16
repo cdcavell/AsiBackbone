@@ -34,6 +34,15 @@
 - name: Why AsiBackbone?
   href: why-asi-backbone.md
 
+- name: ASI Backbone Concept Synopsis
+  href: asi-backbone-concept.md
+
+- name: Dynamic Liability Handshake
+  href: dynamic-liability-handshake.md
+
+- name: Gateway and Regional Policy Flow
+  href: gateway-and-regional-policy-flow.md
+
 - name: Governance Tool Comparisons
   href: governance-tool-comparisons.md
 

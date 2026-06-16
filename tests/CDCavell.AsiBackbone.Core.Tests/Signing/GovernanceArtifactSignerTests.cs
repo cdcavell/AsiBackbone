@@ -18,7 +18,7 @@ public sealed class GovernanceArtifactSignerTests
 
         Assert.False(artifact.IsSigned);
         Assert.True(artifact.IsSigningReady);
-        Assert.False(artifact.IsUnsigned);
+        Assert.False(artifact.HasNoSignature);
         Assert.Equal(record, artifact.Artifact);
         Assert.Equal(CanonicalArtifactTypes.AuditLedgerRecord, artifact.ArtifactType);
         Assert.Equal("record-1", artifact.ArtifactId);
@@ -49,7 +49,7 @@ public sealed class GovernanceArtifactSignerTests
 
         Assert.True(artifact.IsSigned);
         Assert.False(artifact.IsSigningReady);
-        Assert.False(artifact.IsUnsigned);
+        Assert.False(artifact.HasNoSignature);
         Assert.Equal(CanonicalArtifactTypes.GovernanceOutboxEntry, artifact.ArtifactType);
         Assert.Equal("outbox-1", artifact.ArtifactId);
         Assert.Equal(artifact.SigningHash, artifact.SigningMetadata.SigningHash);
@@ -71,7 +71,7 @@ public sealed class GovernanceArtifactSignerTests
 
         SignedGovernanceArtifact<GovernanceOutboxEntry> artifact = GovernanceArtifactSigner.CreateUnsignedGovernanceOutboxEntry(entry);
 
-        Assert.True(artifact.IsUnsigned);
+        Assert.True(artifact.HasNoSignature);
         Assert.False(artifact.IsSigningReady);
         Assert.False(artifact.IsSigned);
         Assert.Equal(CanonicalArtifactTypes.GovernanceOutboxEntry, artifact.ArtifactType);

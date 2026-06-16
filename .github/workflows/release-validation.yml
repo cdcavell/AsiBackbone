@@ -46,6 +46,17 @@ jobs:
       - name: Display .NET information
         run: dotnet --info
 
+      - name: Validate version metadata
+        shell: pwsh
+        run: |
+          $arguments = @{}
+
+          if ('${{ github.ref_type }}' -eq 'tag') {
+              $arguments['TagName'] = '${{ github.ref_name }}'
+          }
+
+          ./scripts/Validate-VersionConsistency.ps1 @arguments
+
       - name: Restore dependencies
         run: dotnet restore "$SOLUTION_PATH"
 
@@ -91,6 +102,19 @@ jobs:
               --output "$PACKAGE_OUTPUT" \
               /p:ContinuousIntegrationBuild=true
           done
+
+      - name: Validate generated package versions
+        shell: pwsh
+        run: |
+          $arguments = @{
+              PackageDirectory = $env:PACKAGE_OUTPUT
+          }
+
+          if ('${{ github.ref_type }}' -eq 'tag') {
+              $arguments['TagName'] = '${{ github.ref_name }}'
+          }
+
+          ./scripts/Validate-VersionConsistency.ps1 @arguments
 
       - name: Validate generated NuGet metadata
         shell: pwsh

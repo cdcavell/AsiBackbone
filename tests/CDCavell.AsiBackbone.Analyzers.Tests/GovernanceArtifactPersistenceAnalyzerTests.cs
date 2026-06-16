@@ -1,5 +1,4 @@
 using System.Collections.Immutable;
-using System.Runtime.InteropServices;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -217,8 +216,11 @@ public sealed class GovernanceArtifactPersistenceAnalyzerTests
 
     private static PortableExecutableReference[] GetMetadataReferences()
     {
-        return Directory
-            .EnumerateFiles(RuntimeEnvironment.GetRuntimeDirectory(), "*.dll")
+        string trustedPlatformAssemblies = (string?)AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES")
+            ?? throw new InvalidOperationException("Trusted platform assemblies were not available for analyzer test compilation.");
+
+        return trustedPlatformAssemblies
+            .Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries)
             .Select(path => MetadataReference.CreateFromFile(path))
             .ToArray();
     }

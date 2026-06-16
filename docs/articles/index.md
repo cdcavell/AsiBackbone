@@ -48,6 +48,9 @@ Start with [Getting Started](getting-started.md), then use the navigation menu t
 * [Cryptographic Security Posture and Production Guidance](cryptographic-security-posture.md)
   Documents signing-ready versus signed, verified, chained, and externally anchored records; production key-management guidance; local signer limits; host responsibilities; audit/outbox signing examples; capability-token validation; and security non-goals.
 
+* [Cryptographic Security Hardening Roadmap](cryptographic-security-hardening-roadmap.md)
+  Splits cryptographic hardening into child issues for canonical hashing, signing providers, signed audit/outbox records, verification policy, key rotation, audit-chain integrity, and capability-token hardening while preserving Core provider neutrality.
+
 * [DLP and Classification Failure Policy](dlp-classification-failure-policy.md)
   Documents the provider-neutral Core policy model for DLP/classification service outages, timeouts, indeterminate results, blocked/classified results, and risk-based fail-open/fail-closed behavior.
 

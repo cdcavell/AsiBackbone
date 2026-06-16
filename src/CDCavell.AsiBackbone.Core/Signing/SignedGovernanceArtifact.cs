@@ -12,7 +12,7 @@ namespace CDCavell.AsiBackbone.Core.Signing;
 /// </remarks>
 public sealed class SignedGovernanceArtifact<TArtifact>
 {
-    private SignedGovernanceArtifact(
+    internal SignedGovernanceArtifact(
         TArtifact artifact,
         CanonicalPayload canonicalPayload,
         CanonicalPayloadHash canonicalHash,
@@ -90,12 +90,18 @@ public sealed class SignedGovernanceArtifact<TArtifact>
     /// <summary>
     /// Gets a value indicating whether the artifact carries no signing metadata.
     /// </summary>
-    public bool IsUnsigned => !SigningMetadata.HasSignature && SigningMetadata.SigningHash is null;
+    public bool HasNoSignature => !SigningMetadata.HasSignature && SigningMetadata.SigningHash is null;
+}
 
+/// <summary>
+/// Provides non-generic factories for creating signed governance artifact wrappers.
+/// </summary>
+public static class SignedGovernanceArtifacts
+{
     /// <summary>
-    /// Creates an unsigned artifact wrapper. The canonical payload and hash are preserved, but no signing metadata is attached.
+    /// Creates an artifact wrapper with no signing metadata attached.
     /// </summary>
-    public static SignedGovernanceArtifact<TArtifact> Unsigned(
+    public static SignedGovernanceArtifact<TArtifact> WithoutSignature<TArtifact>(
         TArtifact artifact,
         CanonicalPayload canonicalPayload,
         CanonicalPayloadHash canonicalHash)
@@ -110,7 +116,7 @@ public sealed class SignedGovernanceArtifact<TArtifact>
     /// <summary>
     /// Creates a signing-ready artifact wrapper. Hash metadata is attached without implying that a signature exists.
     /// </summary>
-    public static SignedGovernanceArtifact<TArtifact> SigningReady(
+    public static SignedGovernanceArtifact<TArtifact> SigningReady<TArtifact>(
         TArtifact artifact,
         CanonicalPayload canonicalPayload,
         CanonicalPayloadHash canonicalHash,
@@ -126,7 +132,7 @@ public sealed class SignedGovernanceArtifact<TArtifact>
     /// <summary>
     /// Creates an artifact wrapper from signing metadata returned by a host or provider package.
     /// </summary>
-    public static SignedGovernanceArtifact<TArtifact> FromSigningMetadata(
+    public static SignedGovernanceArtifact<TArtifact> FromSigningMetadata<TArtifact>(
         TArtifact artifact,
         CanonicalPayload canonicalPayload,
         CanonicalPayloadHash canonicalHash,

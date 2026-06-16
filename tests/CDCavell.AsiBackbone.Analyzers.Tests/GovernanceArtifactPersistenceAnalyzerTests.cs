@@ -217,8 +217,9 @@ public sealed class GovernanceArtifactPersistenceAnalyzerTests
 
     private static PortableExecutableReference[] GetMetadataReferences()
     {
-        return [.. Directory
+        return Directory
             .EnumerateFiles(RuntimeEnvironment.GetRuntimeDirectory(), "*.dll")
-            .Select(MetadataReference.CreateFromFile)];
+            .Select(path => MetadataReference.CreateFromFile(path))
+            .ToArray();
     }
 }

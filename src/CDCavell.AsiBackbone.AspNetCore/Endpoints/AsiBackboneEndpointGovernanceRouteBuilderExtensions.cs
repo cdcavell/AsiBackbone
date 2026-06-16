@@ -8,14 +8,12 @@ namespace CDCavell.AsiBackbone.AspNetCore.Endpoints;
 public static class AsiBackboneEndpointGovernanceRouteBuilderExtensions
 {
     /// <summary>
-    /// Adds a host-defined governance policy marker to an endpoint.
+    /// Adds a host-defined governance policy marker to a Minimal API route handler endpoint.
     /// </summary>
-    /// <typeparam name="TBuilder">The endpoint convention builder type.</typeparam>
     /// <typeparam name="TPolicy">The host-defined policy marker or resolver type.</typeparam>
-    /// <param name="builder">The endpoint convention builder.</param>
+    /// <param name="builder">The route handler builder.</param>
     /// <returns>The same builder so calls can be chained.</returns>
-    public static TBuilder RequireGovernancePolicy<TBuilder, TPolicy>(this TBuilder builder)
-        where TBuilder : IEndpointConventionBuilder
+    public static RouteHandlerBuilder RequireGovernancePolicy<TPolicy>(this RouteHandlerBuilder builder)
     {
         return builder.RequireGovernancePolicy(typeof(TPolicy));
     }

@@ -256,7 +256,9 @@ internal sealed class ConsequentialActionDecisionPolicy : IAsiBackboneDecisionPo
     }
 }
 
-internal sealed class SampleEndpointPolicy;
+internal sealed class SampleEndpointPolicy
+{
+}
 
 internal sealed class SampleEndpointCapabilityGrantValidator : IAsiBackboneEndpointCapabilityGrantValidator
 {
@@ -284,7 +286,7 @@ internal sealed class SampleEndpointCapabilityGrantValidator : IAsiBackboneEndpo
 
 [ApiController]
 [Route("sample/ergonomic/controller")]
-internal sealed class SampleGovernanceController : ControllerBase
+internal sealed class InternalSampleGovernanceController : ControllerBase
 {
     [HttpPost]
     [RequireGovernancePolicy(typeof(SampleEndpointPolicy))]

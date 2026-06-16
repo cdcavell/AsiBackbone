@@ -154,6 +154,12 @@ $expectedPackages = @(
         Description = 'OpenTelemetry-friendly Accountable Systems Infrastructure governance emission provider for AsiBackbone decision-flow telemetry.'
         Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'opentelemetry', 'observability', 'audit', 'outbox')
         ReadmeMustContain = @('provider-neutral', 'OpenTelemetry')
+    },
+    [pscustomobject]@{
+        Id = 'CDCavell.AsiBackbone.Signing.LocalDevelopment'
+        Description = 'Local-development RSA signing and verification provider for exercising AsiBackbone signing abstractions without cloud key-management dependencies.'
+        Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'signing', 'local-development', 'testing', 'audit')
+        ReadmeMustContain = @('local development, samples, and tests', 'not a production managed-key provider')
     }
 )
 

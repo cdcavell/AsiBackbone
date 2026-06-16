@@ -4,14 +4,25 @@ using CDCavell.AsiBackbone.Core.Audit;
 using CDCavell.AsiBackbone.Core.Constraints;
 using CDCavell.AsiBackbone.Core.Decisions;
 using CDCavell.AsiBackbone.Core.Evaluation;
+using CDCavell.AsiBackbone.Core.Signing;
 using CDCavell.AsiBackbone.EntityFrameworkCore;
 using CDCavell.AsiBackbone.EntityFrameworkCore.Audit;
+using CDCavell.AsiBackbone.Signing.LocalDevelopment;
 using CDCavell.AsiBackbone.Storage.InMemory.Audit;
 using Microsoft.EntityFrameworkCore;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddAsiBackboneAspNetCore();
+
+builder.Services.AddSingleton(LocalDevelopmentSigningOptions.Create(
+    keyId: "sample-local-dev-key",
+    keyVersion: "dev"));
+builder.Services.AddSingleton<LocalDevelopmentSigningService>();
+builder.Services.AddSingleton<IAsiBackboneSigningService>(serviceProvider =>
+    serviceProvider.GetRequiredService<LocalDevelopmentSigningService>());
+builder.Services.AddSingleton<IAsiBackboneSignatureVerificationService>(serviceProvider =>
+    serviceProvider.GetRequiredService<LocalDevelopmentSigningService>());
 
 builder.Services.AddDbContext<PlainHostAsiBackboneDbContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("AsiBackbone") ?? "Data Source=asi-backbone-sample.db"));
 
@@ -42,6 +53,8 @@ app.MapGet("/sample/decision", async (
     IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext> evaluator,
     IAsiBackboneAuditSink auditSink,
     IAsiBackboneAuditLedgerStore ledgerStore,
+    IAsiBackboneSigningService signingService,
+    IAsiBackboneSignatureVerificationService verificationService,
     CancellationToken cancellationToken) =>
 {
     string correlationId = httpContext.TraceIdentifier;
@@ -73,7 +86,46 @@ app.MapGet("/sample/decision", async (
 
     await auditSink.WriteAsync(residue, cancellationToken).ConfigureAwait(false);
 
-    var record = AuditLedgerRecord.FromResidue(residue);
+    var unsignedRecord = AuditLedgerRecord.FromResidue(residue);
+    CanonicalPayload canonicalPayload = CanonicalPayloadBuilder.ForAuditLedgerRecord(unsignedRecord);
+    CanonicalPayloadHash canonicalHash = CanonicalPayloadHasher.ComputeHash(canonicalPayload);
+    var hashMetadata = canonicalHash.ToSigningMetadata();
+    SigningResult signingResult = await signingService
+        .SignAsync(
+            new SigningRequest(
+                canonicalHash.HashValue,
+                canonicalHash.HashAlgorithm,
+                purpose: CanonicalArtifactTypes.AuditLedgerRecord,
+                keyId: "sample-local-dev-key",
+                keyVersion: "dev",
+                metadata: hashMetadata.Metadata),
+            cancellationToken)
+        .ConfigureAwait(false);
+    SignatureVerificationResult verificationResult = await verificationService
+        .VerifyAsync(
+            new SignatureVerificationRequest(
+                canonicalHash.HashValue,
+                signingResult.Metadata,
+                purpose: CanonicalArtifactTypes.AuditLedgerRecord),
+            cancellationToken)
+        .ConfigureAwait(false);
+
+    var record = AuditLedgerRecord.FromResidue(
+        residue,
+        recordId: unsignedRecord.RecordId,
+        recordedUtc: unsignedRecord.RecordedUtc,
+        signingHash: signingResult.Metadata.SigningHash,
+        signatureKeyId: signingResult.Metadata.KeyId,
+        signatureKeyVersion: signingResult.Metadata.KeyVersion,
+        signatureAlgorithm: signingResult.Metadata.SignatureAlgorithm,
+        signatureValue: signingResult.Metadata.Signature,
+        signatureProvider: signingResult.Metadata.Provider,
+        signedUtc: signingResult.Metadata.SignedUtc,
+        metadata: new Dictionary<string, string>(StringComparer.Ordinal)
+        {
+            ["sample_signing_status"] = signingResult.IsSigned ? "signed" : "unsigned",
+            ["sample_verification_status"] = verificationResult.Status
+        });
     _ = await ledgerStore.AppendAsync(record, cancellationToken).ConfigureAwait(false);
 
     return Results.Ok(new
@@ -86,7 +138,23 @@ app.MapGet("/sample/decision", async (
         decision.PolicyVersion,
         decision.PolicyHash,
         auditEventId = residue.EventId,
-        ledgerRecordId = record.RecordId
+        ledgerRecordId = record.RecordId,
+        canonicalHash = canonicalHash.HashValue,
+        signing = new
+        {
+            signingResult.IsSigned,
+            signingResult.Metadata.KeyId,
+            signingResult.Metadata.KeyVersion,
+            signingResult.Metadata.SignatureAlgorithm,
+            signingResult.Metadata.Provider,
+            signingResult.Metadata.SignedUtc
+        },
+        verification = new
+        {
+            verificationResult.IsValid,
+            verificationResult.Status,
+            verificationResult.FailureCode
+        }
     });
 });
 

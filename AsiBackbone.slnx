@@ -5,7 +5,9 @@
     <Project Path="src/CDCavell.AsiBackbone.EntityFrameworkCore/CDCavell.AsiBackbone.EntityFrameworkCore.csproj" />
     <Project Path="src/CDCavell.AsiBackbone.OpenTelemetry/CDCavell.AsiBackbone.OpenTelemetry.csproj" />
     <Project Path="src/CDCavell.AsiBackbone.Signing.LocalDevelopment/CDCavell.AsiBackbone.Signing.LocalDevelopment.csproj" />
-    <Project Path="src/CDCavell.AsiBackbone.Signing.ManagedKey/CDCavell.AsiBackbone.Signing.ManagedKey.csproj" />
+    <Project Path="src/CDCavell.AsiBackbone.Signing.ManagedKey/CDCavell.AsiBackbone.Signing.ManagedKey.csproj">
+      <Build Solution="Debug|*" Project="false" />
+    </Project>
     <Project Path="src/CDCavell.AsiBackbone.Storage.InMemory/CDCavell.AsiBackbone.Storage.InMemory.csproj" />
   </Folder>
   <Folder Name="/samples/">
@@ -17,6 +19,8 @@
     <Project Path="tests/CDCavell.AsiBackbone.EntityFrameworkCore.Tests/CDCavell.AsiBackbone.EntityFrameworkCore.Tests.csproj" />
     <Project Path="tests/CDCavell.AsiBackbone.OpenTelemetry.Tests/CDCavell.AsiBackbone.OpenTelemetry.Tests.csproj" />
     <Project Path="tests/CDCavell.AsiBackbone.Signing.LocalDevelopment.Tests/CDCavell.AsiBackbone.Signing.LocalDevelopment.Tests.csproj" />
-    <Project Path="tests/CDCavell.AsiBackbone.Signing.ManagedKey.Tests/CDCavell.AsiBackbone.Signing.ManagedKey.Tests.csproj" />
+    <Project Path="tests/CDCavell.AsiBackbone.Signing.ManagedKey.Tests/CDCavell.AsiBackbone.Signing.ManagedKey.Tests.csproj">
+      <Build Solution="Debug|*" Project="false" />
+    </Project>
   </Folder>
 </Solution>

@@ -209,12 +209,9 @@ public sealed class ManagedKeySigningService : IAsiBackboneSigningService
         }
 
         string? configuredKeyVersion = NormalizeOptional(options.KeyVersion);
-        if (options.RequireKeyVersion && request.KeyVersion is null && configuredKeyVersion is null)
-        {
-            return "managedkey.signing.key-version-missing";
-        }
-
-        return request.KeyVersion is not null
+        return options.RequireKeyVersion && request.KeyVersion is null && configuredKeyVersion is null
+            ? "managedkey.signing.key-version-missing"
+            : request.KeyVersion is not null
             && configuredKeyVersion is not null
             && !string.Equals(request.KeyVersion, configuredKeyVersion, StringComparison.Ordinal)
             ? "managedkey.signing.key-version-mismatch"

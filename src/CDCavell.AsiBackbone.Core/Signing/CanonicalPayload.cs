@@ -105,7 +105,7 @@ internal static class CanonicalPayloadJson
 
     public static string Serialize(IReadOnlyDictionary<string, object?> value)
     {
-        using ArrayBufferWriter<byte> buffer = new();
+        ArrayBufferWriter<byte> buffer = new();
         using (Utf8JsonWriter writer = new(buffer, WriterOptions))
         {
             WriteDictionary(writer, value);

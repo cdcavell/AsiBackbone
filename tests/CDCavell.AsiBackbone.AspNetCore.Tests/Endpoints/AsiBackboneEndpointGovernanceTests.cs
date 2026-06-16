@@ -121,7 +121,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
             CancellationToken cancellationToken = default)
         {
             return ValueTask.FromResult(AsiBackboneEndpointGovernanceResult.Block(
-                Microsoft.AspNetCore.Http.Results.Problem(statusCode: StatusCodes.Status403Forbidden)));
+                Microsoft.AspNetCore.Http.Results.StatusCode(StatusCodes.Status403Forbidden)));
         }
     }
 }

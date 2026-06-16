@@ -103,6 +103,9 @@
 - name: Signing Provider Package Boundary
   href: signing-provider-package-boundary.md
 
+- name: Signed Audit and Outbox Records
+  href: signed-audit-and-outbox-records.md
+
 - name: Cryptographic Security Posture and Production Guidance
   href: cryptographic-security-posture.md
 

@@ -103,6 +103,9 @@
 - name: Signing Provider Package Boundary
   href: signing-provider-package-boundary.md
 
+- name: Managed-Key Signing Provider
+  href: managed-key-signing-provider.md
+
 - name: Signed Audit and Outbox Records
   href: signed-audit-and-outbox-records.md
 

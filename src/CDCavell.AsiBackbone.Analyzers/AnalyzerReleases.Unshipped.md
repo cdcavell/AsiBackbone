@@ -1,7 +1,5 @@
 ; Unshipped analyzer release
 
-## Unshipped
-
 ### New Rules
 
 Rule ID | Category | Severity | Notes

@@ -157,6 +157,9 @@
 - name: ASP.NET Core Integration Boundary
   href: aspnetcore-integration-boundary.md
 
+- name: ASP.NET Core Endpoint Governance
+  href: aspnetcore-endpoint-governance.md
+
 - name: Plain ASP.NET Core Host Sample
   href: plain-aspnetcore-host-sample.md
 

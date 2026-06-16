@@ -1,5 +1,6 @@
 using CDCavell.AsiBackbone.AspNetCore.Actors;
 using CDCavell.AsiBackbone.AspNetCore.Correlation;
+using CDCavell.AsiBackbone.AspNetCore.Endpoints;
 using CDCavell.AsiBackbone.AspNetCore.Handshakes;
 using CDCavell.AsiBackbone.AspNetCore.Outbox;
 using CDCavell.AsiBackbone.AspNetCore.Results;
@@ -105,10 +106,26 @@ public static class AsiBackboneAspNetCoreServiceCollectionExtensions
             }, "Acknowledgment challenge options must be valid.")
             .ValidateOnStart();
 
+        _ = services.AddOptions<AsiBackboneEndpointGovernanceOptions>()
+            .Validate(static options =>
+            {
+                try
+                {
+                    options.Validate();
+                    return true;
+                }
+                catch (InvalidOperationException)
+                {
+                    return false;
+                }
+            }, "Endpoint governance options must be valid.")
+            .ValidateOnStart();
+
         _ = services.AddHttpContextAccessor();
         _ = services.AddScoped<IAsiBackboneHttpActorContextResolver, HttpContextAsiBackboneActorContextResolver>();
         _ = services.AddScoped<IAsiBackboneHttpRequestCorrelationResolver, HttpContextAsiBackboneRequestCorrelationResolver>();
         _ = services.AddScoped<IAsiBackboneAcknowledgmentChallengeService, DefaultAsiBackboneAcknowledgmentChallengeService>();
+        _ = services.AddScoped<IAsiBackboneEndpointGovernanceService, DefaultAsiBackboneEndpointGovernanceService>();
 
         return services;
     }

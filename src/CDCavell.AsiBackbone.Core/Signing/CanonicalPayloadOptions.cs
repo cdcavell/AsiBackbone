@@ -90,12 +90,11 @@ public sealed class CanonicalPayloadOptions
             return EmptyMetadataKeyAllowList;
         }
 
-        string[] normalizedKeys = metadataKeyAllowList
+        string[] normalizedKeys = [.. metadataKeyAllowList
             .Where(key => !string.IsNullOrWhiteSpace(key))
             .Select(key => key.Trim())
             .Distinct(StringComparer.Ordinal)
-            .OrderBy(key => key, StringComparer.Ordinal)
-            .ToArray();
+            .OrderBy(key => key, StringComparer.Ordinal)];
 
         return normalizedKeys.Length == 0
             ? EmptyMetadataKeyAllowList

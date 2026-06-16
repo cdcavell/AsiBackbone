@@ -204,37 +204,31 @@ public static class CanonicalPayloadBuilder
 
     private static SortedDictionary<string, object?>? BuildGovernanceEmissionPayloadContent(GovernanceEmissionPayload? payload, CanonicalPayloadOptions options)
     {
-        if (payload is null)
-        {
-            return null;
-        }
-
-        return new SortedDictionary<string, object?>(StringComparer.Ordinal)
-        {
-            ["contentHash"] = payload.ContentHash,
-            ["contentType"] = payload.ContentType,
-            ["metadata"] = FilterMetadata(payload.Metadata, options),
-            ["payloadType"] = payload.PayloadType,
-            ["schemaVersion"] = payload.SchemaVersion,
-            ["sizeBytes"] = payload.SizeBytes
-        };
+        return payload is null
+            ? null
+            : new SortedDictionary<string, object?>(StringComparer.Ordinal)
+            {
+                ["contentHash"] = payload.ContentHash,
+                ["contentType"] = payload.ContentType,
+                ["metadata"] = FilterMetadata(payload.Metadata, options),
+                ["payloadType"] = payload.PayloadType,
+                ["schemaVersion"] = payload.SchemaVersion,
+                ["sizeBytes"] = payload.SizeBytes
+            };
     }
 
     private static SortedDictionary<string, object?>? BuildGovernanceEmissionErrorContent(GovernanceEmissionError? error)
     {
-        if (error is null)
-        {
-            return null;
-        }
-
-        return new SortedDictionary<string, object?>(StringComparer.Ordinal)
-        {
-            ["code"] = error.Code,
-            ["isRetryable"] = error.IsRetryable,
-            ["message"] = error.Message,
-            ["providerErrorCode"] = error.ProviderErrorCode,
-            ["providerName"] = error.ProviderName
-        };
+        return error is null
+            ? null
+            : new SortedDictionary<string, object?>(StringComparer.Ordinal)
+            {
+                ["code"] = error.Code,
+                ["isRetryable"] = error.IsRetryable,
+                ["message"] = error.Message,
+                ["providerErrorCode"] = error.ProviderErrorCode,
+                ["providerName"] = error.ProviderName
+            };
     }
 
     private static SortedDictionary<string, object?> FilterMetadata(IReadOnlyDictionary<string, string>? metadata, CanonicalPayloadOptions options)
@@ -261,12 +255,11 @@ public static class CanonicalPayloadBuilder
 
     private static string[] NormalizeStringSet(IEnumerable<string> values)
     {
-        return values
+        return [.. values
             .Where(value => !string.IsNullOrWhiteSpace(value))
             .Select(value => value.Trim())
             .Distinct(StringComparer.Ordinal)
-            .OrderBy(value => value, StringComparer.Ordinal)
-            .ToArray();
+            .OrderBy(value => value, StringComparer.Ordinal)];
     }
 
     private static string? FormatUtc(DateTimeOffset? timestamp)

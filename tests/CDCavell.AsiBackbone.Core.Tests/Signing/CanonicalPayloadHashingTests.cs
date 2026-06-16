@@ -12,7 +12,7 @@ public sealed class CanonicalPayloadHashingTests
     [Fact]
     public void EquivalentAuditLedgerRecordsProduceStableCanonicalPayloadAndHash()
     {
-        CanonicalPayloadOptions options = CanonicalPayloadOptions.Create(["safe"]);
+        var options = CanonicalPayloadOptions.Create(["safe"]);
         AuditLedgerRecord first = CreateAuditLedgerRecord(["beta", "alpha"], new Dictionary<string, string>
         {
             ["ignored"] = "one",
@@ -38,7 +38,7 @@ public sealed class CanonicalPayloadHashingTests
     [Fact]
     public void MeaningfulAuditLedgerChangeChangesCanonicalHash()
     {
-        CanonicalPayloadOptions options = CanonicalPayloadOptions.Create(["safe"]);
+        var options = CanonicalPayloadOptions.Create(["safe"]);
         AuditLedgerRecord first = CreateAuditLedgerRecord(["alpha"], new Dictionary<string, string>
         {
             ["safe"] = "included"
@@ -57,7 +57,7 @@ public sealed class CanonicalPayloadHashingTests
     [Fact]
     public void AllowListedMetadataParticipatesInHashButOtherMetadataDoesNot()
     {
-        CanonicalPayloadOptions options = CanonicalPayloadOptions.Create(["safe"]);
+        var options = CanonicalPayloadOptions.Create(["safe"]);
         AuditLedgerRecord first = CreateAuditLedgerRecord(["alpha"], new Dictionary<string, string>
         {
             ["ignored"] = "one",
@@ -85,8 +85,8 @@ public sealed class CanonicalPayloadHashingTests
     [Fact]
     public void OutboxEntryHashBindsArtifactTypeAndIdentifier()
     {
-        CanonicalPayloadOptions options = CanonicalPayloadOptions.Create(["safe"]);
-        GovernanceEmissionPayload payload = GovernanceEmissionPayload.Create(
+        var options = CanonicalPayloadOptions.Create(["safe"]);
+        var payload = GovernanceEmissionPayload.Create(
             "audit-summary",
             schemaVersion: "v1",
             contentType: "application/json",
@@ -96,7 +96,7 @@ public sealed class CanonicalPayloadHashingTests
             {
                 ["safe"] = "payload-metadata"
             });
-        GovernanceEmissionEnvelope envelope = GovernanceEmissionEnvelope.Create(
+        var envelope = GovernanceEmissionEnvelope.Create(
             GovernanceEmissionEventType.AuditResidue,
             eventId: "event-1",
             occurredUtc: new DateTimeOffset(2026, 6, 16, 8, 0, 0, TimeSpan.FromHours(-5)),
@@ -111,7 +111,7 @@ public sealed class CanonicalPayloadHashingTests
             {
                 ["safe"] = "envelope-metadata"
             });
-        GovernanceOutboxEntry entry = GovernanceOutboxEntry.Create(
+        var entry = GovernanceOutboxEntry.Create(
             envelope,
             outboxEntryId: "outbox-1",
             createdUtc: new DateTimeOffset(2026, 6, 16, 13, 0, 2, TimeSpan.Zero),
@@ -137,7 +137,7 @@ public sealed class CanonicalPayloadHashingTests
         CanonicalPayload payload = CanonicalPayloadBuilder.ForAuditLedgerRecord(record);
         CanonicalPayloadHash hash = CanonicalPayloadHasher.ComputeHash(payload);
 
-        SigningMetadata signingMetadata = hash.ToSigningMetadata();
+        var signingMetadata = hash.ToSigningMetadata();
 
         Assert.Equal(hash.HashValue, signingMetadata.SigningHash);
         Assert.Equal(CanonicalPayloadOptions.DefaultHashAlgorithm, signingMetadata.HashAlgorithm);
@@ -150,7 +150,7 @@ public sealed class CanonicalPayloadHashingTests
     private static AuditLedgerRecord CreateAuditLedgerRecord(IEnumerable<string> reasonCodes, IReadOnlyDictionary<string, string> metadata)
     {
         IAsiBackboneActorContext actor = AsiBackboneActorContext.Service("system-1", "System");
-        AuditResidue residue = AuditResidue.Create(
+        var residue = AuditResidue.Create(
             actor,
             "gateway.execute",
             "Allowed",

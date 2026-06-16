@@ -21,4 +21,6 @@ public sealed class SampleGovernanceController : ControllerBase
     }
 }
 
-public sealed class SampleControllerEndpointPolicy;
+public sealed class SampleControllerEndpointPolicy
+{
+}

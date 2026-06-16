@@ -41,15 +41,7 @@ public static class CanonicalPayloadBuilder
         content["handshakeId"] = record.HandshakeId;
         content["previousRecordHash"] = record.PreviousRecordHash;
         content["recordedUtc"] = FormatUtc(record.RecordedUtc);
-        content["recordHash"] = record.RecordHash;
         content["recordId"] = record.RecordId;
-        content["signatureAlgorithm"] = record.SignatureAlgorithm;
-        content["signatureKeyId"] = record.SignatureKeyId;
-        content["signatureKeyVersion"] = record.SignatureKeyVersion;
-        content["signatureProvider"] = record.SignatureProvider;
-        content["signatureValue"] = record.SignatureValue;
-        content["signedUtc"] = FormatUtc(record.SignedUtc);
-        content["signingHash"] = record.SigningHash;
 
         return CanonicalPayload.Create(
             CanonicalArtifactTypes.AuditLedgerRecord,

@@ -1,5 +1,3 @@
-using System.Collections.ObjectModel;
-
 namespace CDCavell.AsiBackbone.Core.CapabilityTokens;
 
 public sealed class CapabilityGrantValidationOptions

@@ -78,12 +78,9 @@ public static class CapabilityGrantValidator
             verificationService,
             cancellationToken: cancellationToken).ConfigureAwait(false);
 
-        if (verificationOutcome.ShouldAllow)
-        {
-            return null;
-        }
-
-        return CapabilityGrantValidationResult.Failed(
+        return verificationOutcome.ShouldAllow
+            ? null
+            : CapabilityGrantValidationResult.Failed(
             grant,
             MapVerificationCategory(verificationOutcome.Category),
             MapVerificationAction(verificationOutcome.Action),
@@ -142,17 +139,11 @@ public static class CapabilityGrantValidator
             return CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.HandshakeMismatch, VerificationPolicyAction.Deny, "capability.handshake-mismatch");
         }
 
-        if (options.GatewayBinding is not null && !string.Equals(options.GatewayBinding, grant.GatewayBinding, StringComparison.Ordinal))
-        {
-            return CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.GatewayMismatch, VerificationPolicyAction.Deny, "capability.gateway-mismatch");
-        }
-
-        if (options.ResourceBinding is not null && !string.Equals(options.ResourceBinding, grant.ResourceBinding, StringComparison.Ordinal))
-        {
-            return CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.ResourceMismatch, VerificationPolicyAction.Deny, "capability.resource-mismatch");
-        }
-
-        return null;
+        return options.GatewayBinding is not null && !string.Equals(options.GatewayBinding, grant.GatewayBinding, StringComparison.Ordinal)
+            ? CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.GatewayMismatch, VerificationPolicyAction.Deny, "capability.gateway-mismatch")
+            : options.ResourceBinding is not null && !string.Equals(options.ResourceBinding, grant.ResourceBinding, StringComparison.Ordinal)
+            ? CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.ResourceMismatch, VerificationPolicyAction.Deny, "capability.resource-mismatch")
+            : null;
     }
 
     private static async ValueTask<CapabilityGrantValidationResult?> ValidateUseAsync(
@@ -210,6 +201,7 @@ public static class CapabilityGrantValidator
             SignatureVerificationCategory.UnknownKeyVersion => CapabilityTokenValidationCategory.Failed,
             SignatureVerificationCategory.CanonicalizationMismatch => CapabilityTokenValidationCategory.Failed,
             SignatureVerificationCategory.UnsupportedAlgorithm => CapabilityTokenValidationCategory.InvalidProof,
+            SignatureVerificationCategory.Failed => throw new NotImplementedException(),
             _ => CapabilityTokenValidationCategory.Failed
         };
     }

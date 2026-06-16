@@ -191,7 +191,7 @@ public sealed class CapabilityGrantValidatorTests
 
     private static SignedGovernanceArtifact<CapabilityTokenGrant> CreateSignedGrant(CapabilityTokenGrant grant)
     {
-        CanonicalPayload payload = CanonicalPayload.Create(
+        var payload = CanonicalPayload.Create(
             CanonicalArtifactTypes.CapabilityTokenGrant,
             grant.TokenId,
             grant.SchemaVersion,

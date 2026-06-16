@@ -53,7 +53,7 @@ public sealed class GovernanceArtifactPersistenceAnalyzer : DiagnosticAnalyzer
 
         IOperation expression = UnwrapAwait(expressionStatement.Operation);
         ITypeSymbol? artifactType = GetGovernanceArtifactType(expression.Type);
-        if (artifactType is null)
+        if (artifactType is null || !IsArtifactProducerOperation(expression))
         {
             return;
         }
@@ -76,7 +76,7 @@ public sealed class GovernanceArtifactPersistenceAnalyzer : DiagnosticAnalyzer
 
         IOperation value = UnwrapAwait(assignment.Value);
         ITypeSymbol? artifactType = GetGovernanceArtifactType(value.Type);
-        if (artifactType is null)
+        if (artifactType is null || !IsArtifactProducerOperation(value))
         {
             return;
         }
@@ -93,6 +93,28 @@ public sealed class GovernanceArtifactPersistenceAnalyzer : DiagnosticAnalyzer
         return operation is IAwaitOperation awaitOperation
             ? awaitOperation.Operation
             : operation;
+    }
+
+    private static bool IsArtifactProducerOperation(IOperation operation)
+    {
+        operation = UnwrapAwait(operation);
+
+        while (operation is IConversionOperation conversionOperation)
+        {
+            operation = conversionOperation.Operand;
+        }
+
+        return operation switch
+        {
+            IInvocationOperation => true,
+            IObjectCreationOperation => true,
+            IPropertyReferenceOperation => true,
+            IConditionalOperation conditionalOperation => IsArtifactProducerOperation(conditionalOperation.WhenTrue)
+                || IsArtifactProducerOperation(conditionalOperation.WhenFalse),
+            ICoalesceOperation coalesceOperation => IsArtifactProducerOperation(coalesceOperation.Value)
+                || IsArtifactProducerOperation(coalesceOperation.WhenNull),
+            _ => false
+        };
     }
 
     private static ITypeSymbol? GetGovernanceArtifactType(ITypeSymbol? type)

@@ -109,6 +109,9 @@
 - name: Verification Policy and Result Handling
   href: verification-policy-and-result-handling.md
 
+- name: Key Rotation and Retired-Key Verification
+  href: key-rotation-and-retired-key-verification.md
+
 - name: Cryptographic Security Posture and Production Guidance
   href: cryptographic-security-posture.md
 

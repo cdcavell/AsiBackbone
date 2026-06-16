@@ -20,13 +20,13 @@ public sealed class CanonicalPayloadOptions
     /// </summary>
     public const string DefaultHashAlgorithm = "SHA-256";
 
-    private static readonly IReadOnlySet<string> EmptyMetadataKeyAllowList =
-        new ReadOnlySet<string>(new HashSet<string>(StringComparer.Ordinal));
+    private static readonly IReadOnlyCollection<string> EmptyMetadataKeyAllowList =
+        new ReadOnlyCollection<string>(Array.Empty<string>());
 
     private CanonicalPayloadOptions(
         string canonicalizationVersion,
         string hashAlgorithm,
-        IReadOnlySet<string> metadataKeyAllowList)
+        IReadOnlyCollection<string> metadataKeyAllowList)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(canonicalizationVersion);
         ArgumentException.ThrowIfNullOrWhiteSpace(hashAlgorithm);
@@ -54,7 +54,7 @@ public sealed class CanonicalPayloadOptions
     /// <summary>
     /// Gets the metadata keys that may be included in canonical payloads.
     /// </summary>
-    public IReadOnlySet<string> MetadataKeyAllowList { get; }
+    public IReadOnlyCollection<string> MetadataKeyAllowList { get; }
 
     /// <summary>
     /// Creates canonical payload options.
@@ -80,30 +80,25 @@ public sealed class CanonicalPayloadOptions
     public bool AllowsMetadataKey(string key)
     {
         return !string.IsNullOrWhiteSpace(key)
-            && MetadataKeyAllowList.Contains(key.Trim());
+            && MetadataKeyAllowList.Contains(key.Trim(), StringComparer.Ordinal);
     }
 
-    private static IReadOnlySet<string> NormalizeMetadataKeyAllowList(IEnumerable<string>? metadataKeyAllowList)
+    private static IReadOnlyCollection<string> NormalizeMetadataKeyAllowList(IEnumerable<string>? metadataKeyAllowList)
     {
         if (metadataKeyAllowList is null)
         {
             return EmptyMetadataKeyAllowList;
         }
 
-        SortedSet<string> normalizedKeys = new(StringComparer.Ordinal);
+        string[] normalizedKeys = metadataKeyAllowList
+            .Where(key => !string.IsNullOrWhiteSpace(key))
+            .Select(key => key.Trim())
+            .Distinct(StringComparer.Ordinal)
+            .OrderBy(key => key, StringComparer.Ordinal)
+            .ToArray();
 
-        foreach (string key in metadataKeyAllowList)
-        {
-            if (string.IsNullOrWhiteSpace(key))
-            {
-                continue;
-            }
-
-            normalizedKeys.Add(key.Trim());
-        }
-
-        return normalizedKeys.Count == 0
+        return normalizedKeys.Length == 0
             ? EmptyMetadataKeyAllowList
-            : new ReadOnlySet<string>(normalizedKeys);
+            : new ReadOnlyCollection<string>(normalizedKeys);
     }
 }

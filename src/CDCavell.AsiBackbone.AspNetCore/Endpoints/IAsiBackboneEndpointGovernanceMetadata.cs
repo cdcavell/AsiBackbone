@@ -3,7 +3,9 @@ namespace CDCavell.AsiBackbone.AspNetCore.Endpoints;
 /// <summary>
 /// Marker interface for ASP.NET Core endpoint metadata that participates in AsiBackbone endpoint governance.
 /// </summary>
-public interface IAsiBackboneEndpointGovernanceMetadata;
+public interface IAsiBackboneEndpointGovernanceMetadata
+{
+}
 
 /// <summary>
 /// Describes a host-defined governance policy marker attached to an ASP.NET Core endpoint.

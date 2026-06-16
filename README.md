@@ -32,11 +32,11 @@ AsiBackbone should be understood as **governance infrastructure**, not an intell
 
 ## Package family
 
-The first stable `1.0.0` release established the Core, in-memory storage, EF Core, and ASP.NET Core package boundary. Current source and package-validation metadata also include analyzer, OpenTelemetry, and signing provider package projects for the `1.x` line.
+Stable `1.1.0` package family includes the original `1.0.0` Core, in-memory storage, EF Core, and ASP.NET Core package boundary plus analyzer, OpenTelemetry, and signing provider packages for the compatible `1.x` line.
 
 | Package | Role |
 | :--- | :--- |
-| `CDCavell.AsiBackbone.Core` | Framework-neutral governance primitives, decisions, constraints, acknowledgments, audit residue, lifecycle events, capability-token abstractions, durable outbox contracts, provider-neutral emission contracts, DLP/classification policy primitives, and signing-ready metadata. |
+| `CDCavell.AsiBackbone.Core` | Framework-neutral governance primitives, decisions, constraints, acknowledgments, audit residue, lifecycle events, capability-token abstractions, durable outbox contracts, provider-neutral emission contracts, DLP/classification policy primitives, signing-ready metadata, canonical hashing/signing seams, and verification-policy primitives. |
 | `CDCavell.AsiBackbone.Storage.InMemory` | Non-durable in-memory storage helpers for tests, samples, local validation, lifecycle events, and outbox proof paths. |
 | `CDCavell.AsiBackbone.EntityFrameworkCore` | EF Core model configuration and host-owned persistence for audit ledger, acknowledgments, lifecycle events, and governance outbox records. |
 | `CDCavell.AsiBackbone.AspNetCore` | ASP.NET Core host adapters for actor context, request correlation, audit enrichment, HTTP result mapping, acknowledgment challenge flows, endpoint governance, and hosted outbox drain integration. |
@@ -129,7 +129,7 @@ The host application remains responsible for execution behavior and operational 
 
 ## Current status
 
-Stable `1.0.0` foundation with active `1.x` package-family expansion.
+Stable `1.1.0` package family prepared for release.
 
 The repository includes the Core foundation, in-memory validation storage, EF Core host-owned persistence, ASP.NET Core integration, analyzers, OpenTelemetry provider implementation, local-development signing provider, managed-key signing adapter boundary, samples, release validation, and host-validation documentation.
 
@@ -137,7 +137,7 @@ The repository includes the Core foundation, in-memory validation storage, EF Co
 
 ### CDCavell.AsiBackbone.Core
 
-Defines framework-neutral domain abstractions and primitives, including provider-neutral governance emission, durable outbox, DLP/classification policy, and signing-ready metadata seams.
+Defines framework-neutral domain abstractions and primitives, including provider-neutral governance emission, durable outbox, DLP/classification policy, signing-ready metadata seams, canonical hashing/signing seams, and verification-policy primitives.
 
 ### CDCavell.AsiBackbone.Storage.InMemory
 

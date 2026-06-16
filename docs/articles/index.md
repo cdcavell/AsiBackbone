@@ -48,6 +48,9 @@ Start with [Getting Started](getting-started.md), then use the navigation menu t
 * [Signing Provider Package Boundary](signing-provider-package-boundary.md)
   Documents the concrete signing-provider package boundary, provider responsibilities, key-material handling rules, configuration seams, local-development signer posture, and managed-key provider direction.
 
+* [Managed-Key Signing Provider](managed-key-signing-provider.md)
+  Documents the managed-key signing provider package, host-owned managed-key client boundary, dependency injection wiring, signing metadata, retry behavior, failure handling, and operational prerequisites.
+
 * [Signed Audit and Outbox Records](signed-audit-and-outbox-records.md)
   Documents the implemented unsigned, signing-ready, and signed artifact flows for audit residue, audit ledger records, lifecycle events, governance emission envelopes, and governance outbox entries.
 

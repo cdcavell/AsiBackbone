@@ -18,13 +18,14 @@ public static class CanonicalPayloadBuilder
     {
         ArgumentNullException.ThrowIfNull(residue);
         CanonicalPayloadOptions effectiveOptions = options ?? CanonicalPayloadOptions.Default;
+        string auditResidueId = GetAuditResidueId(residue);
 
         return CanonicalPayload.Create(
             CanonicalArtifactTypes.AuditResidue,
-            residue.AuditResidueId,
+            auditResidueId,
             residue.SchemaVersion,
             effectiveOptions.CanonicalizationVersion,
-            BuildAuditResidueContent(residue, effectiveOptions));
+            BuildAuditResidueContent(residue, effectiveOptions, auditResidueId));
     }
 
     /// <summary>
@@ -35,7 +36,7 @@ public static class CanonicalPayloadBuilder
         ArgumentNullException.ThrowIfNull(record);
         CanonicalPayloadOptions effectiveOptions = options ?? CanonicalPayloadOptions.Default;
 
-        SortedDictionary<string, object?> content = BuildAuditResidueContent(record, effectiveOptions);
+        SortedDictionary<string, object?> content = BuildAuditResidueContent(record, effectiveOptions, record.AuditResidueId);
         content["acknowledgmentId"] = record.AcknowledgmentId;
         content["capabilityGrantId"] = record.CapabilityTokenId;
         content["handshakeId"] = record.HandshakeId;
@@ -130,14 +131,17 @@ public static class CanonicalPayloadBuilder
             content);
     }
 
-    private static SortedDictionary<string, object?> BuildAuditResidueContent(IAsiBackboneAuditResidue residue, CanonicalPayloadOptions options)
+    private static SortedDictionary<string, object?> BuildAuditResidueContent(
+        IAsiBackboneAuditResidue residue,
+        CanonicalPayloadOptions options,
+        string auditResidueId)
     {
         return new SortedDictionary<string, object?>(StringComparer.Ordinal)
         {
             ["actorDisplayName"] = residue.ActorDisplayName,
             ["actorId"] = residue.ActorId,
             ["actorType"] = residue.ActorType.ToString(),
-            ["auditResidueId"] = residue.AuditResidueId,
+            ["auditResidueId"] = auditResidueId,
             ["constraintCount"] = residue.ConstraintCount,
             ["constraintSetHash"] = residue.ConstraintSetHash,
             ["correlationId"] = residue.CorrelationId,
@@ -273,5 +277,12 @@ public static class CanonicalPayloadBuilder
     private static string FormatUtc(DateTimeOffset timestamp)
     {
         return timestamp.ToUniversalTime().ToString("yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'", CultureInfo.InvariantCulture);
+    }
+
+    private static string GetAuditResidueId(IAsiBackboneAuditResidue residue)
+    {
+        return string.IsNullOrWhiteSpace(residue.AuditResidueId)
+            ? residue.EventId
+            : residue.AuditResidueId;
     }
 }

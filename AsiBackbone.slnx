@@ -1,5 +1,8 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/CDCavell.AsiBackbone.Analyzers/CDCavell.AsiBackbone.Analyzers.csproj">
+      <Build Solution="Debug|*" Project="false" />
+    </Project>
     <Project Path="src/CDCavell.AsiBackbone.AspNetCore/CDCavell.AsiBackbone.AspNetCore.csproj" />
     <Project Path="src/CDCavell.AsiBackbone.Core/CDCavell.AsiBackbone.Core.csproj" />
     <Project Path="src/CDCavell.AsiBackbone.EntityFrameworkCore/CDCavell.AsiBackbone.EntityFrameworkCore.csproj" />
@@ -14,6 +17,9 @@
     <Project Path="samples/PlainAspNetCoreHost/CDCavell.AsiBackbone.Samples.PlainAspNetCoreHost.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/CDCavell.AsiBackbone.Analyzers.Tests/CDCavell.AsiBackbone.Analyzers.Tests.csproj">
+      <Build Solution="Debug|*" Project="false" />
+    </Project>
     <Project Path="tests/CDCavell.AsiBackbone.AspNetCore.Tests/CDCavell.AsiBackbone.AspNetCore.Tests.csproj" />
     <Project Path="tests/CDCavell.AsiBackbone.Core.Tests/CDCavell.AsiBackbone.Core.Tests.csproj" />
     <Project Path="tests/CDCavell.AsiBackbone.EntityFrameworkCore.Tests/CDCavell.AsiBackbone.EntityFrameworkCore.Tests.csproj" />

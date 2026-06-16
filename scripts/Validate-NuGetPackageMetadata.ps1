@@ -132,6 +132,12 @@ $expectedPackages = @(
         ReadmeMustContain = @('Accountable Systems Infrastructure', 'Stable `1.0.0` package family')
     },
     [pscustomobject]@{
+        Id = 'CDCavell.AsiBackbone.Analyzers'
+        Description = 'Roslyn analyzer safety rails for Accountable Systems Infrastructure governance persistence and continuation flows.'
+        Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'roslyn', 'analyzer', 'safety-rails', 'audit', 'outbox')
+        ReadmeMustContain = @('Roslyn analyzer safety rails', 'ASIB001')
+    },
+    [pscustomobject]@{
         Id = 'CDCavell.AsiBackbone.AspNetCore'
         Description = 'ASP.NET Core host adapters for Accountable Systems Infrastructure actor context, request correlation, HTTP result mapping, and acknowledgment challenge flows.'
         Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'aspnetcore', 'web', 'host-integration', 'http', 'acknowledgment')

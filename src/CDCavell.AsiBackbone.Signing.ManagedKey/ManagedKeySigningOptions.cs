@@ -115,11 +115,6 @@ public sealed class ManagedKeySigningOptions
             throw new InvalidOperationException("Managed-key signing key ID is required.");
         }
 
-        if (RequireKeyVersion && string.IsNullOrWhiteSpace(KeyVersion))
-        {
-            throw new InvalidOperationException("Managed-key signing key version is required when RequireKeyVersion is true.");
-        }
-
         if (string.IsNullOrWhiteSpace(SignatureAlgorithm))
         {
             throw new InvalidOperationException("Managed-key signing signature algorithm is required.");

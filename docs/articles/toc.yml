@@ -106,6 +106,9 @@
 - name: Signed Audit and Outbox Records
   href: signed-audit-and-outbox-records.md
 
+- name: Verification Policy and Result Handling
+  href: verification-policy-and-result-handling.md
+
 - name: Cryptographic Security Posture and Production Guidance
   href: cryptographic-security-posture.md
 

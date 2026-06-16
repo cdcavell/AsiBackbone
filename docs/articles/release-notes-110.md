@@ -1,14 +1,14 @@
 # 1.1.0 Release Notes
 
-These notes describe the `1.1.0 - Observability, Outbox, and Governance Emission Providers` release boundary.
+These notes describe the target `1.1.0 - Observability, Outbox, Signing, and Governance Emission Providers` release boundary.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is governance infrastructure for accountable software decision flow. It does not implement artificial superintelligence, host AI models, control robots, certify compliance, or provide production tamper-evidence by itself.
 
 ## Release summary
 
-`1.1.0` is an additive minor release over `1.0.0`. Existing `1.0.0` consumers can continue using the stable Core, in-memory storage, EF Core, and ASP.NET Core package surfaces without adopting the new observability, outbox, or provider paths.
+`1.1.0` is an additive minor release over `1.0.0`. Existing `1.0.0` consumers can continue using the stable Core, in-memory storage, EF Core, and ASP.NET Core package surfaces without adopting the new analyzer, observability, outbox, signing, verification, or provider paths.
 
-The release expands the governance spine from local decision/audit records into a provider-neutral emission pipeline:
+The release expands the governance spine from local decision/audit records into durable lifecycle, provider-neutral emission, optional OpenTelemetry projection, and signing-provider boundaries:
 
 ```text
 Decision
@@ -17,24 +17,30 @@ Decision
   -> gateway or host execution boundary
   -> audit residue / lifecycle event
   -> durable local audit and outbox persistence
+  -> optional signing / verification boundary
   -> optional provider emission
 ```
 
 The durable local audit/outbox record is the reliability baseline. OpenTelemetry, Azure Monitor, Event Hubs, Purview, SIEMs, dashboards, and other downstream systems should be treated as optional projection or enrichment targets unless the host application explicitly designs them as an authoritative store.
 
+Signing and verification are part of an operational trust model, not proof of tamper-evidence by themselves. Production tamper-evidence requires concrete signing, verification, protected key management, durable append-only or otherwise controlled storage, retention policy, monitoring, and incident response supplied by the host or provider environment.
+
 ## Stable package family
 
-The `1.1.0` stable package line covers the package family below.
+The target `1.1.0` package line covers the package family below.
 
 | Package | Stable role |
 | --- | --- |
-| `CDCavell.AsiBackbone.Core` | Framework-neutral governance primitives, decisions, acknowledgments, capability-token references, audit residue, lifecycle events, provider-neutral emission contracts, durable outbox contracts, DLP/classification failure policy primitives, and signing-ready metadata abstractions. |
+| `CDCavell.AsiBackbone.Core` | Framework-neutral governance primitives, decisions, acknowledgments, capability-token references, audit residue, lifecycle events, provider-neutral emission contracts, durable outbox contracts, DLP/classification failure policy primitives, signing-ready metadata abstractions, canonical hashing/signing seams, and verification-policy primitives. |
 | `CDCavell.AsiBackbone.Storage.InMemory` | Non-durable in-memory audit, lifecycle, and outbox helpers for tests, samples, local validation, and no-op proof paths. |
-| `CDCavell.AsiBackbone.EntityFrameworkCore` | EF Core model configuration and host-owned persistence for audit ledger, audit residue lifecycle, and durable governance outbox records. |
-| `CDCavell.AsiBackbone.AspNetCore` | ASP.NET Core host integration seams for service registration, request correlation, audit enrichment, HTTP result mapping, acknowledgment challenge helpers, and hosted outbox drain integration. |
+| `CDCavell.AsiBackbone.EntityFrameworkCore` | EF Core model configuration and host-owned persistence for audit ledger, audit residue lifecycle, acknowledgment, and durable governance outbox records. |
+| `CDCavell.AsiBackbone.AspNetCore` | ASP.NET Core host integration seams for service registration, request correlation, audit enrichment, HTTP result mapping, acknowledgment challenge helpers, endpoint governance, and hosted outbox drain integration. |
+| `CDCavell.AsiBackbone.Analyzers` | Roslyn analyzer safety rails for governance persistence and continuation flows. Analyzer diagnostics are development/build-time guidance and do not enforce runtime behavior. |
 | `CDCavell.AsiBackbone.OpenTelemetry` | Concrete OpenTelemetry governance emission provider that projects provider-neutral governance envelopes into .NET diagnostics primitives such as `ActivitySource` and `Meter`. |
+| `CDCavell.AsiBackbone.Signing.LocalDevelopment` | Local-development RSA signing and verification provider for tests, samples, and host wiring proof paths. Not production key custody, managed-key signing, immutability, non-repudiation, or tamper-evidence. |
+| `CDCavell.AsiBackbone.Signing.ManagedKey` | Provider-neutral managed-key signing adapter. The host supplies the actual managed-key client, credentials, key operations, verification path, monitoring, and operational policy. |
 
-Future Event Hubs, Purview, Azure-specific, signing-provider, gateway, robotics, or immutable-storage packages are not part of the `1.1.0` stable contract unless separately released as stable packages.
+Future Event Hubs, Purview, Azure-specific, Azure Key Vault-specific, HSM-specific, gateway, robotics, or immutable-storage packages are not part of the `1.1.0` stable contract unless separately released as stable packages.
 
 ## What changed since 1.0.0
 
@@ -99,6 +105,12 @@ The hosted worker can drain pending outbox entries through a registered provider
 
 Hosts should avoid duplicate workers unless they intentionally design for multi-worker behavior and understand the storage/concurrency consequences.
 
+### Endpoint governance
+
+`CDCavell.AsiBackbone.AspNetCore` includes endpoint governance metadata and validation seams so hosts can attach governance intent to endpoints and validate endpoint-level policy metadata explicitly.
+
+Endpoint governance remains a host adapter. It does not replace authentication, authorization, routing, middleware enforcement, UI, persistence, or execution controls.
+
 ### OpenTelemetry provider
 
 `CDCavell.AsiBackbone.OpenTelemetry` is the first concrete governance emission provider package.
@@ -126,23 +138,51 @@ CDCavell.AsiBackbone.OpenTelemetry
 
 The OpenTelemetry provider should not hold Azure connection strings, instrumentation keys, workspace IDs, tenant IDs, or Azure SDK types.
 
+### Roslyn analyzer safety rails
+
+`CDCavell.AsiBackbone.Analyzers` adds build-time analyzer safety rails for governance persistence and continuation flows.
+
+Analyzer diagnostics should be treated as development-time feedback. They do not execute governance decisions at runtime, do not prove compliance, and do not replace tests, code review, runtime policy evaluation, or host-owned operational controls.
+
 ### DLP and classification failure behavior
 
 Core includes provider-neutral DLP/classification failure policy primitives so hosts can decide how governance emission should behave when classification is unavailable, times out, returns indeterminate results, blocks a payload, or reports a classified result.
 
 Hosts should explicitly choose risk-sensitive behavior such as fail-open, fail-closed, defer, require acknowledgment, or escalate. Sensitive or unclassified payloads should not be emitted to external providers merely because a classifier is unavailable.
 
-### Signing-ready receipts
+### Signing-ready receipts and verification seams
 
-Core includes signing-ready abstractions and metadata fields for audit receipts and downstream verification seams.
-
-This is not a concrete signing implementation. `1.1.0` does not add Azure Key Vault, HSM, local signer, immutable storage, or production tamper-evidence behavior by default.
+Core includes signing-ready abstractions, canonical hashing/signing seams, signing metadata fields, and verification-policy primitives for audit receipts and downstream verification flows.
 
 Accurate wording:
 
 - records can carry signing-ready metadata;
-- hosts or future provider packages can sign and verify precomputed artifact hashes;
-- production tamper-evidence requires concrete signing, verification, protected key management, durable storage guarantees, retention policy, and operational procedures outside the Core seam.
+- artifact hashes can be signed through a configured provider package or host-owned signing service;
+- verification can classify signatures as valid, invalid, missing, unavailable, unsupported, revoked, or otherwise policy-relevant according to the host's verification policy;
+- signed does not mean verified;
+- verified does not mean tamper-evident unless the deployed storage, retention, key-management, chain/anchor, monitoring, and operational controls support that claim.
+
+### Local-development signing provider
+
+`CDCavell.AsiBackbone.Signing.LocalDevelopment` provides a local-development RSA signing and verification provider.
+
+It is intended for:
+
+- tests;
+- samples;
+- deterministic local validation;
+- host wiring proof paths;
+- documentation examples.
+
+It is not a production managed-key provider and does not provide protected key custody, immutable storage, legal non-repudiation, compliance certification, or production tamper-evidence by itself.
+
+### Managed-key signing adapter
+
+`CDCavell.AsiBackbone.Signing.ManagedKey` provides a provider-neutral managed-key signing adapter.
+
+The package supplies the adapter boundary and registration shape. The host supplies the actual managed-key client. That host-owned client may call Azure Key Vault, Managed HSM, cloud KMS, HSM appliances, or organization-owned signing services, but those concrete integrations are not included by default.
+
+The managed-key adapter must not return private keys, symmetric keys, connection strings, access tokens, managed identity tokens, client secrets, or raw credential material to Core.
 
 ## SemVer and compatibility
 
@@ -153,6 +193,8 @@ Compatibility expectations:
 - existing `1.0.0` package references can be upgraded to `1.1.0` without required source-code changes for consumers that do not use new features;
 - new public APIs are additive;
 - new provider package adoption is optional;
+- analyzer adoption is optional and should not be required for runtime use;
+- signing-provider adoption is optional;
 - new persisted fields and schema additions should be treated as additive migration work owned by the host;
 - preview or future provider packages remain outside the stable compatibility promise until separately released as stable.
 
@@ -167,8 +209,9 @@ The following work is intentionally deferred or documentation/design-only for th
 | Event Hubs | Design documentation only. No Event Hubs SDK dependency or implementation package is included in the stable package family. |
 | Purview | Governance and lineage enrichment strategy documentation only. No Purview SDK dependency or implementation package is included in the stable package family. |
 | Azure Monitor | Supported through host-configured OpenTelemetry exporter guidance. No Azure Monitor-specific package is included. |
-| Signing provider | Core signing-ready abstractions and metadata only. No concrete signing provider, Azure Key Vault adapter, HSM adapter, local signer, or key-management package is included. |
-| Production tamper evidence | Not claimed by default. Requires concrete signing, verification, storage, retention, and operational controls implemented by the host or a future provider package. |
+| Azure Key Vault / Managed HSM / cloud KMS | Not implemented directly. The managed-key adapter requires a host-owned client and does not ship live cloud SDK integration by default. |
+| Production tamper evidence | Not claimed by default. Requires concrete signing, verification, storage, retention, key-management, monitoring, and operational controls implemented by the host or a future provider package. |
+| Immutable storage / external anchoring | Not implemented. Hash-chain or signing metadata should not be described as immutable or externally anchored unless a concrete storage/anchoring design is deployed. |
 | Robotics / physical execution | Not implemented. Robotics remains a later gateway/scenario area and does not change the software package boundary. |
 
 ## Upgrade guidance
@@ -178,11 +221,14 @@ See [Upgrade Guide: 1.0.0 to 1.1.0](upgrade-100-to-110.md) for step-by-step guid
 At a high level:
 
 1. Upgrade existing stable packages from `1.0.0` to `1.1.0`.
-2. Add `CDCavell.AsiBackbone.OpenTelemetry` only if provider emission is needed.
-3. Prefer durable EF Core or another durable host-owned outbox store before provider emission.
-4. Use in-memory stores and no-op emitters only for tests, samples, and local validation.
-5. Configure Azure Monitor through the host OpenTelemetry pipeline if Azure Monitor is the selected backend.
-6. Do not claim signing, immutability, or tamper-evidence unless a concrete signing/storage design is actually implemented.
+2. Add `CDCavell.AsiBackbone.Analyzers` only when build-time diagnostics are desired.
+3. Add `CDCavell.AsiBackbone.OpenTelemetry` only if provider emission is needed.
+4. Prefer durable EF Core or another durable host-owned outbox store before provider emission.
+5. Use in-memory stores and no-op emitters only for tests, samples, and local validation.
+6. Use `CDCavell.AsiBackbone.Signing.LocalDevelopment` only for local development, tests, samples, or proof paths.
+7. Use `CDCavell.AsiBackbone.Signing.ManagedKey` only when the host supplies a managed-key client, credentials, key identity, failure policy, monitoring, and verification plan.
+8. Configure Azure Monitor through the host OpenTelemetry pipeline if Azure Monitor is the selected backend.
+9. Do not claim signing, immutability, non-repudiation, or tamper-evidence unless a concrete signing, verification, storage, retention, and key-management design is actually implemented.
 
 ## Validation expectations
 
@@ -191,11 +237,17 @@ Before tagging or publishing `1.1.0`, run release validation from a clean workin
 Recommended commands:
 
 ```powershell
-dotnet format AsiBackbone.slnx
+dotnet restore AsiBackbone.slnx
+dotnet format AsiBackbone.slnx --verify-no-changes --verbosity minimal
 dotnet build AsiBackbone.slnx -c Release
+dotnet test AsiBackbone.slnx -c Release --no-build --no-restore
+dotnet tool restore
+dotnet tool run docfx -- docs/docfx.json
 ```
 
-The most recent milestone validation captured during OpenTelemetry provider implementation reported a successful Release build and test run with 451 tests passed, 0 failed, and 0 skipped. Rerun validation against the final release candidate before tagging.
+Package validation should also pack and validate the expected package artifacts, including Core, Storage.InMemory, EntityFrameworkCore, AspNetCore, Analyzers, OpenTelemetry, Signing.LocalDevelopment, and Signing.ManagedKey.
+
+Rerun validation against the final release candidate before tagging. Do not rely on older milestone test counts once signing, analyzer, endpoint-governance, or package-boundary changes have landed.
 
 ## Related documentation
 
@@ -207,6 +259,12 @@ The most recent milestone validation captured during OpenTelemetry provider impl
 - [OpenTelemetry Governance Emission Provider](opentelemetry-governance-emission-provider.md)
 - [DLP and Classification Failure Policy](dlp-classification-failure-policy.md)
 - [Signing-Ready Receipts and Key Handling](signing-ready-receipts-and-key-handling.md)
+- [Signing Provider Package Boundary](signing-provider-package-boundary.md)
+- [Managed-Key Signing Provider](managed-key-signing-provider.md)
+- [Signed Audit and Outbox Records](signed-audit-and-outbox-records.md)
+- [Verification Policy and Result Handling](verification-policy-and-result-handling.md)
+- [Key Rotation and Retired-Key Verification](key-rotation-and-retired-key-verification.md)
+- [Capability Grant Hardening](capability-grant-hardening.md)
 - [Event Hubs Governance Emission Provider Design](event-hubs-governance-emission-provider-design.md)
 - [Purview Governance and Lineage Enrichment Strategy](purview-governance-lineage-enrichment-strategy.md)
 - [API Compatibility and SemVer](api-compatibility-and-semver.md)

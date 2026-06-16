@@ -215,11 +215,10 @@ public sealed class GovernanceArtifactPersistenceAnalyzerTests
         return await compilationWithAnalyzers.GetAnalyzerDiagnosticsAsync();
     }
 
-    private static IReadOnlyList<MetadataReference> GetMetadataReferences()
+    private static PortableExecutableReference[] GetMetadataReferences()
     {
-        return Directory
+        return [.. Directory
             .EnumerateFiles(RuntimeEnvironment.GetRuntimeDirectory(), "*.dll")
-            .Select(path => MetadataReference.CreateFromFile(path))
-            .ToArray();
+            .Select(MetadataReference.CreateFromFile)];
     }
 }

@@ -129,17 +129,11 @@ public static class CapabilityGrantValidator
             return CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.MissingAcknowledgmentReference, VerificationPolicyAction.RequireAcknowledgment, "capability.acknowledgment-missing");
         }
 
-        if (options.AcknowledgmentId is not null && !string.Equals(options.AcknowledgmentId, grant.AcknowledgmentId, StringComparison.Ordinal))
-        {
-            return CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.AcknowledgmentMismatch, VerificationPolicyAction.Deny, "capability.acknowledgment-mismatch");
-        }
-
-        if (options.HandshakeId is not null && !string.Equals(options.HandshakeId, grant.HandshakeId, StringComparison.Ordinal))
-        {
-            return CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.HandshakeMismatch, VerificationPolicyAction.Deny, "capability.handshake-mismatch");
-        }
-
-        return options.GatewayBinding is not null && !string.Equals(options.GatewayBinding, grant.GatewayBinding, StringComparison.Ordinal)
+        return options.AcknowledgmentId is not null && !string.Equals(options.AcknowledgmentId, grant.AcknowledgmentId, StringComparison.Ordinal)
+            ? CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.AcknowledgmentMismatch, VerificationPolicyAction.Deny, "capability.acknowledgment-mismatch")
+            : options.HandshakeId is not null && !string.Equals(options.HandshakeId, grant.HandshakeId, StringComparison.Ordinal)
+            ? CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.HandshakeMismatch, VerificationPolicyAction.Deny, "capability.handshake-mismatch")
+            : options.GatewayBinding is not null && !string.Equals(options.GatewayBinding, grant.GatewayBinding, StringComparison.Ordinal)
             ? CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.GatewayMismatch, VerificationPolicyAction.Deny, "capability.gateway-mismatch")
             : options.ResourceBinding is not null && !string.Equals(options.ResourceBinding, grant.ResourceBinding, StringComparison.Ordinal)
             ? CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.ResourceMismatch, VerificationPolicyAction.Deny, "capability.resource-mismatch")
@@ -201,7 +195,7 @@ public static class CapabilityGrantValidator
             SignatureVerificationCategory.UnknownKeyVersion => CapabilityTokenValidationCategory.Failed,
             SignatureVerificationCategory.CanonicalizationMismatch => CapabilityTokenValidationCategory.Failed,
             SignatureVerificationCategory.UnsupportedAlgorithm => CapabilityTokenValidationCategory.InvalidProof,
-            SignatureVerificationCategory.Failed => throw new NotImplementedException(),
+            SignatureVerificationCategory.Failed => CapabilityTokenValidationCategory.Failed,
             _ => CapabilityTokenValidationCategory.Failed
         };
     }

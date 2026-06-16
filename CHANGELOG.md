@@ -4,6 +4,39 @@ All notable changes to this project are documented in this file.
 
 This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/) and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-06-16
+
+### Added
+
+* Added provider-neutral governance emission contracts and envelope/result/error primitives for downstream observability and governance projection.
+* Added durable governance outbox and audit residue lifecycle surfaces so local accountability records can be preserved before provider emission is attempted.
+* Added `CDCavell.AsiBackbone.OpenTelemetry` as the first concrete governance emission provider package for projecting governance envelopes into `ActivitySource` and `Meter` diagnostics.
+* Added `CDCavell.AsiBackbone.Analyzers` as Roslyn analyzer safety rails for governance persistence and continuation flows.
+* Added signing-ready receipt, canonical hashing/signing, and verification-policy seams while keeping Core provider-neutral.
+* Added `CDCavell.AsiBackbone.Signing.LocalDevelopment` for local-development RSA signing and verification in tests, samples, and wiring proof paths.
+* Added `CDCavell.AsiBackbone.Signing.ManagedKey` as a provider-neutral managed-key signing adapter boundary where the host supplies the actual managed-key client and operational policy.
+* Added ASP.NET Core endpoint governance metadata and hosted outbox drain integration.
+
+### Changed
+
+* Promoted central package version metadata from `1.0.0` to `1.1.0` while preserving `AssemblyVersion` as `1.0.0.0` for the compatible `1.x` line.
+* Updated release-facing README, citation metadata, Zenodo metadata, release notes, package validation anchors, and release guidance for the `1.1.0` package family.
+* Expanded package validation to include Analyzers, OpenTelemetry, Signing.LocalDevelopment, and Signing.ManagedKey package artifacts.
+* Clarified that OpenTelemetry is a provider projection path and that Azure Monitor remains host-configured through the host OpenTelemetry pipeline.
+* Clarified signing language so provider signing is described as one part of an operational trust model, not production tamper-evidence or non-repudiation by itself.
+
+### Validation
+
+* Version-consistency validation is expected to pass for `1.1.0`, including `Directory.Build.props`, `CITATION.cff`, `.zenodo.json`, tag version checks, and generated package filenames when package artifacts are supplied.
+* NuGet metadata validation now expects the `1.1.0` stable package-family README wording and all eight package artifacts.
+* Release validation and package publish workflows should restore, build, format-check, test, build DocFX, pack packages, validate package metadata, and run package smoke checks before publication.
+
+### Boundary Notes
+
+* `1.1.0` remains Accountable Systems Infrastructure and governance spine infrastructure, not an artificial superintelligence implementation, AI model host, robot controller, legal/compliance guarantee, or production tamper-evident ledger provider.
+* Event Hubs, Purview, Azure-specific SDK adapters, robotics/physical execution, immutable storage, and external anchoring remain outside the `1.1.0` stable package boundary unless separately released as stable packages.
+* The managed-key signing adapter does not ship live Azure Key Vault, Managed HSM, cloud KMS, HSM, certificate-store, or credential-provider implementation by default.
+
 ## [1.0.0] - 2026-06-14
 
 ### Added

@@ -262,9 +262,6 @@ public sealed class LocalDevelopmentSigningService : IAsiBackboneSigningService,
 
     private void ThrowIfDisposed()
     {
-        if (disposed)
-        {
-            throw new ObjectDisposedException(nameof(LocalDevelopmentSigningService));
-        }
+        ObjectDisposedException.ThrowIf(disposed, this);
     }
 }

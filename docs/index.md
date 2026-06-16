@@ -2,7 +2,7 @@
 
 Welcome to the ASI Backbone documentation site.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a .NET governance and policy-control framework inspired by broader Eden/Backbone governance concepts, but implemented as practical software infrastructure. The project is a **governance spine**, not an intelligence engine. Its purpose is to define practical software patterns for policy evaluation, decision results, acknowledgment workflows, audit receipts, capability-gated execution, durable audit/outbox persistence, optional governance emission, signing-ready artifacts, and host integration.
+In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a .NET governance and policy-control framework inspired by broader Eden/Backbone governance concepts, but implemented as practical software infrastructure. The project is a **governance spine**, not an intelligence engine. Its purpose is to define practical software patterns for policy evaluation, decision results, acknowledgment workflows, audit receipts, capability-gated execution, durable audit/outbox persistence, optional governance emission, signing-ready artifacts, provider signing boundaries, verification policy, and host integration.
 
 > [!IMPORTANT]
 > AsiBackbone does not implement artificial superintelligence. It provides framework-neutral building blocks for governing consequential actions in software systems.
@@ -22,7 +22,7 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
   First stable package-family release identity, known limitations, and stable package boundary.
 
 * [1.1.0 Release Notes](articles/release-notes-110.md)  
-  Additive observability, durable outbox, governance emission, OpenTelemetry, DLP/classification, and signing-ready release guidance.
+  Additive observability, durable outbox, governance emission, OpenTelemetry, DLP/classification, analyzer, and signing-provider release guidance.
 
 * [Upgrade Guide: 1.0.0 to 1.1.0](articles/upgrade-100-to-110.md)  
   Incremental adoption guidance for existing consumers.
@@ -67,6 +67,7 @@ Intent or request
   -> Preserve audit residue and lifecycle events
   -> Issue optional scoped capability grant
   -> Preserve local audit/outbox record when provider emission is used
+  -> Optionally sign or verify governance artifacts when a provider is configured
   -> Optionally emit a minimized governance envelope
   -> Host decides whether and how to execute
 ```
@@ -150,18 +151,13 @@ See also:
 
 The AsiBackbone package family should remain modular. Consumers should be able to adopt the pieces they need without inheriting unnecessary host assumptions.
 
-The first stable `1.0.0` published package boundary covers:
+Stable `1.1.0` package family covers:
 
 ```text
 CDCavell.AsiBackbone.Core
 CDCavell.AsiBackbone.Storage.InMemory
 CDCavell.AsiBackbone.EntityFrameworkCore
 CDCavell.AsiBackbone.AspNetCore
-```
-
-Current source and package-validation metadata also include these additional package projects for the `1.x` line:
-
-```text
 CDCavell.AsiBackbone.Analyzers
 CDCavell.AsiBackbone.OpenTelemetry
 CDCavell.AsiBackbone.Signing.LocalDevelopment
@@ -183,7 +179,7 @@ CDCavell.AsiBackbone.ImmutableStorage
 
 Stable package.
 
-`CDCavell.AsiBackbone.Core` is the dependency-light foundation package. It defines shared contracts, domain abstractions, result primitives, provider-neutral governance emission contracts, durable outbox contracts, DLP/classification policy primitives, signing-ready metadata abstractions, and framework-neutral language used by the rest of the package family.
+`CDCavell.AsiBackbone.Core` is the dependency-light foundation package. It defines shared contracts, domain abstractions, result primitives, provider-neutral governance emission contracts, durable outbox contracts, DLP/classification policy primitives, signing-ready metadata abstractions, canonical hashing/signing seams, verification-policy primitives, and framework-neutral language used by the rest of the package family.
 
 Core remains free of direct ASP.NET Core, Entity Framework Core, database-provider, host-template, robotics, cloud SDK, OpenTelemetry SDK, and AI-model assumptions.
 
@@ -200,6 +196,8 @@ Primary responsibilities:
 * DLP/classification failure policy primitives
 * Capability-token abstractions
 * Signing-ready metadata abstractions
+* Canonical hashing/signing seams
+* Verification-policy primitives
 * Policy version and policy hash fields
 * Shared value objects
 * Framework-neutral domain language
@@ -257,7 +255,7 @@ The host application remains responsible for authentication, authorization, endp
 
 ## CDCavell.AsiBackbone.Analyzers
 
-Source package project.
+Stable package.
 
 `CDCavell.AsiBackbone.Analyzers` provides Roslyn analyzer safety rails for governance persistence and continuation flows. Analyzer packages should remain advisory development-time guardrails and should not be described as runtime enforcement.
 
@@ -270,7 +268,7 @@ Primary responsibilities:
 
 ## CDCavell.AsiBackbone.OpenTelemetry
 
-Source package project and documented `1.x` provider path.
+Stable package.
 
 `CDCavell.AsiBackbone.OpenTelemetry` provides a concrete OpenTelemetry governance emission provider. It adapts provider-neutral governance envelopes into .NET diagnostics primitives such as `ActivitySource` and `Meter` while leaving exporters, Azure Monitor, Application Insights, Log Analytics, SIEMs, dashboards, and backend routing to the host application.
 
@@ -285,7 +283,7 @@ Primary responsibilities:
 
 ## CDCavell.AsiBackbone.Signing.LocalDevelopment
 
-Source package project.
+Stable package for local development, tests, samples, and proof paths.
 
 `CDCavell.AsiBackbone.Signing.LocalDevelopment` provides local-development RSA signing and verification for tests, samples, and host wiring proof paths. It is not a production managed-key provider and does not provide protected key custody, immutability, tamper-evidence, legal non-repudiation, or compliance certification.
 
@@ -299,7 +297,7 @@ Primary responsibilities:
 
 ## CDCavell.AsiBackbone.Signing.ManagedKey
 
-Source package project.
+Stable adapter package.
 
 `CDCavell.AsiBackbone.Signing.ManagedKey` provides a managed-key signing adapter boundary. The package defines the adapter shape and service integration while the host supplies the actual managed-key client, credentials, key identity, provider configuration, monitoring, and operational policy.
 
@@ -358,9 +356,10 @@ The stable implementation path is:
 10. Durable audit lifecycle and governance outbox persistence
 11. Provider-neutral governance emission contracts
 12. OpenTelemetry provider projection
-13. Signing-ready metadata and provider package boundaries
-14. Plain ASP.NET Core sample host
-15. Documentation and host-validation guidance
+13. Analyzer safety rails
+14. Signing-ready metadata and provider package boundaries
+15. Plain ASP.NET Core sample host
+16. Documentation and host-validation guidance
 
 Future work may add Event Hubs, Purview, Azure-specific integration guidance, additional samples, gateway integrations, robotics examples, immutable-storage patterns, and follow-up release packaging.
 

@@ -1,0 +1,37 @@
+namespace CDCavell.AsiBackbone.Core.Signing;
+
+/// <summary>
+/// Provides stable artifact type identifiers for canonical AsiBackbone signing payloads.
+/// </summary>
+public static class CanonicalArtifactTypes
+{
+    /// <summary>
+    /// Identifies a framework-neutral audit residue payload.
+    /// </summary>
+    public const string AuditResidue = "asibackbone.audit-residue";
+
+    /// <summary>
+    /// Identifies a persistence-ready audit ledger record payload.
+    /// </summary>
+    public const string AuditLedgerRecord = "asibackbone.audit-ledger-record";
+
+    /// <summary>
+    /// Identifies an audit residue lifecycle event payload.
+    /// </summary>
+    public const string AuditResidueLifecycleEvent = "asibackbone.audit-residue-lifecycle-event";
+
+    /// <summary>
+    /// Identifies a provider-neutral governance emission envelope payload.
+    /// </summary>
+    public const string GovernanceEmissionEnvelope = "asibackbone.governance-emission-envelope";
+
+    /// <summary>
+    /// Identifies a durable governance outbox entry payload.
+    /// </summary>
+    public const string GovernanceOutboxEntry = "asibackbone.governance-outbox-entry";
+
+    /// <summary>
+    /// Identifies a provider-neutral capability-token grant payload.
+    /// </summary>
+    public const string CapabilityTokenGrant = "asibackbone.capability-token-grant";
+}

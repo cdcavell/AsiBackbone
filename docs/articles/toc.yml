@@ -100,6 +100,9 @@
 - name: Signing-Ready Receipts and Key Handling
   href: signing-ready-receipts-and-key-handling.md
 
+- name: Signing Provider Package Boundary
+  href: signing-provider-package-boundary.md
+
 - name: Cryptographic Security Posture and Production Guidance
   href: cryptographic-security-posture.md
 

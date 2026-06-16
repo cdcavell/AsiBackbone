@@ -46,7 +46,7 @@ public sealed class GovernanceArtifactPersistenceAnalyzer : DiagnosticAnalyzer
     {
         var expressionStatement = (IExpressionStatementOperation)context.Operation;
 
-        if (IsSuppressedByHostMarker(context.ContainingSymbol))
+        if (IsSuppressedByHostMarker(context.ContainingSymbol) || expressionStatement.Operation is ISimpleAssignmentOperation)
         {
             return;
         }

@@ -32,7 +32,7 @@ public sealed class GovernanceArtifactPersistenceAnalyzer : DiagnosticAnalyzer
         "CDCavell.AsiBackbone.Core.Handshakes.LiabilityHandshakeAcknowledgment",
         "CDCavell.AsiBackbone.Core.Outbox.GovernanceOutboxEntry");
 
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
     public override void Initialize(AnalysisContext context)
     {
@@ -116,17 +116,11 @@ public sealed class GovernanceArtifactPersistenceAnalyzer : DiagnosticAnalyzer
 
         string namespaceName = namedType.ContainingNamespace?.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat) ?? string.Empty;
 
-        if (namespaceName == "System.Threading.Tasks" && (namedType.Name == "Task" || namedType.Name == "ValueTask"))
-        {
-            return namedType.TypeArguments[0];
-        }
-
-        if (namespaceName == "CDCavell.AsiBackbone.Core.Results" && namedType.Name == "OperationResult")
-        {
-            return namedType.TypeArguments[0];
-        }
-
-        return type;
+        return namespaceName == "System.Threading.Tasks" && (namedType.Name == "Task" || namedType.Name == "ValueTask")
+            ? namedType.TypeArguments[0]
+            : namespaceName == "CDCavell.AsiBackbone.Core.Results" && namedType.Name == "OperationResult"
+            ? namedType.TypeArguments[0]
+            : type;
     }
 
     private static bool IsSuppressedByHostMarker(ISymbol? symbol)

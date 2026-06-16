@@ -1,6 +1,5 @@
 using System.Collections.Immutable;
 using System.Runtime.InteropServices;
-using CDCavell.AsiBackbone.Analyzers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -200,20 +199,18 @@ public sealed class GovernanceArtifactPersistenceAnalyzerTests
             source,
             new CSharpParseOptions(LanguageVersion.Preview));
 
-        CSharpCompilation compilation = CSharpCompilation.Create(
+        var compilation = CSharpCompilation.Create(
             "AnalyzerTestAssembly",
             [syntaxTree],
             GetMetadataReferences(),
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
-        var compilerErrors = compilation.GetDiagnostics()
-            .Where(diagnostic => diagnostic.Severity == DiagnosticSeverity.Error)
-            .ToArray();
+        Diagnostic[] compilerErrors = [.. compilation.GetDiagnostics().Where(diagnostic => diagnostic.Severity == DiagnosticSeverity.Error)];
 
         Assert.Empty(compilerErrors);
 
         CompilationWithAnalyzers compilationWithAnalyzers = compilation.WithAnalyzers(
-            ImmutableArray.Create<DiagnosticAnalyzer>(new GovernanceArtifactPersistenceAnalyzer()));
+            [new GovernanceArtifactPersistenceAnalyzer()]);
 
         return await compilationWithAnalyzers.GetAnalyzerDiagnosticsAsync();
     }

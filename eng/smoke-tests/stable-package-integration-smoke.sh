@@ -81,6 +81,10 @@ dotnet add "$smoke_project" package CDCavell.AsiBackbone.Core --version "$packag
 dotnet add "$smoke_project" package CDCavell.AsiBackbone.AspNetCore --version "$package_version"
 dotnet add "$smoke_project" package CDCavell.AsiBackbone.EntityFrameworkCore --version "$package_version"
 dotnet add "$smoke_project" package CDCavell.AsiBackbone.Storage.InMemory --version "$package_version"
+dotnet add "$smoke_project" package CDCavell.AsiBackbone.Analyzers --version "$package_version"
+dotnet add "$smoke_project" package CDCavell.AsiBackbone.OpenTelemetry --version "$package_version"
+dotnet add "$smoke_project" package CDCavell.AsiBackbone.Signing.LocalDevelopment --version "$package_version"
+dotnet add "$smoke_project" package CDCavell.AsiBackbone.Signing.ManagedKey --version "$package_version"
 dotnet add "$smoke_project" package Microsoft.AspNetCore.TestHost
 dotnet add "$smoke_project" package Microsoft.EntityFrameworkCore.Sqlite
 
@@ -175,7 +179,7 @@ public sealed class StablePackageIntegrationSmokeTests
             metadata: new Dictionary<string, string>(StringComparer.Ordinal)
             {
                 ["sink"] = "stub",
-                ["release"] = "1.0.0"
+                ["release"] = "1.x"
             });
 
         await auditSink.WriteAsync(residue);
@@ -194,7 +198,6 @@ public sealed class StablePackageIntegrationSmokeTests
         await using WebApplication app = await StableSmokeHost.BuildAsync();
 
         await app.StartAsync();
-
         using HttpClient client = app.GetTestClient();
 
         StableHostResponse response = await GetAsync<StableHostResponse>(client, "/stable-smoke");

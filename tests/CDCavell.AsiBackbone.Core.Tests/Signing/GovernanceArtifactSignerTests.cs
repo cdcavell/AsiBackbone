@@ -182,11 +182,15 @@ public sealed class GovernanceArtifactSignerTests
             ArgumentNullException.ThrowIfNull(request);
             cancellationToken.ThrowIfCancellationRequested();
 
-            Dictionary<string, string> metadata = new(request.Metadata, StringComparer.Ordinal)
+            Dictionary<string, string> metadata = new(StringComparer.Ordinal);
+
+            foreach (KeyValuePair<string, string> item in request.Metadata)
             {
-                ["signing_status"] = "failed",
-                ["failure_code"] = "fake.signing.failed"
-            };
+                metadata[item.Key] = item.Value;
+            }
+
+            metadata["signing_status"] = "failed";
+            metadata["failure_code"] = "fake.signing.failed";
 
             return ValueTask.FromResult(SigningResult.FromMetadata(SigningMetadata.Create(
                 signingHash: request.SigningHash,

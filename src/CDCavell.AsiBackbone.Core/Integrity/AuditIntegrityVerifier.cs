@@ -49,7 +49,7 @@ public static class AuditIntegrityVerifier
                 return result;
             }
 
-            observedSequences.Add(link.Sequence);
+            _ = observedSequences.Add(link.Sequence);
             expectedPreviousHash = link.LinkHash;
             expectedSequence = link.Sequence + 1;
         }
@@ -93,7 +93,7 @@ public static class AuditIntegrityVerifier
                 link);
         }
 
-        observedSequences.Remove(link.Sequence);
+        _ = observedSequences.Remove(link.Sequence);
 
         if (link.Sequence != expectedSequence)
         {
@@ -139,9 +139,8 @@ public static class AuditIntegrityVerifier
         }
 
         string expectedLinkHash = link.ComputeExpectedLinkHash();
-        if (!string.Equals(link.LinkHash, expectedLinkHash, StringComparison.Ordinal))
-        {
-            return AuditIntegrityVerificationResult.Failed(
+        return !string.Equals(link.LinkHash, expectedLinkHash, StringComparison.Ordinal)
+            ? AuditIntegrityVerificationResult.Failed(
                 AuditIntegrityVerificationCategory.ModifiedRecord,
                 "integrity.link-hash-mismatch",
                 "The integrity link hash no longer matches its canonical fields.",
@@ -150,9 +149,7 @@ public static class AuditIntegrityVerifier
                 {
                     ["expected_link_hash"] = expectedLinkHash,
                     ["actual_link_hash"] = link.LinkHash
-                });
-        }
-
-        return null;
+                })
+            : null;
     }
 }

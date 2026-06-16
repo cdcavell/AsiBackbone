@@ -223,7 +223,7 @@ public sealed class CapabilityTokenGrant
             schemaVersion);
     }
 
-    private static IReadOnlyList<string> NormalizeScopes(IEnumerable<string> scopes)
+    private static ReadOnlyCollection<string> NormalizeScopes(IEnumerable<string> scopes)
     {
         ArgumentNullException.ThrowIfNull(scopes);
 

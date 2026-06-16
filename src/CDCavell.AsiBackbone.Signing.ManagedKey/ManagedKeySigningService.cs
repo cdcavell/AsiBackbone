@@ -1,3 +1,4 @@
+using System.Runtime.ExceptionServices;
 using CDCavell.AsiBackbone.Core.Signing;
 
 namespace CDCavell.AsiBackbone.Signing.ManagedKey;
@@ -87,7 +88,7 @@ public sealed class ManagedKeySigningService : IAsiBackboneSigningService
     {
         if (!options.ReturnUnsignedOnFailure)
         {
-            throw exception;
+            ExceptionDispatchInfo.Capture(exception).Throw();
         }
 
         return CreateUnsignedFailureResult(request, failureCode, failureMessage, retryAttempts);
@@ -201,17 +202,21 @@ public sealed class ManagedKeySigningService : IAsiBackboneSigningService
             return "managedkey.signing.hash-algorithm-unsupported";
         }
 
-        if (request.KeyId is not null && !string.Equals(request.KeyId, ResolveKeyId(request), StringComparison.Ordinal))
+        string configuredKeyId = NormalizeRequired(options.KeyId, string.Empty);
+        if (request.KeyId is not null && !string.Equals(request.KeyId, configuredKeyId, StringComparison.Ordinal))
         {
             return "managedkey.signing.key-mismatch";
         }
 
-        if (options.RequireKeyVersion && ResolveKeyVersion(request) is null)
+        string? configuredKeyVersion = NormalizeOptional(options.KeyVersion);
+        if (options.RequireKeyVersion && request.KeyVersion is null && configuredKeyVersion is null)
         {
             return "managedkey.signing.key-version-missing";
         }
 
-        return request.KeyVersion is not null && !string.Equals(request.KeyVersion, ResolveKeyVersion(request), StringComparison.Ordinal)
+        return request.KeyVersion is not null
+            && configuredKeyVersion is not null
+            && !string.Equals(request.KeyVersion, configuredKeyVersion, StringComparison.Ordinal)
             ? "managedkey.signing.key-version-mismatch"
             : null;
     }

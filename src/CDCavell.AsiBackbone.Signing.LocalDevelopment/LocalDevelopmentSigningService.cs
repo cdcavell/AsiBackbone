@@ -63,7 +63,7 @@ public sealed class LocalDevelopmentSigningService : IAsiBackboneSigningService,
             Dictionary<string, string> metadata = CreateBaseMetadata(request);
             metadata["signing_status"] = "signed";
 
-            SigningMetadata signingMetadata = SigningMetadata.Create(
+            var signingMetadata = SigningMetadata.Create(
                 signingHash: request.SigningHash,
                 hashAlgorithm: NormalizeHashAlgorithm(request.HashAlgorithm),
                 signature: Convert.ToBase64String(signature),
@@ -206,12 +206,9 @@ public sealed class LocalDevelopmentSigningService : IAsiBackboneSigningService,
         }
 
         string configuredKeyVersion = NormalizeRequired(options.KeyVersion, LocalDevelopmentSigningOptions.DefaultKeyVersion);
-        if (request.KeyVersion is not null && !string.Equals(request.KeyVersion, configuredKeyVersion, StringComparison.Ordinal))
-        {
-            return "localdev.signing.key-version-mismatch";
-        }
-
-        return null;
+        return request.KeyVersion is not null && !string.Equals(request.KeyVersion, configuredKeyVersion, StringComparison.Ordinal)
+            ? "localdev.signing.key-version-mismatch"
+            : null;
     }
 
     private SigningResult CreateUnsignedFailureResult(SigningRequest request, string failureCode, string failureMessage)
@@ -221,7 +218,7 @@ public sealed class LocalDevelopmentSigningService : IAsiBackboneSigningService,
         metadata["failure_code"] = failureCode;
         metadata["failure_message"] = failureMessage;
 
-        SigningMetadata signingMetadata = SigningMetadata.Create(
+        var signingMetadata = SigningMetadata.Create(
             signingHash: request.SigningHash,
             hashAlgorithm: NormalizeHashAlgorithm(request.HashAlgorithm),
             keyId: NormalizeRequired(options.KeyId, LocalDevelopmentSigningOptions.DefaultKeyId),

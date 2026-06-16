@@ -1,7 +1,6 @@
 using CDCavell.AsiBackbone.Core.Actors;
 using CDCavell.AsiBackbone.Core.Audit;
 using CDCavell.AsiBackbone.Core.Signing;
-using CDCavell.AsiBackbone.Signing.LocalDevelopment;
 using Xunit;
 
 namespace CDCavell.AsiBackbone.Signing.LocalDevelopment.Tests;
@@ -98,7 +97,7 @@ public sealed class LocalDevelopmentSigningServiceTests
     public async Task CanonicalAuditLedgerRecordCanBeSignedAndVerifiedEndToEnd()
     {
         IAsiBackboneActorContext actor = AsiBackboneActorContext.Service("system-1", "System");
-        AuditResidue residue = AuditResidue.Create(
+        var residue = AuditResidue.Create(
             actor,
             "sample.governed-operation",
             "Allowed",
@@ -108,7 +107,7 @@ public sealed class LocalDevelopmentSigningServiceTests
             correlationId: "correlation-1",
             policyVersion: "policy-v1",
             policyHash: "policy-hash");
-        AuditLedgerRecord record = AuditLedgerRecord.FromResidue(
+        var record = AuditLedgerRecord.FromResidue(
             residue,
             recordId: "record-1",
             recordedUtc: new DateTimeOffset(2026, 6, 16, 10, 0, 1, TimeSpan.Zero));

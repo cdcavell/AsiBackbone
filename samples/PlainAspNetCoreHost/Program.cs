@@ -86,10 +86,10 @@ app.MapGet("/sample/decision", async (
 
     await auditSink.WriteAsync(residue, cancellationToken).ConfigureAwait(false);
 
-    AuditLedgerRecord unsignedRecord = AuditLedgerRecord.FromResidue(residue);
+    var unsignedRecord = AuditLedgerRecord.FromResidue(residue);
     CanonicalPayload canonicalPayload = CanonicalPayloadBuilder.ForAuditLedgerRecord(unsignedRecord);
     CanonicalPayloadHash canonicalHash = CanonicalPayloadHasher.ComputeHash(canonicalPayload);
-    SigningMetadata hashMetadata = canonicalHash.ToSigningMetadata();
+    var hashMetadata = canonicalHash.ToSigningMetadata();
     SigningResult signingResult = await signingService
         .SignAsync(
             new SigningRequest(

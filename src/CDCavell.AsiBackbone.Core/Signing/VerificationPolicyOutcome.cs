@@ -144,8 +144,8 @@ public sealed class VerificationPolicyOutcome
     /// <summary>
     /// Creates a verification policy outcome.
     /// </summary>
-    public static VerificationPolicyOutcome Create(
-        SignedGovernanceArtifact<object> artifact,
+    public static VerificationPolicyOutcome Create<TArtifact>(
+        SignedGovernanceArtifact<TArtifact> artifact,
         SignatureVerificationResult verificationResult,
         VerificationPolicyOptions? options = null)
     {

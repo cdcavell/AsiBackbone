@@ -85,6 +85,9 @@
 - name: Production Wording and Alpha Limitations
   href: production-wording-and-alpha-limitations.md
 
+- name: Roslyn Analyzers
+  href: roslyn-analyzers.md
+
 - name: Observability and Governance Emission Architecture
   href: observability-and-governance-emission-architecture.md
 

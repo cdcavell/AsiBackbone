@@ -72,12 +72,9 @@ public sealed class VerificationPolicyOptions
     /// </summary>
     public VerificationPolicyAction GetAction(SignatureVerificationCategory category)
     {
-        if (!Enum.IsDefined(category))
-        {
-            throw new ArgumentOutOfRangeException(nameof(category), category, "Verification category must be defined.");
-        }
-
-        return Actions.TryGetValue(category, out VerificationPolicyAction action)
+        return !Enum.IsDefined(category)
+            ? throw new ArgumentOutOfRangeException(nameof(category), category, "Verification category must be defined.")
+            : Actions.TryGetValue(category, out VerificationPolicyAction action)
             ? action
             : VerificationPolicyAction.Escalate;
     }

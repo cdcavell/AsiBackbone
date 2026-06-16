@@ -63,7 +63,7 @@ public static class GovernanceArtifactVerifier
         VerificationPolicyOptions? options,
         Exception exception)
     {
-        SignatureVerificationResult providerUnavailableResult = SignatureVerificationResult.Failed(
+        var providerUnavailableResult = SignatureVerificationResult.Failed(
             "signature.provider-unavailable",
             exception.GetType().Name);
 
@@ -76,82 +76,52 @@ public static class GovernanceArtifactVerifier
     {
         SigningMetadata metadata = artifact.SigningMetadata;
 
-        if (artifact.HasNoSignature || !metadata.HasSignature)
-        {
-            return SignatureVerificationResult.MissingSignature("The governance artifact does not carry signature metadata.");
-        }
-
-        if (string.IsNullOrWhiteSpace(metadata.SigningHash))
-        {
-            return SignatureVerificationResult.MissingSignature("The governance artifact does not carry the hash that was signed.");
-        }
-
-        if (!string.Equals(metadata.SigningHash, artifact.SigningHash, StringComparison.Ordinal))
-        {
-            return SignatureVerificationResult.Failed(
+        return artifact.HasNoSignature || !metadata.HasSignature
+            ? SignatureVerificationResult.MissingSignature("The governance artifact does not carry signature metadata.")
+            : string.IsNullOrWhiteSpace(metadata.SigningHash)
+            ? SignatureVerificationResult.MissingSignature("The governance artifact does not carry the hash that was signed.")
+            : !string.Equals(metadata.SigningHash, artifact.SigningHash, StringComparison.Ordinal)
+            ? SignatureVerificationResult.Failed(
                 "signature.hash-mismatch",
-                "The signing metadata hash does not match the canonical artifact hash.");
-        }
-
-        if (metadata.HashAlgorithm is not null
-            && !string.Equals(metadata.HashAlgorithm, artifact.HashAlgorithm, StringComparison.OrdinalIgnoreCase))
-        {
-            return SignatureVerificationResult.Failed(
+                "The signing metadata hash does not match the canonical artifact hash.")
+            : metadata.HashAlgorithm is not null
+            && !string.Equals(metadata.HashAlgorithm, artifact.HashAlgorithm, StringComparison.OrdinalIgnoreCase)
+            ? SignatureVerificationResult.Failed(
                 "signature.hash-algorithm-unsupported",
-                "The signing metadata hash algorithm does not match the canonical artifact hash algorithm.");
-        }
-
-        if (context.RequiredHashAlgorithm is not null
-            && !string.Equals(context.RequiredHashAlgorithm, artifact.HashAlgorithm, StringComparison.OrdinalIgnoreCase))
-        {
-            return SignatureVerificationResult.Failed(
+                "The signing metadata hash algorithm does not match the canonical artifact hash algorithm.")
+            : context.RequiredHashAlgorithm is not null
+            && !string.Equals(context.RequiredHashAlgorithm, artifact.HashAlgorithm, StringComparison.OrdinalIgnoreCase)
+            ? SignatureVerificationResult.Failed(
                 "signature.hash-algorithm-unsupported",
-                "The canonical artifact hash algorithm does not match the required verification policy algorithm.");
-        }
-
-        if (!MatchesCanonicalMetadata(metadata, "artifact_id", artifact.ArtifactId)
+                "The canonical artifact hash algorithm does not match the required verification policy algorithm.")
+            : !MatchesCanonicalMetadata(metadata, "artifact_id", artifact.ArtifactId)
             || !MatchesCanonicalMetadata(metadata, "artifact_type", artifact.ArtifactType)
             || !MatchesCanonicalMetadata(metadata, "canonicalization_version", artifact.CanonicalHash.CanonicalizationVersion)
-            || !MatchesCanonicalMetadata(metadata, "payload_schema_version", artifact.CanonicalHash.PayloadSchemaVersion))
-        {
-            return SignatureVerificationResult.Failed(
+            || !MatchesCanonicalMetadata(metadata, "payload_schema_version", artifact.CanonicalHash.PayloadSchemaVersion)
+            ? SignatureVerificationResult.Failed(
                 "signature.canonicalization-mismatch",
-                "The signing metadata canonical artifact descriptors do not match the artifact being verified.");
-        }
-
-        if (context.ExpectedKeyId is not null
-            && !string.Equals(context.ExpectedKeyId, metadata.KeyId, StringComparison.Ordinal))
-        {
-            return SignatureVerificationResult.Failed(
+                "The signing metadata canonical artifact descriptors do not match the artifact being verified.")
+            : context.ExpectedKeyId is not null
+            && !string.Equals(context.ExpectedKeyId, metadata.KeyId, StringComparison.Ordinal)
+            ? SignatureVerificationResult.Failed(
                 "signature.key-version-unknown",
-                "The signing key identifier does not match the verification policy expectation.");
-        }
-
-        if (context.ExpectedKeyVersion is not null
-            && !string.Equals(context.ExpectedKeyVersion, metadata.KeyVersion, StringComparison.Ordinal))
-        {
-            return SignatureVerificationResult.Failed(
+                "The signing key identifier does not match the verification policy expectation.")
+            : context.ExpectedKeyVersion is not null
+            && !string.Equals(context.ExpectedKeyVersion, metadata.KeyVersion, StringComparison.Ordinal)
+            ? SignatureVerificationResult.Failed(
                 "signature.key-version-unknown",
-                "The signing key version does not match the verification policy expectation.");
-        }
-
-        if (context.RequiredProvider is not null
-            && !string.Equals(context.RequiredProvider, metadata.Provider, StringComparison.Ordinal))
-        {
-            return SignatureVerificationResult.Failed(
+                "The signing key version does not match the verification policy expectation.")
+            : context.RequiredProvider is not null
+            && !string.Equals(context.RequiredProvider, metadata.Provider, StringComparison.Ordinal)
+            ? SignatureVerificationResult.Failed(
                 "signature.provider-unavailable",
-                "The signing provider does not match the required verification policy provider.");
-        }
-
-        if (!MatchesOptionalPolicyMetadata(metadata, "policy_version", context.ExpectedPolicyVersion)
-            || !MatchesOptionalPolicyMetadata(metadata, "policy_hash", context.ExpectedPolicyHash))
-        {
-            return SignatureVerificationResult.Failed(
+                "The signing provider does not match the required verification policy provider.")
+            : !MatchesOptionalPolicyMetadata(metadata, "policy_version", context.ExpectedPolicyVersion)
+            || !MatchesOptionalPolicyMetadata(metadata, "policy_hash", context.ExpectedPolicyHash)
+            ? SignatureVerificationResult.Failed(
                 "signature.canonicalization-mismatch",
-                "The signing metadata policy context does not match the verification policy expectation.");
-        }
-
-        return null;
+                "The signing metadata policy context does not match the verification policy expectation.")
+            : null;
     }
 
     private static bool MatchesCanonicalMetadata(SigningMetadata metadata, string key, string expectedValue)

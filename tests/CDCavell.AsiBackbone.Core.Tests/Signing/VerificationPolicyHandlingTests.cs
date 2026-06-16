@@ -71,7 +71,7 @@ public sealed class VerificationPolicyHandlingTests
     {
         SignedGovernanceArtifact<string> artifact = CreateSignedArtifact(keyVersion: "retired");
         var verifier = new StubVerificationService(SignatureVerificationResult.Verified());
-        VerificationPolicyContext context = VerificationPolicyContext.Create(expectedKeyVersion: "v1");
+        var context = VerificationPolicyContext.Create(expectedKeyVersion: "v1");
 
         VerificationPolicyOutcome outcome = await GovernanceArtifactVerifier.VerifyAsync(
             artifact,
@@ -111,7 +111,7 @@ public sealed class VerificationPolicyHandlingTests
     {
         SignedGovernanceArtifact<string> artifact = CreateArtifactWithoutSignature();
         var verifier = new StubVerificationService(SignatureVerificationResult.Verified());
-        VerificationPolicyOptions options = VerificationPolicyOptions.Create(new Dictionary<SignatureVerificationCategory, VerificationPolicyAction>
+        var options = VerificationPolicyOptions.Create(new Dictionary<SignatureVerificationCategory, VerificationPolicyAction>
         {
             [SignatureVerificationCategory.MissingSignature] = VerificationPolicyAction.DeadLetter
         });
@@ -140,7 +140,7 @@ public sealed class VerificationPolicyHandlingTests
             ["policy_hash"] = "policy-hash",
             ["policy_version"] = "policy-v1"
         };
-        SigningMetadata signingMetadata = SigningMetadata.Create(
+        var signingMetadata = SigningMetadata.Create(
             signingHash: effectiveSigningHash,
             hashAlgorithm: hash.HashAlgorithm,
             signature: "fake-signature",
@@ -197,12 +197,9 @@ public sealed class VerificationPolicyHandlingTests
             cancellationToken.ThrowIfCancellationRequested();
             WasCalled = true;
 
-            if (throwProviderUnavailable)
-            {
-                throw new InvalidOperationException("Verification provider unavailable.");
-            }
-
-            return ValueTask.FromResult(result);
+            return throwProviderUnavailable
+                ? throw new InvalidOperationException("Verification provider unavailable.")
+                : ValueTask.FromResult(result);
         }
     }
 }

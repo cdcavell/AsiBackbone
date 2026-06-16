@@ -41,53 +41,29 @@ public static class VerificationPolicyEvaluator
         string failureCode = verificationResult.FailureCode ?? string.Empty;
         string status = verificationResult.Status ?? string.Empty;
 
-        if (Matches(status, "MissingSignature") || Matches(failureCode, "missing"))
-        {
-            return SignatureVerificationCategory.MissingSignature;
-        }
-
-        if (Matches(failureCode, "hash"))
-        {
-            return SignatureVerificationCategory.HashMismatch;
-        }
-
-        if (Matches(failureCode, "canonicalization") || Matches(failureCode, "payload-schema") || Matches(failureCode, "artifact"))
-        {
-            return SignatureVerificationCategory.CanonicalizationMismatch;
-        }
-
-        if (Matches(failureCode, "unsupported") || Matches(failureCode, "algorithm"))
-        {
-            return SignatureVerificationCategory.UnsupportedAlgorithm;
-        }
-
-        if (Matches(failureCode, "revoked") || Matches(failureCode, "disabled"))
-        {
-            return SignatureVerificationCategory.RevokedKey;
-        }
-
-        if ((Matches(failureCode, "unknown") && Matches(failureCode, "key"))
+        return Matches(status, "MissingSignature") || Matches(failureCode, "missing")
+            ? SignatureVerificationCategory.MissingSignature
+            : Matches(failureCode, "hash")
+            ? SignatureVerificationCategory.HashMismatch
+            : Matches(failureCode, "canonicalization") || Matches(failureCode, "payload-schema") || Matches(failureCode, "artifact")
+            ? SignatureVerificationCategory.CanonicalizationMismatch
+            : Matches(failureCode, "unsupported") || Matches(failureCode, "algorithm")
+            ? SignatureVerificationCategory.UnsupportedAlgorithm
+            : Matches(failureCode, "revoked") || Matches(failureCode, "disabled")
+            ? SignatureVerificationCategory.RevokedKey
+            : (Matches(failureCode, "unknown") && Matches(failureCode, "key"))
             || Matches(failureCode, "key-version")
             || Matches(failureCode, "key.mismatch")
-            || Matches(failureCode, "key-mismatch"))
-        {
-            return SignatureVerificationCategory.UnknownKeyVersion;
-        }
-
-        if (Matches(failureCode, "provider-unavailable")
+            || Matches(failureCode, "key-mismatch")
+            ? SignatureVerificationCategory.UnknownKeyVersion
+            : Matches(failureCode, "provider-unavailable")
             || Matches(failureCode, "unavailable")
             || Matches(failureCode, "timeout")
-            || Matches(failureCode, "network"))
-        {
-            return SignatureVerificationCategory.ProviderUnavailable;
-        }
-
-        if (Matches(failureCode, "invalid") || Matches(failureCode, "malformed") || Matches(failureCode, "signature"))
-        {
-            return SignatureVerificationCategory.InvalidSignature;
-        }
-
-        return SignatureVerificationCategory.Failed;
+            || Matches(failureCode, "network")
+            ? SignatureVerificationCategory.ProviderUnavailable
+            : Matches(failureCode, "invalid") || Matches(failureCode, "malformed") || Matches(failureCode, "signature")
+            ? SignatureVerificationCategory.InvalidSignature
+            : SignatureVerificationCategory.Failed;
     }
 
     private static bool Matches(string value, string pattern)

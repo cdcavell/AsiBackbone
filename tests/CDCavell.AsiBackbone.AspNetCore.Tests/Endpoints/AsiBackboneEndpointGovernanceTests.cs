@@ -51,7 +51,11 @@ public sealed class AsiBackboneEndpointGovernanceTests
     [Fact]
     public async Task MiddlewareBlocksWhenGovernanceServiceBlocksExecution()
     {
-        var httpContext = new DefaultHttpContext();
+        using ServiceProvider requestServices = new ServiceCollection().AddLogging().BuildServiceProvider();
+        var httpContext = new DefaultHttpContext
+        {
+            RequestServices = requestServices
+        };
         httpContext.Response.Body = new MemoryStream();
         httpContext.SetEndpoint(new Endpoint(
             static _ => Task.CompletedTask,

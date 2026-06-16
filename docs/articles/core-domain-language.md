@@ -208,7 +208,7 @@ A capability token should be:
 * revocable where possible
 * signed or verifiable where appropriate
 
-Core defines token concepts and contracts. Signing implementation can live in a later signing package.
+Core defines token concepts and contracts. Concrete signing and verification implementations remain outside Core. Current source includes local-development and managed-key signing provider packages, but production key custody, verification policy, and operational trust remain host responsibilities.
 
 ### Gateway boundary
 
@@ -257,40 +257,3 @@ The Core boundary establishes language and primitives, not a full integration st
 * concrete signing or key-management implementation
 * robotics control implementation
 * AI model hosting, training, inference, or orchestration
-
-## Package ownership
-
-The current and planned package ownership model is:
-
-| Package area | Ownership |
-| --- | --- |
-| `CDCavell.AsiBackbone.Core` | Framework-neutral governance primitives and domain language. |
-| `CDCavell.AsiBackbone.Storage.InMemory` | Non-durable in-memory storage helpers for tests, samples, and local validation hosts. |
-| `CDCavell.AsiBackbone.EntityFrameworkCore` | EF Core model configuration and persistence hooks while the host owns the `DbContext`, provider, migrations, and schema lifecycle. |
-| `CDCavell.AsiBackbone.AspNetCore` | ASP.NET Core service registration, request correlation, HTTP actor/context seams, HTTP result mapping, and acknowledgment challenge helpers. |
-| `CDCavell.AsiBackbone.Signing` | Planned future signing and verification helpers for receipts, policy hashes, and capability tokens. |
-| `CDCavell.AsiBackbone.Samples` | Planned future sample package or continuing samples area for console, worker, ASP.NET Core, and NetCoreApplicationTemplate-based examples. |
-| `CDCavell.AsiBackbone.Robotics` | Later simulated or physical gateway examples after the governance spine is proven. |
-
-## Alignment boundary
-
-AsiBackbone documentation may reference the broader Eden/Backbone framework as conceptual inspiration. It should remain careful about claims.
-
-Safe language:
-
-* ASI means Accountable Systems Infrastructure in this repository.
-* AsiBackbone stands for Accountable Systems Infrastructure Backbone.
-* AsiBackbone implements governance-oriented software primitives.
-* AsiBackbone helps structure consequential decision flow through constraints, acknowledgment, audit, and capability boundaries.
-* AsiBackbone can surround intelligent or decision-producing systems with accountable execution infrastructure.
-
-Avoid language such as:
-
-* AsiBackbone implements artificial superintelligence.
-* AsiBackbone proves the Eden Hypothesis.
-* AsiBackbone is an AI model.
-* AsiBackbone replaces AI safety governance, legal review, or organizational accountability.
-
-## Guiding principle
-
-`CDCavell.AsiBackbone.Core` should make consequential software actions easier to govern, audit, constrain, acknowledge, and explain while remaining free of host, persistence, web, and AI-model assumptions.

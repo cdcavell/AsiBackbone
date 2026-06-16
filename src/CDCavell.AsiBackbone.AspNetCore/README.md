@@ -5,7 +5,7 @@ ASP.NET Core host adapters for Accountable Systems Infrastructure governance pri
 This package acts as a thin web-host adapter around `CDCavell.AsiBackbone.Core`.
 
 > [!IMPORTANT]
-> This package provides host adapters only. It does not provide concrete middleware enforcement, endpoint mapping, authentication integration, policy enforcement, persistence, provider exporters, or execution-gateway behavior. HTTP result mapping, acknowledgment challenge helpers, and hosted outbox drain integration are explicit adapters and do not enforce decisions automatically.
+> This package provides host adapters only. Endpoint-governance middleware, metadata attributes, HTTP result mapping, acknowledgment challenge helpers, and hosted outbox drain integration delegate to host-owned policy, capability, audit, persistence, and transaction services. Attributes and route-builder calls do not by themselves make audit records durable, immutable, tamper-evident, or transactionally safe.
 
 ## Service registration
 
@@ -30,7 +30,38 @@ builder.Services.AddAsiBackboneAspNetCore(options =>
 });
 ```
 
-The base registration is intentionally narrow. It does not register persistence, EF Core, authentication handlers, MVC, Razor Pages, Minimal API endpoints, middleware, policy evaluators, or host-specific authorization behavior.
+The base registration is intentionally narrow. It does not register persistence, EF Core, authentication handlers, MVC, Razor Pages, Minimal API endpoints, policy evaluators, capability grant validators, or host-specific authorization behavior.
+
+## Ergonomic endpoint governance
+
+`UseAsiBackboneEndpointGovernance()` evaluates AsiBackbone endpoint metadata before endpoint execution.
+
+```csharp
+using CDCavell.AsiBackbone.AspNetCore.Endpoints;
+
+app.UseAsiBackboneEndpointGovernance();
+
+app.MapPost("/high-risk-action", handler)
+    .RequireGovernancePolicy<MyStrictPolicy>()
+    .RequireLiabilityHandshake()
+    .RequireCapabilityGrant("robotics.execute")
+    .EmitGovernanceAudit();
+```
+
+Controller/action attributes are also available:
+
+```csharp
+[RequireGovernancePolicy(typeof(MyStrictPolicy))]
+[RequireLiabilityHandshake]
+[RequireCapabilityGrant("robotics.execute")]
+[EmitGovernanceAudit]
+public IActionResult ExecuteHighRiskAction()
+{
+    return Ok();
+}
+```
+
+The metadata layer is optional and ergonomic. It does not replace full manual wire-up. Hosts that attach policy metadata should register an `IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>`. Hosts that attach capability metadata should register an `IAsiBackboneEndpointCapabilityGrantValidator`. Hosts that request audit emission should register a host-owned `IAsiBackboneAuditSink`.
 
 ## Hosted governance outbox drain
 
@@ -184,6 +215,7 @@ This package provides:
 - audit enrichment helpers;
 - HTTP and Problem Details result mapping helpers;
 - acknowledgment challenge creation and response handling helpers;
+- optional endpoint-governance middleware and metadata helpers;
 - hosted governance outbox drain registration and scheduling options.
 
 This package avoids:
@@ -193,9 +225,9 @@ This package avoids:
 - direct dependencies on NetCoreApplicationTemplate;
 - authentication-provider assumptions;
 - provider exporter dependencies;
-- middleware enforcement;
-- endpoint mapping;
+- automatic transaction safety;
+- durable persistence guarantees from attributes or endpoint metadata alone;
 - robotics or physical execution dependencies;
 - AI model hosting, training, inference, or orchestration.
 
-See `docs/articles/aspnetcore-integration-boundary.md` and `docs/articles/hosted-governance-outbox-drain.md` for the implemented design boundary.
+See `docs/articles/aspnetcore-integration-boundary.md`, `docs/articles/aspnetcore-endpoint-governance.md`, and `docs/articles/hosted-governance-outbox-drain.md` for the implemented design boundary.

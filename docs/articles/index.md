@@ -60,6 +60,9 @@ Start with [Getting Started](getting-started.md), then use the navigation menu t
 * [Capability Grant Hardening](capability-grant-hardening.md)
   Documents scoped grant metadata, proof validation, execution-boundary checks, bounded-use storage expectations, and failure behavior for high-risk workflows.
 
+* [Audit Integrity Chain Model](audit-integrity-chain-model.md)
+  Documents the append-only hash-chain integrity model, chain-link metadata, verification behavior, persistence interaction, and safe wording around chained records versus externally anchored tamper-evidence.
+
 * [Cryptographic Security Posture and Production Guidance](cryptographic-security-posture.md)
   Documents signing-ready versus signed, verified, chained, and externally anchored records; production key-management guidance; local signer limits; host responsibilities; audit/outbox signing examples; capability-token validation; and security non-goals.
 

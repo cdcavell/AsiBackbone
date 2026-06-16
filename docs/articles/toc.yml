@@ -115,6 +115,9 @@
 - name: Capability Grant Hardening
   href: capability-grant-hardening.md
 
+- name: Audit Integrity Chain Model
+  href: audit-integrity-chain-model.md
+
 - name: Cryptographic Security Posture and Production Guidance
   href: cryptographic-security-posture.md
 

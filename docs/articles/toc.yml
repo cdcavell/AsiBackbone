@@ -103,6 +103,9 @@
 - name: Cryptographic Security Posture and Production Guidance
   href: cryptographic-security-posture.md
 
+- name: Cryptographic Security Hardening Roadmap
+  href: cryptographic-security-hardening-roadmap.md
+
 - name: DLP and Classification Failure Policy
   href: dlp-classification-failure-policy.md
 

@@ -151,7 +151,12 @@ public sealed class SignedGovernanceArtifact<TArtifact>
             throw new ArgumentException("Signing metadata hash must match the canonical payload hash.", nameof(signingMetadata));
         }
 
-        Dictionary<string, string> metadata = new(canonicalHash.ToSigningMetadata().Metadata, StringComparer.Ordinal);
+        Dictionary<string, string> metadata = new(StringComparer.Ordinal);
+
+        foreach (KeyValuePair<string, string> item in canonicalHash.ToSigningMetadata().Metadata)
+        {
+            metadata[item.Key] = item.Value;
+        }
 
         foreach (KeyValuePair<string, string> item in signingMetadata.Metadata)
         {

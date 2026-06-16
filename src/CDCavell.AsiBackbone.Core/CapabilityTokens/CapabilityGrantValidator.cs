@@ -93,43 +93,22 @@ public static class CapabilityGrantValidator
         CapabilityGrantValidationOptions options,
         DateTimeOffset validationUtc)
     {
-        if (options.Issuer is not null && !string.Equals(options.Issuer, grant.Issuer, StringComparison.Ordinal))
-        {
-            return CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.WrongIssuer, VerificationPolicyAction.Deny, "capability.issuer-mismatch");
-        }
-
-        if (options.Audience is not null && !string.Equals(options.Audience, grant.Audience, StringComparison.Ordinal))
-        {
-            return CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.WrongAudience, VerificationPolicyAction.Deny, "capability.audience-mismatch");
-        }
-
-        if (grant.NotBeforeUtc.HasValue && validationUtc < grant.NotBeforeUtc.Value)
-        {
-            return CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.NotYetValid, VerificationPolicyAction.Defer, "capability.not-yet-valid");
-        }
-
-        if (validationUtc >= grant.ExpiresUtc)
-        {
-            return CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.Expired, VerificationPolicyAction.Deny, "capability.expired");
-        }
-
-        if (options.Scopes.Count > 0 && !ContainsRequiredScopes(grant.Scopes, options.Scopes))
-        {
-            return CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.WrongScope, VerificationPolicyAction.Deny, "capability.scope-missing");
-        }
-
-        if ((options.PolicyVersion is not null && !string.Equals(options.PolicyVersion, grant.PolicyVersion, StringComparison.Ordinal))
-            || (options.PolicyHash is not null && !string.Equals(options.PolicyHash, grant.PolicyHash, StringComparison.Ordinal)))
-        {
-            return CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.PolicyMismatch, VerificationPolicyAction.Deny, "capability.policy-mismatch");
-        }
-
-        if (options.RequireAcknowledgmentReference && !grant.HasAcknowledgmentReference)
-        {
-            return CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.MissingAcknowledgmentReference, VerificationPolicyAction.RequireAcknowledgment, "capability.acknowledgment-missing");
-        }
-
-        return options.AcknowledgmentId is not null && !string.Equals(options.AcknowledgmentId, grant.AcknowledgmentId, StringComparison.Ordinal)
+        return options.Issuer is not null && !string.Equals(options.Issuer, grant.Issuer, StringComparison.Ordinal)
+            ? CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.WrongIssuer, VerificationPolicyAction.Deny, "capability.issuer-mismatch")
+            : options.Audience is not null && !string.Equals(options.Audience, grant.Audience, StringComparison.Ordinal)
+            ? CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.WrongAudience, VerificationPolicyAction.Deny, "capability.audience-mismatch")
+            : grant.NotBeforeUtc.HasValue && validationUtc < grant.NotBeforeUtc.Value
+            ? CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.NotYetValid, VerificationPolicyAction.Defer, "capability.not-yet-valid")
+            : validationUtc >= grant.ExpiresUtc
+            ? CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.Expired, VerificationPolicyAction.Deny, "capability.expired")
+            : options.Scopes.Count > 0 && !ContainsRequiredScopes(grant.Scopes, options.Scopes)
+            ? CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.WrongScope, VerificationPolicyAction.Deny, "capability.scope-missing")
+            : (options.PolicyVersion is not null && !string.Equals(options.PolicyVersion, grant.PolicyVersion, StringComparison.Ordinal))
+            || (options.PolicyHash is not null && !string.Equals(options.PolicyHash, grant.PolicyHash, StringComparison.Ordinal))
+            ? CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.PolicyMismatch, VerificationPolicyAction.Deny, "capability.policy-mismatch")
+            : options.RequireAcknowledgmentReference && !grant.HasAcknowledgmentReference
+            ? CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.MissingAcknowledgmentReference, VerificationPolicyAction.RequireAcknowledgment, "capability.acknowledgment-missing")
+            : options.AcknowledgmentId is not null && !string.Equals(options.AcknowledgmentId, grant.AcknowledgmentId, StringComparison.Ordinal)
             ? CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.AcknowledgmentMismatch, VerificationPolicyAction.Deny, "capability.acknowledgment-mismatch")
             : options.HandshakeId is not null && !string.Equals(options.HandshakeId, grant.HandshakeId, StringComparison.Ordinal)
             ? CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.HandshakeMismatch, VerificationPolicyAction.Deny, "capability.handshake-mismatch")

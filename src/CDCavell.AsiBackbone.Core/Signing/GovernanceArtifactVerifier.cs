@@ -44,14 +44,30 @@ public static class GovernanceArtifactVerifier
 
             return VerificationPolicyEvaluator.Evaluate(artifact, verificationResult, options);
         }
-        catch (Exception exception) when (exception is InvalidOperationException or NotSupportedException or TimeoutException)
+        catch (InvalidOperationException exception)
         {
-            SignatureVerificationResult providerUnavailableResult = SignatureVerificationResult.Failed(
-                "signature.provider-unavailable",
-                exception.GetType().Name);
-
-            return VerificationPolicyEvaluator.Evaluate(artifact, providerUnavailableResult, options);
+            return CreateProviderUnavailableOutcome(artifact, options, exception);
         }
+        catch (NotSupportedException exception)
+        {
+            return CreateProviderUnavailableOutcome(artifact, options, exception);
+        }
+        catch (TimeoutException exception)
+        {
+            return CreateProviderUnavailableOutcome(artifact, options, exception);
+        }
+    }
+
+    private static VerificationPolicyOutcome CreateProviderUnavailableOutcome<TArtifact>(
+        SignedGovernanceArtifact<TArtifact> artifact,
+        VerificationPolicyOptions? options,
+        Exception exception)
+    {
+        SignatureVerificationResult providerUnavailableResult = SignatureVerificationResult.Failed(
+            "signature.provider-unavailable",
+            exception.GetType().Name);
+
+        return VerificationPolicyEvaluator.Evaluate(artifact, providerUnavailableResult, options);
     }
 
     private static SignatureVerificationResult? ValidateBeforeProvider<TArtifact>(

@@ -45,6 +45,9 @@ Start with [Getting Started](getting-started.md), then use the navigation menu t
 * [Signing-Ready Receipts and Key Handling](signing-ready-receipts-and-key-handling.md)
   Documents the Core-neutral signing and verification abstractions, signing-ready audit receipt metadata, key identifier/version handling, verification seam, and current unsigned-vs-production-signed wording boundary.
 
+* [Cryptographic Security Posture and Production Guidance](cryptographic-security-posture.md)
+  Documents signing-ready versus signed, verified, chained, and externally anchored records; production key-management guidance; local signer limits; host responsibilities; audit/outbox signing examples; capability-token validation; and security non-goals.
+
 * [DLP and Classification Failure Policy](dlp-classification-failure-policy.md)
   Documents the provider-neutral Core policy model for DLP/classification service outages, timeouts, indeterminate results, blocked/classified results, and risk-based fail-open/fail-closed behavior.
 

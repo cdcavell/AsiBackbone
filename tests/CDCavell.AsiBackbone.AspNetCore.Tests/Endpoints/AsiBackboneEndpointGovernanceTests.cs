@@ -73,10 +73,10 @@ public sealed class AsiBackboneEndpointGovernanceTests
     [Fact]
     public async Task DefaultServiceFailsClosedWhenCapabilityValidatorIsMissing()
     {
-        ServiceProvider services = new ServiceCollection()
+        using ServiceProvider services = new ServiceCollection()
             .AddAsiBackboneAspNetCore()
             .BuildServiceProvider(validateScopes: true);
-        using ServiceScope scope = services.CreateScope();
+        using IServiceScope scope = services.CreateScope();
         var httpContext = new DefaultHttpContext
         {
             RequestServices = scope.ServiceProvider,
@@ -98,7 +98,9 @@ public sealed class AsiBackboneEndpointGovernanceTests
         Assert.Contains("endpoint.capability_validator.missing", result.Decision.ReasonCodes);
     }
 
-    private sealed class SamplePolicy;
+    private sealed class SamplePolicy
+    {
+    }
 
     private sealed class ThrowingEndpointGovernanceService : IAsiBackboneEndpointGovernanceService
     {
@@ -119,7 +121,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
             CancellationToken cancellationToken = default)
         {
             return ValueTask.FromResult(AsiBackboneEndpointGovernanceResult.Block(
-                Results.Problem(statusCode: StatusCodes.Status403Forbidden)));
+                global::Microsoft.AspNetCore.Http.Results.Problem(statusCode: StatusCodes.Status403Forbidden)));
         }
     }
 }

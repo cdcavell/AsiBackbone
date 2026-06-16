@@ -160,6 +160,12 @@ $expectedPackages = @(
         Description = 'Local-development RSA signing and verification provider for exercising AsiBackbone signing abstractions without cloud key-management dependencies.'
         Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'signing', 'local-development', 'testing', 'audit')
         ReadmeMustContain = @('local development, samples, and tests', 'not a production managed-key provider')
+    },
+    [pscustomobject]@{
+        Id = 'CDCavell.AsiBackbone.Signing.ManagedKey'
+        Description = 'Provider-neutral managed-key signing adapter for Accountable Systems Infrastructure governance artifacts without loading raw private keys into Core.'
+        Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'signing', 'managed-key', 'key-management', 'audit')
+        ReadmeMustContain = @('Provider-neutral managed-key signing adapter', 'raw key material must not be returned')
     }
 )
 

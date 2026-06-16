@@ -1,4 +1,5 @@
 using CDCavell.AsiBackbone.AspNetCore.DependencyInjection;
+using CDCavell.AsiBackbone.AspNetCore.Endpoints;
 using CDCavell.AsiBackbone.Core.Actors;
 using CDCavell.AsiBackbone.Core.Audit;
 using CDCavell.AsiBackbone.Core.Constraints;
@@ -9,10 +10,12 @@ using CDCavell.AsiBackbone.EntityFrameworkCore;
 using CDCavell.AsiBackbone.EntityFrameworkCore.Audit;
 using CDCavell.AsiBackbone.Signing.LocalDevelopment;
 using CDCavell.AsiBackbone.Storage.InMemory.Audit;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddControllers();
 builder.Services.AddAsiBackboneAspNetCore();
 
 builder.Services.AddSingleton(LocalDevelopmentSigningOptions.Create(
@@ -33,6 +36,7 @@ builder.Services.AddScoped<IAsiBackboneAuditLedgerStore, EfCoreAuditLedgerStore>
 builder.Services.AddSingleton<InMemoryAuditLedger>();
 builder.Services.AddSingleton<IAsiBackboneAuditSink>(serviceProvider =>
     serviceProvider.GetRequiredService<InMemoryAuditLedger>());
+builder.Services.AddSingleton<IAsiBackboneEndpointCapabilityGrantValidator, SampleEndpointCapabilityGrantValidator>();
 
 builder.Services.AddSingleton<IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>, RegionConstraint>();
 builder.Services.AddSingleton<IAsiBackboneDecisionPolicy<AsiBackboneConstraintEvaluationContext>, ConsequentialActionDecisionPolicy>();
@@ -46,7 +50,19 @@ await using (AsyncServiceScope scope = app.Services.CreateAsyncScope())
     _ = await dbContext.Database.EnsureCreatedAsync().ConfigureAwait(false);
 }
 
+app.UseAsiBackboneEndpointGovernance();
+
 app.MapGet("/", () => Results.Redirect("/sample/decision"));
+
+app.MapPost("/sample/ergonomic/minimal", () => Results.Ok(new
+{
+    message = "Minimal API endpoint executed after AsiBackbone endpoint governance metadata was evaluated."
+}))
+.WithDisplayName("sample.ergonomic.minimal")
+.RequireGovernancePolicy<SampleEndpointPolicy>()
+.RequireLiabilityHandshake()
+.RequireCapabilityGrant("sample.high-risk.execute")
+.EmitGovernanceAudit();
 
 app.MapGet("/sample/decision", async (
     HttpContext httpContext,
@@ -174,6 +190,8 @@ app.MapGet("/sample/ledger/{correlationId}", async (
     return Results.Ok(records);
 });
 
+app.MapControllers();
+
 app.Run();
 
 internal sealed class PlainHostAsiBackboneDbContext(DbContextOptions<PlainHostAsiBackboneDbContext> options) : DbContext(options)
@@ -199,7 +217,9 @@ internal sealed class RegionConstraint : IAsiBackboneConstraint<AsiBackboneConst
         bool hasRegion = context.Metadata.TryGetValue("region", out string? region)
             && !string.IsNullOrWhiteSpace(region);
 
-        return ValueTask.FromResult(hasRegion
+        bool hasEndpointPolicy = context.Metadata.ContainsKey("endpoint.policy_types");
+
+        return ValueTask.FromResult(hasRegion || hasEndpointPolicy
             ? ConstraintEvaluationResult.Allow()
             : ConstraintEvaluationResult.Deny(
                 "sample.region.missing",
@@ -233,5 +253,49 @@ internal sealed class ConsequentialActionDecisionPolicy : IAsiBackboneDecisionPo
                 policyVersion: context.PolicyVersion,
                 policyHash: context.PolicyHash)
             : composedDecision);
+    }
+}
+
+internal sealed class SampleEndpointPolicy;
+
+internal sealed class SampleEndpointCapabilityGrantValidator : IAsiBackboneEndpointCapabilityGrantValidator
+{
+    public ValueTask<GovernanceDecision> ValidateAsync(
+        HttpContext httpContext,
+        AsiBackboneEndpointGovernanceDescriptor descriptor,
+        GovernanceDecision currentDecision,
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        ArgumentNullException.ThrowIfNull(descriptor);
+        ArgumentNullException.ThrowIfNull(currentDecision);
+
+        return ValueTask.FromResult(descriptor.CapabilityScopes.Contains("sample.high-risk.execute", StringComparer.Ordinal)
+            ? currentDecision
+            : GovernanceDecision.Deny(
+                "sample.capability.missing",
+                "The sample endpoint capability grant validator did not find the required scope.",
+                correlationId: currentDecision.CorrelationId,
+                traceId: currentDecision.TraceId,
+                policyVersion: currentDecision.PolicyVersion,
+                policyHash: currentDecision.PolicyHash));
+    }
+}
+
+[ApiController]
+[Route("sample/ergonomic/controller")]
+internal sealed class SampleGovernanceController : ControllerBase
+{
+    [HttpPost]
+    [RequireGovernancePolicy(typeof(SampleEndpointPolicy))]
+    [RequireLiabilityHandshake]
+    [RequireCapabilityGrant("sample.high-risk.execute")]
+    [EmitGovernanceAudit]
+    public IActionResult ExecuteHighRiskAction()
+    {
+        return Ok(new
+        {
+            message = "Controller action executed after AsiBackbone endpoint governance metadata was evaluated."
+        });
     }
 }

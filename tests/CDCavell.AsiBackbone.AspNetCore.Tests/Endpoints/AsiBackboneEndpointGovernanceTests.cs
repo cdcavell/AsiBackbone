@@ -20,7 +20,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
                 new EmitGovernanceAuditAttribute()),
             "sample.robotics.execute");
 
-        AsiBackboneEndpointGovernanceDescriptor descriptor = AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(endpoint);
+        var descriptor = AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(endpoint);
 
         Assert.True(descriptor.HasGovernanceMetadata);
         Assert.Equal("sample.robotics.execute", descriptor.OperationName);
@@ -87,10 +87,10 @@ public sealed class AsiBackboneEndpointGovernanceTests
             static _ => Task.CompletedTask,
             new EndpointMetadataCollection(new RequireCapabilityGrantAttribute("robotics.execute")),
             "robotics.execute");
-        AsiBackboneEndpointGovernanceDescriptor descriptor = AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(endpoint);
+        var descriptor = AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(endpoint);
         IAsiBackboneEndpointGovernanceService service = scope.ServiceProvider.GetRequiredService<IAsiBackboneEndpointGovernanceService>();
 
-        AsiBackboneEndpointGovernanceResult result = await service.EvaluateAsync(httpContext, descriptor);
+        AsiBackboneEndpointGovernanceResult result = await service.EvaluateAsync(httpContext, descriptor, TestContext.Current.CancellationToken);
 
         Assert.False(result.CanExecute);
         Assert.NotNull(result.FailureResult);

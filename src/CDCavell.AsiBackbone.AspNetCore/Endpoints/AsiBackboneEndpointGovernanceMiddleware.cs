@@ -5,18 +5,13 @@ namespace CDCavell.AsiBackbone.AspNetCore.Endpoints;
 /// <summary>
 /// Middleware that evaluates AsiBackbone endpoint governance metadata before endpoint execution.
 /// </summary>
-public sealed class AsiBackboneEndpointGovernanceMiddleware
+/// <remarks>
+/// Initializes a new instance of the <see cref="AsiBackboneEndpointGovernanceMiddleware" /> class.
+/// </remarks>
+/// <param name="next">The next request delegate.</param>
+public sealed class AsiBackboneEndpointGovernanceMiddleware(RequestDelegate next)
 {
-    private readonly RequestDelegate next;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AsiBackboneEndpointGovernanceMiddleware" /> class.
-    /// </summary>
-    /// <param name="next">The next request delegate.</param>
-    public AsiBackboneEndpointGovernanceMiddleware(RequestDelegate next)
-    {
-        this.next = next ?? throw new ArgumentNullException(nameof(next));
-    }
+    private readonly RequestDelegate next = next ?? throw new ArgumentNullException(nameof(next));
 
     /// <summary>
     /// Evaluates endpoint governance metadata and either continues execution or writes a failure result.
@@ -32,7 +27,7 @@ public sealed class AsiBackboneEndpointGovernanceMiddleware
         ArgumentNullException.ThrowIfNull(governanceService);
 
         Endpoint? endpoint = httpContext.GetEndpoint();
-        AsiBackboneEndpointGovernanceDescriptor descriptor = AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(endpoint);
+        var descriptor = AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(endpoint);
 
         if (!descriptor.HasGovernanceMetadata)
         {

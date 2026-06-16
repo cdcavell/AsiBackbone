@@ -68,7 +68,7 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
             endpointOptions.PolicyHash,
             endpointMetadata);
 
-        GovernanceDecision decision = GovernanceDecision.Allow(
+        var decision = GovernanceDecision.Allow(
             correlationId: evaluationContext.CorrelationId,
             traceId: correlation.TraceId,
             policyVersion: evaluationContext.PolicyVersion,
@@ -129,7 +129,7 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
                     : AsiBackboneEndpointGovernanceResult.Allow(decision);
             }
 
-            AuditResidue residue = AuditResidue.FromDecision(
+            var residue = AuditResidue.FromDecision(
                 actor,
                 descriptor.OperationName,
                 decision,
@@ -164,7 +164,7 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
         string message,
         GovernanceDecision currentDecision)
     {
-        GovernanceDecision decision = GovernanceDecision.Deny(
+        var decision = GovernanceDecision.Deny(
             code,
             message,
             correlationId: currentDecision.CorrelationId,
@@ -190,7 +190,7 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
         string message,
         GovernanceDecision currentDecision)
     {
-        GovernanceDecision decision = GovernanceDecision.Deny(
+        var decision = GovernanceDecision.Deny(
             code,
             message,
             correlationId: currentDecision.CorrelationId,

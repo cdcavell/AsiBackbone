@@ -3,20 +3,16 @@ namespace CDCavell.AsiBackbone.AspNetCore.Endpoints;
 /// <summary>
 /// Marks an ASP.NET Core endpoint as requiring host-defined AsiBackbone governance policy evaluation.
 /// </summary>
+/// <remarks>
+/// Initializes a new instance of the <see cref="RequireGovernancePolicyAttribute" /> class.
+/// </remarks>
+/// <param name="policyType">The host-defined policy marker or resolver type associated with the endpoint.</param>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
-public sealed class RequireGovernancePolicyAttribute : Attribute, IAsiBackboneEndpointGovernancePolicyMetadata
+public sealed class RequireGovernancePolicyAttribute(Type policyType) : Attribute, IAsiBackboneEndpointGovernancePolicyMetadata
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="RequireGovernancePolicyAttribute" /> class.
-    /// </summary>
-    /// <param name="policyType">The host-defined policy marker or resolver type associated with the endpoint.</param>
-    public RequireGovernancePolicyAttribute(Type policyType)
-    {
-        PolicyType = policyType ?? throw new ArgumentNullException(nameof(policyType));
-    }
 
     /// <inheritdoc />
-    public Type PolicyType { get; }
+    public Type PolicyType { get; } = policyType ?? throw new ArgumentNullException(nameof(policyType));
 }
 
 /// <summary>

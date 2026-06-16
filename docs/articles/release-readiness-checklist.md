@@ -1,44 +1,45 @@
-# 1.0.0 Release Readiness Checklist
+# 1.1.0 Release Readiness Checklist
 
-This checklist is the release-candidate control sheet for the first stable AsiBackbone `1.0.0` NuGet package release.
+This checklist is the release-candidate control sheet for the AsiBackbone `1.1.0` NuGet package release.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. This checklist verifies the package family as governance infrastructure for accountable decision flow. It does not treat AsiBackbone as an artificial superintelligence implementation, AI model host, robot controller, legal/compliance guarantee, signing system, or tamper-evident ledger provider.
+In this software project, **ASI** means **Accountable Systems Infrastructure**. This checklist verifies the package family as governance infrastructure for accountable decision flow. It does not treat AsiBackbone as an artificial superintelligence implementation, AI model host, robot controller, legal/compliance guarantee, or production tamper-evident ledger provider.
 
 ## Stable package family
 
-The first stable release covers only the implemented packages below.
+The `1.1.0` release covers the implemented packages below.
 
 | Package | Stable role | Release boundary |
 | --- | --- | --- |
-| `CDCavell.AsiBackbone.Core` | Framework-neutral governance primitives, decisions, constraints, audit contracts, acknowledgment contracts, capability-token abstractions, and operation results. | Core remains independent of ASP.NET Core, EF Core, cloud, robotics, AI model, and host-template dependencies. |
-| `CDCavell.AsiBackbone.Storage.InMemory` | Non-durable in-memory storage helpers for tests, samples, and local validation. | Not durable storage, not production audit storage, and not a compliance archive. |
-| `CDCavell.AsiBackbone.EntityFrameworkCore` | EF Core model configuration and host-owned persistence helpers. | Host owns `DbContext`, provider, migrations, deployment, schema lifecycle, retention, and access controls. |
-| `CDCavell.AsiBackbone.AspNetCore` | Thin ASP.NET Core host adapters for actor context, request correlation, HTTP result mapping, and acknowledgment challenge flows. | Does not own host authentication, authorization, routing, policy enforcement, persistence, UI, or execution behavior. |
+| `CDCavell.AsiBackbone.Core` | Framework-neutral governance primitives, decisions, constraints, acknowledgments, audit residue, lifecycle events, durable outbox contracts, provider-neutral emission contracts, DLP/classification failure policy primitives, signing-ready metadata, canonical hashing/signing seams, and verification-policy primitives. | Core remains independent of ASP.NET Core, EF Core, cloud-provider SDKs, OpenTelemetry SDKs, robotics, AI model, and host-template dependencies. |
+| `CDCavell.AsiBackbone.Storage.InMemory` | Non-durable in-memory storage helpers for tests, samples, local validation, lifecycle events, and outbox proof paths. | Not durable storage, not production audit storage, and not a compliance archive. |
+| `CDCavell.AsiBackbone.EntityFrameworkCore` | EF Core model configuration and host-owned persistence helpers. | Host owns `DbContext`, provider, migrations, deployment, schema lifecycle, retention, access controls, backup, and recovery. |
+| `CDCavell.AsiBackbone.AspNetCore` | ASP.NET Core host adapters for actor context, request correlation, HTTP result mapping, acknowledgment challenge flows, endpoint governance, and hosted outbox drain integration. | Does not own host authentication, authorization, routing, policy enforcement, persistence, UI, exporter configuration, key management, or execution behavior. |
+| `CDCavell.AsiBackbone.Analyzers` | Roslyn analyzer safety rails for governance persistence and continuation flows. | Build-time guidance only; not runtime enforcement, compliance proof, or security control by itself. |
+| `CDCavell.AsiBackbone.OpenTelemetry` | OpenTelemetry-friendly governance emission provider for projecting provider-neutral envelopes into .NET diagnostics. | Does not configure exporters and does not depend on Azure Monitor, Event Hubs, Purview, SIEM, AI, robotics, or cloud-provider SDK packages. |
+| `CDCavell.AsiBackbone.Signing.LocalDevelopment` | Local-development RSA signing and verification for tests, samples, and wiring proof paths. | Not production key custody, managed-key signing, immutability, non-repudiation, or tamper-evidence. |
+| `CDCavell.AsiBackbone.Signing.ManagedKey` | Provider-neutral managed-key signing adapter. | Host supplies the actual managed-key client, credentials, key operations, verification path, monitoring, and operational policy. |
 
-Future signing, key-management, durable outbox, cloud observability/enrichment, robotics, external gateway, and provider-specific packages remain outside the `1.0.0` stable contract unless separately reviewed and released as stable.
-
-## Release-blocker issue status
-
-| Item | Status | Evidence |
-| --- | --- | --- |
-| Stable API review | Complete | Issue #13 documents the public API and package-boundary review. |
-| Version metadata and release artifacts | Complete | Issue #173 aligned `Directory.Build.props`, `CHANGELOG.md`, release notes, `CITATION.cff`, `.zenodo.json`, and stable wording. |
-| `1.x` assembly-version strategy | Complete | Issue #174 documents the stable `AssemblyVersion` `1.0.0.0` strategy for compatible `1.x` releases. |
-| Durable artifact schema stamping | Complete | Issue #175 added concrete schema-version stamping for package-owned durable or exported artifacts. |
-| Public wording and NuGet metadata sweep | Complete | Issue #176 added generated `.nupkg` metadata validation and tightened package README/metadata wording. |
+Future Event Hubs, Purview, Azure-specific SDK adapters, robotics/physical execution, immutable storage, external anchoring, or additional provider packages remain outside the `1.1.0` stable contract unless separately reviewed and released as stable.
 
 ## Pre-tag hard gate
 
-Do not cut the `v1.0.0` tag until every item in this section is complete for the exact release-candidate commit.
+Do not cut the `v1.1.0` tag until every item in this section is complete for the exact release-candidate commit.
 
-- [x] PR for issue #14 is merged to `main`.
-- [x] `CI` passes on `main` after the issue #14 merge.
-- [x] `Stable Release Validation` passes on `main` after the issue #14 merge.
-- [x] `External Consumer Smoke Test` passes against the package-shaped artifacts for the release candidate.
-- [x] `Publish Documentation` passes and the DocFX site reflects the stable `1.0.0` boundary.
-- [x] `Version Consistency` passes for the release candidate.
-- [x] No open release-blocking issues remain in the `1.0.0` milestone.
-- [x] Any intentionally deferred release-critical check is documented in this checklist, the release notes, or a follow-up issue before tagging.
+- [ ] `Directory.Build.props` resolves package version `1.1.0` with no preview suffix.
+- [ ] `AssemblyVersion` remains `1.0.0.0` for compatible `1.x` binary identity.
+- [ ] `FileVersion` is `1.1.0.0`.
+- [ ] `CITATION.cff` and `.zenodo.json` report version `1.1.0`.
+- [ ] `CHANGELOG.md` includes the `1.1.0` entry.
+- [ ] `1.1.0 Release Notes` match the current package family.
+- [ ] `README.md` describes the `1.1.0` stable package family and bounded implementation claims.
+- [ ] `Validate-VersionConsistency.ps1` passes for the release candidate and for tag `v1.1.0` before publishing from the tag.
+- [ ] `Validate-NuGetPackageMetadata.ps1` passes against generated `.nupkg` artifacts.
+- [ ] `CI` passes on the release-candidate commit.
+- [ ] `Stable Release Validation` passes on the release-candidate commit.
+- [ ] `External Consumer Smoke Test` passes against package-shaped artifacts.
+- [ ] `Publish Documentation` passes and the DocFX site reflects the `1.1.0` package boundary.
+- [ ] No open release-blocking issues remain for the `1.1.0` milestone.
+- [ ] Any intentionally deferred release-critical check is documented in this checklist, the release notes, or a follow-up issue before tagging.
 
 ## Local release-candidate validation
 
@@ -65,8 +66,9 @@ done
 Validate release identity and generated NuGet metadata:
 
 ```powershell
-./scripts/Validate-VersionConsistency.ps1 -PackageDirectory artifacts/packages
-./scripts/Validate-NuGetPackageMetadata.ps1 -PackageDirectory artifacts/packages
+./scripts/Validate-VersionConsistency.ps1 -ExpectedVersion 1.1.0 -PackageDirectory artifacts/packages
+./scripts/Validate-VersionConsistency.ps1 -ExpectedVersion 1.1.0 -TagName v1.1.0 -PackageDirectory artifacts/packages
+./scripts/Validate-NuGetPackageMetadata.ps1 -ExpectedVersion 1.1.0 -PackageDirectory artifacts/packages
 ```
 
 Run package-consumer smoke checks when the host environment can execute them:
@@ -95,24 +97,30 @@ The release candidate must inspect actual packed `.nupkg` files, not only projec
 Expected package artifacts:
 
 ```text
-CDCavell.AsiBackbone.Core.1.0.0.nupkg
-CDCavell.AsiBackbone.Storage.InMemory.1.0.0.nupkg
-CDCavell.AsiBackbone.EntityFrameworkCore.1.0.0.nupkg
-CDCavell.AsiBackbone.AspNetCore.1.0.0.nupkg
+CDCavell.AsiBackbone.Core.1.1.0.nupkg
+CDCavell.AsiBackbone.Storage.InMemory.1.1.0.nupkg
+CDCavell.AsiBackbone.EntityFrameworkCore.1.1.0.nupkg
+CDCavell.AsiBackbone.AspNetCore.1.1.0.nupkg
+CDCavell.AsiBackbone.Analyzers.1.1.0.nupkg
+CDCavell.AsiBackbone.OpenTelemetry.1.1.0.nupkg
+CDCavell.AsiBackbone.Signing.LocalDevelopment.1.1.0.nupkg
+CDCavell.AsiBackbone.Signing.ManagedKey.1.1.0.nupkg
 ```
 
 ## Documentation checklist
 
-- [x] Root `README.md` describes the project as stable Accountable Systems Infrastructure and does not describe the stable package family as early alpha.
-- [x] Package README files describe their package-specific boundaries.
-- [x] `Storage.InMemory` is clearly non-durable and local-validation focused.
-- [x] EF Core docs preserve host-owned persistence language.
-- [x] ASP.NET Core docs preserve host-adapter language and do not imply automatic enforcement.
-- [x] `1.0.0 Release Notes` list the stable package family and known limitations.
-- [x] `API Compatibility and SemVer` documents the stable package contract and `AssemblyVersion` strategy.
-- [x] `Schema Versioning` documents the current stable artifact schema and durable-artifact rationale.
-- [x] `Privacy and Signing Boundaries` bounds signing, privacy, tamper, and compliance claims.
-- [x] `Release Validation` documents the workflow gates and generated package metadata validation.
+- [ ] Root `README.md` describes the project as stable Accountable Systems Infrastructure and does not describe the package family as early alpha.
+- [ ] Package README files describe their package-specific boundaries.
+- [ ] `Storage.InMemory` is clearly non-durable and local-validation focused.
+- [ ] EF Core docs preserve host-owned persistence language.
+- [ ] ASP.NET Core docs preserve host-adapter language and do not imply automatic enforcement.
+- [ ] Analyzer docs describe build-time guidance, not runtime enforcement.
+- [ ] OpenTelemetry docs describe provider projection, not exporter ownership.
+- [ ] Signing docs avoid unsupported claims of production tamper-evidence, immutability, legal non-repudiation, or compliance certification.
+- [ ] `1.1.0 Release Notes` list the stable package family and accepted deferrals.
+- [ ] `API Compatibility and SemVer` documents the stable package contract and `AssemblyVersion` strategy.
+- [ ] `Schema Versioning` documents stable artifact schema and durable-artifact rationale.
+- [ ] `Release Validation` documents the workflow gates and generated package metadata validation.
 
 ## Public wording checklist
 
@@ -121,8 +129,12 @@ Use bounded language such as:
 - `Accountable Systems Infrastructure`;
 - `governance spine`;
 - `host-owned persistence`;
+- `durable outbox baseline`;
+- `provider-neutral governance emission`;
+- `OpenTelemetry projection`;
 - `signing-ready fields`;
-- `future provider work`;
+- `provider signing boundary`;
+- `verification policy`;
 - `non-durable in-memory storage`;
 - `host-owned execution`.
 
@@ -130,6 +142,7 @@ Avoid unsupported claims such as:
 
 - `tamper-proof`;
 - `tamper-evident`, unless implemented by a documented signing/storage path;
+- `immutable`, unless backed by a concrete storage/anchoring design;
 - `non-repudiation`;
 - `compliance guarantee`;
 - `legal certification`;
@@ -158,37 +171,11 @@ The publish job should only run after those checks complete successfully.
 
 ## Tagging and publish sequence
 
-Use this sequence for the final stable release:
+Recommended release sequence:
 
-1. Merge all release-readiness PRs to `main`.
+1. Merge the release-preparation PR into `main`.
 2. Confirm release-blocking workflows pass on `main`.
-3. Confirm generated `.nupkg` metadata validation passes for the release-candidate artifacts.
-4. Confirm docs and release notes reflect the exact `1.0.0` boundary.
-5. Create the `v1.0.0` tag only after the release candidate is accepted.
-6. Let tag-triggered package validation run.
-7. Publish only if the tag-triggered validation-and-pack job succeeds.
-8. Do not manually replace published NuGet packages. If validation fails before publish, fix the release candidate and repeat the release process with documented rationale.
-
-## Accepted mutation coverage deferral
-
-Issue #178 records the accepted pre-`1.0.0` mutation-scope deferral. The current mutation reports remain limited to the Core governance path and the targeted ASP.NET Core acknowledgment challenge adapter path. The expanded gap list and `1.x` follow-up priority are documented in [Mutation Coverage Scope and Deferrals](../quality/mutation-coverage-scope.md).
-
-The accepted `1.0.0` deferral includes correlation helpers outside the targeted challenge path, broader ASP.NET Core result mapping, additional acknowledgment challenge adapters, EF Core persistence edge cases, in-memory storage edge cases, and other integration-layer adapters that remain test-covered or smoke-validated but not mutation-validated.
-
-This deferral is non-blocking while the regular test suite, coverage publication, external consumer smoke tests, stable release validation, generated package validation, and documentation build remain passing. Follow-up mutation expansion should be prioritized for the `1.x` line instead of broadening the pre-tag stable release gate.
-
-## Non-blocking follow-up tracking
-
-The following items are visible for post-`1.0.0` work and should not silently disappear, but they do not block `1.0.0` unless a new release-critical dependency is discovered.
-
-| Follow-up | Status | Release decision |
-| --- | --- | --- |
-| Post-`1.0` public API baseline and architecture boundary checks | Tracked by issue #177. | Non-blocking for `1.0.0` if release notes and API review remain accurate. |
-| Mutation coverage expansion after stabilization | Recorded by issue #178 and [Mutation Coverage Scope and Deferrals](../quality/mutation-coverage-scope.md). | Accepted pre-`1.0.0` deferral; non-blocking for `1.0.0`; prioritize Core carry-forward, ASP.NET Core result/correlation, EF Core edge-case, and integration-adapter mutation work in `1.x`. |
-| Separate `CDCavell.AsiBackbone.Abstractions` package | Deferred. | Keep contracts in Core unless a concrete provider dependency problem appears. |
-| Generated public API baseline files | Deferred. | Consider after `1.0.0` to detect unapproved public surface changes. |
-| Architecture tests for package dependency boundaries | Deferred. | Consider after `1.0.0` to guard Core against accidental framework/provider dependencies. |
-
-## Final release note
-
-This checklist is a release-readiness aid, not a compliance certification. Passing it means the project has completed its documented software release gates for the implemented `1.0.0` package family. It does not certify legal compliance, regulatory approval, tamper-evidence, non-repudiation, production security, or operational safety for a consuming host application.
+3. Create tag `v1.1.0` from the exact validated commit.
+4. Let tag-triggered package validation run.
+5. Publish only after tag validation succeeds.
+6. Confirm NuGet packages, GitHub release notes, documentation site, and Zenodo metadata are aligned.

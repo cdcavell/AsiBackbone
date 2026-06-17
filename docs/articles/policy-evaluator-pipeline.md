@@ -113,6 +113,8 @@ This evaluator does not execute the governed action. It decides whether the acti
 
 Execution still belongs to the host or gateway layer. That boundary keeps Core as governance infrastructure rather than an execution engine.
 
+See [Host-Owned Execution Enforcement](host-owned-execution-enforcement.md) for recommended enforcement patterns across HTTP endpoints, service-layer calls, background workers, message consumers, CLI tools, and fail-closed review paths.
+
 The Core evaluator itself deliberately avoids:
 
 * ASP.NET Core middleware

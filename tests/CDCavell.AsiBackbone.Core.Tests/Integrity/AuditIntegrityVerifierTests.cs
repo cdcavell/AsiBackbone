@@ -185,7 +185,9 @@ public sealed class AuditIntegrityVerifierTests
         Assert.False(result.IsValid);
         Assert.Equal(AuditIntegrityVerificationCategory.WrongChain, result.Category);
         Assert.Equal("integrity.chain-id-mismatch", result.FailureCode);
-        Assert.Same(first, result.Link);
+        Assert.Equal("audit-ledger", result.SafeMetadata["chain_id"]);
+        Assert.Equal("record-1", result.SafeMetadata["record_id"]);
+        Assert.Equal("1", result.SafeMetadata["sequence"]);
     }
 
     [Fact]

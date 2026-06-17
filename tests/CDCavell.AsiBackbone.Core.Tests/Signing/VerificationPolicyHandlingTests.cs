@@ -22,30 +22,30 @@ public sealed class VerificationPolicyHandlingTests
         { "expected-policy-hash-mismatch", SignatureVerificationCategory.CanonicalizationMismatch, VerificationPolicyAction.Escalate, "signature.canonicalization-mismatch" }
     };
 
-    public static TheoryData<SignatureVerificationResult, SignatureVerificationCategory> CategoryMappingCases => new()
+    public static TheoryData<string, SignatureVerificationCategory> CategoryMappingCases => new()
     {
-        { SignatureVerificationResult.MissingSignature("Missing signature."), SignatureVerificationCategory.MissingSignature },
-        { SignatureVerificationResult.Failed("proof.missing", "Missing proof."), SignatureVerificationCategory.MissingSignature },
-        { SignatureVerificationResult.Failed("signature.hash-mismatch", "Hash mismatch."), SignatureVerificationCategory.HashMismatch },
-        { SignatureVerificationResult.Failed("signature.canonicalization-mismatch", "Canonicalization mismatch."), SignatureVerificationCategory.CanonicalizationMismatch },
-        { SignatureVerificationResult.Failed("payload-schema.mismatch", "Payload schema mismatch."), SignatureVerificationCategory.CanonicalizationMismatch },
-        { SignatureVerificationResult.Failed("artifact.mismatch", "Artifact mismatch."), SignatureVerificationCategory.CanonicalizationMismatch },
-        { SignatureVerificationResult.Failed("signature.unsupported", "Unsupported signature."), SignatureVerificationCategory.UnsupportedAlgorithm },
-        { SignatureVerificationResult.Failed("signature.algorithm-unsupported", "Unsupported algorithm."), SignatureVerificationCategory.UnsupportedAlgorithm },
-        { SignatureVerificationResult.Failed("signature.revoked", "Revoked key."), SignatureVerificationCategory.RevokedKey },
-        { SignatureVerificationResult.Failed("signature.disabled", "Disabled key."), SignatureVerificationCategory.RevokedKey },
-        { SignatureVerificationResult.Failed("signature.unknown-key", "Unknown key."), SignatureVerificationCategory.UnknownKeyVersion },
-        { SignatureVerificationResult.Failed("signature.key-version-unknown", "Unknown key version."), SignatureVerificationCategory.UnknownKeyVersion },
-        { SignatureVerificationResult.Failed("signature.key.mismatch", "Key mismatch."), SignatureVerificationCategory.UnknownKeyVersion },
-        { SignatureVerificationResult.Failed("signature.key-mismatch", "Key mismatch."), SignatureVerificationCategory.UnknownKeyVersion },
-        { SignatureVerificationResult.Failed("signature.provider-unavailable", "Provider unavailable."), SignatureVerificationCategory.ProviderUnavailable },
-        { SignatureVerificationResult.Failed("provider.unavailable", "Provider unavailable."), SignatureVerificationCategory.ProviderUnavailable },
-        { SignatureVerificationResult.Failed("provider.timeout", "Provider timeout."), SignatureVerificationCategory.ProviderUnavailable },
-        { SignatureVerificationResult.Failed("provider.network", "Provider network failure."), SignatureVerificationCategory.ProviderUnavailable },
-        { SignatureVerificationResult.Failed("signature.invalid", "Invalid signature."), SignatureVerificationCategory.InvalidSignature },
-        { SignatureVerificationResult.Failed("signature.malformed", "Malformed signature."), SignatureVerificationCategory.InvalidSignature },
-        { SignatureVerificationResult.Failed("signature.bad", "Bad signature."), SignatureVerificationCategory.InvalidSignature },
-        { SignatureVerificationResult.Failed("verification.failure", "Verification failed."), SignatureVerificationCategory.Failed }
+        { "missing-signature-status", SignatureVerificationCategory.MissingSignature },
+        { "missing-failure-code", SignatureVerificationCategory.MissingSignature },
+        { "hash-mismatch", SignatureVerificationCategory.HashMismatch },
+        { "canonicalization-mismatch", SignatureVerificationCategory.CanonicalizationMismatch },
+        { "payload-schema-mismatch", SignatureVerificationCategory.CanonicalizationMismatch },
+        { "artifact-mismatch", SignatureVerificationCategory.CanonicalizationMismatch },
+        { "unsupported-signature", SignatureVerificationCategory.UnsupportedAlgorithm },
+        { "unsupported-algorithm", SignatureVerificationCategory.UnsupportedAlgorithm },
+        { "revoked-key", SignatureVerificationCategory.RevokedKey },
+        { "disabled-key", SignatureVerificationCategory.RevokedKey },
+        { "unknown-key", SignatureVerificationCategory.UnknownKeyVersion },
+        { "key-version-unknown", SignatureVerificationCategory.UnknownKeyVersion },
+        { "key-dot-mismatch", SignatureVerificationCategory.UnknownKeyVersion },
+        { "key-dash-mismatch", SignatureVerificationCategory.UnknownKeyVersion },
+        { "provider-unavailable", SignatureVerificationCategory.ProviderUnavailable },
+        { "unavailable", SignatureVerificationCategory.ProviderUnavailable },
+        { "timeout", SignatureVerificationCategory.ProviderUnavailable },
+        { "network", SignatureVerificationCategory.ProviderUnavailable },
+        { "invalid-signature", SignatureVerificationCategory.InvalidSignature },
+        { "malformed-signature", SignatureVerificationCategory.InvalidSignature },
+        { "signature-failure", SignatureVerificationCategory.InvalidSignature },
+        { "failed-fallback", SignatureVerificationCategory.Failed }
     };
 
     [Fact]
@@ -221,9 +221,11 @@ public sealed class VerificationPolicyHandlingTests
     [Theory]
     [MemberData(nameof(CategoryMappingCases))]
     public void CategorizeMapsFailureCodeAndStatusPatterns(
-        SignatureVerificationResult verificationResult,
+        string scenario,
         SignatureVerificationCategory expectedCategory)
     {
+        SignatureVerificationResult verificationResult = CreateCategoryMappingResult(scenario);
+
         SignatureVerificationCategory category = VerificationPolicyEvaluator.Categorize(verificationResult);
 
         Assert.Equal(expectedCategory, category);
@@ -397,6 +399,36 @@ public sealed class VerificationPolicyHandlingTests
         }
 
         return metadata;
+    }
+
+    private static SignatureVerificationResult CreateCategoryMappingResult(string scenario)
+    {
+        return scenario switch
+        {
+            "missing-signature-status" => SignatureVerificationResult.MissingSignature("Missing signature."),
+            "missing-failure-code" => SignatureVerificationResult.Failed("proof.missing", "Missing proof."),
+            "hash-mismatch" => SignatureVerificationResult.Failed("signature.hash-mismatch", "Hash mismatch."),
+            "canonicalization-mismatch" => SignatureVerificationResult.Failed("signature.canonicalization-mismatch", "Canonicalization mismatch."),
+            "payload-schema-mismatch" => SignatureVerificationResult.Failed("payload-schema.mismatch", "Payload schema mismatch."),
+            "artifact-mismatch" => SignatureVerificationResult.Failed("artifact.mismatch", "Artifact mismatch."),
+            "unsupported-signature" => SignatureVerificationResult.Failed("signature.unsupported", "Unsupported signature."),
+            "unsupported-algorithm" => SignatureVerificationResult.Failed("signature.algorithm-unsupported", "Unsupported algorithm."),
+            "revoked-key" => SignatureVerificationResult.Failed("signature.revoked", "Revoked key."),
+            "disabled-key" => SignatureVerificationResult.Failed("signature.disabled", "Disabled key."),
+            "unknown-key" => SignatureVerificationResult.Failed("signature.unknown-key", "Unknown key."),
+            "key-version-unknown" => SignatureVerificationResult.Failed("signature.key-version-unknown", "Unknown key version."),
+            "key-dot-mismatch" => SignatureVerificationResult.Failed("signature.key.mismatch", "Key mismatch."),
+            "key-dash-mismatch" => SignatureVerificationResult.Failed("signature.key-mismatch", "Key mismatch."),
+            "provider-unavailable" => SignatureVerificationResult.Failed("signature.provider-unavailable", "Provider unavailable."),
+            "unavailable" => SignatureVerificationResult.Failed("provider.unavailable", "Provider unavailable."),
+            "timeout" => SignatureVerificationResult.Failed("provider.timeout", "Provider timeout."),
+            "network" => SignatureVerificationResult.Failed("provider.network", "Provider network failure."),
+            "invalid-signature" => SignatureVerificationResult.Failed("signature.invalid", "Invalid signature."),
+            "malformed-signature" => SignatureVerificationResult.Failed("signature.malformed", "Malformed signature."),
+            "signature-failure" => SignatureVerificationResult.Failed("signature.bad", "Bad signature."),
+            "failed-fallback" => SignatureVerificationResult.Failed("verification.failure", "Verification failed."),
+            _ => throw new ArgumentOutOfRangeException(nameof(scenario), scenario, "Unknown category mapping scenario.")
+        };
     }
 
     private static Exception CreateProviderException(string scenario)

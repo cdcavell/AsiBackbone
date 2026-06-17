@@ -60,7 +60,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
 
         if (constraints.Count == 0 && options.DenyWhenNoConstraints)
         {
-            GovernanceDecision noConstraintsDecision = GovernanceDecision.Deny(
+            var noConstraintsDecision = GovernanceDecision.Deny(
                 options.NoConstraintsReasonCode,
                 options.NoConstraintsReasonMessage,
                 correlationId: context.CorrelationId,

@@ -11,6 +11,9 @@ Start with [Getting Started](getting-started.md), then use the navigation menu t
 * [First 15 Minutes: Standard API Gating](quickstart-api-gating.md)  
   A heavily commented, practical quickstart for gating one ASP.NET Core API endpoint with a simple constraint, allowed/denied paths, and local audit residue.
 
+* [Terminology Map](terminology-map.md)  
+  Translates AsiBackbone vocabulary into familiar .NET and application-architecture language, including first-use versus advanced concepts and a recommended reading path.
+
 * [Why AsiBackbone?](why-asi-backbone.md)  
   Explains the project purpose, adoption rationale, and governance-spine framing.
 

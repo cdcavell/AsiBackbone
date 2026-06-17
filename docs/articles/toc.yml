@@ -88,6 +88,9 @@
 - name: Policy Evaluator Pipeline
   href: policy-evaluator-pipeline.md
 
+- name: Host-Owned Execution Enforcement
+  href: host-owned-execution-enforcement.md
+
 - name: Schema Versioning
   href: schema-versioning.md
 

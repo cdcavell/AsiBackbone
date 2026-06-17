@@ -214,7 +214,7 @@ public sealed class DefaultAsiBackboneDlpFailurePolicyResolverTests
             policyVersion: "policy-v250",
             policyHash: "hash-250");
 
-        DlpFailurePolicyResolution resolution = DlpFailurePolicyResolution.Create(context, behavior);
+        var resolution = DlpFailurePolicyResolution.Create(context, behavior);
 
         Assert.Same(context, resolution.Context);
         Assert.Equal(behavior, resolution.Behavior);
@@ -291,7 +291,7 @@ public sealed class DefaultAsiBackboneDlpFailurePolicyResolverTests
             failureKind,
             DlpIntentRiskLevel.Low);
 
-        DlpFailurePolicyResolution resolution = DlpFailurePolicyResolution.Create(
+        var resolution = DlpFailurePolicyResolution.Create(
             context,
             DlpFailureBehavior.WarnAndAllow);
 
@@ -303,7 +303,7 @@ public sealed class DefaultAsiBackboneDlpFailurePolicyResolverTests
     [Fact]
     public void TimeoutWithoutTimeoutValueUsesGenericMessageAndOmitsTimeoutMetadata()
     {
-        DlpFailurePolicyResolution resolution = DlpFailurePolicyResolution.Create(
+        var resolution = DlpFailurePolicyResolution.Create(
             DlpFailurePolicyContext.TimeoutFailure(DlpIntentRiskLevel.Low),
             DlpFailureBehavior.WarnAndAllow);
 
@@ -452,19 +452,19 @@ public sealed class DefaultAsiBackboneDlpFailurePolicyResolverTests
     [Fact]
     public void NullAndEmptyMetadataRemainSafe()
     {
-        DlpFailurePolicyContext nullMetadataContext = DlpFailurePolicyContext.Create(
+        var nullMetadataContext = DlpFailurePolicyContext.Create(
             DlpClassificationFailureKind.ServiceUnavailable,
             DlpIntentRiskLevel.Low,
             metadata: null);
-        DlpFailurePolicyContext emptyMetadataContext = DlpFailurePolicyContext.Create(
+        var emptyMetadataContext = DlpFailurePolicyContext.Create(
             DlpClassificationFailureKind.ServiceUnavailable,
             DlpIntentRiskLevel.Low,
             metadata: new Dictionary<string, string>());
 
-        DlpFailurePolicyResolution nullMetadataResolution = DlpFailurePolicyResolution.Create(
+        var nullMetadataResolution = DlpFailurePolicyResolution.Create(
             nullMetadataContext,
             DlpFailureBehavior.WarnAndAllow);
-        DlpFailurePolicyResolution emptyMetadataResolution = DlpFailurePolicyResolution.Create(
+        var emptyMetadataResolution = DlpFailurePolicyResolution.Create(
             emptyMetadataContext,
             DlpFailureBehavior.WarnAndAllow);
 
@@ -479,7 +479,7 @@ public sealed class DefaultAsiBackboneDlpFailurePolicyResolverTests
     [Fact]
     public void MetadataNormalizationIgnoresBlankKeysAndTrimsKeysAndValues()
     {
-        DlpFailurePolicyContext context = DlpFailurePolicyContext.Create(
+        var context = DlpFailurePolicyContext.Create(
             DlpClassificationFailureKind.ServiceUnavailable,
             DlpIntentRiskLevel.Low,
             intentCategory: " ",
@@ -491,7 +491,7 @@ public sealed class DefaultAsiBackboneDlpFailurePolicyResolverTests
                 ["empty-value"] = null!
             });
 
-        DlpFailurePolicyResolution resolution = DlpFailurePolicyResolution.Create(
+        var resolution = DlpFailurePolicyResolution.Create(
             context,
             DlpFailureBehavior.WarnAndAllow);
 
@@ -509,14 +509,14 @@ public sealed class DefaultAsiBackboneDlpFailurePolicyResolverTests
     [Fact]
     public void IntentCategoryAndEnvironmentAreIncludedOnlyWhenNonblank()
     {
-        DlpFailurePolicyResolution blankResolution = DlpFailurePolicyResolution.Create(
+        var blankResolution = DlpFailurePolicyResolution.Create(
             DlpFailurePolicyContext.Create(
                 DlpClassificationFailureKind.ServiceUnavailable,
                 DlpIntentRiskLevel.Low,
                 intentCategory: " ",
                 environment: " "),
             DlpFailureBehavior.WarnAndAllow);
-        DlpFailurePolicyResolution nonblankResolution = DlpFailurePolicyResolution.Create(
+        var nonblankResolution = DlpFailurePolicyResolution.Create(
             DlpFailurePolicyContext.Create(
                 DlpClassificationFailureKind.ServiceUnavailable,
                 DlpIntentRiskLevel.Low,

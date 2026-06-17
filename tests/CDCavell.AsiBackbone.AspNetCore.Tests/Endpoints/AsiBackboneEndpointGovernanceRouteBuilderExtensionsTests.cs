@@ -1,7 +1,6 @@
 using System.Reflection;
 using CDCavell.AsiBackbone.AspNetCore.Endpoints;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Patterns;
 using Xunit;

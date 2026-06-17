@@ -12,7 +12,7 @@ public sealed class AuditIntegrityVerifierBranchTests
     [Fact]
     public void VerifyRejectsNullLinks()
     {
-        _ = Assert.Throws<ArgumentNullException>(() => AuditIntegrityVerifier.Verify(null!));
+        Assert.Throws<ArgumentNullException>(() => AuditIntegrityVerifier.Verify(null!));
     }
 
     [Fact]
@@ -102,7 +102,7 @@ public sealed class AuditIntegrityVerifierBranchTests
     [Fact]
     public void VerifyDetectsReorderedSequenceWhenGenesisIsNotRequired()
     {
-        AuditIntegrityLink startingAtSecond = CreateComputedLink(
+        var startingAtSecond = CreateComputedLink(
             chainId: "audit-ledger",
             sequence: 2,
             recordHash: CreateRecordHash("record-2"),
@@ -155,7 +155,7 @@ public sealed class AuditIntegrityVerifierBranchTests
     [Fact]
     public void VerifyAcceptsNonGenesisStartingSequenceWhenGenesisIsNotRequired()
     {
-        AuditIntegrityLink partial = CreateComputedLink(
+        var partial = CreateComputedLink(
             chainId: "audit-ledger",
             sequence: 5,
             recordHash: CreateRecordHash("record-5"),

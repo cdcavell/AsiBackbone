@@ -50,6 +50,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
 
         var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
             [],
+            decisionPolicy: null,
             options: new AsiBackbonePolicyEvaluatorOptions
             {
                 DenyWhenNoConstraints = true
@@ -74,6 +75,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
 
         var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
             [],
+            decisionPolicy: null,
             options: new AsiBackbonePolicyEvaluatorOptions
             {
                 DenyWhenNoConstraints = true,
@@ -97,6 +99,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
         _ = Assert.Throws<InvalidOperationException>(() =>
             new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
                 [],
+                decisionPolicy: null,
                 options: new AsiBackbonePolicyEvaluatorOptions
                 {
                     DenyWhenNoConstraints = true,
@@ -113,6 +116,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
         _ = Assert.Throws<InvalidOperationException>(() =>
             new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
                 [],
+                decisionPolicy: null,
                 options: new AsiBackbonePolicyEvaluatorOptions
                 {
                     DenyWhenNoConstraints = true,
@@ -132,6 +136,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
                         "constraint.warning",
                         "The constraint produced a warning."))
             ],
+            decisionPolicy: null,
             options: new AsiBackbonePolicyEvaluatorOptions
             {
                 DenyWhenNoConstraints = true
@@ -157,6 +162,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
                         "constraint.denied",
                         "The constraint denied the operation."))
             ],
+            decisionPolicy: null,
             options: new AsiBackbonePolicyEvaluatorOptions
             {
                 DenyWhenNoConstraints = true

@@ -127,6 +127,117 @@ public sealed class AuditIntegrityVerifierTests
         Assert.Equal("integrity.previous-link-hash-mismatch", result.FailureCode);
     }
 
+    [Fact]
+    public void VerifyRejectsEmptyChain()
+    {
+        AuditIntegrityVerificationResult result = AuditIntegrityVerifier.Verify([]);
+
+        Assert.False(result.IsValid);
+        Assert.Equal(AuditIntegrityVerificationCategory.EmptyChain, result.Category);
+        Assert.Equal("integrity.chain-empty", result.FailureCode);
+    }
+
+    [Fact]
+    public void VerifyDetectsWrongChain()
+    {
+        var first = AuditIntegrityLink.CreateGenesis("audit-ledger", CreateRecordHash("record-1"), Now);
+
+        AuditIntegrityVerificationResult result = AuditIntegrityVerifier.Verify([first], "other-ledger");
+
+        Assert.False(result.IsValid);
+        Assert.Equal(AuditIntegrityVerificationCategory.WrongChain, result.Category);
+        Assert.Equal("integrity.chain-id-mismatch", result.FailureCode);
+    }
+
+    [Fact]
+    public void VerifyDetectsUnsupportedHashAlgorithm()
+    {
+        var first = AuditIntegrityLink.CreateGenesis("audit-ledger", CreateRecordHash("record-1"), Now);
+        var unsupported = AuditIntegrityLink.Rehydrate(
+            first.ChainId,
+            first.Sequence,
+            first.RecordId,
+            first.RecordType,
+            first.RecordHash,
+            first.PreviousLinkHash,
+            first.LinkHash,
+            "SHA-512",
+            first.CanonicalizationVersion,
+            first.SchemaVersion,
+            first.CreatedUtc);
+
+        AuditIntegrityVerificationResult result = AuditIntegrityVerifier.Verify([unsupported], "audit-ledger");
+
+        Assert.False(result.IsValid);
+        Assert.Equal(AuditIntegrityVerificationCategory.UnsupportedAlgorithm, result.Category);
+        Assert.Equal("integrity.hash-algorithm-unsupported", result.FailureCode);
+    }
+
+    [Fact]
+    public void VerifyDetectsGenesisPreviousHash()
+    {
+        var first = AuditIntegrityLink.CreateGenesis("audit-ledger", CreateRecordHash("record-1"), Now);
+        var broken = AuditIntegrityLink.Rehydrate(
+            first.ChainId,
+            first.Sequence,
+            first.RecordId,
+            first.RecordType,
+            first.RecordHash,
+            "unexpected-previous-hash",
+            first.LinkHash,
+            first.HashAlgorithm,
+            first.CanonicalizationVersion,
+            first.SchemaVersion,
+            first.CreatedUtc);
+
+        AuditIntegrityVerificationResult result = AuditIntegrityVerifier.Verify([broken], "audit-ledger");
+
+        Assert.False(result.IsValid);
+        Assert.Equal(AuditIntegrityVerificationCategory.HashMismatch, result.Category);
+        Assert.Equal("integrity.genesis-previous-hash-present", result.FailureCode);
+    }
+
+    [Fact]
+    public void VerifyAcceptsPartialChainWhenGenesisIsNotRequired()
+    {
+        var partial = CreateComputedLink(5, CreateRecordHash("record-5"));
+
+        AuditIntegrityVerificationResult result = AuditIntegrityVerifier.Verify([partial], "audit-ledger", requireGenesis: false);
+
+        Assert.True(result.IsValid);
+        Assert.Equal("1", result.SafeMetadata["link_count"]);
+        Assert.Equal(partial.LinkHash, result.SafeMetadata["tip_hash"]);
+    }
+
+    private static AuditIntegrityLink CreateComputedLink(long sequence, CanonicalPayloadHash recordHash)
+    {
+        var draft = AuditIntegrityLink.Rehydrate(
+            "audit-ledger",
+            sequence,
+            recordHash.ArtifactId,
+            recordHash.ArtifactType,
+            recordHash.HashValue,
+            string.Empty,
+            recordHash.HashValue,
+            recordHash.HashAlgorithm,
+            recordHash.CanonicalizationVersion,
+            AsiBackboneSchemaVersions.StableArtifactsV1,
+            Now.AddSeconds(sequence));
+
+        return AuditIntegrityLink.Rehydrate(
+            draft.ChainId,
+            draft.Sequence,
+            draft.RecordId,
+            draft.RecordType,
+            draft.RecordHash,
+            draft.PreviousLinkHash,
+            draft.ComputeExpectedLinkHash(),
+            draft.HashAlgorithm,
+            draft.CanonicalizationVersion,
+            draft.SchemaVersion,
+            draft.CreatedUtc);
+    }
+
     private static CanonicalPayloadHash CreateRecordHash(string recordId)
     {
         var payload = CanonicalPayload.Create(

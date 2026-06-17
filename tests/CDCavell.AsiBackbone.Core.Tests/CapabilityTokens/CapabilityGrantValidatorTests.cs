@@ -339,7 +339,7 @@ public sealed class CapabilityGrantValidatorTests
         SignedGovernanceArtifact<CapabilityTokenGrant> grant = CreateSignedGrant(CreateGrant());
         var cancellationToken = new CancellationToken(canceled: true);
 
-        await Assert.ThrowsAsync<OperationCanceledException>(
+        _ = await Assert.ThrowsAsync<OperationCanceledException>(
             async () => await CapabilityGrantValidator.ValidateAsync(
                 grant,
                 CreateOptions(),
@@ -349,7 +349,7 @@ public sealed class CapabilityGrantValidatorTests
     [Fact]
     public async Task ValidateAsyncThrowsWhenSignedGrantIsNull()
     {
-        await Assert.ThrowsAsync<ArgumentNullException>(
+        _ = await Assert.ThrowsAsync<ArgumentNullException>(
             async () => await CapabilityGrantValidator.ValidateAsync(
                 null!,
                 CreateOptions(),

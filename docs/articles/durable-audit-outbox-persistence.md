@@ -114,10 +114,13 @@ Outbox entries should contain minimized provider-neutral metadata only. Do not s
 
 Use opaque identifiers, hashes, policy versions, policy hashes, lifecycle stage values, correlation identifiers, and trace identifiers that are safe under host policy.
 
+See [Safe Audit and Telemetry Data Guidance](safe-audit-telemetry-data.md) for practical safe-to-store and safe-to-export guidance before enabling durable audit persistence or provider emission.
+
 ## Related documentation
 
 - [Governance Emission Contract](governance-emission-contract.md)
 - [Observability and Governance Emission Architecture](observability-and-governance-emission-architecture.md)
 - [Outbox Drain Reliability and Alerting](outbox-drain-reliability-and-alerting.md)
+- [Safe Audit and Telemetry Data Guidance](safe-audit-telemetry-data.md)
 - [Audit Residue Observability Schema](audit-residue-observability-schema.md)
 - [EF Core Integration Boundary](ef-core-integration-boundary.md)

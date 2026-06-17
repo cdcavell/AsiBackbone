@@ -160,6 +160,9 @@
 - name: Outbox Drain Reliability and Alerting
   href: outbox-drain-reliability-and-alerting.md
 
+- name: Safe Audit and Telemetry Data
+  href: safe-audit-telemetry-data.md
+
 - name: Audit Residue Observability Schema
   href: audit-residue-observability-schema.md
 

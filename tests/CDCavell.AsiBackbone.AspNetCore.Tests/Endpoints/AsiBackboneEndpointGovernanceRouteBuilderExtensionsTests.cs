@@ -18,7 +18,7 @@ public sealed class AsiBackboneEndpointGovernanceRouteBuilderExtensionsTests
 
         RouteHandlerBuilder routeBuilder = app.MapGet(
             "/governed",
-            static () => Results.Ok());
+            static () => Microsoft.AspNetCore.Http.Results.Ok());
 
         RouteHandlerBuilder returned = routeBuilder.RequireGovernancePolicy<TestPolicy>();
 
@@ -144,7 +144,7 @@ public sealed class AsiBackboneEndpointGovernanceRouteBuilderExtensionsTests
         Assert.Equal("metadata", innerException.ParamName);
     }
 
-    private static EndpointBuilder CreateEndpointBuilder()
+    private static RouteEndpointBuilder CreateEndpointBuilder()
     {
         return new RouteEndpointBuilder(
             static _ => Task.CompletedTask,

@@ -44,6 +44,161 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     }
 
     [Fact]
+    public async Task EvaluateWithNoConstraintsAndStrictOptionProducesDeniedDecision()
+    {
+        TestPolicyContext context = CreateContext();
+
+        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+            [],
+            options: new AsiBackbonePolicyEvaluatorOptions
+            {
+                DenyWhenNoConstraints = true
+            });
+
+        GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
+
+        Assert.True(decision.IsDenied);
+        Assert.False(decision.CanProceed);
+        Assert.Equal(
+            AsiBackbonePolicyEvaluatorOptions.DefaultNoConstraintsReasonCode,
+            Assert.Single(decision.ReasonCodes));
+        Assert.Equal(context.CorrelationId, decision.CorrelationId);
+        Assert.Equal(context.PolicyVersion, decision.PolicyVersion);
+        Assert.Equal(context.PolicyHash, decision.PolicyHash);
+    }
+
+    [Fact]
+    public async Task EvaluateWithNoConstraintsAndStrictOptionUsesConfiguredReason()
+    {
+        TestPolicyContext context = CreateContext();
+
+        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+            [],
+            options: new AsiBackbonePolicyEvaluatorOptions
+            {
+                DenyWhenNoConstraints = true,
+                NoConstraintsReasonCode = "host.policy.empty",
+                NoConstraintsReasonMessage = "Host policy load produced no constraints."
+            });
+
+        GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
+
+        Assert.True(decision.IsDenied);
+        Assert.Equal("host.policy.empty", Assert.Single(decision.ReasonCodes));
+        Assert.Equal("Host policy load produced no constraints.", Assert.Single(decision.Reasons).Message);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData(" ")]
+    public void ConstructorThrowsForInvalidNoConstraintsReasonCode(string? reasonCode)
+    {
+        _ = Assert.Throws<InvalidOperationException>(() =>
+            new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+                [],
+                options: new AsiBackbonePolicyEvaluatorOptions
+                {
+                    DenyWhenNoConstraints = true,
+                    NoConstraintsReasonCode = reasonCode!
+                }));
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData(" ")]
+    public void ConstructorThrowsForInvalidNoConstraintsReasonMessage(string? reasonMessage)
+    {
+        _ = Assert.Throws<InvalidOperationException>(() =>
+            new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+                [],
+                options: new AsiBackbonePolicyEvaluatorOptions
+                {
+                    DenyWhenNoConstraints = true,
+                    NoConstraintsReasonMessage = reasonMessage!
+                }));
+    }
+
+    [Fact]
+    public async Task EvaluateWithStrictOptionAndWarningsStillProducesWarningDecision()
+    {
+        TestPolicyContext context = CreateContext();
+
+        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+            [
+                new StaticConstraint(
+                    ConstraintEvaluationResult.Warning(
+                        "constraint.warning",
+                        "The constraint produced a warning."))
+            ],
+            options: new AsiBackbonePolicyEvaluatorOptions
+            {
+                DenyWhenNoConstraints = true
+            });
+
+        GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
+
+        Assert.True(decision.IsWarning);
+        Assert.True(decision.CanProceed);
+        Assert.Contains("constraint.warning", decision.ReasonCodes);
+        Assert.DoesNotContain(AsiBackbonePolicyEvaluatorOptions.DefaultNoConstraintsReasonCode, decision.ReasonCodes);
+    }
+
+    [Fact]
+    public async Task EvaluateWithStrictOptionAndDenialsStillProducesConstraintDeniedDecision()
+    {
+        TestPolicyContext context = CreateContext();
+
+        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+            [
+                new StaticConstraint(
+                    ConstraintEvaluationResult.Deny(
+                        "constraint.denied",
+                        "The constraint denied the operation."))
+            ],
+            options: new AsiBackbonePolicyEvaluatorOptions
+            {
+                DenyWhenNoConstraints = true
+            });
+
+        GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
+
+        Assert.True(decision.IsDenied);
+        Assert.False(decision.CanProceed);
+        Assert.Equal("constraint.denied", Assert.Single(decision.ReasonCodes));
+    }
+
+    [Fact]
+    public async Task EvaluateWithNoConstraintsAndStrictOptionAppliesDecisionPolicyWithEmptyResults()
+    {
+        TestPolicyContext context = CreateContext();
+        var policy = new CapturingDecisionPolicy();
+
+        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+            [],
+            policy,
+            new AsiBackbonePolicyEvaluatorOptions
+            {
+                DenyWhenNoConstraints = true
+            });
+
+        GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
+
+        Assert.True(decision.IsDeferred);
+        Assert.Equal("policy.deferred", Assert.Single(decision.ReasonCodes));
+        Assert.Equal(1, policy.ApplyCount);
+        Assert.Same(context, policy.Context);
+        Assert.NotNull(policy.ComposedDecision);
+        Assert.True(policy.ComposedDecision.IsDenied);
+        Assert.Equal(
+            AsiBackbonePolicyEvaluatorOptions.DefaultNoConstraintsReasonCode,
+            Assert.Single(policy.ComposedDecision.ReasonCodes));
+        Assert.NotNull(policy.ConstraintResults);
+        Assert.Empty(policy.ConstraintResults);
+    }
+
+    [Fact]
     public async Task ConstructorMaterializesNonListConstraintEnumerable()
     {
         TestPolicyContext context = CreateContext();

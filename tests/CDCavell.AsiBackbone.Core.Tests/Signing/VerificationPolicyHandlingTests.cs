@@ -10,8 +10,8 @@ public sealed class VerificationPolicyHandlingTests
     {
         { "missing-signing-hash", SignatureVerificationCategory.MissingSignature, VerificationPolicyAction.RequireAcknowledgment, "signature.missing" },
         { "signing-hash-mismatch", SignatureVerificationCategory.HashMismatch, VerificationPolicyAction.Deny, "signature.hash-mismatch" },
-        { "metadata-hash-algorithm-mismatch", SignatureVerificationCategory.UnsupportedAlgorithm, VerificationPolicyAction.Deny, "signature.hash-algorithm-unsupported" },
-        { "required-hash-algorithm-mismatch", SignatureVerificationCategory.UnsupportedAlgorithm, VerificationPolicyAction.Deny, "signature.hash-algorithm-unsupported" },
+        { "metadata-hash-algorithm-mismatch", SignatureVerificationCategory.HashMismatch, VerificationPolicyAction.Deny, "signature.hash-algorithm-unsupported" },
+        { "required-hash-algorithm-mismatch", SignatureVerificationCategory.HashMismatch, VerificationPolicyAction.Deny, "signature.hash-algorithm-unsupported" },
         { "canonical-artifact-id-mismatch", SignatureVerificationCategory.CanonicalizationMismatch, VerificationPolicyAction.Escalate, "signature.canonicalization-mismatch" },
         { "canonical-artifact-type-mismatch", SignatureVerificationCategory.CanonicalizationMismatch, VerificationPolicyAction.Escalate, "signature.canonicalization-mismatch" },
         { "canonicalization-version-mismatch", SignatureVerificationCategory.CanonicalizationMismatch, VerificationPolicyAction.Escalate, "signature.canonicalization-mismatch" },

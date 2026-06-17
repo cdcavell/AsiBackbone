@@ -29,6 +29,9 @@ Start with [Getting Started](getting-started.md), then use the navigation menu t
 * [Core Domain Language](core-domain-language.md)  
   Defines the Core terminology for governance spine, constraints, collapse boundary, audit residue, actor context, decision results, operation results, acknowledgment, capability tokens, and gateway boundaries.
 
+* [Host-Owned Execution Enforcement](host-owned-execution-enforcement.md)  
+  Documents the execution boundary where host applications must honor governance decisions before HTTP endpoints, service methods, message consumers, workers, CLI tools, or other consequential paths execute side effects.
+
 * [1.0.0 Release Notes](release-notes-100.md)  
   Describes the first stable release identity, stable package list, known limitations, and upgrade guidance.
 

@@ -157,6 +157,9 @@
 - name: Hosted Governance Outbox Drain
   href: hosted-governance-outbox-drain.md
 
+- name: Outbox Drain Reliability and Alerting
+  href: outbox-drain-reliability-and-alerting.md
+
 - name: Audit Residue Observability Schema
   href: audit-residue-observability-schema.md
 

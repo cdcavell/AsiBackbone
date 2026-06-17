@@ -102,6 +102,12 @@ Recommended sequence:
 
 This avoids losing the local accountability record when external sinks are unavailable.
 
+## Operational visibility
+
+Durable outbox persistence reduces event-loss risk, but it does not automatically guarantee that centralized monitoring, governance catalogs, SIEM systems, or compliance ledgers received the event. Hosts should monitor the drain path and alert on sustained backlog or repeated emission failure.
+
+See [Outbox Drain Reliability and Alerting](outbox-drain-reliability-and-alerting.md) for provider-neutral operational controls, metrics, alert thresholds, dead-letter guidance, and recovery runbook expectations.
+
 ## Privacy and provider boundaries
 
 Outbox entries should contain minimized provider-neutral metadata only. Do not store raw capability tokens, secrets, connection strings, provider credentials, raw prompts, protected document bodies, or unredacted sensitive records in the outbox payload or metadata.
@@ -112,5 +118,6 @@ Use opaque identifiers, hashes, policy versions, policy hashes, lifecycle stage 
 
 - [Governance Emission Contract](governance-emission-contract.md)
 - [Observability and Governance Emission Architecture](observability-and-governance-emission-architecture.md)
+- [Outbox Drain Reliability and Alerting](outbox-drain-reliability-and-alerting.md)
 - [Audit Residue Observability Schema](audit-residue-observability-schema.md)
 - [EF Core Integration Boundary](ef-core-integration-boundary.md)

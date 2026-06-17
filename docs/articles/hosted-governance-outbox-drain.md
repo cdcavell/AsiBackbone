@@ -91,6 +91,14 @@ Emitter failures should be returned as provider-neutral `GovernanceEmissionResul
 
 If the provider throws unexpectedly, the Core drain converts the exception into a retryable provider-neutral outbox failure. If the worker itself fails before or outside emission, such as a DI or storage exception, the hosted worker waits for `FailureDelay` before the next pass.
 
+## Operational reliability guidance
+
+Durable local persistence keeps governance emission records available for retry and review, but it does not prove that centralized monitoring, compliance ledgers, SIEM tools, or governance catalogs received the event.
+
+Production hosts should monitor queue depth, oldest pending record age, retry and dead-letter counts, drain failure rate, last successful drain timestamp, and worker heartbeat. Sustained backlog or stale worker heartbeat should be treated as an operational incident in review-sensitive deployments.
+
+See [Outbox Drain Reliability and Alerting](outbox-drain-reliability-and-alerting.md) for provider-neutral monitoring, alerting, retry, dead-letter, and recovery guidance.
+
 ## Boundary reminder
 
 The hosted drain worker is part of the host/integration layer. It does not make Core responsible for hosting, scheduling, exporter selection, cloud SDKs, database configuration, or production operations.

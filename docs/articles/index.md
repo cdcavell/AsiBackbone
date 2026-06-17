@@ -101,6 +101,9 @@ Start with [Getting Started](getting-started.md), then use the navigation menu t
 * [Durable Audit and Outbox Persistence](durable-audit-outbox-persistence.md)  
   Documents the provider-neutral local persistence seam for audit residue lifecycle events and governance emission outbox entries before optional provider delivery.
 
+* [Outbox Drain Reliability and Alerting](outbox-drain-reliability-and-alerting.md)  
+  Documents provider-neutral operational guidance for outbox drain monitoring, alerting, retry/dead-letter handling, and recovery runbooks.
+
 * [Audit Residue Observability Schema](audit-residue-observability-schema.md)  
   Documents the provider-neutral telemetry, traceability, outbox, emission, and PII-safe identifier fields added to audit residue for observability and governance emission providers.
 

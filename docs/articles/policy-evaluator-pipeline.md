@@ -36,9 +36,10 @@ Composition rules are intentionally conservative:
 
 1. Deny wins when any constraint denies the request.
 2. Warning is returned when no constraint denies but at least one constraint warns.
-3. Allow is returned when no constraint denies or warns.
+3. Allow is returned when no constraint denies or warns. This preserves the existing zero-constraint behavior unless strict empty-policy denial is enabled.
 4. Not-applicable constraint results do not block the request.
 5. An optional `IAsiBackboneDecisionPolicy<TContext>` can raise the composed decision to deferred, acknowledgment-required, or escalation-recommended.
+6. When `AsiBackbonePolicyEvaluatorOptions.DenyWhenNoConstraints` is enabled and the supplied constraint collection is empty, the evaluator returns a denied decision with reason code `asibackbone.policy.no_constraints`.
 
 The evaluator propagates correlation, policy version, and policy hash metadata from the evaluation context into the composed governance decision.
 
@@ -58,6 +59,28 @@ GovernanceDecision decision = await evaluator.EvaluateAsync(
     context,
     cancellationToken);
 ```
+
+## Strict default-deny for empty policies
+
+By default, an empty constraint collection still composes to `Allowed` for backward compatibility and for hosts that intentionally run an unconstrained local validation flow. In zero-trust or dynamically configured deployments, however, an empty collection can also mean that a database, configuration, feature-flag, or dependency-injection policy load failed.
+
+Hosts that require a fail-closed posture can opt in:
+
+```csharp
+var evaluator = new DefaultAsiBackbonePolicyEvaluator<MyPolicyContext>(
+    constraints: constraintsFromConfiguration,
+    decisionPolicy: new HighRiskDecisionPolicy(),
+    options: new AsiBackbonePolicyEvaluatorOptions
+    {
+        DenyWhenNoConstraints = true
+    });
+```
+
+When enabled and no constraints are supplied, the evaluator returns a denied `GovernanceDecision` with reason code `asibackbone.policy.no_constraints`, preserving correlation, policy version, and policy hash metadata from the evaluation context.
+
+Permissive zero-constraint behavior is appropriate only when the host explicitly intends an unconstrained policy surface, such as a local sample, test harness, migration step, or separately protected flow. Strict default-deny should be used when constraints are loaded dynamically and an empty collection may indicate a policy-load failure.
+
+This option is not a substitute for authentication, authorization, or host-level configuration validation.
 
 After the decision is produced, a host or gateway can create audit residue and write it through an audit sink:
 

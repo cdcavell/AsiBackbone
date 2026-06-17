@@ -14,15 +14,18 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
 {
     private readonly ReadOnlyCollection<IAsiBackboneConstraint<TContext>> constraints;
     private readonly IAsiBackboneDecisionPolicy<TContext>? decisionPolicy;
+    private readonly AsiBackbonePolicyEvaluatorOptions options;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}"/> class.
     /// </summary>
     /// <param name="constraints">The constraints that make up the active policy structure.</param>
     /// <param name="decisionPolicy">Optional decision policy applied after constraint composition.</param>
+    /// <param name="options">Optional evaluator options.</param>
     public DefaultAsiBackbonePolicyEvaluator(
         IEnumerable<IAsiBackboneConstraint<TContext>> constraints,
-        IAsiBackboneDecisionPolicy<TContext>? decisionPolicy = null)
+        IAsiBackboneDecisionPolicy<TContext>? decisionPolicy = null,
+        AsiBackbonePolicyEvaluatorOptions? options = null)
     {
         ArgumentNullException.ThrowIfNull(constraints);
 
@@ -31,6 +34,8 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
 
         this.constraints = new ReadOnlyCollection<IAsiBackboneConstraint<TContext>>(list);
         this.decisionPolicy = decisionPolicy;
+        this.options = options ?? new AsiBackbonePolicyEvaluatorOptions();
+        this.options.Validate();
     }
 
     /// <inheritdoc />
@@ -39,6 +44,27 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(context);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        if (constraints.Count == 0 && options.DenyWhenNoConstraints)
+        {
+            GovernanceDecision noConstraintsDecision = GovernanceDecision.Deny(
+                options.NoConstraintsReasonCode,
+                options.NoConstraintsReasonMessage,
+                correlationId: context.CorrelationId,
+                policyVersion: context.PolicyVersion,
+                policyHash: context.PolicyHash);
+
+            return decisionPolicy is null
+                ? noConstraintsDecision
+                : await decisionPolicy
+                .ApplyAsync(
+                    context,
+                    noConstraintsDecision,
+                    Array.AsReadOnly(Array.Empty<ConstraintEvaluationResult>()),
+                    cancellationToken)
+                .ConfigureAwait(false);
+        }
 
         List<ConstraintEvaluationResult> results = new(constraints.Count);
         List<OperationReason> denials = [];

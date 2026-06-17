@@ -183,6 +183,7 @@ Key documentation pages:
 - [Upgrade Guide: 1.0.0 to 1.1.0](docs/articles/upgrade-100-to-110.md)
 - [Core Domain Language](docs/articles/core-domain-language.md)
 - [Policy Evaluator Pipeline](docs/articles/policy-evaluator-pipeline.md)
+- [Host-Owned Execution Enforcement](docs/articles/host-owned-execution-enforcement.md)
 - [Equations and Toy Models](docs/articles/equations-and-toy-models.md)
 - [Observability and Governance Emission Architecture](docs/articles/observability-and-governance-emission-architecture.md)
 - [Governance Emission Contract](docs/articles/governance-emission-contract.md)

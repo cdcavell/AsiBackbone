@@ -176,6 +176,7 @@ Key documentation pages:
 - [Dynamic Liability Handshake](docs/articles/dynamic-liability-handshake.md)
 - [Gateway and Regional Policy Flow](docs/articles/gateway-and-regional-policy-flow.md)
 - [Getting Started](docs/articles/getting-started.md)
+- [First 15 Minutes: Standard API Gating](docs/articles/quickstart-api-gating.md)
 - [1.0.0 Quickstart](docs/articles/quickstart-100.md)
 - [1.0.0 Release Notes](docs/articles/release-notes-100.md)
 - [1.1.0 Release Notes](docs/articles/release-notes-110.md)

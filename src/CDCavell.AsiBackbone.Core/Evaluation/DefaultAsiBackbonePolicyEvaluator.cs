@@ -32,18 +32,6 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
     /// Initializes a new instance of the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}"/> class.
     /// </summary>
     /// <param name="constraints">The constraints that make up the active policy structure.</param>
-    /// <param name="options">Evaluator options applied during constraint composition.</param>
-    public DefaultAsiBackbonePolicyEvaluator(
-        IEnumerable<IAsiBackboneConstraint<TContext>> constraints,
-        AsiBackbonePolicyEvaluatorOptions? options)
-        : this(constraints, decisionPolicy: null, options)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}"/> class.
-    /// </summary>
-    /// <param name="constraints">The constraints that make up the active policy structure.</param>
     /// <param name="decisionPolicy">Optional decision policy applied after constraint composition.</param>
     /// <param name="options">Evaluator options applied during constraint composition.</param>
     public DefaultAsiBackbonePolicyEvaluator(

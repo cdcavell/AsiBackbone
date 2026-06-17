@@ -17,7 +17,7 @@ public sealed class GovernanceOutboxEntryTests
     [Fact]
     public void CreateGeneratesIdentifierForBlankOutboxIdAndNormalizesCreatedTimestamp()
     {
-        GovernanceOutboxEntry entry = GovernanceOutboxEntry.Create(
+        var entry = GovernanceOutboxEntry.Create(
             CreateEnvelope(),
             outboxEntryId: " ",
             createdUtc: CreatedLocal);
@@ -83,7 +83,7 @@ public sealed class GovernanceOutboxEntryTests
     [Fact]
     public void RestoreNormalizesTimestampsAndOptionalStrings()
     {
-        GovernanceOutboxEntry entry = GovernanceOutboxEntry.Restore(
+        var entry = GovernanceOutboxEntry.Restore(
             CreateEnvelope(),
             GovernanceEmissionStatus.DeadLettered,
             " outbox-123 ",
@@ -104,7 +104,7 @@ public sealed class GovernanceOutboxEntryTests
     [Fact]
     public void MetadataNormalizationIgnoresBlankKeysTrimsValuesAndAllowsDeliveredResultOverrides()
     {
-        GovernanceOutboxEntry entry = GovernanceOutboxEntry.Create(
+        var entry = GovernanceOutboxEntry.Create(
             CreateEnvelope(),
             metadata: new Dictionary<string, string>
             {
@@ -139,9 +139,9 @@ public sealed class GovernanceOutboxEntryTests
     [Fact]
     public void CreateReturnsEmptyMetadataViewForNullEmptyAndBlankMetadata()
     {
-        GovernanceOutboxEntry nullMetadataEntry = GovernanceOutboxEntry.Create(CreateEnvelope(), metadata: null);
-        GovernanceOutboxEntry emptyMetadataEntry = GovernanceOutboxEntry.Create(CreateEnvelope(), metadata: new Dictionary<string, string>());
-        GovernanceOutboxEntry blankMetadataEntry = GovernanceOutboxEntry.Create(
+        var nullMetadataEntry = GovernanceOutboxEntry.Create(CreateEnvelope(), metadata: null);
+        var emptyMetadataEntry = GovernanceOutboxEntry.Create(CreateEnvelope(), metadata: new Dictionary<string, string>());
+        var blankMetadataEntry = GovernanceOutboxEntry.Create(
             CreateEnvelope(),
             metadata: new Dictionary<string, string>
             {
@@ -182,7 +182,7 @@ public sealed class GovernanceOutboxEntryTests
     [Fact]
     public void MarkDeliveredRejectsNonSuccessResults()
     {
-        GovernanceOutboxEntry entry = GovernanceOutboxEntry.Create(CreateEnvelope());
+        var entry = GovernanceOutboxEntry.Create(CreateEnvelope());
 
         _ = Assert.Throws<ArgumentException>(() =>
             entry.MarkDelivered(GovernanceEmissionResult.Pending()));
@@ -193,11 +193,11 @@ public sealed class GovernanceOutboxEntryTests
     {
         DateTimeOffset retryUtc = RetryLocal;
         DateTimeOffset updatedUtc = UpdatedLocal;
-        GovernanceEmissionError nonRetryableError = GovernanceEmissionError.Create(
+        var nonRetryableError = GovernanceEmissionError.Create(
             "provider.rejected",
             "Provider rejected the minimized envelope.",
             providerName: "provider");
-        GovernanceEmissionError retryableError = GovernanceEmissionError.Create(
+        var retryableError = GovernanceEmissionError.Create(
             "provider.timeout",
             "Provider timed out.",
             isRetryable: true,
@@ -238,8 +238,8 @@ public sealed class GovernanceOutboxEntryTests
     [Fact]
     public void MarkDeferredCoversNullErrorAndErrorPresentPaths()
     {
-        GovernanceOutboxEntry entry = GovernanceOutboxEntry.Create(CreateEnvelope());
-        GovernanceEmissionError error = GovernanceEmissionError.Create(
+        var entry = GovernanceOutboxEntry.Create(CreateEnvelope());
+        var error = GovernanceEmissionError.Create(
             "provider.throttled",
             "Provider throttled the request.",
             isRetryable: true,
@@ -269,11 +269,11 @@ public sealed class GovernanceOutboxEntryTests
     [Fact]
     public void MarkDeadLetteredCoversExplicitReasonAndFallbackErrorMessageReason()
     {
-        GovernanceEmissionError error = GovernanceEmissionError.Create(
+        var error = GovernanceEmissionError.Create(
             "provider.rejected",
             "Provider rejected the minimized envelope.",
             providerName: "provider");
-        GovernanceOutboxEntry entry = GovernanceOutboxEntry.Create(CreateEnvelope());
+        var entry = GovernanceOutboxEntry.Create(CreateEnvelope());
 
         GovernanceOutboxEntry explicitReason = entry.MarkDeadLettered(
             error,

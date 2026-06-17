@@ -30,7 +30,7 @@ public sealed class GovernanceEmissionBranchTests
         string? auditResidueId,
         bool expectedHasCorrelation)
     {
-        GovernanceEmissionEnvelope envelope = GovernanceEmissionEnvelope.Create(
+        var envelope = GovernanceEmissionEnvelope.Create(
             GovernanceEmissionEventType.Decision,
             correlationId: correlationId,
             traceId: traceId,
@@ -42,7 +42,7 @@ public sealed class GovernanceEmissionBranchTests
     [Fact]
     public void FromResidueUsesCallerMetadataWhenKeysOverlapResidueMetadata()
     {
-        AuditResidue residue = AuditResidue.Create(
+        var residue = AuditResidue.Create(
             AsiBackboneActorContext.Service("service-123"),
             "document.approve",
             "Allowed",
@@ -55,7 +55,7 @@ public sealed class GovernanceEmissionBranchTests
             },
             auditResidueId: "residue-123");
 
-        GovernanceEmissionEnvelope envelope = GovernanceEmissionEnvelope.FromResidue(
+        var envelope = GovernanceEmissionEnvelope.FromResidue(
             residue,
             metadata: new Dictionary<string, string>
             {
@@ -71,7 +71,7 @@ public sealed class GovernanceEmissionBranchTests
     [Fact]
     public void FromLifecycleEventUsesCallerMetadataWhenKeysOverlapLifecycleMetadata()
     {
-        AuditResidueLifecycleEvent lifecycleEvent = AuditResidueLifecycleEvent.Create(
+        var lifecycleEvent = AuditResidueLifecycleEvent.Create(
             AuditResidueLifecycleStage.ExternalEmissionQueued,
             "correlation-123",
             auditResidueId: "residue-123",
@@ -82,7 +82,7 @@ public sealed class GovernanceEmissionBranchTests
                 ["lifecycle-only"] = " retained "
             });
 
-        GovernanceEmissionEnvelope envelope = GovernanceEmissionEnvelope.FromLifecycleEvent(
+        var envelope = GovernanceEmissionEnvelope.FromLifecycleEvent(
             lifecycleEvent,
             metadata: new Dictionary<string, string>
             {
@@ -98,13 +98,13 @@ public sealed class GovernanceEmissionBranchTests
     [Fact]
     public void CreateReturnsEmptyMetadataViewForNullEmptyAndBlankMetadata()
     {
-        GovernanceEmissionEnvelope nullMetadataEnvelope = GovernanceEmissionEnvelope.Create(
+        var nullMetadataEnvelope = GovernanceEmissionEnvelope.Create(
             GovernanceEmissionEventType.Decision,
             metadata: null);
-        GovernanceEmissionEnvelope emptyMetadataEnvelope = GovernanceEmissionEnvelope.Create(
+        var emptyMetadataEnvelope = GovernanceEmissionEnvelope.Create(
             GovernanceEmissionEventType.Decision,
             metadata: new Dictionary<string, string>());
-        GovernanceEmissionEnvelope blankMetadataEnvelope = GovernanceEmissionEnvelope.Create(
+        var blankMetadataEnvelope = GovernanceEmissionEnvelope.Create(
             GovernanceEmissionEventType.Decision,
             metadata: new Dictionary<string, string>
             {
@@ -122,7 +122,7 @@ public sealed class GovernanceEmissionBranchTests
     [Fact]
     public void CreateTrimsOptionalStringsAndNormalizesBlankStringsToNull()
     {
-        GovernanceEmissionEnvelope envelope = GovernanceEmissionEnvelope.Create(
+        var envelope = GovernanceEmissionEnvelope.Create(
             GovernanceEmissionEventType.ProviderEmission,
             eventId: " event-123 ",
             envelopeId: " envelope-123 ",
@@ -163,7 +163,7 @@ public sealed class GovernanceEmissionBranchTests
     [Fact]
     public void PayloadCreateTrimsOptionalStringsNormalizesMetadataAndRejectsInvalidInputs()
     {
-        GovernanceEmissionPayload payload = GovernanceEmissionPayload.Create(
+        var payload = GovernanceEmissionPayload.Create(
             " audit-residue ",
             schemaVersion: " ",
             contentType: " application/json ",
@@ -189,8 +189,8 @@ public sealed class GovernanceEmissionBranchTests
     [Fact]
     public void ResultFactoriesNormalizeOptionalStringsAndMetadata()
     {
-        GovernanceEmissionResult pending = GovernanceEmissionResult.Pending(providerName: " ");
-        GovernanceEmissionResult delivered = GovernanceEmissionResult.Delivered(
+        var pending = GovernanceEmissionResult.Pending(providerName: " ");
+        var delivered = GovernanceEmissionResult.Delivered(
             providerName: " provider ",
             providerRecordId: " record-123 ",
             metadata: new Dictionary<string, string>
@@ -198,12 +198,12 @@ public sealed class GovernanceEmissionBranchTests
                 [" result "] = " delivered ",
                 [" "] = "ignored"
             });
-        GovernanceEmissionError retryableError = GovernanceEmissionError.Create(
+        var retryableError = GovernanceEmissionError.Create(
             " retry.timeout ",
             " Provider timed out. ",
             isRetryable: true,
             providerName: " error-provider ");
-        GovernanceEmissionResult failed = GovernanceEmissionResult.Failed(retryableError);
+        var failed = GovernanceEmissionResult.Failed(retryableError);
 
         Assert.Null(pending.ProviderName);
         Assert.False(pending.HasMetadata);
@@ -219,7 +219,7 @@ public sealed class GovernanceEmissionBranchTests
     [Fact]
     public void ErrorCreateTrimsOptionalStringsAndRejectsBlankRequiredValues()
     {
-        GovernanceEmissionError error = GovernanceEmissionError.Create(
+        var error = GovernanceEmissionError.Create(
             " provider.timeout ",
             " Provider timed out. ",
             isRetryable: true,

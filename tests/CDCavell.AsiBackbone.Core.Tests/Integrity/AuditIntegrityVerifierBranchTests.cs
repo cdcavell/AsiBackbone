@@ -18,7 +18,7 @@ public sealed class AuditIntegrityVerifierBranchTests
     [Fact]
     public void VerifyRejectsEmptyChain()
     {
-        AuditIntegrityVerificationResult result = AuditIntegrityVerifier.Verify(Array.Empty<AuditIntegrityLink>());
+        AuditIntegrityVerificationResult result = AuditIntegrityVerifier.Verify([]);
 
         Assert.False(result.IsValid);
         Assert.Equal(AuditIntegrityVerificationCategory.EmptyChain, result.Category);
@@ -28,7 +28,7 @@ public sealed class AuditIntegrityVerifierBranchTests
     [Fact]
     public void VerifyUsesFirstLinkChainWhenNoExpectedChainIsSupplied()
     {
-        AuditIntegrityLink first = AuditIntegrityLink.CreateGenesis(
+        var first = AuditIntegrityLink.CreateGenesis(
             "audit-ledger",
             CreateRecordHash("record-1"),
             Now);
@@ -43,7 +43,7 @@ public sealed class AuditIntegrityVerifierBranchTests
     [Fact]
     public void VerifyTrimsExpectedChainId()
     {
-        AuditIntegrityLink first = AuditIntegrityLink.CreateGenesis(
+        var first = AuditIntegrityLink.CreateGenesis(
             "audit-ledger",
             CreateRecordHash("record-1"),
             Now);
@@ -57,7 +57,7 @@ public sealed class AuditIntegrityVerifierBranchTests
     [Fact]
     public void VerifyDetectsWrongChain()
     {
-        AuditIntegrityLink first = AuditIntegrityLink.CreateGenesis(
+        var first = AuditIntegrityLink.CreateGenesis(
             "audit-ledger",
             CreateRecordHash("record-1"),
             Now);
@@ -75,11 +75,11 @@ public sealed class AuditIntegrityVerifierBranchTests
     [Fact]
     public void VerifyDetectsUnsupportedHashAlgorithmBeforeHashComparison()
     {
-        AuditIntegrityLink first = AuditIntegrityLink.CreateGenesis(
+        var first = AuditIntegrityLink.CreateGenesis(
             "audit-ledger",
             CreateRecordHash("record-1"),
             Now);
-        AuditIntegrityLink unsupported = AuditIntegrityLink.Rehydrate(
+        var unsupported = AuditIntegrityLink.Rehydrate(
             first.ChainId,
             first.Sequence,
             first.RecordId,
@@ -102,13 +102,13 @@ public sealed class AuditIntegrityVerifierBranchTests
     [Fact]
     public void VerifyDetectsReorderedSequenceWhenGenesisIsNotRequired()
     {
-        AuditIntegrityLink startingAtSecond = CreateComputedLink(
+        var startingAtSecond = CreateComputedLink(
             chainId: "audit-ledger",
             sequence: 2,
             recordHash: CreateRecordHash("record-2"),
             previousLinkHash: string.Empty,
             createdUtc: Now.AddSeconds(1));
-        AuditIntegrityLink earlier = AuditIntegrityLink.CreateGenesis(
+        var earlier = AuditIntegrityLink.CreateGenesis(
             "audit-ledger",
             CreateRecordHash("record-1"),
             Now);
@@ -128,11 +128,11 @@ public sealed class AuditIntegrityVerifierBranchTests
     [Fact]
     public void VerifyDetectsGenesisPreviousHashWhenGenesisIsRequired()
     {
-        AuditIntegrityLink first = AuditIntegrityLink.CreateGenesis(
+        var first = AuditIntegrityLink.CreateGenesis(
             "audit-ledger",
             CreateRecordHash("record-1"),
             Now);
-        AuditIntegrityLink brokenGenesis = AuditIntegrityLink.Rehydrate(
+        var brokenGenesis = AuditIntegrityLink.Rehydrate(
             first.ChainId,
             first.Sequence,
             first.RecordId,
@@ -155,7 +155,7 @@ public sealed class AuditIntegrityVerifierBranchTests
     [Fact]
     public void VerifyAcceptsNonGenesisStartingSequenceWhenGenesisIsNotRequired()
     {
-        AuditIntegrityLink partial = CreateComputedLink(
+        var partial = CreateComputedLink(
             chainId: "audit-ledger",
             sequence: 5,
             recordHash: CreateRecordHash("record-5"),
@@ -180,7 +180,7 @@ public sealed class AuditIntegrityVerifierBranchTests
         string previousLinkHash,
         DateTimeOffset createdUtc)
     {
-        AuditIntegrityLink draft = AuditIntegrityLink.Rehydrate(
+        var draft = AuditIntegrityLink.Rehydrate(
             chainId,
             sequence,
             recordHash.ArtifactId,
@@ -209,7 +209,7 @@ public sealed class AuditIntegrityVerifierBranchTests
 
     private static CanonicalPayloadHash CreateRecordHash(string recordId)
     {
-        CanonicalPayload payload = CanonicalPayload.Create(
+        var payload = CanonicalPayload.Create(
             CanonicalArtifactTypes.AuditLedgerRecord,
             recordId,
             AsiBackboneSchemaVersions.StableArtifactsV1,

@@ -104,6 +104,9 @@ Start with [Getting Started](getting-started.md), then use the navigation menu t
 * [Outbox Drain Reliability and Alerting](outbox-drain-reliability-and-alerting.md)  
   Documents provider-neutral operational guidance for outbox drain monitoring, alerting, retry/dead-letter handling, and recovery runbooks.
 
+* [Safe Audit and Telemetry Data](safe-audit-telemetry-data.md)  
+  Documents safe-to-store and safe-to-export practices for audit residue, governance emissions, telemetry attributes, reason codes, metadata, and host context mapping.
+
 * [Audit Residue Observability Schema](audit-residue-observability-schema.md)  
   Documents the provider-neutral telemetry, traceability, outbox, emission, and PII-safe identifier fields added to audit residue for observability and governance emission providers.
 

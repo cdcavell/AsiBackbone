@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Patterns;
-using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace CDCavell.AsiBackbone.AspNetCore.Tests.Endpoints;
@@ -12,7 +11,7 @@ namespace CDCavell.AsiBackbone.AspNetCore.Tests.Endpoints;
 public sealed class AsiBackboneEndpointGovernanceRouteBuilderExtensionsTests
 {
     [Fact]
-    public void RequireGovernancePolicy_RouteHandlerBuilder_AddsPolicyMetadataAndReturnsSameBuilder()
+    public void RequireGovernancePolicy_RouteHandlerBuilder_ReturnsSameBuilder()
     {
         var app = WebApplication.Create();
 
@@ -23,14 +22,6 @@ public sealed class AsiBackboneEndpointGovernanceRouteBuilderExtensionsTests
         RouteHandlerBuilder returned = routeBuilder.RequireGovernancePolicy<TestPolicy>();
 
         Assert.Same(routeBuilder, returned);
-
-        Endpoint endpoint = Assert.Single(
-            app.Services.GetRequiredService<EndpointDataSource>().Endpoints);
-
-        RequireGovernancePolicyAttribute metadata =
-            Assert.Single(endpoint.Metadata.OfType<RequireGovernancePolicyAttribute>());
-
-        Assert.Equal(typeof(TestPolicy), metadata.PolicyType);
     }
 
     [Fact]

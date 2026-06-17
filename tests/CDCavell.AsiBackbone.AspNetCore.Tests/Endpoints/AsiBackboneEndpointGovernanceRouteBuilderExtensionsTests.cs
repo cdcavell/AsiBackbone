@@ -14,7 +14,7 @@ public sealed class AsiBackboneEndpointGovernanceRouteBuilderExtensionsTests
     [Fact]
     public void RequireGovernancePolicy_RouteHandlerBuilder_AddsPolicyMetadataAndReturnsSameBuilder()
     {
-        WebApplication app = WebApplication.Create();
+        var app = WebApplication.Create();
 
         RouteHandlerBuilder routeBuilder = app.MapGet(
             "/governed",
@@ -66,7 +66,7 @@ public sealed class AsiBackboneEndpointGovernanceRouteBuilderExtensionsTests
         Action<EndpointBuilder> convention = Assert.Single(builder.Conventions);
         convention(endpointBuilder);
 
-        Assert.Single(endpointBuilder.Metadata.OfType<RequireLiabilityHandshakeAttribute>());
+        _ = Assert.Single(endpointBuilder.Metadata.OfType<RequireLiabilityHandshakeAttribute>());
     }
 
     [Fact]
@@ -101,7 +101,7 @@ public sealed class AsiBackboneEndpointGovernanceRouteBuilderExtensionsTests
         Action<EndpointBuilder> convention = Assert.Single(builder.Conventions);
         convention(endpointBuilder);
 
-        Assert.Single(endpointBuilder.Metadata.OfType<EmitGovernanceAuditAttribute>());
+        _ = Assert.Single(endpointBuilder.Metadata.OfType<EmitGovernanceAuditAttribute>());
     }
 
     [Fact]

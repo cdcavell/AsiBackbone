@@ -367,17 +367,17 @@ public sealed class VerificationPolicyHandlingTests
         ConstructorInfo constructor = typeof(SignedGovernanceArtifact<string>).GetConstructor(
             BindingFlags.Instance | BindingFlags.NonPublic,
             binder: null,
-            types: new[] { typeof(string), typeof(CanonicalPayload), typeof(CanonicalPayloadHash), typeof(SigningMetadata) },
+            types: [typeof(string), typeof(CanonicalPayload), typeof(CanonicalPayloadHash), typeof(SigningMetadata)],
             modifiers: null)
             ?? throw new InvalidOperationException("SignedGovernanceArtifact constructor could not be located.");
 
-        return (SignedGovernanceArtifact<string>)constructor.Invoke(new object?[]
-        {
+        return (SignedGovernanceArtifact<string>)constructor.Invoke(
+        [
             "artifact",
             payload,
             hash,
             signingMetadata
-        });
+        ]);
     }
 
     private static Dictionary<string, string> CreateDefaultMetadata(

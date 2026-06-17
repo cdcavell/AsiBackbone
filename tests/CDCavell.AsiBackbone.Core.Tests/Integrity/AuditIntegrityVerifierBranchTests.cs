@@ -102,17 +102,19 @@ public sealed class AuditIntegrityVerifierBranchTests
     [Fact]
     public void VerifyDetectsReorderedSequenceWhenGenesisIsNotRequired()
     {
-        AuditIntegrityLink first = AuditIntegrityLink.CreateGenesis(
+        AuditIntegrityLink startingAtSecond = CreateComputedLink(
+            chainId: "audit-ledger",
+            sequence: 2,
+            recordHash: CreateRecordHash("record-2"),
+            previousLinkHash: string.Empty,
+            createdUtc: Now.AddSeconds(1));
+        AuditIntegrityLink earlier = AuditIntegrityLink.CreateGenesis(
             "audit-ledger",
             CreateRecordHash("record-1"),
             Now);
-        AuditIntegrityLink second = AuditIntegrityLink.Append(
-            first,
-            CreateRecordHash("record-2"),
-            Now.AddSeconds(1));
 
         AuditIntegrityVerificationResult result = AuditIntegrityVerifier.Verify(
-            [second, first],
+            [startingAtSecond, earlier],
             "audit-ledger",
             requireGenesis: false);
 
@@ -154,11 +156,11 @@ public sealed class AuditIntegrityVerifierBranchTests
     public void VerifyAcceptsNonGenesisStartingSequenceWhenGenesisIsNotRequired()
     {
         AuditIntegrityLink partial = CreateComputedLink(
-            "audit-ledger",
+            chainId: "audit-ledger",
             sequence: 5,
-            CreateRecordHash("record-5"),
+            recordHash: CreateRecordHash("record-5"),
             previousLinkHash: string.Empty,
-            Now.AddSeconds(5));
+            createdUtc: Now.AddSeconds(5));
 
         AuditIntegrityVerificationResult result = AuditIntegrityVerifier.Verify(
             [partial],

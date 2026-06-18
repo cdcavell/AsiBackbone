@@ -88,7 +88,7 @@ public sealed class CanonicalPayloadBuilderBranchTests
     public void ForGovernanceEmissionEnvelopeIncludesPayloadAndFilteredMetadataWhenPresent()
     {
         var options = CanonicalPayloadOptions.Create(["safe"]);
-        GovernanceEmissionPayload emissionPayload = GovernanceEmissionPayload.Create(
+        var emissionPayload = GovernanceEmissionPayload.Create(
             " audit-summary ",
             schemaVersion: " v1 ",
             contentType: " application/json ",
@@ -119,7 +119,7 @@ public sealed class CanonicalPayloadBuilderBranchTests
     [Fact]
     public void ForGovernanceOutboxEntryIncludesErrorContentAndRetryTimestamp()
     {
-        GovernanceEmissionError error = GovernanceEmissionError.Create(
+        var error = GovernanceEmissionError.Create(
             " provider.timeout ",
             " Provider timed out. ",
             isRetryable: true,
@@ -144,7 +144,7 @@ public sealed class CanonicalPayloadBuilderBranchTests
     [Fact]
     public void ForGovernanceOutboxEntryWritesNullOptionalErrorAndRetryFields()
     {
-        GovernanceOutboxEntry entry = GovernanceOutboxEntry.Create(
+        var entry = GovernanceOutboxEntry.Create(
             CreateEnvelope(payload: null, metadata: null),
             outboxEntryId: " outbox-1 ",
             createdUtc: CreatedUtc);

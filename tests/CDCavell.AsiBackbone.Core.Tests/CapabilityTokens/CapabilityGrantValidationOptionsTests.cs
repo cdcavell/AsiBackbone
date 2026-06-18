@@ -28,7 +28,10 @@ public sealed class CapabilityGrantValidationOptionsTests
 
         Assert.Equal("issuer-1", options.Issuer);
         Assert.Equal("gateway-1", options.Audience);
-        Assert.Equal(["robotics.read", "robotics.write"], options.Scopes);
+        Assert.Collection(
+            options.Scopes,
+            scope => Assert.Equal("robotics.read", scope),
+            scope => Assert.Equal("robotics.write", scope));
         Assert.Equal(new DateTimeOffset(2026, 6, 16, 12, 0, 0, TimeSpan.Zero), options.ValidationUtc);
         Assert.Equal("policy-v1", options.PolicyVersion);
         Assert.Equal("policy-hash", options.PolicyHash);
@@ -83,6 +86,7 @@ public sealed class CapabilityGrantValidationOptionsTests
     [Fact]
     public void CreateRejectsNonPositiveMaximumUseCount()
     {
-        _ = Assert.Throws<ArgumentOutOfRangeException>(() => CapabilityGrantValidationOptions.Create(maxUseCount: 0));
+        _ = Assert.Throws<ArgumentOutOfRangeException>(() =>
+            CapabilityGrantValidationOptions.Create(maxUseCount: 0));
     }
 }

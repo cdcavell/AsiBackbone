@@ -47,6 +47,8 @@ Core does not reference Azure Monitor, Event Hubs, Purview, OpenTelemetry, SIEM 
 
 These stores are intentionally not durable across process restarts. Production hosts should use EF Core or another host-owned durable storage adapter.
 
+The in-memory outbox store is single-process test/sample infrastructure. It should not be used to infer cross-replica claim or lease behavior.
+
 ## No-op drain proof path
 
 The no-op drain path exists to prove the outbox handoff before a real provider is added:
@@ -77,6 +79,8 @@ Outbox entries use the provider-neutral `GovernanceEmissionStatus` vocabulary:
 | `RetryableFailure` | Delivery failed but is expected to be retryable. |
 | `DeadLettered` | Delivery reached a terminal state or policy quarantine. |
 
+The current status model does not include a provider-neutral `Claimed` or `InProgress` state. `FindPendingAsync` and `FindRetryReadyAsync` return candidates for delivery, not claimed work items. Hosts that run multiple workers against the same durable store need host-owned claiming, partitioning, or downstream idempotency.
+
 `GovernanceOutboxEntry` also tracks:
 
 * `RetryCount`
@@ -102,11 +106,15 @@ Recommended sequence:
 
 This avoids losing the local accountability record when external sinks are unavailable.
 
+The sequence above is not an exactly-once delivery guarantee. A scaled host should either run one active worker per partition or add a claim-before-emit strategy before increasing worker count for the same durable outbox.
+
 ## Operational visibility
 
 Durable outbox persistence reduces event-loss risk, but it does not automatically guarantee that centralized monitoring, governance catalogs, SIEM systems, or compliance ledgers received the event. Hosts should monitor the drain path and alert on sustained backlog or repeated emission failure.
 
 See [Outbox Drain Reliability and Alerting](outbox-drain-reliability-and-alerting.md) for provider-neutral operational controls, metrics, alert thresholds, dead-letter guidance, and recovery runbook expectations.
+
+See [Outbox Multi-Worker Concurrency](outbox-multi-worker-concurrency.md) for guidance on horizontally scaled drain workers, EF Core optimistic concurrency limits, provider-specific SQL claiming patterns, and idempotent provider delivery.
 
 ## Privacy and provider boundaries
 
@@ -121,6 +129,7 @@ See [Safe Audit and Telemetry Data Guidance](safe-audit-telemetry-data.md) for p
 - [Governance Emission Contract](governance-emission-contract.md)
 - [Observability and Governance Emission Architecture](observability-and-governance-emission-architecture.md)
 - [Outbox Drain Reliability and Alerting](outbox-drain-reliability-and-alerting.md)
+- [Outbox Multi-Worker Concurrency](outbox-multi-worker-concurrency.md)
 - [Safe Audit and Telemetry Data Guidance](safe-audit-telemetry-data.md)
 - [Audit Residue Observability Schema](audit-residue-observability-schema.md)
 - [EF Core Integration Boundary](ef-core-integration-boundary.md)

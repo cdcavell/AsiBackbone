@@ -71,6 +71,10 @@ Use the outbox store when a host needs local durability across process restarts 
 
 The EF Core adapter is durable storage only. It does not drain the outbox by itself and does not add a cloud-provider SDK dependency to Core.
 
+`EfCoreGovernanceOutboxStore` participates in EF Core optimistic concurrency through the configured `ConcurrencyStamp` token. That protects state updates from stale writes, but it is not an atomic claim-before-emit mechanism. Multiple workers can still read the same pending row before either worker saves the final delivered/failed state.
+
+For scaled-out deployments, run one active worker per durable outbox partition unless the host adds provider-specific claim/lease behavior or downstream idempotency. See the DocFX article `Outbox Multi-Worker Concurrency` for the detailed deployment guidance.
+
 ## Registering EF Core stores
 
 A host can register its concrete `DbContext` and expose it as EF Core's base `DbContext` for the stores.
@@ -89,7 +93,7 @@ builder.Services.AddScoped<IAsiBackboneAuditResidueLifecycleStore, EfCoreAuditRe
 builder.Services.AddScoped<IAsiBackboneGovernanceOutboxStore, EfCoreGovernanceOutboxStore>();
 ```
 
-Provider-specific behavior belongs in the host application. For example, SQLite hosts may need provider-specific `DateTimeOffset` conversions for ordering or range queries.
+Provider-specific behavior belongs in the host application. For example, SQLite hosts may need provider-specific `DateTimeOffset` conversions for ordering or range queries. Multi-worker claiming patterns such as skip-locked row selection, update locks, read-past hints, or claim-lease columns also belong in the host/provider layer unless a future provider-specific package explicitly implements them.
 
 ## Privacy boundary
 
@@ -101,4 +105,4 @@ The host owns access control, encryption, retention, archival, deletion, and leg
 
 Use this package when you want ASI Backbone accountability records persisted through a host-owned EF Core database.
 
-Do not use this package as an AI model host, ASP.NET Core middleware package, migration owner, signing system, tamper-evident ledger provider, compliance system, downstream emission provider, or database provider abstraction.
+Do not use this package as an AI model host, ASP.NET Core middleware package, migration owner, signing system, tamper-evident ledger provider, compliance system, downstream emission provider, database provider abstraction, or distributed lock manager.

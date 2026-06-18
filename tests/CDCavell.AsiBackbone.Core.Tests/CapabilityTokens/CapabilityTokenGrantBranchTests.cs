@@ -40,7 +40,10 @@ public sealed class CapabilityTokenGrantBranchTests
         Assert.Equal("grant-1", grant.TokenId);
         Assert.Equal("issuer-1", grant.Issuer);
         Assert.Equal("gateway-1", grant.Audience);
-        Assert.Equal(["robotics.read", "robotics.write"], grant.Scopes);
+        Assert.Collection(
+            grant.Scopes,
+            scope => Assert.Equal("robotics.read", scope),
+            scope => Assert.Equal("robotics.write", scope));
         Assert.Equal(IssuedUtc, grant.IssuedUtc);
         Assert.Equal(IssuedUtc.AddMinutes(1), grant.NotBeforeUtc);
         Assert.Equal(ExpiresUtc, grant.ExpiresUtc);
@@ -86,49 +89,53 @@ public sealed class CapabilityTokenGrantBranchTests
     [Fact]
     public void CreateRejectsNullScopes()
     {
-        _ = Assert.Throws<ArgumentNullException>(() => CapabilityTokenGrant.Create(
-            tokenId: "grant-1",
-            issuer: "issuer-1",
-            audience: "gateway-1",
-            scopes: null!,
-            issuedUtc: IssuedUtc,
-            expiresUtc: ExpiresUtc));
+        _ = Assert.Throws<ArgumentNullException>(() =>
+            CapabilityTokenGrant.Create(
+                tokenId: "grant-1",
+                issuer: "issuer-1",
+                audience: "gateway-1",
+                scopes: null!,
+                issuedUtc: IssuedUtc,
+                expiresUtc: ExpiresUtc));
     }
 
     [Fact]
     public void CreateRejectsEmptyNormalizedScopes()
     {
-        _ = Assert.Throws<ArgumentException>(() => CapabilityTokenGrant.Create(
-            tokenId: "grant-1",
-            issuer: "issuer-1",
-            audience: "gateway-1",
-            scopes: [" ", ""],
-            issuedUtc: IssuedUtc,
-            expiresUtc: ExpiresUtc));
+        _ = Assert.Throws<ArgumentException>(() =>
+            CapabilityTokenGrant.Create(
+                tokenId: "grant-1",
+                issuer: "issuer-1",
+                audience: "gateway-1",
+                scopes: [" ", ""],
+                issuedUtc: IssuedUtc,
+                expiresUtc: ExpiresUtc));
     }
 
     [Fact]
     public void CreateRejectsNotBeforeAfterExpiration()
     {
-        _ = Assert.Throws<ArgumentOutOfRangeException>(() => CapabilityTokenGrant.Create(
-            tokenId: "grant-1",
-            issuer: "issuer-1",
-            audience: "gateway-1",
-            scopes: ["robotics.read"],
-            issuedUtc: IssuedUtc,
-            expiresUtc: ExpiresUtc,
-            notBeforeUtc: ExpiresUtc.AddTicks(1)));
+        _ = Assert.Throws<ArgumentOutOfRangeException>(() =>
+            CapabilityTokenGrant.Create(
+                tokenId: "grant-1",
+                issuer: "issuer-1",
+                audience: "gateway-1",
+                scopes: ["robotics.read"],
+                issuedUtc: IssuedUtc,
+                expiresUtc: ExpiresUtc,
+                notBeforeUtc: ExpiresUtc.AddTicks(1)));
     }
 
     [Fact]
     public void CreateRejectsIssuedAfterExpiration()
     {
-        _ = Assert.Throws<ArgumentOutOfRangeException>(() => CapabilityTokenGrant.Create(
-            tokenId: "grant-1",
-            issuer: "issuer-1",
-            audience: "gateway-1",
-            scopes: ["robotics.read"],
-            issuedUtc: ExpiresUtc.AddTicks(1),
-            expiresUtc: ExpiresUtc));
+        _ = Assert.Throws<ArgumentOutOfRangeException>(() =>
+            CapabilityTokenGrant.Create(
+                tokenId: "grant-1",
+                issuer: "issuer-1",
+                audience: "gateway-1",
+                scopes: ["robotics.read"],
+                issuedUtc: ExpiresUtc.AddTicks(1),
+                expiresUtc: ExpiresUtc));
     }
 }

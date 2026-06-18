@@ -94,7 +94,7 @@
   items:
     - name: Roslyn Analyzers
       href: roslyn-analyzers.md
-    - name: OpenTelemetry Governance Emission Provider
+    - name: "Released: OpenTelemetry Governance Emission Provider"
       href: opentelemetry-governance-emission-provider.md
     - name: Signing Provider Package Boundary
       href: signing-provider-package-boundary.md
@@ -122,9 +122,9 @@
 
 - name: Design-Only and Future Provider Strategy
   items:
-    - name: Event Hubs Governance Emission Provider Design
+    - name: "Design-Only: Event Hubs Governance Emission Provider"
       href: event-hubs-governance-emission-provider-design.md
-    - name: Purview Governance and Lineage Enrichment Strategy
+    - name: "Strategy-Only: Purview Governance and Lineage Enrichment"
       href: purview-governance-lineage-enrichment-strategy.md
 
 - name: Advanced Scenarios

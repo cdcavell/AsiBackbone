@@ -19,7 +19,7 @@ env:
   CONFIGURATION: Release
   SOLUTION_FILE: './AsiBackbone.slnx'
   CORE_TEST_PROJECT: './tests/CDCavell.AsiBackbone.Core.Tests/CDCavell.AsiBackbone.Core.Tests.csproj'
-  CORE_COVERAGE_OUTPUT: './artifacts/core-coverage'
+  CORE_COVERAGE_OUTPUT: '${{ github.workspace }}/artifacts/core-coverage'
   CORE_BRANCH_COVERAGE_THRESHOLD: 90
 
 jobs:
@@ -76,6 +76,12 @@ jobs:
             /p:Threshold="${{ env.CORE_BRANCH_COVERAGE_THRESHOLD }}" `
             /p:ThresholdType=branch `
             /p:ThresholdStat=total
+
+      - name: List Core coverage outputs
+        shell: pwsh
+        run: |
+          Get-ChildItem -Path "${{ github.workspace }}" -Recurse -Filter "*.cobertura.xml" |
+            ForEach-Object { Write-Host $_.FullName }
 
       - name: Restore .NET tools
         run: dotnet tool restore

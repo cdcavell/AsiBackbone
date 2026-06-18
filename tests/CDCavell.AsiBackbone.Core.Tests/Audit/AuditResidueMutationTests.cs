@@ -156,7 +156,10 @@ public sealed class AuditResidueMutationTests
         Assert.Equal("gateway.execute", residue.OperationName);
         Assert.Equal("Allowed", residue.Outcome);
         Assert.True(residue.HasReasonCodes);
-        Assert.Equal(["reason.beta", "reason.alpha"], residue.ReasonCodes);
+        Assert.Collection(
+            residue.ReasonCodes,
+            reasonCode => Assert.Equal("reason.beta", reasonCode),
+            reasonCode => Assert.Equal("reason.alpha", reasonCode));
         Assert.Null(residue.CorrelationId);
         Assert.Equal("trace-123", residue.TraceId);
         Assert.Equal("span-123", residue.SpanId);
@@ -183,11 +186,12 @@ public sealed class AuditResidueMutationTests
     {
         IAsiBackboneActorContext actor = AsiBackboneActorContext.Service("service-123");
 
-        _ = Assert.Throws<ArgumentOutOfRangeException>(() => AuditResidue.Create(
-            actor,
-            "gateway.execute",
-            "Allowed",
-            decisionLatencyMs: -1));
+        _ = Assert.Throws<ArgumentOutOfRangeException>(() =>
+            AuditResidue.Create(
+                actor,
+                "gateway.execute",
+                "Allowed",
+                decisionLatencyMs: -1));
     }
 
     [Fact]
@@ -195,11 +199,12 @@ public sealed class AuditResidueMutationTests
     {
         IAsiBackboneActorContext actor = AsiBackboneActorContext.Service("service-123");
 
-        _ = Assert.Throws<ArgumentOutOfRangeException>(() => AuditResidue.Create(
-            actor,
-            "gateway.execute",
-            "Allowed",
-            constraintCount: -1));
+        _ = Assert.Throws<ArgumentOutOfRangeException>(() =>
+            AuditResidue.Create(
+                actor,
+                "gateway.execute",
+                "Allowed",
+                constraintCount: -1));
     }
 
     [Fact]
@@ -207,11 +212,12 @@ public sealed class AuditResidueMutationTests
     {
         IAsiBackboneActorContext actor = AsiBackboneActorContext.Service("service-123");
 
-        _ = Assert.Throws<ArgumentOutOfRangeException>(() => AuditResidue.Create(
-            actor,
-            "gateway.execute",
-            "Allowed",
-            outboxSequence: -1));
+        _ = Assert.Throws<ArgumentOutOfRangeException>(() =>
+            AuditResidue.Create(
+                actor,
+                "gateway.execute",
+                "Allowed",
+                outboxSequence: -1));
     }
 
     [Theory]
@@ -222,10 +228,11 @@ public sealed class AuditResidueMutationTests
     {
         IAsiBackboneActorContext actor = AsiBackboneActorContext.Service("service-123");
 
-        _ = Assert.Throws<ArgumentOutOfRangeException>(() => AuditResidue.Create(
-            actor,
-            "gateway.execute",
-            "Allowed",
-            riskScore: riskScore));
+        _ = Assert.Throws<ArgumentOutOfRangeException>(() =>
+            AuditResidue.Create(
+                actor,
+                "gateway.execute",
+                "Allowed",
+                riskScore: riskScore));
     }
 }

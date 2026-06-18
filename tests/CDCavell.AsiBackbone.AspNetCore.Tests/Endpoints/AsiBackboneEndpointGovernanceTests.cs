@@ -1,5 +1,8 @@
 using CDCavell.AsiBackbone.AspNetCore.DependencyInjection;
 using CDCavell.AsiBackbone.AspNetCore.Endpoints;
+using CDCavell.AsiBackbone.Core.Constraints;
+using CDCavell.AsiBackbone.Core.Decisions;
+using CDCavell.AsiBackbone.Core.Evaluation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -201,6 +204,36 @@ public sealed class AsiBackboneEndpointGovernanceTests
     }
 
     [Fact]
+    public async Task DefaultServiceUsesDefaultFailureForDeniedPolicyDecision()
+    {
+        using ServiceProvider services = new ServiceCollection()
+            .AddAsiBackboneAspNetCore()
+            .AddSingleton<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>>(new DenyingPolicyEvaluator())
+            .BuildServiceProvider(validateScopes: true);
+        using IServiceScope scope = services.CreateScope();
+        var httpContext = new DefaultHttpContext
+        {
+            RequestServices = scope.ServiceProvider,
+            TraceIdentifier = "trace-denied"
+        };
+        scope.ServiceProvider.GetRequiredService<IHttpContextAccessor>().HttpContext = httpContext;
+        var endpoint = new Endpoint(
+            static _ => Task.CompletedTask,
+            new EndpointMetadataCollection(new RequireGovernancePolicyAttribute(typeof(SamplePolicy))),
+            "policy.denied");
+        var descriptor = AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(endpoint);
+        IAsiBackboneEndpointGovernanceService service = scope.ServiceProvider.GetRequiredService<IAsiBackboneEndpointGovernanceService>();
+
+        AsiBackboneEndpointGovernanceResult result = await service.EvaluateAsync(httpContext, descriptor, TestContext.Current.CancellationToken);
+
+        Assert.False(result.CanExecute);
+        Assert.Null(result.FailureResult);
+        Assert.NotNull(result.Decision);
+        Assert.True(result.Decision.IsDenied);
+        Assert.Contains("policy.denied", result.Decision.ReasonCodes);
+    }
+
+    [Fact]
     public async Task MiddlewareBlocksUngovernedEndpointWhenRequireGovernanceMetadataIsEnabled()
     {
         using ServiceProvider requestServices = new ServiceCollection()
@@ -320,6 +353,21 @@ public sealed class AsiBackboneEndpointGovernanceTests
         {
             return ValueTask.FromResult(AsiBackboneEndpointGovernanceResult.Block(
                 Microsoft.AspNetCore.Http.Results.Text(body, statusCode: statusCode)));
+        }
+    }
+
+    private sealed class DenyingPolicyEvaluator : IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>
+    {
+        public ValueTask<GovernanceDecision> EvaluateAsync(
+            AsiBackboneConstraintEvaluationContext context,
+            CancellationToken cancellationToken = default)
+        {
+            return new ValueTask<GovernanceDecision>(GovernanceDecision.Deny(
+                "policy.denied",
+                "The policy denied execution.",
+                correlationId: context.CorrelationId,
+                policyVersion: context.PolicyVersion,
+                policyHash: context.PolicyHash));
         }
     }
 }

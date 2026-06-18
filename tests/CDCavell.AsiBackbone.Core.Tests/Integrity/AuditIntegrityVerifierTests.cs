@@ -200,7 +200,7 @@ public sealed class AuditIntegrityVerifierTests
     [Fact]
     public void VerifyAcceptsPartialChainWhenGenesisIsNotRequired()
     {
-        var partial = CreateComputedLink(5, CreateRecordHash("record-5"));
+        AuditIntegrityLink partial = CreateComputedLink(5, CreateRecordHash("record-5"));
 
         AuditIntegrityVerificationResult result = AuditIntegrityVerifier.Verify([partial], "audit-ledger", requireGenesis: false);
 

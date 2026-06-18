@@ -84,6 +84,22 @@ builder.Services.Configure<AsiBackboneEndpointGovernanceOptions>(options =>
 
 Failing closed is the default because an endpoint that declares governance intent should not silently bypass missing policy, capability, or audit services. Advanced hosts can relax this behavior during migration, but should document why.
 
+When middleware blocks execution and no explicit `FailureResult` is supplied, the default response is a bodyless `403 Forbidden` status result. This low-allocation default is intentional for high-volume rejection traffic such as probing, credential stuffing, or denial flooding, and it avoids exposing governance reason codes or policy details in generic denial responses.
+
+Custom failure results remain supported. A host-owned governance service can return an explicit `FailureResult`, and that result is executed instead of the generic default. Hosts that prefer richer API responses for generic 403 denials can configure a safe factory:
+
+```csharp
+builder.Services.Configure<AsiBackboneEndpointGovernanceOptions>(options =>
+{
+    options.DefaultForbiddenResultFactory = _ => Results.Problem(
+        title: "Forbidden.",
+        detail: "The request is not allowed.",
+        statusCode: StatusCodes.Status403Forbidden);
+});
+```
+
+Use richer ProblemDetails responses only when the response body is safe for the deployment. Do not include sensitive policy internals, capability-token details, audit identifiers, or reason messages unless the host has explicitly decided those values are safe to expose.
+
 ## Strict metadata enforcement
 
 By default, endpoint governance remains opt-in. Endpoints without AsiBackbone governance metadata pass through to the next middleware. This mirrors common ASP.NET Core adoption patterns and preserves backwards compatibility.
@@ -97,7 +113,7 @@ builder.Services.Configure<AsiBackboneEndpointGovernanceOptions>(options =>
 });
 ```
 
-When enabled, selected endpoints without governance metadata are blocked before execution unless the endpoint explicitly allows missing governance metadata. This option does not replace ASP.NET Core authentication or authorization. It only prevents accidental governance bypass caused by missing AsiBackbone endpoint metadata.
+When enabled, selected endpoints without governance metadata are blocked before execution unless the endpoint explicitly allows missing governance metadata. This option does not replace ASP.NET Core authentication or authorization. It only prevents accidental governance bypass caused by missing AsiBackbone endpoint metadata. The default strict-metadata rejection also uses the bodyless generic `403 Forbidden` response unless `DefaultForbiddenResultFactory` is configured.
 
 ## Relation to full manual wire-up
 

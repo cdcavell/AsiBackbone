@@ -81,6 +81,98 @@ public sealed class AsiBackboneEndpointGovernanceTests
     }
 
     [Fact]
+    public async Task MiddlewareUsesBodylessDefaultForbiddenResultWhenBlockedWithoutFailureResult()
+    {
+        using ServiceProvider requestServices = new ServiceCollection().AddLogging().BuildServiceProvider();
+        var httpContext = new DefaultHttpContext
+        {
+            RequestServices = requestServices
+        };
+        httpContext.Response.Body = new MemoryStream();
+        httpContext.SetEndpoint(new Endpoint(
+            static _ => Task.CompletedTask,
+            new EndpointMetadataCollection(new RequireCapabilityGrantAttribute("robotics.execute")),
+            "blocked.default"));
+        bool nextCalled = false;
+        var middleware = new AsiBackboneEndpointGovernanceMiddleware(_ =>
+        {
+            nextCalled = true;
+            return Task.CompletedTask;
+        });
+
+        await middleware.InvokeAsync(
+            httpContext,
+            new DefaultBlockingEndpointGovernanceService(),
+            Microsoft.Extensions.Options.Options.Create(new AsiBackboneEndpointGovernanceOptions()));
+
+        Assert.False(nextCalled);
+        Assert.Equal(StatusCodes.Status403Forbidden, httpContext.Response.StatusCode);
+        Assert.Equal(0, httpContext.Response.Body.Length);
+    }
+
+    [Fact]
+    public async Task MiddlewareUsesConfiguredDefaultForbiddenResultFactoryWhenBlockedWithoutFailureResult()
+    {
+        var httpContext = new DefaultHttpContext();
+        httpContext.Response.Body = new MemoryStream();
+        httpContext.SetEndpoint(new Endpoint(
+            static _ => Task.CompletedTask,
+            new EndpointMetadataCollection(new RequireCapabilityGrantAttribute("robotics.execute")),
+            "blocked.configured"));
+        bool nextCalled = false;
+        var middleware = new AsiBackboneEndpointGovernanceMiddleware(_ =>
+        {
+            nextCalled = true;
+            return Task.CompletedTask;
+        });
+
+        await middleware.InvokeAsync(
+            httpContext,
+            new DefaultBlockingEndpointGovernanceService(),
+            Microsoft.Extensions.Options.Options.Create(new AsiBackboneEndpointGovernanceOptions
+            {
+                DefaultForbiddenResultFactory = _ => Microsoft.AspNetCore.Http.Results.Text(
+                    "rich failure response",
+                    statusCode: StatusCodes.Status403Forbidden)
+            }));
+
+        Assert.False(nextCalled);
+        Assert.Equal(StatusCodes.Status403Forbidden, httpContext.Response.StatusCode);
+        Assert.Equal("rich failure response", await ReadResponseBodyAsync(httpContext));
+    }
+
+    [Fact]
+    public async Task MiddlewarePreservesCustomFailureResultWhenConfiguredDefaultForbiddenResultFactoryExists()
+    {
+        var httpContext = new DefaultHttpContext();
+        httpContext.Response.Body = new MemoryStream();
+        httpContext.SetEndpoint(new Endpoint(
+            static _ => Task.CompletedTask,
+            new EndpointMetadataCollection(new RequireCapabilityGrantAttribute("robotics.execute")),
+            "blocked.custom"));
+        bool nextCalled = false;
+        var middleware = new AsiBackboneEndpointGovernanceMiddleware(_ =>
+        {
+            nextCalled = true;
+            return Task.CompletedTask;
+        });
+
+        await middleware.InvokeAsync(
+            httpContext,
+            new TextBlockingEndpointGovernanceService("custom failure response", StatusCodes.Status409Conflict),
+            Microsoft.Extensions.Options.Options.Create(new AsiBackboneEndpointGovernanceOptions
+            {
+                DefaultForbiddenResultFactory = _ => Microsoft.AspNetCore.Http.Results.Text(
+                    "default factory response",
+                    statusCode: StatusCodes.Status403Forbidden)
+            }));
+
+        Assert.False(nextCalled);
+        Assert.Equal(StatusCodes.Status409Conflict, httpContext.Response.StatusCode);
+        Assert.Equal("custom failure response", await ReadResponseBodyAsync(httpContext));
+    }
+
+    [Fact]
     public async Task DefaultServiceFailsClosedWhenCapabilityValidatorIsMissing()
     {
         using ServiceProvider services = new ServiceCollection()
@@ -143,6 +235,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
 
         Assert.False(nextCalled);
         Assert.Equal(StatusCodes.Status403Forbidden, httpContext.Response.StatusCode);
+        Assert.Equal(0, httpContext.Response.Body.Length);
     }
 
     [Fact]
@@ -172,6 +265,14 @@ public sealed class AsiBackboneEndpointGovernanceTests
         Assert.True(nextCalled);
     }
 
+    private static async Task<string> ReadResponseBodyAsync(HttpContext httpContext)
+    {
+        httpContext.Response.Body.Position = 0;
+        using var reader = new StreamReader(httpContext.Response.Body, leaveOpen: true);
+
+        return await reader.ReadToEndAsync();
+    }
+
     private sealed class SamplePolicy
     {
     }
@@ -196,6 +297,29 @@ public sealed class AsiBackboneEndpointGovernanceTests
         {
             return ValueTask.FromResult(AsiBackboneEndpointGovernanceResult.Block(
                 Microsoft.AspNetCore.Http.Results.StatusCode(StatusCodes.Status403Forbidden)));
+        }
+    }
+
+    private sealed class DefaultBlockingEndpointGovernanceService : IAsiBackboneEndpointGovernanceService
+    {
+        public ValueTask<AsiBackboneEndpointGovernanceResult> EvaluateAsync(
+            HttpContext httpContext,
+            AsiBackboneEndpointGovernanceDescriptor descriptor,
+            CancellationToken cancellationToken = default)
+        {
+            return ValueTask.FromResult(AsiBackboneEndpointGovernanceResult.BlockWithDefaultFailure());
+        }
+    }
+
+    private sealed class TextBlockingEndpointGovernanceService(string body, int statusCode) : IAsiBackboneEndpointGovernanceService
+    {
+        public ValueTask<AsiBackboneEndpointGovernanceResult> EvaluateAsync(
+            HttpContext httpContext,
+            AsiBackboneEndpointGovernanceDescriptor descriptor,
+            CancellationToken cancellationToken = default)
+        {
+            return ValueTask.FromResult(AsiBackboneEndpointGovernanceResult.Block(
+                Microsoft.AspNetCore.Http.Results.Text(body, statusCode: statusCode)));
         }
     }
 }

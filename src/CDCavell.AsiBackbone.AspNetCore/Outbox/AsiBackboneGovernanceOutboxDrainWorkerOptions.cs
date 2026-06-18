@@ -3,11 +3,19 @@ namespace CDCavell.AsiBackbone.AspNetCore.Outbox;
 /// <summary>
 /// Provides host-owned scheduling options for the governance outbox drain worker.
 /// </summary>
+/// <remarks>
+/// The hosted worker is local to the process in which it is registered. In horizontally scaled deployments, each
+/// replica may run its own worker unless the host disables extra replicas, partitions work, or adds durable claiming.
+/// </remarks>
 public sealed class AsiBackboneGovernanceOutboxDrainWorkerOptions
 {
     /// <summary>
     /// Gets or sets a value indicating whether the hosted drain worker should run.
     /// </summary>
+    /// <remarks>
+    /// For multi-replica hosts, enable this only on the selected worker role or partition owner unless the outbox store
+    /// provides host-owned claim/lease behavior before provider emission.
+    /// </remarks>
     public bool Enabled { get; set; } = true;
 
     /// <summary>
@@ -33,6 +41,10 @@ public sealed class AsiBackboneGovernanceOutboxDrainWorkerOptions
     /// <summary>
     /// Gets or sets a value indicating whether a final drain pass should be attempted during host shutdown.
     /// </summary>
+    /// <remarks>
+    /// Avoid enabling shutdown drains on many replicas against the same durable outbox unless duplicate-emission behavior
+    /// is controlled through partitioning, durable claiming, or provider-side idempotency.
+    /// </remarks>
     public bool DrainOnShutdown { get; set; }
 
     /// <summary>

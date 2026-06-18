@@ -14,7 +14,7 @@ public sealed class DlpFailurePolicyOptionsBranchTests
         DlpFailureBehavior expectedBehavior)
     {
         var options = new DlpFailurePolicyOptions();
-        DlpFailurePolicyContext context = DlpFailurePolicyContext.Create(
+        var context = DlpFailurePolicyContext.Create(
             DlpClassificationFailureKind.ServiceUnavailable,
             riskLevel);
 
@@ -30,7 +30,7 @@ public sealed class DlpFailurePolicyOptionsBranchTests
         options.BehaviorOverrides[new DlpFailurePolicyKey(
             DlpIntentRiskLevel.High,
             DlpClassificationFailureKind.Timeout)] = DlpFailureBehavior.Escalate;
-        DlpFailurePolicyContext context = DlpFailurePolicyContext.TimeoutFailure(
+        var context = DlpFailurePolicyContext.TimeoutFailure(
             DlpIntentRiskLevel.High,
             TimeSpan.FromSeconds(3));
 
@@ -46,7 +46,7 @@ public sealed class DlpFailurePolicyOptionsBranchTests
         options.BehaviorOverrides[new DlpFailurePolicyKey(
             DlpIntentRiskLevel.Low,
             DlpClassificationFailureKind.Timeout)] = (DlpFailureBehavior)999;
-        DlpFailurePolicyContext context = DlpFailurePolicyContext.TimeoutFailure(DlpIntentRiskLevel.Low);
+        var context = DlpFailurePolicyContext.TimeoutFailure(DlpIntentRiskLevel.Low);
 
         _ = Assert.Throws<ArgumentOutOfRangeException>(() => options.GetBehavior(context));
     }
@@ -58,7 +58,7 @@ public sealed class DlpFailurePolicyOptionsBranchTests
         {
             MediumRiskBehavior = (DlpFailureBehavior)999
         };
-        DlpFailurePolicyContext context = DlpFailurePolicyContext.Create(
+        var context = DlpFailurePolicyContext.Create(
             DlpClassificationFailureKind.IndeterminateResult,
             DlpIntentRiskLevel.Medium);
 
@@ -76,7 +76,7 @@ public sealed class DlpFailurePolicyOptionsBranchTests
     [Fact]
     public void ContextNormalizesOptionalFieldsAndMetadata()
     {
-        DlpFailurePolicyContext context = DlpFailurePolicyContext.Create(
+        var context = DlpFailurePolicyContext.Create(
             DlpClassificationFailureKind.BlockedResult,
             DlpIntentRiskLevel.High,
             intentCategory: " regulated-export ",
@@ -109,7 +109,7 @@ public sealed class DlpFailurePolicyOptionsBranchTests
     [Fact]
     public void ContextUsesEmptyMetadataAndNullOptionalFieldsForBlankInputs()
     {
-        DlpFailurePolicyContext context = DlpFailurePolicyContext.Create(
+        var context = DlpFailurePolicyContext.Create(
             DlpClassificationFailureKind.ClassifiedResult,
             DlpIntentRiskLevel.Low,
             intentCategory: " ",

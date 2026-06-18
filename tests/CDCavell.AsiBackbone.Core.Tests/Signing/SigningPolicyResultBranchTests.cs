@@ -41,7 +41,7 @@ public sealed class SigningPolicyResultBranchTests
     [Fact]
     public void VerificationPolicyOptionsAppliesOverridesAndRejectsUndefinedInputs()
     {
-        VerificationPolicyOptions options = VerificationPolicyOptions.Create(
+        var options = VerificationPolicyOptions.Create(
             new Dictionary<SignatureVerificationCategory, VerificationPolicyAction>
             {
                 [SignatureVerificationCategory.MissingSignature] = VerificationPolicyAction.Deny,
@@ -83,7 +83,7 @@ public sealed class SigningPolicyResultBranchTests
                     [" "] = " exclude-me "
                 }));
 
-        VerificationPolicyOutcome outcome = VerificationPolicyOutcome.Create(
+        var outcome = VerificationPolicyOutcome.Create(
             signedArtifact,
             SignatureVerificationResult.Failed(" signature.invalid ", " Bad signature. "));
 
@@ -105,13 +105,13 @@ public sealed class SigningPolicyResultBranchTests
     {
         SignedGovernanceArtifact<CanonicalPayload> artifact = CreateArtifact(SigningMetadata.Create(
             hashAlgorithm: "SHA-256"));
-        VerificationPolicyOptions options = VerificationPolicyOptions.Create(
+        var options = VerificationPolicyOptions.Create(
             new Dictionary<SignatureVerificationCategory, VerificationPolicyAction>
             {
                 [SignatureVerificationCategory.Valid] = VerificationPolicyAction.Allow
             });
 
-        VerificationPolicyOutcome outcome = VerificationPolicyOutcome.Create(
+        var outcome = VerificationPolicyOutcome.Create(
             artifact,
             SignatureVerificationResult.Verified(),
             options);
@@ -147,7 +147,7 @@ public sealed class SigningPolicyResultBranchTests
     {
         CanonicalPayload payload = CreatePayload("artifact-1");
         CanonicalPayloadHash hash = CanonicalPayloadHasher.ComputeHash(payload);
-        SigningMetadata normalized = SigningMetadata.Create(
+        var normalized = SigningMetadata.Create(
             signingHash: hash.HashValue,
             hashAlgorithm: signingMetadata.HashAlgorithm,
             signature: signingMetadata.Signature,

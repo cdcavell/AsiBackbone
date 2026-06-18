@@ -14,21 +14,21 @@ public sealed class CanonicalPayloadHashingTests
     public void EquivalentAuditLedgerRecordsProduceStableCanonicalPayloadAndHash()
     {
         var options = CanonicalPayloadOptions.Create(["safe"]);
-        var first = CreateAuditLedgerRecord(["beta", "alpha"], new Dictionary<string, string>
+        AuditLedgerRecord first = CreateAuditLedgerRecord(["beta", "alpha"], new Dictionary<string, string>
         {
             ["ignored"] = "one",
             ["safe"] = "included"
         });
-        var second = CreateAuditLedgerRecord(["alpha", "beta"], new Dictionary<string, string>
+        AuditLedgerRecord second = CreateAuditLedgerRecord(["alpha", "beta"], new Dictionary<string, string>
         {
             ["safe"] = "included",
             ["ignored"] = "two"
         });
 
-        var firstPayload = CanonicalPayloadBuilder.ForAuditLedgerRecord(first, options);
-        var secondPayload = CanonicalPayloadBuilder.ForAuditLedgerRecord(second, options);
-        var firstHash = CanonicalPayloadHasher.ComputeHash(firstPayload);
-        var secondHash = CanonicalPayloadHasher.ComputeHash(secondPayload);
+        CanonicalPayload firstPayload = CanonicalPayloadBuilder.ForAuditLedgerRecord(first, options);
+        CanonicalPayload secondPayload = CanonicalPayloadBuilder.ForAuditLedgerRecord(second, options);
+        CanonicalPayloadHash firstHash = CanonicalPayloadHasher.ComputeHash(firstPayload);
+        CanonicalPayloadHash secondHash = CanonicalPayloadHasher.ComputeHash(secondPayload);
 
         Assert.Equal(firstPayload.CanonicalJson, secondPayload.CanonicalJson);
         Assert.Equal(firstHash.HashValue, secondHash.HashValue);
@@ -40,17 +40,17 @@ public sealed class CanonicalPayloadHashingTests
     public void MeaningfulAuditLedgerChangeChangesCanonicalHash()
     {
         var options = CanonicalPayloadOptions.Create(["safe"]);
-        var first = CreateAuditLedgerRecord(["alpha"], new Dictionary<string, string>
+        AuditLedgerRecord first = CreateAuditLedgerRecord(["alpha"], new Dictionary<string, string>
         {
             ["safe"] = "included"
         });
-        var second = CreateAuditLedgerRecord(["alpha", "policy.additional-review"], new Dictionary<string, string>
+        AuditLedgerRecord second = CreateAuditLedgerRecord(["alpha", "policy.additional-review"], new Dictionary<string, string>
         {
             ["safe"] = "included"
         });
 
-        var firstHash = CanonicalPayloadHasher.ComputeHash(CanonicalPayloadBuilder.ForAuditLedgerRecord(first, options));
-        var secondHash = CanonicalPayloadHasher.ComputeHash(CanonicalPayloadBuilder.ForAuditLedgerRecord(second, options));
+        CanonicalPayloadHash firstHash = CanonicalPayloadHasher.ComputeHash(CanonicalPayloadBuilder.ForAuditLedgerRecord(first, options));
+        CanonicalPayloadHash secondHash = CanonicalPayloadHasher.ComputeHash(CanonicalPayloadBuilder.ForAuditLedgerRecord(second, options));
 
         Assert.NotEqual(firstHash.HashValue, secondHash.HashValue);
     }
@@ -59,29 +59,31 @@ public sealed class CanonicalPayloadHashingTests
     public void AllowListedMetadataParticipatesInHashButOtherMetadataDoesNot()
     {
         var options = CanonicalPayloadOptions.Create(["safe"]);
-        var first = CreateAuditLedgerRecord(["alpha"], new Dictionary<string, string>
+        AuditLedgerRecord first = CreateAuditLedgerRecord(["alpha"], new Dictionary<string, string>
         {
             ["ignored"] = "one",
             ["safe"] = "included"
         });
-        var ignoredChange = CreateAuditLedgerRecord(["alpha"], new Dictionary<string, string>
+        AuditLedgerRecord ignoredChange = CreateAuditLedgerRecord(["alpha"], new Dictionary<string, string>
         {
             ["ignored"] = "two",
             ["safe"] = "included"
         });
-        var allowedChange = CreateAuditLedgerRecord(["alpha"], new Dictionary<string, string>
+        AuditLedgerRecord allowedChange = CreateAuditLedgerRecord(["alpha"], new Dictionary<string, string>
         {
             ["ignored"] = "one",
             ["safe"] = "changed"
         });
 
-        var firstHash = CanonicalPayloadHasher.ComputeHash(CanonicalPayloadBuilder.ForAuditLedgerRecord(first, options)).HashValue;
-        var ignoredChangeHash = CanonicalPayloadHasher.ComputeHash(CanonicalPayloadBuilder.ForAuditLedgerRecord(ignoredChange, options)).HashValue;
-        var allowedChangeHash = CanonicalPayloadHasher.ComputeHash(CanonicalPayloadBuilder.ForAuditLedgerRecord(allowedChange, options)).HashValue;
+        string firstHash = CanonicalPayloadHasher.ComputeHash(CanonicalPayloadBuilder.ForAuditLedgerRecord(first, options)).HashValue;
+        string ignoredChangeHash = CanonicalPayloadHasher.ComputeHash(CanonicalPayloadBuilder.ForAuditLedgerRecord(ignoredChange, options)).HashValue;
+        string allowedChangeHash = CanonicalPayloadHasher.ComputeHash(CanonicalPayloadBuilder.ForAuditLedgerRecord(allowedChange, options)).HashValue;
 
         Assert.Equal(firstHash, ignoredChangeHash);
         Assert.NotEqual(firstHash, allowedChangeHash);
     }
+
+    private static readonly string[] expected = ["alpha", "beta"];
 
     [Fact]
     public void AuditResiduePayloadUsesEventIdWhenResidueIdIsBlankAndNormalizesReasonCodesAndMetadata()
@@ -101,19 +103,19 @@ public sealed class CanonicalPayloadHashingTests
             }
         };
 
-        var payload = CanonicalPayloadBuilder.ForAuditResidue(residue, options);
+        CanonicalPayload payload = CanonicalPayloadBuilder.ForAuditResidue(residue, options);
 
         Assert.Equal(CanonicalArtifactTypes.AuditResidue, payload.ArtifactType);
         Assert.Equal("event-fallback", payload.ArtifactId);
 
-        using var document = Parse(payload);
-        var content = document.RootElement.GetProperty("content");
-        var metadata = content.GetProperty("metadata");
+        using JsonDocument document = Parse(payload);
+        JsonElement content = document.RootElement.GetProperty("content");
+        JsonElement metadata = content.GetProperty("metadata");
 
         Assert.Equal("event-fallback", document.RootElement.GetProperty("artifactId").GetString());
         Assert.Equal("event-fallback", content.GetProperty("auditResidueId").GetString());
         Assert.Equal("2026-06-16T13:00:00.0000000Z", content.GetProperty("occurredUtc").GetString());
-        Assert.Equal(new[] { "alpha", "beta" }, ReadStringArray(content.GetProperty("reasonCodes")));
+        Assert.Equal(expected, ReadStringArray(content.GetProperty("reasonCodes")));
         Assert.Equal("included", metadata.GetProperty("safe").GetString());
         Assert.Equal("second", metadata.GetProperty("allowed").GetString());
         Assert.False(metadata.TryGetProperty("unsafe", out _));
@@ -138,14 +140,14 @@ public sealed class CanonicalPayloadHashingTests
                 ["unsafe"] = "ignored"
             });
 
-        var payload = CanonicalPayloadBuilder.ForAuditResidueLifecycleEvent(lifecycleEvent, options);
+        CanonicalPayload payload = CanonicalPayloadBuilder.ForAuditResidueLifecycleEvent(lifecycleEvent, options);
 
         Assert.Equal(CanonicalArtifactTypes.AuditResidueLifecycleEvent, payload.ArtifactType);
         Assert.Equal("lifecycle-event-1", payload.ArtifactId);
 
-        using var document = Parse(payload);
-        var content = document.RootElement.GetProperty("content");
-        var metadata = content.GetProperty("metadata");
+        using JsonDocument document = Parse(payload);
+        JsonElement content = document.RootElement.GetProperty("content");
+        JsonElement metadata = content.GetProperty("metadata");
 
         Assert.Equal("residue-1", content.GetProperty("auditResidueId").GetString());
         Assert.Equal("correlation-1", content.GetProperty("correlationId").GetString());
@@ -204,16 +206,16 @@ public sealed class CanonicalPayloadHashingTests
                 ["unsafe"] = "ignored"
             });
 
-        var canonicalPayload = CanonicalPayloadBuilder.ForGovernanceEmissionEnvelope(envelope, options);
+        CanonicalPayload canonicalPayload = CanonicalPayloadBuilder.ForGovernanceEmissionEnvelope(envelope, options);
 
         Assert.Equal(CanonicalArtifactTypes.GovernanceEmissionEnvelope, canonicalPayload.ArtifactType);
         Assert.Equal("envelope-1", canonicalPayload.ArtifactId);
 
-        using var document = Parse(canonicalPayload);
-        var content = document.RootElement.GetProperty("content");
-        var payloadContent = content.GetProperty("payload");
-        var metadata = content.GetProperty("metadata");
-        var payloadMetadata = payloadContent.GetProperty("metadata");
+        using JsonDocument document = Parse(canonicalPayload);
+        JsonElement content = document.RootElement.GetProperty("content");
+        JsonElement payloadContent = content.GetProperty("payload");
+        JsonElement metadata = content.GetProperty("metadata");
+        JsonElement payloadMetadata = payloadContent.GetProperty("metadata");
 
         Assert.Equal("AuditLifecycle", content.GetProperty("eventType").GetString());
         Assert.Equal("ExternalEmissionQueued", content.GetProperty("lifecycleStage").GetString());
@@ -241,10 +243,10 @@ public sealed class CanonicalPayloadHashingTests
             envelopeId: "envelope-without-payload",
             createdUtc: new DateTimeOffset(2026, 6, 16, 13, 0, 1, TimeSpan.Zero));
 
-        var payload = CanonicalPayloadBuilder.ForGovernanceEmissionEnvelope(envelope);
+        CanonicalPayload payload = CanonicalPayloadBuilder.ForGovernanceEmissionEnvelope(envelope);
 
-        using var document = Parse(payload);
-        var content = document.RootElement.GetProperty("content");
+        using JsonDocument document = Parse(payload);
+        JsonElement content = document.RootElement.GetProperty("content");
 
         Assert.Equal(JsonValueKind.Null, content.GetProperty("payload").ValueKind);
         Assert.Equal(JsonValueKind.Null, content.GetProperty("lifecycleStage").ValueKind);
@@ -255,7 +257,7 @@ public sealed class CanonicalPayloadHashingTests
     public void GovernanceOutboxEntryPayloadHandlesErrorRetryProviderDeadLetterAndMetadataFields()
     {
         var options = CanonicalPayloadOptions.Create(["safe"]);
-        var envelope = CreateEmissionEnvelope("envelope-outbox", "payload-hash");
+        GovernanceEmissionEnvelope envelope = CreateEmissionEnvelope("envelope-outbox", "payload-hash");
         var error = GovernanceEmissionError.Create(
             " provider.failure ",
             " Provider failed ",
@@ -281,15 +283,15 @@ public sealed class CanonicalPayloadHashingTests
                 ["unsafe"] = "ignored"
             });
 
-        var payload = CanonicalPayloadBuilder.ForGovernanceOutboxEntry(entry, options);
+        CanonicalPayload payload = CanonicalPayloadBuilder.ForGovernanceOutboxEntry(entry, options);
 
         Assert.Equal(CanonicalArtifactTypes.GovernanceOutboxEntry, payload.ArtifactType);
         Assert.Equal("outbox-1", payload.ArtifactId);
 
-        using var document = Parse(payload);
-        var content = document.RootElement.GetProperty("content");
-        var lastError = content.GetProperty("lastError");
-        var metadata = content.GetProperty("metadata");
+        using JsonDocument document = Parse(payload);
+        JsonElement content = document.RootElement.GetProperty("content");
+        JsonElement lastError = content.GetProperty("lastError");
+        JsonElement metadata = content.GetProperty("metadata");
 
         Assert.Equal("2026-06-16T13:00:00.0000000Z", content.GetProperty("createdUtc").GetString());
         Assert.Equal("2026-06-16T13:30:00.0000000Z", content.GetProperty("updatedUtc").GetString());
@@ -312,16 +314,16 @@ public sealed class CanonicalPayloadHashingTests
     [Fact]
     public void GovernanceOutboxEntryPayloadWritesNullOptionalFieldsWhenAbsent()
     {
-        var envelope = CreateEmissionEnvelope("envelope-with-null-outbox-fields", "payload-hash");
+        GovernanceEmissionEnvelope envelope = CreateEmissionEnvelope("envelope-with-null-outbox-fields", "payload-hash");
         var entry = GovernanceOutboxEntry.Create(
             envelope,
             outboxEntryId: "outbox-with-null-fields",
             createdUtc: new DateTimeOffset(2026, 6, 16, 13, 0, 0, TimeSpan.Zero));
 
-        var payload = CanonicalPayloadBuilder.ForGovernanceOutboxEntry(entry);
+        CanonicalPayload payload = CanonicalPayloadBuilder.ForGovernanceOutboxEntry(entry);
 
-        using var document = Parse(payload);
-        var content = document.RootElement.GetProperty("content");
+        using JsonDocument document = Parse(payload);
+        JsonElement content = document.RootElement.GetProperty("content");
 
         Assert.Equal(JsonValueKind.Null, content.GetProperty("deadLetterReason").ValueKind);
         Assert.Equal(JsonValueKind.Null, content.GetProperty("lastError").ValueKind);
@@ -334,7 +336,7 @@ public sealed class CanonicalPayloadHashingTests
     public void EquivalentGovernanceEmissionPayloadsProduceStableHashAndMeaningfulPayloadChangeChangesHash()
     {
         var options = CanonicalPayloadOptions.Create(["safe"]);
-        var first = CreateEmissionEnvelope(
+        GovernanceEmissionEnvelope first = CreateEmissionEnvelope(
             "envelope-hash-stability",
             "payload-hash",
             payloadMetadata: new Dictionary<string, string>
@@ -342,7 +344,7 @@ public sealed class CanonicalPayloadHashingTests
                 ["safe"] = "included",
                 ["ignored"] = "one"
             });
-        var ignoredChange = CreateEmissionEnvelope(
+        GovernanceEmissionEnvelope ignoredChange = CreateEmissionEnvelope(
             "envelope-hash-stability",
             "payload-hash",
             payloadMetadata: new Dictionary<string, string>
@@ -350,7 +352,7 @@ public sealed class CanonicalPayloadHashingTests
                 ["ignored"] = "two",
                 ["safe"] = "included"
             });
-        var meaningfulChange = CreateEmissionEnvelope(
+        GovernanceEmissionEnvelope meaningfulChange = CreateEmissionEnvelope(
             "envelope-hash-stability",
             "payload-hash-changed",
             payloadMetadata: new Dictionary<string, string>
@@ -359,9 +361,9 @@ public sealed class CanonicalPayloadHashingTests
                 ["ignored"] = "one"
             });
 
-        var firstHash = CanonicalPayloadHasher.ComputeHash(CanonicalPayloadBuilder.ForGovernanceEmissionEnvelope(first, options)).HashValue;
-        var ignoredChangeHash = CanonicalPayloadHasher.ComputeHash(CanonicalPayloadBuilder.ForGovernanceEmissionEnvelope(ignoredChange, options)).HashValue;
-        var meaningfulChangeHash = CanonicalPayloadHasher.ComputeHash(CanonicalPayloadBuilder.ForGovernanceEmissionEnvelope(meaningfulChange, options)).HashValue;
+        string firstHash = CanonicalPayloadHasher.ComputeHash(CanonicalPayloadBuilder.ForGovernanceEmissionEnvelope(first, options)).HashValue;
+        string ignoredChangeHash = CanonicalPayloadHasher.ComputeHash(CanonicalPayloadBuilder.ForGovernanceEmissionEnvelope(ignoredChange, options)).HashValue;
+        string meaningfulChangeHash = CanonicalPayloadHasher.ComputeHash(CanonicalPayloadBuilder.ForGovernanceEmissionEnvelope(meaningfulChange, options)).HashValue;
 
         Assert.Equal(firstHash, ignoredChangeHash);
         Assert.NotEqual(firstHash, meaningfulChangeHash);
@@ -405,8 +407,8 @@ public sealed class CanonicalPayloadHashingTests
                 ["safe"] = "outbox-metadata"
             });
 
-        var payloadToHash = CanonicalPayloadBuilder.ForGovernanceOutboxEntry(entry, options);
-        var hash = CanonicalPayloadHasher.ComputeHash(payloadToHash);
+        CanonicalPayload payloadToHash = CanonicalPayloadBuilder.ForGovernanceOutboxEntry(entry, options);
+        CanonicalPayloadHash hash = CanonicalPayloadHasher.ComputeHash(payloadToHash);
 
         Assert.Equal(CanonicalArtifactTypes.GovernanceOutboxEntry, payloadToHash.ArtifactType);
         Assert.Equal("outbox-1", payloadToHash.ArtifactId);
@@ -418,9 +420,9 @@ public sealed class CanonicalPayloadHashingTests
     [Fact]
     public void HashMetadataCarriesSigningHashWithoutImplyingSignature()
     {
-        var record = CreateAuditLedgerRecord(["alpha"], new Dictionary<string, string>());
-        var payload = CanonicalPayloadBuilder.ForAuditLedgerRecord(record);
-        var hash = CanonicalPayloadHasher.ComputeHash(payload);
+        AuditLedgerRecord record = CreateAuditLedgerRecord(["alpha"], new Dictionary<string, string>());
+        CanonicalPayload payload = CanonicalPayloadBuilder.ForAuditLedgerRecord(record);
+        CanonicalPayloadHash hash = CanonicalPayloadHasher.ComputeHash(payload);
 
         var signingMetadata = hash.ToSigningMetadata();
 

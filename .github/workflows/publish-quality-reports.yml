@@ -18,6 +18,9 @@ concurrency:
 env:
   CONFIGURATION: Release
   SOLUTION_FILE: './AsiBackbone.slnx'
+  CORE_TEST_PROJECT: './tests/CDCavell.AsiBackbone.Core.Tests/CDCavell.AsiBackbone.Core.Tests.csproj'
+  CORE_COVERAGE_OUTPUT: './artifacts/core-coverage'
+  CORE_BRANCH_COVERAGE_THRESHOLD: 90
 
 jobs:
   build-docs:
@@ -54,6 +57,26 @@ jobs:
           --results-directory "./artifacts/test-results" `
           /p:ContinuousIntegrationBuild=true
 
+      - name: Run Core tests with branch coverage gate
+        shell: pwsh
+        run: |
+          dotnet test ${{ env.CORE_TEST_PROJECT }} `
+            --configuration ${{ env.CONFIGURATION }} `
+            --no-restore `
+            --no-build `
+            --verbosity normal `
+            --logger "trx" `
+            --results-directory "./artifacts/core-test-results" `
+            /p:ContinuousIntegrationBuild=true `
+            /p:CollectCoverage=true `
+            /p:CoverletOutputFormat=cobertura `
+            /p:CoverletOutput="${{ env.CORE_COVERAGE_OUTPUT }}/" `
+            /p:Include="[CDCavell.AsiBackbone.Core]*" `
+            /p:Exclude="[*.Tests]*" `
+            /p:Threshold="${{ env.CORE_BRANCH_COVERAGE_THRESHOLD }}" `
+            /p:ThresholdType=branch `
+            /p:ThresholdStat=total
+
       - name: Restore .NET tools
         run: dotnet tool restore
 
@@ -65,6 +88,16 @@ jobs:
             -targetdir:"./artifacts/coverage-report" `
             -reporttypes:"Html;MarkdownSummaryGithub;Cobertura" `
             -assemblyfilters:"-*.Tests" `
+            -filefilters:"-**/bin/**;-**/obj/**;-**/*.g.cs"
+
+      - name: Generate Core branch coverage report
+        shell: pwsh
+        run: |
+          dotnet reportgenerator `
+            -reports:"${{ env.CORE_COVERAGE_OUTPUT }}/coverage.cobertura.xml" `
+            -targetdir:"./artifacts/core-branch-coverage-report" `
+            -reporttypes:"Html;MarkdownSummaryGithub;Cobertura" `
+            -assemblyfilters:"+CDCavell.AsiBackbone.Core;-*.Tests" `
             -filefilters:"-**/bin/**;-**/obj/**;-**/*.g.cs"
 
       - name: Generate Core mutation report
@@ -87,6 +120,12 @@ jobs:
         run: |
           New-Item -ItemType Directory -Path "./docs/_site/coverage" -Force | Out-Null
           Copy-Item -Path "./artifacts/coverage-report/*" -Destination "./docs/_site/coverage" -Recurse -Force
+
+      - name: Copy Core branch coverage report to DocFX output
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path "./docs/_site/coverage/core" -Force | Out-Null
+          Copy-Item -Path "./artifacts/core-branch-coverage-report/*" -Destination "./docs/_site/coverage/core" -Recurse -Force
 
       - name: Copy mutation reports to DocFX output
         shell: pwsh

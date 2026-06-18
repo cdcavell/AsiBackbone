@@ -21,6 +21,9 @@ env:
   CONFIGURATION: Release
   PACKAGE_OUTPUT: artifacts/packages
   COVERAGE_OUTPUT: artifacts/coverage
+  CORE_TEST_PROJECT: tests/CDCavell.AsiBackbone.Core.Tests/CDCavell.AsiBackbone.Core.Tests.csproj
+  CORE_COVERAGE_OUTPUT: artifacts/coverage/core
+  CORE_BRANCH_COVERAGE_THRESHOLD: 90
 
 jobs:
   dependency-review:
@@ -82,6 +85,21 @@ jobs:
           /p:ThresholdType=line
           /p:ThresholdStat=total
 
+      - name: Test Core with branch coverage gate
+        run: >
+          dotnet test "$CORE_TEST_PROJECT"
+          --configuration "$CONFIGURATION"
+          --no-build
+          --verbosity normal
+          /p:CollectCoverage=true
+          /p:CoverletOutputFormat=cobertura
+          /p:CoverletOutput="${{ github.workspace }}/${{ env.CORE_COVERAGE_OUTPUT }}/"
+          /p:Include="[CDCavell.AsiBackbone.Core]*"
+          /p:Exclude="[*.Tests]*"
+          /p:Threshold="$CORE_BRANCH_COVERAGE_THRESHOLD"
+          /p:ThresholdType=branch
+          /p:ThresholdStat=total
+
       - name: Pack packages
         shell: bash
         run: |
@@ -116,6 +134,13 @@ jobs:
         with:
           name: asi-backbone-coverage
           path: ${{ env.COVERAGE_OUTPUT }}/coverage.cobertura.xml
+          if-no-files-found: error
+
+      - name: Upload Core branch coverage artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: asi-backbone-core-branch-coverage
+          path: ${{ env.CORE_COVERAGE_OUTPUT }}/coverage.cobertura.xml
           if-no-files-found: error
 
   codeql-analysis:

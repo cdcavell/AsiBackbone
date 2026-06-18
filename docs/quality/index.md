@@ -7,18 +7,23 @@ Coverage and mutation analysis answer different questions:
 | Report | Question answered | Purpose |
 | --- | --- | --- |
 | Coverage Report | Did the tests execute this code? | Shows the tested surface area and highlights unvisited code paths. |
+| Core Branch Coverage | Did Core tests exercise the decision branches that protect governance behavior? | Enforces a stricter branch gate for the framework-neutral Core package without applying that same threshold to every adapter or sample. |
 | Mutation Analysis | Would tests fail if behavior changed? | Checks assertion strength by introducing small code mutations and verifying tests catch them. |
 | External Consumer Smoke Test | Can a clean host consume package-shaped artifacts? | Validates package ergonomics, DI registration, host-owned EF persistence, in-memory audit storage, and HTTP allow/deny/acknowledgment flows. |
 
-For a governance package, both views matter. Coverage helps show that policy, acknowledgment, audit, and capability-token paths are exercised. Mutation analysis helps show that the tests are strong enough to detect behavior changes in important decision logic. External consumer smoke testing helps prove that package-shaped adoption works from outside the repository's normal project-reference graph.
+For a governance package, both views matter. Coverage helps show that policy, acknowledgment, audit, and capability-token paths are exercised. The Core branch coverage gate protects the framework-neutral governance engine from missed policy, decision, signing, capability, acknowledgment, and audit branches. Mutation analysis helps show that the tests are strong enough to detect behavior changes in important decision logic. External consumer smoke testing helps prove that package-shaped adoption works from outside the repository's normal project-reference graph.
 
 ## Available reports
 
-### Coverage Report
+### Coverage Reports
 
 - [Open Coverage Report](../coverage/index.html)
+- [Open Core Branch Coverage](../coverage/core/index.html)
+- [Core Branch Coverage Quality Gate](core-branch-coverage.md)
 
-The coverage report is generated from the test suite using Coverlet and ReportGenerator. It is published with the documentation site when the documentation workflow runs successfully.
+The repository-wide coverage report is generated from the full test suite using Coverlet and ReportGenerator. It is published with the documentation site when the documentation workflow runs successfully.
+
+The Core branch coverage report is generated separately from `CDCavell.AsiBackbone.Core.Tests`, filtered to `CDCavell.AsiBackbone.Core`, and enforced as a 90% branch coverage gate. The repository-wide 75% line coverage gate remains in place; the stricter Core gate does not apply to every adapter, storage provider, telemetry provider, or sample package.
 
 ### Mutation Analysis
 
@@ -58,6 +63,28 @@ dotnet reportgenerator \
   -targetdir:"./artifacts/coverage-report" \
   -reporttypes:"Html;MarkdownSummaryGithub;Cobertura" \
   -assemblyfilters:"-*.Tests" \
+  -filefilters:"-**/bin/**;-**/obj/**;-**/*.g.cs"
+```
+
+Run the Core branch coverage gate and generate the Core-only report:
+
+```bash
+dotnet test ./tests/CDCavell.AsiBackbone.Core.Tests/CDCavell.AsiBackbone.Core.Tests.csproj \
+  --configuration Release \
+  /p:CollectCoverage=true \
+  /p:CoverletOutputFormat=cobertura \
+  /p:CoverletOutput="./artifacts/core-coverage/" \
+  /p:Include="[CDCavell.AsiBackbone.Core]*" \
+  /p:Exclude="[*.Tests]*" \
+  /p:Threshold=90 \
+  /p:ThresholdType=branch \
+  /p:ThresholdStat=total
+
+dotnet reportgenerator \
+  -reports:"./artifacts/core-coverage/coverage.cobertura.xml" \
+  -targetdir:"./artifacts/core-branch-coverage-report" \
+  -reporttypes:"Html;MarkdownSummaryGithub;Cobertura" \
+  -assemblyfilters:"+CDCavell.AsiBackbone.Core;-*.Tests" \
   -filefilters:"-**/bin/**;-**/obj/**;-**/*.g.cs"
 ```
 

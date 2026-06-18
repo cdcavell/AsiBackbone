@@ -116,7 +116,11 @@ public sealed class AsiBackboneEndpointGovernanceTests
     [Fact]
     public async Task MiddlewareUsesConfiguredDefaultForbiddenResultFactoryWhenBlockedWithoutFailureResult()
     {
-        var httpContext = new DefaultHttpContext();
+        using ServiceProvider requestServices = new ServiceCollection().AddLogging().BuildServiceProvider();
+        var httpContext = new DefaultHttpContext
+        {
+            RequestServices = requestServices
+        };
         httpContext.Response.Body = new MemoryStream();
         httpContext.SetEndpoint(new Endpoint(
             static _ => Task.CompletedTask,
@@ -147,7 +151,11 @@ public sealed class AsiBackboneEndpointGovernanceTests
     [Fact]
     public async Task MiddlewarePreservesCustomFailureResultWhenConfiguredDefaultForbiddenResultFactoryExists()
     {
-        var httpContext = new DefaultHttpContext();
+        using ServiceProvider requestServices = new ServiceCollection().AddLogging().BuildServiceProvider();
+        var httpContext = new DefaultHttpContext
+        {
+            RequestServices = requestServices
+        };
         httpContext.Response.Body = new MemoryStream();
         httpContext.SetEndpoint(new Endpoint(
             static _ => Task.CompletedTask,

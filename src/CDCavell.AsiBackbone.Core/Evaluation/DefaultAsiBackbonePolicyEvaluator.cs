@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using CDCavell.AsiBackbone.Core.Constraints;
 using CDCavell.AsiBackbone.Core.Decisions;
 using CDCavell.AsiBackbone.Core.Results;
@@ -12,7 +11,7 @@ namespace CDCavell.AsiBackbone.Core.Evaluation;
 public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePolicyEvaluator<TContext>
     where TContext : IAsiBackboneConstraintEvaluationContext
 {
-    private readonly ReadOnlyCollection<IAsiBackboneConstraint<TContext>> constraints;
+    private readonly IAsiBackboneConstraint<TContext>[] constraints;
     private readonly IAsiBackboneDecisionPolicy<TContext>? decisionPolicy;
     private readonly AsiBackbonePolicyEvaluatorOptions options;
 
@@ -41,10 +40,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
     {
         ArgumentNullException.ThrowIfNull(constraints);
 
-        IList<IAsiBackboneConstraint<TContext>> list =
-            constraints as IList<IAsiBackboneConstraint<TContext>> ?? [.. constraints];
-
-        this.constraints = new ReadOnlyCollection<IAsiBackboneConstraint<TContext>>(list);
+        // Keep an exact-sized private snapshot rather than wrapping a caller-owned list.
+        // This avoids a per-evaluator ReadOnlyCollection<T> wrapper and prevents later caller mutations
+        // from changing the evaluator's deterministic constraint order or behavior.
+        this.constraints = [.. constraints];
         this.decisionPolicy = decisionPolicy;
         this.options = options ?? new AsiBackbonePolicyEvaluatorOptions();
         this.options.Validate();
@@ -58,7 +57,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
         ArgumentNullException.ThrowIfNull(context);
         cancellationToken.ThrowIfCancellationRequested();
 
-        if (constraints.Count == 0 && options.DenyWhenNoConstraints)
+        if (constraints.Length == 0 && options.DenyWhenNoConstraints)
         {
             var noConstraintsDecision = GovernanceDecision.Deny(
                 options.NoConstraintsReasonCode,
@@ -78,7 +77,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
                 .ConfigureAwait(false);
         }
 
-        List<ConstraintEvaluationResult> results = new(constraints.Count);
+        List<ConstraintEvaluationResult> results = new(constraints.Length);
         List<OperationReason> denials = [];
         List<OperationReason> warnings = [];
 

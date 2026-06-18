@@ -12,7 +12,7 @@ public sealed class CapabilityGrantResultBranchTests
     [Fact]
     public void UseResultAcceptedNormalizesSuccessBranches()
     {
-        CapabilityGrantUseResult result = CapabilityGrantUseResult.Accepted(2);
+        var result = CapabilityGrantUseResult.Accepted(2);
 
         Assert.True(result.IsAccepted);
         Assert.Equal(GrantUseState.Accepted, result.State);
@@ -60,7 +60,7 @@ public sealed class CapabilityGrantResultBranchTests
     {
         CapabilityTokenGrant grant = CreateGrant();
 
-        CapabilityGrantValidationResult result = CapabilityGrantValidationResult.Valid(grant);
+        var result = CapabilityGrantValidationResult.Valid(grant);
 
         Assert.True(result.IsValid);
         Assert.True(result.ShouldAllow);
@@ -86,7 +86,7 @@ public sealed class CapabilityGrantResultBranchTests
             policyHash: " policy-hash ",
             resourceBinding: " robot-arm-1 ");
 
-        CapabilityGrantValidationResult result = CapabilityGrantValidationResult.Failed(
+        var result = CapabilityGrantValidationResult.Failed(
             grant,
             CapabilityTokenValidationCategory.WrongScope,
             VerificationPolicyAction.Deny,
@@ -113,7 +113,7 @@ public sealed class CapabilityGrantResultBranchTests
             policyHash: null,
             resourceBinding: null);
 
-        CapabilityGrantValidationResult result = CapabilityGrantValidationResult.Failed(
+        var result = CapabilityGrantValidationResult.Failed(
             grant,
             CapabilityTokenValidationCategory.Failed,
             VerificationPolicyAction.Escalate,

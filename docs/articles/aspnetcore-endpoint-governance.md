@@ -84,6 +84,21 @@ builder.Services.Configure<AsiBackboneEndpointGovernanceOptions>(options =>
 
 Failing closed is the default because an endpoint that declares governance intent should not silently bypass missing policy, capability, or audit services. Advanced hosts can relax this behavior during migration, but should document why.
 
+## Strict metadata enforcement
+
+By default, endpoint governance remains opt-in. Endpoints without AsiBackbone governance metadata pass through to the next middleware. This mirrors common ASP.NET Core adoption patterns and preserves backwards compatibility.
+
+Regulated or governance-sensitive hosts can enable fail-closed metadata enforcement:
+
+```csharp
+builder.Services.Configure<AsiBackboneEndpointGovernanceOptions>(options =>
+{
+    options.RequireGovernanceMetadata = true;
+});
+```
+
+When enabled, selected endpoints without governance metadata are blocked before execution unless the endpoint explicitly allows missing governance metadata. This option does not replace ASP.NET Core authentication or authorization. It only prevents accidental governance bypass caused by missing AsiBackbone endpoint metadata.
+
 ## Relation to full manual wire-up
 
 Manual wire-up remains the most explicit path for complex flows. Use manual integration when the endpoint requires a custom transaction boundary, multiple persistence stores, custom signing, outbox enqueue-before-execution semantics, or workflow-specific acknowledgment handling.

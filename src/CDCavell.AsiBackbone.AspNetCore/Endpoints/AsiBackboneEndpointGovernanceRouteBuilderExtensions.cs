@@ -69,6 +69,18 @@ public static class AsiBackboneEndpointGovernanceRouteBuilderExtensions
         return AddEndpointMetadata(builder, new EmitGovernanceAuditAttribute());
     }
 
+    /// <summary>
+    /// Allows an endpoint to pass through endpoint governance middleware when strict governance metadata enforcement is enabled.
+    /// </summary>
+    /// <typeparam name="TBuilder">The endpoint convention builder type.</typeparam>
+    /// <param name="builder">The endpoint convention builder.</param>
+    /// <returns>The same builder so calls can be chained.</returns>
+    public static TBuilder AllowMissingGovernanceMetadata<TBuilder>(this TBuilder builder)
+        where TBuilder : IEndpointConventionBuilder
+    {
+        return AddEndpointMetadata(builder, new AllowMissingGovernanceMetadataAttribute());
+    }
+
     private static TBuilder AddEndpointMetadata<TBuilder>(TBuilder builder, object metadata)
         where TBuilder : IEndpointConventionBuilder
     {

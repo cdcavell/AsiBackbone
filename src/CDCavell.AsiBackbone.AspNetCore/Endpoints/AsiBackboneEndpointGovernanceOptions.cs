@@ -48,6 +48,11 @@ public sealed class AsiBackboneEndpointGovernanceOptions
     public int AcknowledgmentChallengeStatusCode { get; set; } = StatusCodes.Status428PreconditionRequired;
 
     /// <summary>
+    /// Gets or sets a value indicating whether selected endpoints without AsiBackbone governance metadata should fail closed.
+    /// </summary>
+    public bool RequireGovernanceMetadata { get; set; }
+
+    /// <summary>
     /// Validates endpoint governance options.
     /// </summary>
     public void Validate()

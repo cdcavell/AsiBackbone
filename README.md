@@ -29,7 +29,7 @@ It is designed for systems where consequential actions need to be governed, expl
 AsiBackbone should be understood as **governance infrastructure**, not an intelligence engine.
 
 > [!IMPORTANT]
-> These packages do **not** implement artificial superintelligence, host AI models, train AI models, control robots, certify compliance, or prove the Eden/Backbone framework. They provide framework-neutral building blocks and host integration seams for governing consequential actions in software systems.
+> These packages do **not** implement an intelligence engine, host AI models, train AI models, control physical systems, certify compliance, or prove the Eden/Backbone framework. They provide framework-neutral building blocks and host integration seams for governing consequential actions in software systems.
 
 ## Package family
 
@@ -120,8 +120,8 @@ AsiBackbone does not:
 - Replace normal authentication or authorization.
 - Guarantee compliance with any law, regulation, audit framework, or security standard.
 - Host, train, run, or orchestrate AI models.
-- Implement artificial superintelligence.
-- Execute tools, APIs, infrastructure changes, or robot commands by itself.
+- Implement an intelligence engine.
+- Perform host operational actions by itself.
 - Own the consuming application's database, migrations, deployment, observability backend, exporter configuration, key-management boundary, or operational policy.
 - Provide production tamper-evidence, immutability, or non-repudiation by default.
 - Replace legal review, AI safety governance, organizational accountability, operational security, DLP review, or key-management controls.
@@ -130,7 +130,7 @@ The host application remains responsible for execution behavior and operational 
 
 ## Current status
 
-Stable `1.1.0` package family prepared for release.
+Stable `1.1.0` is the current released package family for the compatible `1.x` line.
 
 The repository includes the Core foundation, in-memory validation storage, EF Core host-owned persistence, ASP.NET Core integration, analyzers, OpenTelemetry provider implementation, local-development signing provider, managed-key signing adapter boundary, samples, release validation, and host-validation documentation.
 
@@ -244,11 +244,11 @@ Safe language:
 - AsiBackbone implements governance-oriented software primitives.
 - AsiBackbone helps structure consequential decision flow through constraints, acknowledgment, audit, capability boundaries, durable outbox persistence, provider emission, and signing-provider boundaries.
 - AsiBackbone can surround intelligent or decision-producing systems with accountable execution infrastructure.
-- AsiBackbone is inspired by broader Eden/Backbone governance concepts without claiming to implement artificial superintelligence.
+- AsiBackbone is inspired by broader Eden/Backbone governance concepts without claiming to implement an intelligence engine.
 
 Avoid language such as:
 
-- AsiBackbone implements artificial superintelligence.
+- AsiBackbone implements an intelligence engine.
 - AsiBackbone proves the Eden Hypothesis.
 - AsiBackbone is an AI model.
 - AsiBackbone is tamper-evident or immutable by default.

@@ -1,10 +1,12 @@
-# 1.1.0 Release Readiness Checklist
+# 1.1.0 Release Readiness Record
 
-This checklist is the release-candidate control sheet for the AsiBackbone `1.1.0` NuGet package release.
+This document is retained as the historical release-candidate control sheet for the AsiBackbone `1.1.0` NuGet package release. It is not a live indication that `1.1.0` is still pending.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. This checklist verifies the package family as governance infrastructure for accountable decision flow. It does not treat AsiBackbone as an artificial superintelligence implementation, AI model host, robot controller, legal/compliance guarantee, or production tamper-evident ledger provider.
+For future stable releases, use this record as a reusable checklist shape together with [Stable Release Validation](release-validation.md), then copy or adapt the checks for the new release version.
 
-## Stable package family
+In this software project, **ASI** means **Accountable Systems Infrastructure**. This record verifies the package family as governance infrastructure for accountable decision flow. It does not treat AsiBackbone as an artificial superintelligence implementation, AI model host, robot controller, legal/compliance guarantee, or production tamper-evident ledger provider.
+
+## Stable package family recorded for 1.1.0
 
 The `1.1.0` release covers the implemented packages below.
 
@@ -21,29 +23,31 @@ The `1.1.0` release covers the implemented packages below.
 
 Future Event Hubs, Purview, Azure-specific SDK adapters, robotics/physical execution, immutable storage, external anchoring, or additional provider packages remain outside the `1.1.0` stable contract unless separately reviewed and released as stable.
 
-## Pre-tag hard gate
+## Historical pre-tag hard gate
 
-Do not cut the `v1.1.0` tag until every item in this section is complete for the exact release-candidate commit.
+At the time of the `1.1.0` release candidate, the pre-tag gate expected the exact release-candidate commit to satisfy these checks before creating `v1.1.0`:
 
-- [ ] `Directory.Build.props` resolves package version `1.1.0` with no preview suffix.
-- [ ] `AssemblyVersion` remains `1.0.0.0` for compatible `1.x` binary identity.
-- [ ] `FileVersion` is `1.1.0.0`.
-- [ ] `CITATION.cff` and `.zenodo.json` report version `1.1.0`.
-- [ ] `CHANGELOG.md` includes the `1.1.0` entry.
-- [ ] `1.1.0 Release Notes` match the current package family.
-- [ ] `README.md` describes the `1.1.0` stable package family and bounded implementation claims.
-- [ ] `Validate-VersionConsistency.ps1` passes for the release candidate and for tag `v1.1.0` before publishing from the tag.
-- [ ] `Validate-NuGetPackageMetadata.ps1` passes against generated `.nupkg` artifacts.
-- [ ] `CI` passes on the release-candidate commit.
-- [ ] `Stable Release Validation` passes on the release-candidate commit.
-- [ ] `External Consumer Smoke Test` passes against package-shaped artifacts.
-- [ ] `Publish Documentation` passes and the DocFX site reflects the `1.1.0` package boundary.
-- [ ] No open release-blocking issues remain for the `1.1.0` milestone.
-- [ ] Any intentionally deferred release-critical check is documented in this checklist, the release notes, or a follow-up issue before tagging.
+- `Directory.Build.props` resolves package version `1.1.0` with no preview suffix.
+- `AssemblyVersion` remains `1.0.0.0` for compatible `1.x` binary identity.
+- `FileVersion` is `1.1.0.0`.
+- `CITATION.cff` and `.zenodo.json` report version `1.1.0`.
+- `CHANGELOG.md` includes the `1.1.0` entry.
+- `1.1.0 Release Notes` match the current package family.
+- `README.md` describes the `1.1.0` stable package family and bounded implementation claims.
+- `Validate-VersionConsistency.ps1` passes for the release candidate and for tag `v1.1.0` before publishing from the tag.
+- `Validate-NuGetPackageMetadata.ps1` passes against generated `.nupkg` artifacts.
+- `CI` passes on the release-candidate commit.
+- `Stable Release Validation` passes on the release-candidate commit.
+- `External Consumer Smoke Test` passes against package-shaped artifacts.
+- `Publish Documentation` passes and the DocFX site reflects the `1.1.0` package boundary.
+- No open release-blocking issues remain for the `1.1.0` milestone.
+- Any intentionally deferred release-critical check is documented in this record, the release notes, or a follow-up issue before tagging.
 
-## Local release-candidate validation
+For future releases, copy this section into a release-specific checklist and replace `1.1.0` / `v1.1.0` with the target version.
 
-Before relying only on hosted workflows, a maintainer may run the following commands from a clean checkout of the release-candidate commit.
+## Reusable local release-candidate validation
+
+Before relying only on hosted workflows, a maintainer may run the following commands from a clean checkout of a release-candidate commit.
 
 ```bash
 dotnet restore AsiBackbone.slnx
@@ -71,6 +75,8 @@ Validate release identity and generated NuGet metadata:
 ./scripts/Validate-NuGetPackageMetadata.ps1 -ExpectedVersion 1.1.0 -PackageDirectory artifacts/packages
 ```
 
+For future release candidates, replace `1.1.0` and `v1.1.0` with the new release version.
+
 Run package-consumer smoke checks when the host environment can execute them:
 
 ```bash
@@ -80,7 +86,7 @@ bash ./eng/smoke-tests/stable-package-integration-smoke.sh
 
 ## Generated `.nupkg` metadata inspection
 
-The release candidate must inspect actual packed `.nupkg` files, not only project files.
+A release candidate should inspect actual packed `.nupkg` files, not only project files.
 
 `Validate-NuGetPackageMetadata.ps1` validates:
 
@@ -94,7 +100,7 @@ The release candidate must inspect actual packed `.nupkg` files, not only projec
 - packaged README presence;
 - package-specific README wording anchors.
 
-Expected package artifacts:
+Expected `1.1.0` package artifacts:
 
 ```text
 CDCavell.AsiBackbone.Core.1.1.0.nupkg
@@ -107,20 +113,22 @@ CDCavell.AsiBackbone.Signing.LocalDevelopment.1.1.0.nupkg
 CDCavell.AsiBackbone.Signing.ManagedKey.1.1.0.nupkg
 ```
 
-## Documentation checklist
+## Documentation checklist shape
 
-- [ ] Root `README.md` describes the project as stable Accountable Systems Infrastructure and does not describe the package family as early alpha.
-- [ ] Package README files describe their package-specific boundaries.
-- [ ] `Storage.InMemory` is clearly non-durable and local-validation focused.
-- [ ] EF Core docs preserve host-owned persistence language.
-- [ ] ASP.NET Core docs preserve host-adapter language and do not imply automatic enforcement.
-- [ ] Analyzer docs describe build-time guidance, not runtime enforcement.
-- [ ] OpenTelemetry docs describe provider projection, not exporter ownership.
-- [ ] Signing docs avoid unsupported claims of production tamper-evidence, immutability, legal non-repudiation, or compliance certification.
-- [ ] `1.1.0 Release Notes` list the stable package family and accepted deferrals.
-- [ ] `API Compatibility and SemVer` documents the stable package contract and `AssemblyVersion` strategy.
-- [ ] `Schema Versioning` documents stable artifact schema and durable-artifact rationale.
-- [ ] `Release Validation` documents the workflow gates and generated package metadata validation.
+For a future release-candidate checklist, confirm that:
+
+- Root `README.md` describes the project as stable Accountable Systems Infrastructure and does not describe the package family as early alpha.
+- Package README files describe their package-specific boundaries.
+- `Storage.InMemory` is clearly non-durable and local-validation focused.
+- EF Core docs preserve host-owned persistence language.
+- ASP.NET Core docs preserve host-adapter language and do not imply automatic enforcement.
+- Analyzer docs describe build-time guidance, not runtime enforcement.
+- OpenTelemetry docs describe provider projection, not exporter ownership.
+- Signing docs avoid unsupported claims of production tamper-evidence, immutability, legal non-repudiation, or compliance certification.
+- Release notes list the stable package family and accepted deferrals.
+- `API Compatibility and SemVer` documents the stable package contract and `AssemblyVersion` strategy.
+- `Schema Versioning` documents stable artifact schema and durable-artifact rationale.
+- `Release Validation` documents the workflow gates and generated package metadata validation.
 
 ## Public wording checklist
 
@@ -153,7 +161,7 @@ Avoid unsupported claims such as:
 
 The `Publish AsiBackbone Packages` workflow must block package publication unless the validation-and-pack job succeeds.
 
-Before using the workflow to publish to NuGet.org, confirm that the validation-and-pack job performs:
+Before using the workflow to publish to NuGet.org for a future release, confirm that the validation-and-pack job performs:
 
 1. version metadata validation;
 2. restore;
@@ -171,11 +179,18 @@ The publish job should only run after those checks complete successfully.
 
 ## Tagging and publish sequence
 
-Recommended release sequence:
+Recommended sequence for future stable releases:
 
 1. Merge the release-preparation PR into `main`.
 2. Confirm release-blocking workflows pass on `main`.
-3. Create tag `v1.1.0` from the exact validated commit.
+3. Create the release tag from the exact validated commit.
 4. Let tag-triggered package validation run.
 5. Publish only after tag validation succeeds.
 6. Confirm NuGet packages, GitHub release notes, documentation site, and Zenodo metadata are aligned.
+
+## Related documentation
+
+- [1.1.0 Release Notes](release-notes-110.md)
+- [Stable Release Validation](release-validation.md)
+- [API Compatibility and SemVer](api-compatibility-and-semver.md)
+- [Schema Versioning](schema-versioning.md)

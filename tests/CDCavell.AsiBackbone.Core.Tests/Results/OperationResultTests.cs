@@ -295,6 +295,11 @@ public sealed class OperationResultTests
 
     private static IEnumerable<OperationReason> EnumerateReasons(params OperationReason?[]? reasons)
     {
+        if (reasons is null)
+        {
+            yield break;
+        }
+
         foreach (OperationReason? reason in reasons)
         {
             yield return reason!;

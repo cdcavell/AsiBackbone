@@ -111,9 +111,20 @@ public sealed class AsiBackboneEndpointGovernanceTests
     [Fact]
     public async Task MiddlewareBlocksUngovernedEndpointWhenRequireGovernanceMetadataIsEnabled()
     {
-        var httpContext = new DefaultHttpContext();
+        using ServiceProvider requestServices = new ServiceCollection()
+            .AddLogging()
+            .BuildServiceProvider();
+
+        var httpContext = new DefaultHttpContext
+        {
+            RequestServices = requestServices
+        };
+
         httpContext.Response.Body = new MemoryStream();
-        httpContext.SetEndpoint(new Endpoint(static _ => Task.CompletedTask, new EndpointMetadataCollection(), "plain"));
+        httpContext.SetEndpoint(new Endpoint(
+            static _ => Task.CompletedTask,
+            new EndpointMetadataCollection(),
+            "plain"));
 
         bool nextCalled = false;
         var middleware = new AsiBackboneEndpointGovernanceMiddleware(_ =>

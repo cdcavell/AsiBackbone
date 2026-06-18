@@ -416,7 +416,7 @@ public sealed class GovernanceDecisionTests
         Assert.Equal("Decision denied the operation.", reason.Message);
     }
 
-    private static IEnumerable<OperationReason> EnumerateReasons(params OperationReason?[] reasons)
+    private static IEnumerable<OperationReason> EnumerateReasons(params OperationReason?[]? reasons)
     {
         foreach (OperationReason? reason in reasons)
         {

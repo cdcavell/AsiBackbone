@@ -293,7 +293,7 @@ public sealed class OperationResultTests
         Assert.Equal("Operation failed.", reason.Message);
     }
 
-    private static IEnumerable<OperationReason> EnumerateReasons(params OperationReason?[] reasons)
+    private static IEnumerable<OperationReason> EnumerateReasons(params OperationReason?[]? reasons)
     {
         foreach (OperationReason? reason in reasons)
         {

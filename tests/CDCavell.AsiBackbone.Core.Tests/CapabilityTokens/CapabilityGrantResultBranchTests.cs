@@ -34,6 +34,7 @@ public sealed class CapabilityGrantResultBranchTests
     {
         CapabilityGrantUseResult result = expectedState switch
         {
+            GrantUseState.Accepted => throw new ArgumentException("Accepted is covered by the success-result test.", nameof(expectedState)),
             GrantUseState.UseLimitExceeded => CapabilityGrantUseResult.UseLimitExceeded(expectedUseCount, failureMessage),
             GrantUseState.Stopped => CapabilityGrantUseResult.Stopped(failureMessage),
             GrantUseState.Cancelled => CapabilityGrantUseResult.Cancelled(failureMessage),

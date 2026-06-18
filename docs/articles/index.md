@@ -7,6 +7,12 @@ Use this page as a map. The groups below separate current stable guidance from r
 > [!IMPORTANT]
 > In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is governance infrastructure for accountable software decision flow, not an artificial superintelligence implementation.
 
+## Provider documentation boundary
+
+`1.1.0` includes one concrete released governance emission provider package: [OpenTelemetry Governance Emission Provider](opentelemetry-governance-emission-provider.md). The analyzer and signing packages are also released package documentation, but OpenTelemetry is the only concrete released governance emission provider package in the `1.1.0` family.
+
+Design-only or strategy-only provider pages remain useful planning references, but they do not mean a corresponding NuGet package shipped in `1.1.0`. See [1.1.0 Release Notes](release-notes-110.md#accepted-deferrals) for accepted deferrals covering Event Hubs, Purview, Azure-specific SDK adapters, and other future provider work.
+
 ## Start here / current stable usage
 
 These pages are the best entry point for current package consumers.
@@ -112,7 +118,7 @@ These pages describe implemented package boundaries and host-owned integration s
 These pages cover the additive `1.1.0` governance-emission and durability surface.
 
 * [Observability and Governance Emission Architecture](observability-and-governance-emission-architecture.md)  
-  Documents the `1.1.0` observability, outbox, and governance emission architecture direction.
+  Documents the `1.1.0` observability, outbox, and governance emission architecture direction, including the released OpenTelemetry provider and design-only future provider paths.
 
 * [Governance Emission Contract](governance-emission-contract.md)  
   Defines the provider-neutral emission contract between Core governance artifacts, durable local audit/outbox persistence, and optional downstream providers.
@@ -140,12 +146,12 @@ These pages cover the additive `1.1.0` governance-emission and durability surfac
 
 ## Released provider package documentation
 
-These pages describe currently released provider or provider-adjacent packages.
+These pages describe currently released provider or provider-adjacent packages. OpenTelemetry is the only concrete released governance emission provider package in `1.1.0`.
 
 * [Roslyn Analyzers](roslyn-analyzers.md)  
   Documents build-time analyzer safety rails for governance persistence and continuation flows.
 
-* [OpenTelemetry Governance Emission Provider](opentelemetry-governance-emission-provider.md)  
+* [Released: OpenTelemetry Governance Emission Provider](opentelemetry-governance-emission-provider.md)  
   Documents the concrete `CDCavell.AsiBackbone.OpenTelemetry` provider package and host-owned exporter boundary.
 
 * [Signing Provider Package Boundary](signing-provider-package-boundary.md)  
@@ -184,13 +190,13 @@ These pages describe signing, verification, capability, and cryptographic-harden
 
 ## Design-only and future provider strategy
 
-These pages remain available as strategy/design material. They are not released provider packages unless a future release explicitly says so.
+These pages remain available as strategy/design material. They are not released provider packages unless a future release explicitly says so. See [1.1.0 Release Notes](release-notes-110.md#accepted-deferrals) for current deferral status.
 
-* [Event Hubs Governance Emission Provider Design](event-hubs-governance-emission-provider-design.md)  
-  Documents an optional Event Hubs streaming provider design and provider-specific considerations.
+* [Design-Only: Event Hubs Governance Emission Provider](event-hubs-governance-emission-provider-design.md)  
+  Documents a future optional Event Hubs streaming provider design. No Event Hubs NuGet package or Azure SDK adapter is included in the `1.1.0` stable package family.
 
-* [Purview Governance and Lineage Enrichment Strategy](purview-governance-lineage-enrichment-strategy.md)  
-  Documents an optional Microsoft Purview governance and lineage enrichment strategy.
+* [Strategy-Only: Purview Governance and Lineage Enrichment](purview-governance-lineage-enrichment-strategy.md)  
+  Documents a future optional Microsoft Purview governance enrichment strategy. No Purview NuGet package or SDK adapter is included in the `1.1.0` stable package family.
 
 ## Advanced scenarios
 

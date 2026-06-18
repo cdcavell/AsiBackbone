@@ -28,15 +28,15 @@ public sealed class GovernanceOutboxDrainBranchTests
             new QueueEmitter(GovernanceEmissionResult.Delivered()));
 
         _ = await Assert.ThrowsAsync<ArgumentOutOfRangeException>(
-            async () => await drain.DrainAsync(maxCount: 0));
+            async () => await drain.DrainAsync(maxCount: 0, cancellationToken: TestContext.Current.CancellationToken));
     }
 
     [Fact]
     public async Task DrainAsyncDoesNotQueryRetryReadyWhenPendingEntriesFillMaxCount()
     {
-        var first = CreateEntry("outbox-1", "event-1");
-        var second = CreateEntry("outbox-2", "event-2");
-        var retryReady = CreateEntry("outbox-3", "event-3");
+        GovernanceOutboxEntry first = CreateEntry("outbox-1", "event-1");
+        GovernanceOutboxEntry second = CreateEntry("outbox-2", "event-2");
+        GovernanceOutboxEntry retryReady = CreateEntry("outbox-3", "event-3");
         var store = new RecordingOutboxStore(
             pendingEntries: [first, second],
             retryReadyEntries: [retryReady]);
@@ -60,11 +60,11 @@ public sealed class GovernanceOutboxDrainBranchTests
     [Fact]
     public async Task DrainAsyncDeduplicatesRetryReadyEntriesAgainstPendingEntries()
     {
-        var pending = CreateEntry("outbox-1", "event-1");
-        var retryReadyDuplicate = pending.MarkDeferred(
+        GovernanceOutboxEntry pending = CreateEntry("outbox-1", "event-1");
+        GovernanceOutboxEntry retryReadyDuplicate = pending.MarkDeferred(
             nextRetryUtc: DrainUtc.AddMinutes(-1),
             updatedUtc: DrainUtc.AddMinutes(-2));
-        var retryReady = CreateEntry("outbox-2", "event-2").MarkDeferred(
+        GovernanceOutboxEntry retryReady = CreateEntry("outbox-2", "event-2").MarkDeferred(
             nextRetryUtc: DrainUtc.AddMinutes(-1),
             updatedUtc: DrainUtc.AddMinutes(-2));
         var store = new RecordingOutboxStore(
@@ -91,7 +91,7 @@ public sealed class GovernanceOutboxDrainBranchTests
     [Fact]
     public async Task DrainAsyncMarksEmitterExceptionAsRetryableFailure()
     {
-        var entry = CreateEntry("outbox-1", "event-1");
+        GovernanceOutboxEntry entry = CreateEntry("outbox-1", "event-1");
         var store = new RecordingOutboxStore(pendingEntries: [entry]);
         var drain = new AsiBackboneGovernanceOutboxDrain(
             store,
@@ -112,7 +112,7 @@ public sealed class GovernanceOutboxDrainBranchTests
     public async Task DrainAsyncRethrowsOperationCanceledExceptionWhenCancellationIsRequestedByEmitter()
     {
         using var cancellationTokenSource = new CancellationTokenSource();
-        var entry = CreateEntry("outbox-1", "event-1");
+        GovernanceOutboxEntry entry = CreateEntry("outbox-1", "event-1");
         var store = new RecordingOutboxStore(pendingEntries: [entry]);
         var drain = new AsiBackboneGovernanceOutboxDrain(
             store,
@@ -131,7 +131,7 @@ public sealed class GovernanceOutboxDrainBranchTests
             "provider.rejected",
             "Provider rejected the envelope.",
             providerName: "sink");
-        var entry = CreateEntry("outbox-1", "event-1");
+        GovernanceOutboxEntry entry = CreateEntry("outbox-1", "event-1");
         var store = new RecordingOutboxStore(pendingEntries: [entry]);
         var drain = new AsiBackboneGovernanceOutboxDrain(
             store,
@@ -150,7 +150,7 @@ public sealed class GovernanceOutboxDrainBranchTests
     [Fact]
     public async Task DrainAsyncDefersPendingResultWithFallbackError()
     {
-        var entry = CreateEntry("outbox-1", "event-1");
+        GovernanceOutboxEntry entry = CreateEntry("outbox-1", "event-1");
         var store = new RecordingOutboxStore(pendingEntries: [entry]);
         var drain = new AsiBackboneGovernanceOutboxDrain(
             store,
@@ -171,7 +171,7 @@ public sealed class GovernanceOutboxDrainBranchTests
     public async Task DrainAsyncDefersDeferredResultWithoutError()
     {
         DateTimeOffset retryAfterUtc = DrainUtc.AddMinutes(5);
-        var entry = CreateEntry("outbox-1", "event-1");
+        GovernanceOutboxEntry entry = CreateEntry("outbox-1", "event-1");
         var store = new RecordingOutboxStore(pendingEntries: [entry]);
         var drain = new AsiBackboneGovernanceOutboxDrain(
             store,
@@ -258,7 +258,7 @@ public sealed class GovernanceOutboxDrainBranchTests
             string outboxEntryId,
             CancellationToken cancellationToken = default)
         {
-            entries.TryGetValue(outboxEntryId, out GovernanceOutboxEntry? entry);
+            _ = entries.TryGetValue(outboxEntryId, out GovernanceOutboxEntry? entry);
             return ValueTask.FromResult(entry);
         }
 

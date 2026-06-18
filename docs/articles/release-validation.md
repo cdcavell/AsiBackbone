@@ -1,14 +1,14 @@
 # Stable Release Validation
 
-This article documents the release-blocking validation path for the current stable `1.x` release line. The current release target is `1.1.0`.
+This article documents the reusable release-blocking validation path for the stable `1.x` release line. The current released stable package family is `1.1.0`; future `1.x` maintenance releases should continue to use the same validation posture unless a later release note supersedes it.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. Release validation should confirm that the package family remains practical governance infrastructure and that implementation claims stay within the documented software boundary.
 
-Use [1.1.0 Release Readiness Checklist](release-readiness-checklist.md) as the final pre-tag control sheet that ties these workflow gates to package metadata inspection, wording boundaries, accepted deferrals, and follow-up tracking.
+The [1.1.0 Release Readiness Record](release-readiness-checklist.md) is retained as the historical release-candidate control sheet for the `1.1.0` release. Treat this article as the reusable validation process for future release candidates and maintenance releases.
 
-## Required checks before tagging `1.1.0`
+## Required checks before tagging a stable release
 
-Before cutting a stable release tag, confirm the following checks have passed on the release candidate commit:
+Before cutting a stable release tag, confirm the following checks have passed on the release-candidate commit:
 
 | Check | Where it runs | Release purpose |
 | --- | --- | --- |
@@ -26,7 +26,7 @@ Before cutting a stable release tag, confirm the following checks have passed on
 
 ## Release-blocking workflows
 
-The following workflows form the release gate for `1.1.0`:
+The following workflows formed the `1.1.0` release gate and remain the reusable gate for future stable `1.x` release candidates:
 
 - `CI` validates dependency review for pull requests, solution restore/build/test, formatting, package creation, coverage output, and CodeQL analysis.
 - `External Consumer Smoke Test` validates package-consumer wiring through the external consumer and stable package integration smoke scripts.
@@ -36,7 +36,7 @@ The following workflows form the release gate for `1.1.0`:
 
 ## Tagging rule
 
-Do not cut a stable `v1.1.0` tag until the release candidate commit has passed the release-blocking workflows above, or until any intentionally deferred check is documented in the release notes or release readiness checklist.
+Do not cut a stable release tag until the release-candidate commit has passed the release-blocking workflows above, or until any intentionally deferred check is documented in the release notes or release readiness record for that release.
 
 If a tag is pushed and package validation fails, do not publish replacement packages by hand. Fix the release candidate, document the reason, and repeat the release process with a corrected tag or clearly documented follow-up plan.
 
@@ -98,7 +98,7 @@ This keeps package publication behind restore, build, test, documentation, packa
 - README metadata and packaged README presence;
 - package-specific README wording anchors, such as non-durable storage language for `Storage.InMemory`, provider-neutral wording for `OpenTelemetry`, and local-development/managed-key boundaries for signing packages.
 
-This check is intended to catch release-blocking NuGet metadata mistakes before `1.1.0` is published, because NuGet package metadata for a published version cannot be overwritten.
+This check catches release-blocking NuGet metadata mistakes before package publication because NuGet package metadata for a published version cannot be overwritten.
 
 ## Checks intentionally not owned by the package
 
@@ -128,7 +128,7 @@ Deferred checks should be rare for a stable release.
 
 ## Related documentation
 
-- [1.1.0 Release Readiness Checklist](release-readiness-checklist.md)
+- [1.1.0 Release Readiness Record](release-readiness-checklist.md)
 - [1.1.0 Release Notes](release-notes-110.md)
 - [Upgrade Guide: 1.0.0 to 1.1.0](upgrade-100-to-110.md)
 - [Developer Checklist](developer-checklist.md)

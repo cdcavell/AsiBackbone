@@ -1,6 +1,8 @@
-# Stable API Review
+# Historical Stable API Review
 
-This review records the public API review for the initial stable AsiBackbone package family before committing to a `1.0.0` surface.
+This review records the public API review for the initial stable AsiBackbone package family before the `1.0.0` surface was established. It is retained as a historical API-shape baseline for the compatible `1.x` line.
+
+The current released stable package family is documented in [1.1.0 Release Notes](release-notes-110.md). Future stable packages or public API expansions should continue to use release validation, package-boundary review, and follow-up API review notes when needed.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. This review is limited to implemented .NET package APIs and does not treat AsiBackbone as an artificial superintelligence implementation, AI model host, legal/compliance guarantee, or robot controller.
 
@@ -8,11 +10,11 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 
 | Item | Status |
 | --- | --- |
-| Public API review documented | Complete |
-| Required breaking changes identified | None identified in this review |
-| Package boundaries reviewed | Complete |
-| Dependency direction reviewed | Complete |
-| Stable release dependency | `1.0.0` should not be tagged until release validation passes and any later review findings are resolved or intentionally deferred. |
+| Public API review documented | Complete for the initial `1.0.0` stable surface. |
+| Required breaking changes identified | None identified in this review. |
+| Package boundaries reviewed | Complete for the initial package family. |
+| Dependency direction reviewed | Complete for the initial package family. |
+| Stable release dependency | Historical: the `1.0.0` tag was not to be cut until release validation passed and later review findings were resolved or intentionally deferred. For current releases, use [Stable Release Validation](release-validation.md). |
 
 ## Reviewed package family
 
@@ -25,9 +27,11 @@ The initial stable package family reviewed here is:
 | `CDCavell.AsiBackbone.EntityFrameworkCore` | EF Core model configuration and host-owned persistence integration. | Stable candidate as host-owned EF Core integration. Should not own migrations, database lifecycle, provider selection, or retention policy. |
 | `CDCavell.AsiBackbone.AspNetCore` | Thin ASP.NET Core host adapters for actor context, request correlation, result mapping, and acknowledgment challenge support. | Stable candidate as host integration. Should not become the owner of host authentication, authorization, routing, policy evaluation, persistence, UI, or execution behavior. |
 
+`1.1.0` later added stable analyzer, OpenTelemetry, and signing-provider packages. See the `1.1.0` release notes for those package-specific boundaries.
+
 ## Public naming review
 
-The reviewed public naming pattern is acceptable for `1.0.0`:
+The reviewed public naming pattern was acceptable for `1.0.0`:
 
 - package names consistently use `CDCavell.AsiBackbone.*`;
 - namespaces mirror package boundaries;
@@ -40,7 +44,7 @@ No required renames were identified.
 
 ## Namespace review
 
-The namespace layout is acceptable for `1.0.0`:
+The namespace layout was acceptable for `1.0.0`:
 
 | Namespace area | Review result |
 | --- | --- |
@@ -59,7 +63,7 @@ No required namespace changes were identified.
 
 ## Dependency direction review
 
-The dependency direction is acceptable for the initial stable package family:
+The dependency direction was acceptable for the initial stable package family:
 
 ```text
 CDCavell.AsiBackbone.Core
@@ -80,7 +84,7 @@ No dependency-direction breaking changes were identified.
 
 ## Extension point review
 
-The reviewed extension points are acceptable for `1.0.0`:
+The reviewed extension points were acceptable for `1.0.0`:
 
 | Extension point | Review result |
 | --- | --- |
@@ -110,7 +114,7 @@ Reviewed artifact families:
 
 Review decision:
 
-- the current stable direction is acceptable because durable artifacts are documented separately from package versioning;
+- the stable direction was acceptable because durable artifacts are documented separately from package versioning;
 - future additive fields should remain compatible where possible;
 - future incompatible durable shape changes should use schema-version guidance and migration documentation;
 - built-in signing, key management, tamper-evident storage, privacy classification, and compliance certification remain outside the `1.0.0` stable package boundary.
@@ -123,7 +127,7 @@ None identified in this review.
 
 ### Non-blocking follow-up considerations
 
-The following are not required before `1.0.0`, but should remain visible for later milestones:
+The following were not required before `1.0.0`, but should remain visible for later milestones:
 
 - Core architecture boundary checks are tracked by [API Baseline and Architecture Boundary Checks](api-baseline-and-boundary-checks.md) and should continue to protect Core from integration/provider dependencies;
 - generated public API baseline files remain explicitly deferred to a later `1.x` milestone so the project can choose one stable public API drift process;
@@ -133,15 +137,16 @@ The following are not required before `1.0.0`, but should remain visible for lat
 
 ## Release decision
 
-The initial stable package family is acceptable to proceed toward `1.0.0` from an API-shape perspective, provided release validation passes and any new API concerns discovered before tagging are resolved or intentionally deferred with follow-up issues.
+The initial stable package family was acceptable to proceed toward `1.0.0` from an API-shape perspective, provided release validation passed and any new API concerns discovered before tagging were resolved or intentionally deferred with follow-up issues.
 
-This review does not replace CI, tests, package smoke validation, DocFX validation, or release version checks. It only documents the stable public API and package-boundary review for issue #13.
+This review does not replace CI, tests, package smoke validation, DocFX validation, or release version checks. It only documents the historical stable public API and package-boundary review for issue #13.
 
 ## Related documentation
 
+- [1.1.0 Release Notes](release-notes-110.md)
+- [Release Validation](release-validation.md)
 - [API Compatibility and SemVer](api-compatibility-and-semver.md)
 - [API Baseline and Architecture Boundary Checks](api-baseline-and-boundary-checks.md)
 - [Schema Versioning](schema-versioning.md)
 - [Privacy and Signing Boundaries](privacy-and-signing-boundaries.md)
-- [Release Validation](release-validation.md)
 - [Developer Checklist](developer-checklist.md)

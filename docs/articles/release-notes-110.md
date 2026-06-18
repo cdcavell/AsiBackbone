@@ -1,12 +1,12 @@
 # 1.1.0 Release Notes
 
-These notes describe the target `1.1.0 - Observability, Outbox, Signing, and Governance Emission Providers` release boundary.
+These notes describe the released `1.1.0 - Observability, Outbox, Signing, and Governance Emission Providers` package-family boundary.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is governance infrastructure for accountable software decision flow. It does not implement artificial superintelligence, host AI models, control robots, certify compliance, or provide production tamper-evidence by itself.
 
 ## Release summary
 
-`1.1.0` is an additive minor release over `1.0.0`. Existing `1.0.0` consumers can continue using the stable Core, in-memory storage, EF Core, and ASP.NET Core package surfaces without adopting the new analyzer, observability, outbox, signing, verification, or provider paths.
+`1.1.0` is the current stable additive minor release over `1.0.0`. Existing `1.0.0` consumers can continue using the stable Core, in-memory storage, EF Core, and ASP.NET Core package surfaces without adopting the new analyzer, observability, outbox, signing, verification, or provider paths.
 
 The release expands the governance spine from local decision/audit records into durable lifecycle, provider-neutral emission, optional OpenTelemetry projection, and signing-provider boundaries:
 
@@ -27,7 +27,7 @@ Signing and verification are part of an operational trust model, not proof of ta
 
 ## Stable package family
 
-The target `1.1.0` package line covers the package family below.
+The released `1.1.0` package line covers the package family below.
 
 | Package | Stable role |
 | --- | --- |
@@ -182,11 +182,11 @@ It is not a production managed-key provider and does not provide protected key c
 
 The package supplies the adapter boundary and registration shape. The host supplies the actual managed-key client. That host-owned client may call Azure Key Vault, Managed HSM, cloud KMS, HSM appliances, or organization-owned signing services, but those concrete integrations are not included by default.
 
-The managed-key adapter must not return private keys, symmetric keys, connection strings, access tokens, managed identity tokens, client secrets, or raw credential material to Core.
+The managed-key adapter must not return private keys, symmetric keys, connection strings, or raw credential material to Core.
 
 ## SemVer and compatibility
 
-`1.1.0` is intended to be SemVer-compatible with `1.0.0` consumers.
+`1.1.0` is SemVer-compatible with `1.0.0` consumers.
 
 Compatibility expectations:
 
@@ -202,7 +202,7 @@ Hosts using EF Core should still review generated migrations before deployment b
 
 ## Accepted deferrals
 
-The following work is intentionally deferred or documentation/design-only for this release boundary:
+The following work is intentionally deferred or documentation/design-only for this released boundary:
 
 | Area | `1.1.0` status |
 | --- | --- |
@@ -230,9 +230,11 @@ At a high level:
 8. Configure Azure Monitor through the host OpenTelemetry pipeline if Azure Monitor is the selected backend.
 9. Do not claim signing, immutability, non-repudiation, or tamper-evidence unless a concrete signing, verification, storage, retention, and key-management design is actually implemented.
 
-## Validation expectations
+## Validation record and reusable commands
 
-Before tagging or publishing `1.1.0`, run release validation from a clean working tree and capture results in the release PR or release checklist.
+The `1.1.0` release boundary is documented by this release note, the historical release readiness record, and the reusable [Stable Release Validation](release-validation.md) process.
+
+For maintenance validation, follow-up release candidates, or package-shape checks, run validation from a clean working tree and capture results in the relevant release PR or maintenance checklist.
 
 Recommended commands:
 
@@ -247,7 +249,7 @@ dotnet tool run docfx -- docs/docfx.json
 
 Package validation should also pack and validate the expected package artifacts, including Core, Storage.InMemory, EntityFrameworkCore, AspNetCore, Analyzers, OpenTelemetry, Signing.LocalDevelopment, and Signing.ManagedKey.
 
-Rerun validation against the final release candidate before tagging. Do not rely on older milestone test counts once signing, analyzer, endpoint-governance, or package-boundary changes have landed.
+For future releases, rerun validation against the final release candidate before tagging. Do not rely on older milestone test counts once signing, analyzer, endpoint-governance, or package-boundary changes have landed.
 
 ## Related documentation
 

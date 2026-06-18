@@ -5,6 +5,11 @@ namespace CDCavell.AsiBackbone.Core.Outbox;
 /// <summary>
 /// Defines a provider-neutral durable outbox store for governance emission envelopes.
 /// </summary>
+/// <remarks>
+/// The provider-neutral find methods return delivery candidates. They do not imply cross-process row claiming,
+/// leasing, skip-locked selection, or exactly-once provider delivery. Hosts that run multiple drain workers against
+/// the same durable store must add host-owned claiming, partitioning, or provider-side idempotency.
+/// </remarks>
 public interface IAsiBackboneGovernanceOutboxStore
 {
     /// <summary>
@@ -31,6 +36,10 @@ public interface IAsiBackboneGovernanceOutboxStore
     /// <summary>
     /// Finds pending outbox entries ordered for delivery.
     /// </summary>
+    /// <remarks>
+    /// Returned entries are candidates, not claimed work items. A multi-worker host should use a storage adapter or
+    /// deployment pattern that claims or partitions work before provider emission.
+    /// </remarks>
     ValueTask<IReadOnlyList<GovernanceOutboxEntry>> FindPendingAsync(
         int maxCount = 100,
         CancellationToken cancellationToken = default);
@@ -38,6 +47,10 @@ public interface IAsiBackboneGovernanceOutboxStore
     /// <summary>
     /// Finds retry-ready outbox entries ordered for delivery.
     /// </summary>
+    /// <remarks>
+    /// Returned entries are candidates, not claimed work items. A multi-worker host should use a storage adapter or
+    /// deployment pattern that claims or partitions work before provider emission.
+    /// </remarks>
     ValueTask<IReadOnlyList<GovernanceOutboxEntry>> FindRetryReadyAsync(
         DateTimeOffset utcNow,
         int maxCount = 100,

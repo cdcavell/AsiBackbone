@@ -53,6 +53,15 @@ public sealed class AsiBackboneEndpointGovernanceOptions
     public bool RequireGovernanceMetadata { get; set; }
 
     /// <summary>
+    /// Gets or sets an optional factory for the generic 403 response used by middleware when no explicit failure result was supplied.
+    /// </summary>
+    /// <remarks>
+    /// Leave this unset for the low-allocation, bodyless default 403 response. Hosts that prefer richer API responses
+    /// may provide a safe factory, such as a ProblemDetails result, while avoiding sensitive governance details.
+    /// </remarks>
+    public Func<HttpContext, IResult>? DefaultForbiddenResultFactory { get; set; }
+
+    /// <summary>
     /// Validates endpoint governance options.
     /// </summary>
     public void Validate()

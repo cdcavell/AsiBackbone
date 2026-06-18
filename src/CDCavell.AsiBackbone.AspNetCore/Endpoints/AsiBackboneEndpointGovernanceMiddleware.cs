@@ -12,8 +12,9 @@ namespace CDCavell.AsiBackbone.AspNetCore.Endpoints;
 /// <param name="next">The next request delegate.</param>
 public sealed class AsiBackboneEndpointGovernanceMiddleware(RequestDelegate next)
 {
+    private static readonly IResult DefaultForbiddenResult = Microsoft.AspNetCore.Http.Results.StatusCode(StatusCodes.Status403Forbidden);
+
     private readonly RequestDelegate next = next ?? throw new ArgumentNullException(nameof(next));
-    private static readonly string[] extensions = ["endpoint.governance_metadata.missing"];
 
     /// <summary>
     /// Evaluates endpoint governance metadata and either continues execution or writes a failure result.
@@ -44,15 +45,7 @@ public sealed class AsiBackboneEndpointGovernanceMiddleware(RequestDelegate next
         {
             if (options.RequireGovernanceMetadata && !endpointAllowsMissingGovernance)
             {
-                IResult missingGovernanceResult = Microsoft.AspNetCore.Http.Results.Problem(
-                    title: "Governance metadata is required for this endpoint.",
-                    detail: "The selected endpoint does not contain AsiBackbone governance metadata.",
-                    statusCode: StatusCodes.Status403Forbidden,
-                    extensions: new Dictionary<string, object?>(StringComparer.Ordinal)
-                    {
-                        ["reasonCodes"] = extensions,
-                        ["outcome"] = "Denied"
-                    });
+                IResult missingGovernanceResult = CreateDefaultForbiddenResult(httpContext, options);
 
                 await missingGovernanceResult.ExecuteAsync(httpContext).ConfigureAwait(false);
                 return;
@@ -72,9 +65,18 @@ public sealed class AsiBackboneEndpointGovernanceMiddleware(RequestDelegate next
             return;
         }
 
-        IResult failureResult = result.FailureResult
-            ?? Microsoft.AspNetCore.Http.Results.Problem(statusCode: StatusCodes.Status403Forbidden);
+        IResult failureResult = result.FailureResult ?? CreateDefaultForbiddenResult(httpContext, options);
 
         await failureResult.ExecuteAsync(httpContext).ConfigureAwait(false);
+    }
+
+    private static IResult CreateDefaultForbiddenResult(
+        HttpContext httpContext,
+        AsiBackboneEndpointGovernanceOptions options)
+    {
+        return options.DefaultForbiddenResultFactory is null
+            ? DefaultForbiddenResult
+            : options.DefaultForbiddenResultFactory(httpContext)
+                ?? throw new InvalidOperationException($"{nameof(AsiBackboneEndpointGovernanceOptions.DefaultForbiddenResultFactory)} must return a non-null result.");
     }
 }

@@ -56,6 +56,20 @@ public sealed class AsiBackboneEndpointGovernanceResult
     }
 
     /// <summary>
+    /// Creates a result that blocks endpoint execution and lets middleware write the configured generic failure response.
+    /// </summary>
+    /// <param name="decision">The governance decision that blocked execution.</param>
+    /// <returns>A blocked result without a custom failure response.</returns>
+    public static AsiBackboneEndpointGovernanceResult BlockWithDefaultFailure(GovernanceDecision? decision = null)
+    {
+        return new AsiBackboneEndpointGovernanceResult(
+            canExecute: false,
+            decision,
+            failureResult: null,
+            acknowledgmentChallenge: null);
+    }
+
+    /// <summary>
     /// Creates a result that blocks endpoint execution and returns a host-safe failure result.
     /// </summary>
     /// <param name="failureResult">The HTTP result to execute.</param>

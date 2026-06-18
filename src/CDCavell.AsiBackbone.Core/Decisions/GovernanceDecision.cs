@@ -13,6 +13,22 @@ public sealed class GovernanceDecision
     private const string DefaultWarningCode = "decision.warning";
     private const string DefaultWarningMessage = "Decision produced a warning.";
 
+    /// <summary>
+    /// Defines the maximum retained length for normalized correlation identifiers.
+    /// </summary>
+    /// <remarks>
+    /// Correlation identifiers are trimmed before enforcement. Values longer than this limit are truncated to keep telemetry-facing identifiers bounded.
+    /// </remarks>
+    public const int MaxCorrelationIdLength = 256;
+
+    /// <summary>
+    /// Defines the maximum retained length for normalized trace identifiers.
+    /// </summary>
+    /// <remarks>
+    /// Trace identifiers are trimmed before enforcement. Values longer than this limit are truncated to keep telemetry-facing identifiers bounded.
+    /// </remarks>
+    public const int MaxTraceIdLength = 256;
+
     private static readonly ReadOnlyCollection<OperationReason> EmptyReasons =
         Array.AsReadOnly(Array.Empty<OperationReason>());
 
@@ -27,8 +43,8 @@ public sealed class GovernanceDecision
         Outcome = outcome;
         Reasons = reasons;
         ReasonCodes = Array.AsReadOnly([.. reasons.Select(reason => reason.Code)]);
-        CorrelationId = NormalizeOptional(correlationId);
-        TraceId = NormalizeOptional(traceId);
+        CorrelationId = NormalizeTelemetryIdentifier(correlationId, MaxCorrelationIdLength);
+        TraceId = NormalizeTelemetryIdentifier(traceId, MaxTraceIdLength);
         PolicyVersion = NormalizeOptional(policyVersion);
         PolicyHash = NormalizeOptional(policyHash);
     }
@@ -373,6 +389,15 @@ public sealed class GovernanceDecision
         return string.IsNullOrWhiteSpace(value)
             ? null
             : value.Trim();
+    }
+
+    private static string? NormalizeTelemetryIdentifier(string? value, int maxLength)
+    {
+        string? normalized = NormalizeOptional(value);
+
+        return normalized is null || normalized.Length <= maxLength
+            ? normalized
+            : normalized[..maxLength];
     }
 
     private static ReadOnlyCollection<OperationReason> NormalizeReasons(

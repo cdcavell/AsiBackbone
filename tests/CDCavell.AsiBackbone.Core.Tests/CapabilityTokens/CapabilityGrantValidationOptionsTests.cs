@@ -10,7 +10,7 @@ public sealed class CapabilityGrantValidationOptionsTests
     {
         DateTimeOffset localValidationTime = new(2026, 6, 16, 7, 0, 0, TimeSpan.FromHours(-5));
 
-        CapabilityGrantValidationOptions options = CapabilityGrantValidationOptions.Create(
+        var options = CapabilityGrantValidationOptions.Create(
             issuer: " issuer-1 ",
             audience: " gateway-1 ",
             scopes: [" robotics.write ", "robotics.read", " ", "robotics.read"],
@@ -45,7 +45,7 @@ public sealed class CapabilityGrantValidationOptionsTests
     [Fact]
     public void CreateUsesEmptyScopesAndNullBindingsForMissingOrWhitespaceInputs()
     {
-        CapabilityGrantValidationOptions options = CapabilityGrantValidationOptions.Create(
+        var options = CapabilityGrantValidationOptions.Create(
             issuer: " ",
             audience: " ",
             scopes: null,
@@ -75,7 +75,7 @@ public sealed class CapabilityGrantValidationOptionsTests
     [Fact]
     public void CreateUsesEmptyScopesWhenAllScopeEntriesNormalizeAway()
     {
-        CapabilityGrantValidationOptions options = CapabilityGrantValidationOptions.Create(scopes: [" ", ""]);
+        var options = CapabilityGrantValidationOptions.Create(scopes: [" ", ""]);
 
         Assert.Empty(options.Scopes);
     }
@@ -83,6 +83,6 @@ public sealed class CapabilityGrantValidationOptionsTests
     [Fact]
     public void CreateRejectsNonPositiveMaximumUseCount()
     {
-        Assert.Throws<ArgumentOutOfRangeException>(() => CapabilityGrantValidationOptions.Create(maxUseCount: 0));
+        _ = Assert.Throws<ArgumentOutOfRangeException>(() => CapabilityGrantValidationOptions.Create(maxUseCount: 0));
     }
 }

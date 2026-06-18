@@ -18,7 +18,7 @@ public sealed class CapabilityTokenGrantBranchTests
             ["nullable"] = null!
         };
 
-        CapabilityTokenGrant grant = CapabilityTokenGrant.Create(
+        var grant = CapabilityTokenGrant.Create(
             tokenId: " grant-1 ",
             issuer: " issuer-1 ",
             audience: " gateway-1 ",
@@ -59,7 +59,7 @@ public sealed class CapabilityTokenGrantBranchTests
     [Fact]
     public void CreateAllowsMinimalGrantAndReportsMissingOptionalReferences()
     {
-        CapabilityTokenGrant grant = CapabilityTokenGrant.Create(
+        var grant = CapabilityTokenGrant.Create(
             tokenId: "grant-1",
             issuer: "issuer-1",
             audience: "gateway-1",
@@ -86,7 +86,7 @@ public sealed class CapabilityTokenGrantBranchTests
     [Fact]
     public void CreateRejectsNullScopes()
     {
-        Assert.Throws<ArgumentNullException>(() => CapabilityTokenGrant.Create(
+        _ = Assert.Throws<ArgumentNullException>(() => CapabilityTokenGrant.Create(
             tokenId: "grant-1",
             issuer: "issuer-1",
             audience: "gateway-1",
@@ -98,7 +98,7 @@ public sealed class CapabilityTokenGrantBranchTests
     [Fact]
     public void CreateRejectsEmptyNormalizedScopes()
     {
-        Assert.Throws<ArgumentException>(() => CapabilityTokenGrant.Create(
+        _ = Assert.Throws<ArgumentException>(() => CapabilityTokenGrant.Create(
             tokenId: "grant-1",
             issuer: "issuer-1",
             audience: "gateway-1",
@@ -110,7 +110,7 @@ public sealed class CapabilityTokenGrantBranchTests
     [Fact]
     public void CreateRejectsNotBeforeAfterExpiration()
     {
-        Assert.Throws<ArgumentOutOfRangeException>(() => CapabilityTokenGrant.Create(
+        _ = Assert.Throws<ArgumentOutOfRangeException>(() => CapabilityTokenGrant.Create(
             tokenId: "grant-1",
             issuer: "issuer-1",
             audience: "gateway-1",
@@ -123,7 +123,7 @@ public sealed class CapabilityTokenGrantBranchTests
     [Fact]
     public void CreateRejectsIssuedAfterExpiration()
     {
-        Assert.Throws<ArgumentOutOfRangeException>(() => CapabilityTokenGrant.Create(
+        _ = Assert.Throws<ArgumentOutOfRangeException>(() => CapabilityTokenGrant.Create(
             tokenId: "grant-1",
             issuer: "issuer-1",
             audience: "gateway-1",

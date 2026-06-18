@@ -1,12 +1,19 @@
-# Purview Governance and Lineage Enrichment Strategy
+# Strategy-Only: Purview Governance and Lineage Enrichment
 
-This article documents the optional Microsoft Purview governance and lineage enrichment strategy for the `1.1.0 - Observability, Outbox, and Governance Emission Providers` milestone.
+This article documents a **strategy-only** future Microsoft Purview governance and lineage enrichment direction. It is retained as planning guidance after the released `1.1.0 - Observability, Outbox, Signing, and Governance Emission Providers` package-family boundary.
 
 Issue: #146.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a governance spine for consequential software decision flow. It is not an AI model host, robot controller, cloud governance platform, Purview catalog provider, SIEM product, signing product, or compliance guarantee by itself.
 
 > [!IMPORTANT]
+> This page does **not** document a released NuGet package. No Purview provider package, Purview SDK adapter, catalog-ingestion implementation, or Azure-specific enrichment package is included in the `1.1.0` stable package family.
+>
+> `CDCavell.AsiBackbone.OpenTelemetry` is the only concrete released governance emission provider package in `1.1.0`. Purview remains a future/strategy-only governance enrichment direction unless a later release separately reviews and ships it.
+>
+> See [1.1.0 Release Notes - Accepted deferrals](release-notes-110.md#accepted-deferrals) for the current release boundary.
+
+> [!NOTE]
 > Purview enrichment is not durable audit storage. It should add classification, lineage, catalog, and compliance context around selected governance events while the host-owned durable audit and outbox records remain the reliability and accountability baseline.
 
 ## Purpose
@@ -20,7 +27,7 @@ Decision / acknowledgment / capability token / gateway result
   -> Audit residue
   -> Durable local store / outbox
   -> Optional observability or streaming emission
-  -> Optional Purview governance and lineage enrichment
+  -> Future optional Purview governance and lineage enrichment
   -> Catalog, classification, lineage, compliance, or policy-context views
 ```
 
@@ -157,7 +164,7 @@ Host-owned audit residue
         |
         +--> Event Hubs message body/properties
         |
-        +--> Purview summarized enrichment record
+        +--> Future Purview summarized enrichment record
 ```
 
 Recommended correlation fields:
@@ -234,7 +241,9 @@ CDCavell.AsiBackbone.Purview
 CDCavell.AsiBackbone.Lineage.Purview
 ```
 
-The package should depend on:
+These names are planning candidates only. They are not part of the released `1.1.0` package list.
+
+A future package should depend on:
 
 * `CDCavell.AsiBackbone.Core`;
 * Purview SDKs/APIs or host abstractions required for catalog and lineage enrichment;
@@ -290,7 +299,7 @@ Before implementation begins, confirm:
 | #140 Durable outbox | Purview enrichment should happen after local durable audit/outbox persistence. |
 | #141 Lifecycle stages | Lifecycle stage and sequence can inform process lineage and compliance checkpoint records. |
 | #142 Audit residue telemetry | Trace, gateway, outbox, and PII-safe identifiers provide safe correlation fields. |
-| #144 OpenTelemetry provider | OpenTelemetry remains the neutral operational telemetry path; Purview is governance/catalog enrichment. |
+| #144 OpenTelemetry provider | OpenTelemetry remains the released `1.1.0` governance emission provider; Purview remains governance/catalog enrichment strategy. |
 | #145 Event Hubs provider | Event Hubs can feed downstream processors that selectively summarize and enrich Purview records. |
 | #149 Observability architecture | This strategy follows the Core-neutral provider package architecture. |
 | #187 Governance emission contract | Purview enrichment should consume minimized, versioned governance emission envelopes or summaries. |
@@ -298,6 +307,9 @@ Before implementation begins, confirm:
 
 ## Related documentation
 
+- [1.1.0 Release Notes - Accepted deferrals](release-notes-110.md#accepted-deferrals)
+- [Released: OpenTelemetry Governance Emission Provider](opentelemetry-governance-emission-provider.md)
+- [Design-Only: Event Hubs Governance Emission Provider](event-hubs-governance-emission-provider-design.md)
 - [Observability and Governance Emission Architecture](observability-and-governance-emission-architecture.md)
 - [Governance Emission Contract](governance-emission-contract.md)
 - [Durable Audit and Outbox Persistence](durable-audit-outbox-persistence.md)
@@ -308,9 +320,10 @@ Before implementation begins, confirm:
 
 ## Non-goals
 
-This strategy does not implement:
+This strategy-only provider page does not implement:
 
 * Purview ingestion code;
+* a Purview NuGet package in the `1.1.0` stable package family;
 * Purview catalog asset creation;
 * Purview account, collection, classification, or lineage provisioning;
 * OpenTelemetry, Azure Monitor, Log Analytics, or Event Hubs emission;
@@ -319,4 +332,4 @@ This strategy does not implement:
 * replacement of durable local audit/outbox persistence;
 * legal, compliance, retention, or data-residency guarantees.
 
-Purview should remain an optional governance enrichment layer for selected, classified, summarized, and correlated AsiBackbone governance context.
+Purview should remain an optional future governance enrichment layer for selected, classified, summarized, and correlated AsiBackbone governance context unless a later release separately implements and publishes it.

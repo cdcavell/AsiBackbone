@@ -277,7 +277,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
-        Assert.Equal(["first", "second"], observedOrder);
+        Assert.Equal(new[] { "first", "second" }, observedOrder);
         Assert.True(decision.IsWarning);
         Assert.True(decision.CanProceed);
         Assert.Contains("constraint.warning", decision.ReasonCodes);

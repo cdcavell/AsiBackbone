@@ -57,24 +57,29 @@ The EF Core `DbContext`, migrations, provider SDKs, exporters, authentication, s
 
 | Option | Default | Purpose |
 | --- | ---: | --- |
-| `Enabled` | `true` | Allows the worker to be registered but disabled by configuration. |
+| `Enabled` | `true` | Allows the worker to be registered but disabled by configuration. In scaled deployments, set this to `true` only for the selected worker role or partition owner unless the host has implemented durable claiming. |
 | `BatchSize` | `100` | Maximum number of pending/retry-ready entries attempted per drain pass. |
 | `PollingInterval` | `30s` | Delay between normal drain passes. |
 | `FailureDelay` | `30s` | Delay after worker-level failures such as DI or storage exceptions. Provider failures returned through the emitter are still persisted by the Core drain. |
 | `RetryClock` | `DateTimeOffset.UtcNow` | Clock source used for retry-ready lookups. Tests can replace this with a fixed clock. |
-| `DrainOnShutdown` | `false` | Optionally attempts one final drain pass after the background loop has stopped. |
+| `DrainOnShutdown` | `false` | Optionally attempts one final drain pass after the background loop has stopped. Do not enable this on many replicas unless duplicate drain behavior is understood. |
 | `ShutdownDrainTimeout` | `5s` | Time budget for the optional shutdown drain. |
 
 ## Duplicate worker guidance
 
-Run one active drain worker per durable outbox partition. Multiple workers pointed at the same durable store may duplicate provider calls unless the store implements leasing, row claiming, or provider-side idempotency.
+Run one active drain worker per durable outbox partition. Multiple workers pointed at the same durable store may duplicate provider calls unless the store implements leasing, row claiming, partition ownership, or provider-side idempotency.
+
+The current provider-neutral store APIs return candidate entries, not claimed entries. `FindPendingAsync` and `FindRetryReadyAsync` do not prevent another process from reading the same entries before provider emission occurs. EF Core optimistic concurrency can detect conflicting state updates, but it cannot undo a duplicate provider call that already happened.
 
 For a single ASP.NET Core app instance, register the worker once. For scaled-out deployments, prefer one of these patterns:
 
-- designate a single worker instance;
-- partition outbox entries by tenant, region, or workload;
+- designate a single worker instance or separate worker role;
+- disable the hosted drain worker in web/API replicas and enable it only in the selected worker process;
+- partition outbox entries by tenant, region, workload, or provider path;
 - add durable claiming/lease behavior in the storage provider;
 - make the downstream provider idempotent by envelope or outbox entry identifier.
+
+See [Outbox Multi-Worker Concurrency](outbox-multi-worker-concurrency.md) for the detailed review of EF Core optimistic concurrency, claim-before-emit patterns, provider-specific SQL options, and safe multi-replica deployment guidance.
 
 ## Polling interval guidance
 

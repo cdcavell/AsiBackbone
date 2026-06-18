@@ -156,6 +156,13 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
 
         return decision.CanProceed
             ? AsiBackboneEndpointGovernanceResult.Allow(decision)
+            : CreateBlockedDecisionResult(decision);
+    }
+
+    private AsiBackboneEndpointGovernanceResult CreateBlockedDecisionResult(GovernanceDecision decision)
+    {
+        return decision.IsDenied && resultOptions.DeniedStatusCode == StatusCodes.Status403Forbidden
+            ? AsiBackboneEndpointGovernanceResult.BlockWithDefaultFailure(decision)
             : AsiBackboneEndpointGovernanceResult.Block(decision.ToHttpResult(resultOptions), decision);
     }
 

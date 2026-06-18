@@ -1,70 +1,133 @@
 - name: Documentation Home
   href: index.md
 
-- name: Getting Started
-  href: getting-started.md
+- name: Start Here / Current Stable Usage
+  items:
+    - name: Getting Started
+      href: getting-started.md
+    - name: "First 15 Minutes: Standard API Gating"
+      href: quickstart-api-gating.md
+    - name: Terminology Map
+      href: terminology-map.md
+    - name: Why AsiBackbone?
+      href: why-asi-backbone.md
+    - name: 1.1.0 Release Notes
+      href: release-notes-110.md
+    - name: "Upgrade Guide: 1.0.0 to 1.1.0"
+      href: upgrade-100-to-110.md
 
-- name: "First 15 Minutes: Standard API Gating"
-  href: quickstart-api-gating.md
+- name: Core Concepts and Domain Language
+  items:
+    - name: ASI Backbone Concept Synopsis
+      href: asi-backbone-concept.md
+    - name: Core Domain Language
+      href: core-domain-language.md
+    - name: Policy Evaluator Pipeline
+      href: policy-evaluator-pipeline.md
+    - name: Host-Owned Execution Enforcement
+      href: host-owned-execution-enforcement.md
+    - name: Dynamic Liability Handshake
+      href: dynamic-liability-handshake.md
+    - name: Gateway and Regional Policy Flow
+      href: gateway-and-regional-policy-flow.md
+    - name: Equations and Toy Models
+      href: equations-and-toy-models.md
+    - name: Glossary
+      href: glossary.md
 
-- name: Terminology Map
-  href: terminology-map.md
+- name: Adoption and Use Cases
+  items:
+    - name: Governance Tool Comparisons
+      href: governance-tool-comparisons.md
+    - name: Adoption and Target Use Cases
+      href: use-cases.md
+    - name: Enterprise Adoption Personas
+      href: enterprise-adoption-personas.md
+    - name: Government and Regulated Systems
+      href: government-and-regulated-systems.md
 
-- name: 1.0.0 Quickstart
-  href: quickstart-100.md
+- name: Package Integration Guides
+  items:
+    - name: 1.0.0 Quickstart
+      href: quickstart-100.md
+    - name: EF Core Integration Boundary
+      href: ef-core-integration-boundary.md
+    - name: EF Core Host Ownership and Migrations
+      href: ef-core-host-ownership-and-migrations.md
+    - name: ASP.NET Core Integration Boundary
+      href: aspnetcore-integration-boundary.md
+    - name: ASP.NET Core Endpoint Governance
+      href: aspnetcore-endpoint-governance.md
+    - name: Plain ASP.NET Core Host Sample
+      href: plain-aspnetcore-host-sample.md
+    - name: NetCoreApplicationTemplate Host Validation
+      href: netcoreapplicationtemplate-host-validation.md
+    - name: Schema Versioning
+      href: schema-versioning.md
+    - name: API Compatibility and SemVer
+      href: api-compatibility-and-semver.md
+    - name: Privacy and Signing Boundaries
+      href: privacy-and-signing-boundaries.md
 
-- name: 1.0.0 Release Notes
-  href: release-notes-100.md
+- name: "1.1.0 Observability, Outbox, Signing, and Governance Emission"
+  items:
+    - name: Observability and Governance Emission Architecture
+      href: observability-and-governance-emission-architecture.md
+    - name: Governance Emission Contract
+      href: governance-emission-contract.md
+    - name: Durable Audit and Outbox Persistence
+      href: durable-audit-outbox-persistence.md
+    - name: Hosted Governance Outbox Drain
+      href: hosted-governance-outbox-drain.md
+    - name: Outbox Multi-Worker Concurrency
+      href: outbox-multi-worker-concurrency.md
+    - name: Outbox Drain Reliability and Alerting
+      href: outbox-drain-reliability-and-alerting.md
+    - name: Safe Audit and Telemetry Data
+      href: safe-audit-telemetry-data.md
+    - name: Audit Residue Observability Schema
+      href: audit-residue-observability-schema.md
+    - name: DLP and Classification Failure Policy
+      href: dlp-classification-failure-policy.md
 
-- name: 1.1.0 Release Notes
-  href: release-notes-110.md
+- name: Released Provider Package Documentation
+  items:
+    - name: Roslyn Analyzers
+      href: roslyn-analyzers.md
+    - name: OpenTelemetry Governance Emission Provider
+      href: opentelemetry-governance-emission-provider.md
+    - name: Signing Provider Package Boundary
+      href: signing-provider-package-boundary.md
+    - name: Managed-Key Signing Provider
+      href: managed-key-signing-provider.md
 
-- name: "Upgrade Guide: 1.0.0 to 1.1.0"
-  href: upgrade-100-to-110.md
+- name: Security and Cryptographic Boundaries
+  items:
+    - name: Signing-Ready Receipts and Key Handling
+      href: signing-ready-receipts-and-key-handling.md
+    - name: Signed Audit and Outbox Records
+      href: signed-audit-and-outbox-records.md
+    - name: Verification Policy and Result Handling
+      href: verification-policy-and-result-handling.md
+    - name: Key Rotation and Retired-Key Verification
+      href: key-rotation-and-retired-key-verification.md
+    - name: Capability Grant Hardening
+      href: capability-grant-hardening.md
+    - name: Audit Integrity Chain Model
+      href: audit-integrity-chain-model.md
+    - name: Cryptographic Security Posture and Production Guidance
+      href: cryptographic-security-posture.md
+    - name: Cryptographic Security Hardening Roadmap
+      href: cryptographic-security-hardening-roadmap.md
 
-- name: Release Readiness Checklist
-  href: release-readiness-checklist.md
+- name: Design-Only and Future Provider Strategy
+  items:
+    - name: Event Hubs Governance Emission Provider Design
+      href: event-hubs-governance-emission-provider-design.md
+    - name: Purview Governance and Lineage Enrichment Strategy
+      href: purview-governance-lineage-enrichment-strategy.md
 
-- name: Release Validation
-  href: release-validation.md
-
-- name: Stable API Review
-  href: stable-api-review.md
-
-- name: API Baseline and Boundary Checks
-  href: api-baseline-and-boundary-checks.md
-
-- name: Developer Checklist
-  href: developer-checklist.md
-
-- name: Why AsiBackbone?
-  href: why-asi-backbone.md
-
-- name: ASI Backbone Concept Synopsis
-  href: asi-backbone-concept.md
-
-- name: Dynamic Liability Handshake
-  href: dynamic-liability-handshake.md
-
-- name: Gateway and Regional Policy Flow
-  href: gateway-and-regional-policy-flow.md
-
-- name: Governance Tool Comparisons
-  href: governance-tool-comparisons.md
-
-- name: Glossary
-  href: glossary.md
-
-- name: Adoption and Target Use Cases
-  href: use-cases.md
-
-- name: Enterprise Adoption Personas
-  href: enterprise-adoption-personas.md
-
-- name: Government and Regulated Systems
-  href: government-and-regulated-systems.md
-
-- name: Scenarios
+- name: Advanced Scenarios
   items:
     - name: AI Agent Gateway
       href: scenarios/ai-agent-gateway.md
@@ -79,119 +142,26 @@
     - name: Robotics Operational Gateway
       href: scenarios/robotics-operational-gateway.md
 
-- name: Core Domain Language
-  href: core-domain-language.md
+- name: Quality and Release Process
+  items:
+    - name: Release Validation
+      href: release-validation.md
+    - name: Historical 1.1.0 Release Readiness Record
+      href: release-readiness-checklist.md
+    - name: API Baseline and Boundary Checks
+      href: api-baseline-and-boundary-checks.md
+    - name: Developer Checklist
+      href: developer-checklist.md
+    - name: 1.0.0 Release Notes
+      href: release-notes-100.md
 
-- name: Equations and Toy Models
-  href: equations-and-toy-models.md
-
-- name: Policy Evaluator Pipeline
-  href: policy-evaluator-pipeline.md
-
-- name: Host-Owned Execution Enforcement
-  href: host-owned-execution-enforcement.md
-
-- name: Schema Versioning
-  href: schema-versioning.md
-
-- name: API Compatibility and SemVer
-  href: api-compatibility-and-semver.md
-
-- name: Privacy and Signing Boundaries
-  href: privacy-and-signing-boundaries.md
-
-- name: Production Wording and Alpha Limitations
-  href: production-wording-and-alpha-limitations.md
-
-- name: Roslyn Analyzers
-  href: roslyn-analyzers.md
-
-- name: Observability and Governance Emission Architecture
-  href: observability-and-governance-emission-architecture.md
-
-- name: OpenTelemetry Governance Emission Provider
-  href: opentelemetry-governance-emission-provider.md
-
-- name: Event Hubs Governance Emission Provider Design
-  href: event-hubs-governance-emission-provider-design.md
-
-- name: Purview Governance and Lineage Enrichment Strategy
-  href: purview-governance-lineage-enrichment-strategy.md
-
-- name: Signing-Ready Receipts and Key Handling
-  href: signing-ready-receipts-and-key-handling.md
-
-- name: Signing Provider Package Boundary
-  href: signing-provider-package-boundary.md
-
-- name: Managed-Key Signing Provider
-  href: managed-key-signing-provider.md
-
-- name: Signed Audit and Outbox Records
-  href: signed-audit-and-outbox-records.md
-
-- name: Verification Policy and Result Handling
-  href: verification-policy-and-result-handling.md
-
-- name: Key Rotation and Retired-Key Verification
-  href: key-rotation-and-retired-key-verification.md
-
-- name: Capability Grant Hardening
-  href: capability-grant-hardening.md
-
-- name: Audit Integrity Chain Model
-  href: audit-integrity-chain-model.md
-
-- name: Cryptographic Security Posture and Production Guidance
-  href: cryptographic-security-posture.md
-
-- name: Cryptographic Security Hardening Roadmap
-  href: cryptographic-security-hardening-roadmap.md
-
-- name: DLP and Classification Failure Policy
-  href: dlp-classification-failure-policy.md
-
-- name: Governance Emission Contract
-  href: governance-emission-contract.md
-
-- name: Durable Audit and Outbox Persistence
-  href: durable-audit-outbox-persistence.md
-
-- name: Hosted Governance Outbox Drain
-  href: hosted-governance-outbox-drain.md
-
-- name: Outbox Multi-Worker Concurrency
-  href: outbox-multi-worker-concurrency.md
-
-- name: Outbox Drain Reliability and Alerting
-  href: outbox-drain-reliability-and-alerting.md
-
-- name: Safe Audit and Telemetry Data
-  href: safe-audit-telemetry-data.md
-
-- name: Audit Residue Observability Schema
-  href: audit-residue-observability-schema.md
-
-- name: Historical Alpha Package Boundary
-  href: alpha-package-boundary.md
-
-- name: EF Core Integration Boundary
-  href: ef-core-integration-boundary.md
-
-- name: EF Core Host Ownership and Migrations
-  href: ef-core-host-ownership-and-migrations.md
-
-- name: ASP.NET Core Integration Boundary
-  href: aspnetcore-integration-boundary.md
-
-- name: ASP.NET Core Endpoint Governance
-  href: aspnetcore-endpoint-governance.md
-
-- name: Plain ASP.NET Core Host Sample
-  href: plain-aspnetcore-host-sample.md
-
-- name: NetCoreApplicationTemplate Host Validation
-  href: netcoreapplicationtemplate-host-validation.md
-
-- name: Historical Core Alpha Readiness Review
-  href: core-alpha-readiness-review.md
+- name: Historical Design Records
+  items:
+    - name: Historical Stable API Review
+      href: stable-api-review.md
+    - name: Historical Alpha Package Boundary
+      href: alpha-package-boundary.md
+    - name: Historical Core Alpha Readiness Review
+      href: core-alpha-readiness-review.md
+    - name: Production Wording and Alpha Limitations
+      href: production-wording-and-alpha-limitations.md

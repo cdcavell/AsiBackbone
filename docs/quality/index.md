@@ -11,7 +11,22 @@ Coverage and mutation analysis answer different questions:
 | Mutation Analysis | Would tests fail if behavior changed? | Checks assertion strength by introducing small code mutations and verifying tests catch them. |
 | External Consumer Smoke Test | Can a clean host consume package-shaped artifacts? | Validates package ergonomics, DI registration, host-owned EF persistence, in-memory audit storage, and HTTP allow/deny/acknowledgment flows. |
 
-For a governance package, both views matter. Coverage helps show that policy, acknowledgment, audit, and capability-token paths are exercised. The Core branch coverage gate protects the framework-neutral governance engine from missed policy, decision, signing, capability, acknowledgment, and audit branches. Mutation analysis helps show that the tests are strong enough to detect behavior changes in important decision logic. External consumer smoke testing helps prove that package-shaped adoption works from outside the repository's normal project-reference graph.
+For a governance package, both views matter. Coverage helps show that policy, acknowledgment, audit, capability-token, DLP/classification, provider-neutral emission, durable outbox, signing, verification, and canonical-hashing paths are exercised. The Core branch coverage gate protects the framework-neutral governance engine from missed policy, decision, signing, capability, acknowledgment, audit, emission, outbox, DLP/classification, and verification branches. Mutation analysis helps show that tests are strong enough to detect behavior changes in selected high-value decision logic. External consumer smoke testing helps prove that package-shaped adoption works from outside the repository's normal project-reference graph.
+
+## Current quality posture
+
+The `1.1.0` stable package family expanded the quality surface beyond the original `1.0.0` decision/audit/acknowledgment baseline. Current Core coverage now includes provider-neutral governance emission contracts, durable outbox contracts, DLP/classification failure policy primitives, signing-ready metadata, canonical hashing/signing seams, verification-policy primitives, and capability grant hardening.
+
+The post-`1.1.0` / `1.1.1` hardening direction is focused on meaningful xUnit line and branch coverage for public Core behavior, not an automatic expansion of mutation-testing scope. The targeted mutation reports remain quality signals for selected high-value behavior; they are not full-repository certification.
+
+Tracked Core coverage-hardening work includes:
+
+- [#246 — Core capability grant validation branch gaps](https://github.com/cdcavell/AsiBackbone/issues/246)
+- [#247 — Core signing verifier and policy outcome branch gaps](https://github.com/cdcavell/AsiBackbone/issues/247)
+- [#248 — Core canonical payload builder branch gaps](https://github.com/cdcavell/AsiBackbone/issues/248)
+- [#249 — Core governance emission and outbox branch gaps](https://github.com/cdcavell/AsiBackbone/issues/249)
+- [#250 — Core DLP classification policy branch gaps](https://github.com/cdcavell/AsiBackbone/issues/250)
+- [#262 — Core-specific branch coverage quality gate](https://github.com/cdcavell/AsiBackbone/issues/262)
 
 ## Available reports
 
@@ -34,7 +49,7 @@ The Core branch coverage report is generated separately from `CDCavell.AsiBackbo
 
 The mutation analysis reports are generated with Stryker.NET for targeted governance behavior. The Core report focuses on evaluator and policy-pipeline behavior, including denial precedence, decision outcome selection, reason-code preservation, and related edge cases. The ASP.NET Core report focuses on acknowledgment challenge round-trip behavior, including safe-default challenge shaping, correlation preservation, and conversion of host acknowledgment responses back into Core acknowledgment language.
 
-The current pre-`1.0.0` mutation boundary and accepted `1.x` expansion deferrals are documented in [Mutation Coverage Scope and Deferrals](mutation-coverage-scope.md). This keeps integration-layer gaps visible without expanding the stable release gates beyond the current validated scope.
+The historical pre-`1.0.0` mutation boundary and accepted `1.x` expansion deferrals are documented in [Mutation Coverage Scope and Deferrals](mutation-coverage-scope.md). Post-`1.1.0` xUnit coverage-hardening work is tracked separately from mutation-scope expansion so readers can distinguish execution coverage improvements from mutation-testing growth.
 
 ### External Consumer Smoke Test
 

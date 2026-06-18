@@ -184,6 +184,14 @@ The package supplies the adapter boundary and registration shape. The host suppl
 
 The managed-key adapter must not return private keys, symmetric keys, connection strings, or raw credential material to Core.
 
+## Quality and coverage posture
+
+The `1.1.0` release is validated through normal tests, release-validation workflows, generated package checks, external consumer smoke tests, repository-wide line coverage, Core-only branch coverage, and targeted mutation reports.
+
+Post-`1.1.0` / `1.1.1` quality hardening focuses on raising meaningful Core line and branch coverage around the expanded Core surface, including capability grant validation, signing and verification policy, canonical payload building, governance emission, durable outbox objects, and DLP/classification policy behavior.
+
+That coverage-hardening work is separate from mutation-testing scope expansion. Mutation testing remains a targeted quality signal for selected high-value governance behavior, not a full-repository certification. See [Quality Reports](../quality/index.md) and [Mutation Coverage Scope and Deferrals](../quality/mutation-coverage-scope.md) for the current distinction between coverage gates, branch hardening, and mutation scope.
+
 ## SemVer and compatibility
 
 `1.1.0` is SemVer-compatible with `1.0.0` consumers.
@@ -254,6 +262,8 @@ For future releases, rerun validation against the final release candidate before
 ## Related documentation
 
 - [Upgrade Guide: 1.0.0 to 1.1.0](upgrade-100-to-110.md)
+- [Quality Reports](../quality/index.md)
+- [Mutation Coverage Scope and Deferrals](../quality/mutation-coverage-scope.md)
 - [Observability and Governance Emission Architecture](observability-and-governance-emission-architecture.md)
 - [Governance Emission Contract](governance-emission-contract.md)
 - [Durable Audit and Outbox Persistence](durable-audit-outbox-persistence.md)

@@ -226,4 +226,78 @@ public sealed class OperationResultTests
         _ = Assert.Throws<ArgumentNullException>(() =>
             OperationResult.Failure<string>((OperationReason)null!));
     }
+
+    /// <summary>
+    /// Verifies that the Failure factory method falls back to the default failure reason when all provided reasons are null.
+    /// </summary>
+    [Fact]
+    public void Failure_WithOnlyNullReasons_UsesDefaultFailureReason()
+    {
+        OperationReason[] reasons = [null!];
+
+        var result = OperationResult.Failure(reasons);
+
+        Assert.False(result.Succeeded);
+
+        OperationReason reason = Assert.Single(result.Reasons);
+        Assert.Equal("operation.failed", reason.Code);
+        Assert.Equal("Operation failed.", reason.Message);
+    }
+
+    /// <summary>
+    /// Verifies that the generic Failure factory method uses the default failure reason.
+    /// </summary>
+    [Fact]
+    public void FailureOfT_WithNoReasons_UsesDefaultFailureReason()
+    {
+        var result = OperationResult.Failure<string>();
+
+        Assert.False(result.Succeeded);
+
+        OperationReason reason = Assert.Single(result.Reasons);
+        Assert.Equal("operation.failed", reason.Code);
+        Assert.Equal("Operation failed.", reason.Message);
+    }
+
+    /// <summary>
+    /// Verifies that the Failure factory method normalizes iterator-based reason sequences.
+    /// </summary>
+    [Fact]
+    public void Failure_WithIteratorReasons_StoresReasonCodes()
+    {
+        IEnumerable<OperationReason> reasons = EnumerateReasons(
+            OperationReason.Create("policy.denied", "Policy denied the request."),
+            OperationReason.Create("constraint.failed", "Constraint failed."));
+
+        var result = OperationResult.Failure(reasons);
+
+        Assert.False(result.Succeeded);
+        Assert.Equal(2, result.Reasons.Count);
+        Assert.Equal(["policy.denied", "constraint.failed"], result.ReasonCodes);
+    }
+
+    /// <summary>
+    /// Verifies that the Failure factory method falls back when an iterator-based reason sequence contains only null entries.
+    /// </summary>
+    [Fact]
+    public void Failure_WithIteratorOnlyNullReasons_UsesDefaultFailureReason()
+    {
+        IEnumerable<OperationReason> reasons = EnumerateReasons(null);
+
+        var result = OperationResult.Failure(reasons);
+
+        Assert.False(result.Succeeded);
+
+        OperationReason reason = Assert.Single(result.Reasons);
+        Assert.Equal("operation.failed", reason.Code);
+        Assert.Equal("Operation failed.", reason.Message);
+    }
+
+    private static IEnumerable<OperationReason> EnumerateReasons(params OperationReason?[] reasons)
+    {
+        foreach (OperationReason? reason in reasons)
+        {
+            yield return reason!;
+        }
+    }
 }

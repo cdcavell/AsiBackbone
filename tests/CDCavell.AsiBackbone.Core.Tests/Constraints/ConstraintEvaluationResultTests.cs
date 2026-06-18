@@ -180,4 +180,139 @@ public sealed class ConstraintEvaluationResultTests
         Assert.Equal("constraint.warning", reason.Code);
         Assert.Equal("Constraint produced a warning.", reason.Message);
     }
+
+    /// <summary>
+    /// Verifies that the Deny factory method preserves all reason codes when all provided reasons are valid.
+    /// </summary>
+    [Fact]
+    public void DenyWithMultipleReasonsStoresReasonCodes()
+    {
+        OperationReason[] reasons =
+        [
+            OperationReason.Create("constraint.first", "First constraint failure."),
+            OperationReason.Create("constraint.second", "Second constraint failure.")
+        ];
+
+        var result = ConstraintEvaluationResult.Deny(reasons);
+
+        Assert.True(result.IsDenied);
+        Assert.Equal(2, result.Reasons.Count);
+        Assert.Equal(["constraint.first", "constraint.second"], result.ReasonCodes);
+    }
+
+    /// <summary>
+    /// Verifies that the Deny factory method filters null reason entries while preserving valid reasons.
+    /// </summary>
+    [Fact]
+    public void DenyWithReasonsContainingNullFiltersNullReasons()
+    {
+        OperationReason[] reasons =
+        [
+            OperationReason.Create("constraint.first", "First constraint failure."),
+            null!,
+            OperationReason.Create("constraint.second", "Second constraint failure.")
+        ];
+
+        var result = ConstraintEvaluationResult.Deny(reasons);
+
+        Assert.True(result.IsDenied);
+        Assert.Equal(2, result.Reasons.Count);
+        Assert.Equal(["constraint.first", "constraint.second"], result.ReasonCodes);
+    }
+
+    /// <summary>
+    /// Verifies that the Warning factory method filters null reason entries while preserving valid reasons.
+    /// </summary>
+    [Fact]
+    public void WarningWithReasonsContainingNullFiltersNullReasons()
+    {
+        OperationReason[] reasons =
+        [
+            OperationReason.Create("constraint.warning", "Constraint warning."),
+            null!,
+            OperationReason.Create("risk.warning", "Risk warning.")
+        ];
+
+        var result = ConstraintEvaluationResult.Warning(reasons);
+
+        Assert.True(result.IsWarning);
+        Assert.Equal(2, result.Reasons.Count);
+        Assert.Equal(["constraint.warning", "risk.warning"], result.ReasonCodes);
+    }
+
+    /// <summary>
+    /// Verifies that the Deny factory method falls back to the default denied reason when all provided reasons are null.
+    /// </summary>
+    [Fact]
+    public void DenyWithOnlyNullReasonsUsesDefaultDeniedReason()
+    {
+        OperationReason[] reasons = [null!];
+
+        var result = ConstraintEvaluationResult.Deny(reasons);
+
+        Assert.True(result.IsDenied);
+
+        OperationReason reason = Assert.Single(result.Reasons);
+        Assert.Equal("constraint.denied", reason.Code);
+        Assert.Equal("Constraint denied the operation.", reason.Message);
+    }
+
+    /// <summary>
+    /// Verifies that the Warning factory method falls back to the default warning reason when all provided reasons are null.
+    /// </summary>
+    [Fact]
+    public void WarningWithOnlyNullReasonsUsesDefaultWarningReason()
+    {
+        OperationReason[] reasons = [null!];
+
+        var result = ConstraintEvaluationResult.Warning(reasons);
+
+        Assert.True(result.IsWarning);
+
+        OperationReason reason = Assert.Single(result.Reasons);
+        Assert.Equal("constraint.warning", reason.Code);
+        Assert.Equal("Constraint produced a warning.", reason.Message);
+    }
+
+    /// <summary>
+    /// Verifies that the Deny factory method normalizes iterator-based reason sequences.
+    /// </summary>
+    [Fact]
+    public void DenyWithIteratorReasonsStoresReasonCodes()
+    {
+        IEnumerable<OperationReason> reasons = EnumerateReasons(
+            OperationReason.Create("constraint.first", "First constraint failure."),
+            OperationReason.Create("constraint.second", "Second constraint failure."));
+
+        var result = ConstraintEvaluationResult.Deny(reasons);
+
+        Assert.True(result.IsDenied);
+        Assert.Equal(2, result.Reasons.Count);
+        Assert.Equal(["constraint.first", "constraint.second"], result.ReasonCodes);
+    }
+
+    /// <summary>
+    /// Verifies that the Deny factory method falls back when an iterator-based reason sequence contains only null entries.
+    /// </summary>
+    [Fact]
+    public void DenyWithIteratorOnlyNullReasonsUsesDefaultDeniedReason()
+    {
+        IEnumerable<OperationReason> reasons = EnumerateReasons(null);
+
+        var result = ConstraintEvaluationResult.Deny(reasons);
+
+        Assert.True(result.IsDenied);
+
+        OperationReason reason = Assert.Single(result.Reasons);
+        Assert.Equal("constraint.denied", reason.Code);
+        Assert.Equal("Constraint denied the operation.", reason.Message);
+    }
+
+    private static IEnumerable<OperationReason> EnumerateReasons(params OperationReason?[] reasons)
+    {
+        foreach (OperationReason? reason in reasons)
+        {
+            yield return reason!;
+        }
+    }
 }

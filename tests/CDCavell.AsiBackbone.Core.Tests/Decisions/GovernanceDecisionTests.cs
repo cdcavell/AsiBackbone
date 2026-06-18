@@ -381,4 +381,46 @@ public sealed class GovernanceDecisionTests
         _ = Assert.Throws<ArgumentNullException>(() =>
             GovernanceDecision.Warning((OperationReason)null!));
     }
+
+    /// <summary>
+    /// Verifies that the Deny factory method normalizes iterator-based reason sequences.
+    /// </summary>
+    [Fact]
+    public void DenyWithIteratorReasonsStoresReasonCodes()
+    {
+        IEnumerable<OperationReason> reasons = EnumerateReasons(
+            OperationReason.Create("policy.first", "First policy failure."),
+            OperationReason.Create("policy.second", "Second policy failure."));
+
+        var decision = GovernanceDecision.Deny(reasons);
+
+        Assert.True(decision.IsDenied);
+        Assert.Equal(2, decision.Reasons.Count);
+        Assert.Equal(["policy.first", "policy.second"], decision.ReasonCodes);
+    }
+
+    /// <summary>
+    /// Verifies that the Deny factory method falls back when an iterator-based reason sequence contains only null entries.
+    /// </summary>
+    [Fact]
+    public void DenyWithIteratorOnlyNullReasonsUsesDefaultDeniedReason()
+    {
+        IEnumerable<OperationReason> reasons = EnumerateReasons(null);
+
+        var decision = GovernanceDecision.Deny(reasons);
+
+        Assert.True(decision.IsDenied);
+
+        OperationReason reason = Assert.Single(decision.Reasons);
+        Assert.Equal("decision.denied", reason.Code);
+        Assert.Equal("Decision denied the operation.", reason.Message);
+    }
+
+    private static IEnumerable<OperationReason> EnumerateReasons(params OperationReason?[] reasons)
+    {
+        foreach (OperationReason? reason in reasons)
+        {
+            yield return reason!;
+        }
+    }
 }

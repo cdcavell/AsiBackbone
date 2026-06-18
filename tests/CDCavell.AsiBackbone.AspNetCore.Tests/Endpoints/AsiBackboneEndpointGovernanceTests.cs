@@ -43,7 +43,10 @@ public sealed class AsiBackboneEndpointGovernanceTests
             return Task.CompletedTask;
         });
 
-        await middleware.InvokeAsync(httpContext, new ThrowingEndpointGovernanceService());
+        await middleware.InvokeAsync(
+            httpContext,
+            new ThrowingEndpointGovernanceService(),
+            Microsoft.Extensions.Options.Options.Create(new AsiBackboneEndpointGovernanceOptions()));
 
         Assert.True(nextCalled);
     }
@@ -68,7 +71,10 @@ public sealed class AsiBackboneEndpointGovernanceTests
             return Task.CompletedTask;
         });
 
-        await middleware.InvokeAsync(httpContext, new BlockingEndpointGovernanceService());
+        await middleware.InvokeAsync(
+            httpContext,
+            new BlockingEndpointGovernanceService(),
+            Microsoft.Extensions.Options.Options.Create(new AsiBackboneEndpointGovernanceOptions()));
 
         Assert.False(nextCalled);
         Assert.Equal(StatusCodes.Status403Forbidden, httpContext.Response.StatusCode);
@@ -100,6 +106,59 @@ public sealed class AsiBackboneEndpointGovernanceTests
         Assert.NotNull(result.FailureResult);
         Assert.NotNull(result.Decision);
         Assert.Contains("endpoint.capability_validator.missing", result.Decision.ReasonCodes);
+    }
+
+    [Fact]
+    public async Task MiddlewareBlocksUngovernedEndpointWhenRequireGovernanceMetadataIsEnabled()
+    {
+        var httpContext = new DefaultHttpContext();
+        httpContext.Response.Body = new MemoryStream();
+        httpContext.SetEndpoint(new Endpoint(static _ => Task.CompletedTask, new EndpointMetadataCollection(), "plain"));
+
+        bool nextCalled = false;
+        var middleware = new AsiBackboneEndpointGovernanceMiddleware(_ =>
+        {
+            nextCalled = true;
+            return Task.CompletedTask;
+        });
+
+        await middleware.InvokeAsync(
+            httpContext,
+            new ThrowingEndpointGovernanceService(),
+            Microsoft.Extensions.Options.Options.Create(new AsiBackboneEndpointGovernanceOptions
+            {
+                RequireGovernanceMetadata = true
+            }));
+
+        Assert.False(nextCalled);
+        Assert.Equal(StatusCodes.Status403Forbidden, httpContext.Response.StatusCode);
+    }
+
+    [Fact]
+    public async Task MiddlewareAllowsUngovernedEndpointWithExplicitMissingGovernanceMetadataOptOut()
+    {
+        var httpContext = new DefaultHttpContext();
+        httpContext.SetEndpoint(new Endpoint(
+            static _ => Task.CompletedTask,
+            new EndpointMetadataCollection(new AllowMissingGovernanceMetadataAttribute()),
+            "public"));
+
+        bool nextCalled = false;
+        var middleware = new AsiBackboneEndpointGovernanceMiddleware(_ =>
+        {
+            nextCalled = true;
+            return Task.CompletedTask;
+        });
+
+        await middleware.InvokeAsync(
+            httpContext,
+            new ThrowingEndpointGovernanceService(),
+            Microsoft.Extensions.Options.Options.Create(new AsiBackboneEndpointGovernanceOptions
+            {
+                RequireGovernanceMetadata = true
+            }));
+
+        Assert.True(nextCalled);
     }
 
     private sealed class SamplePolicy

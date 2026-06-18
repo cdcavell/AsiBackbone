@@ -134,6 +134,22 @@ public sealed class AsiBackboneEndpointGovernanceRouteBuilderExtensionsTests
         Assert.Equal("metadata", innerException.ParamName);
     }
 
+    [Fact]
+    public void AllowMissingGovernanceMetadata_AddsMetadataAndReturnsSameBuilder()
+    {
+        var builder = new CapturingEndpointConventionBuilder();
+
+        CapturingEndpointConventionBuilder returned = builder.AllowMissingGovernanceMetadata();
+
+        Assert.Same(builder, returned);
+
+        EndpointBuilder endpointBuilder = CreateEndpointBuilder();
+        Action<EndpointBuilder> convention = Assert.Single(builder.Conventions);
+        convention(endpointBuilder);
+
+        _ = Assert.Single(endpointBuilder.Metadata.OfType<AllowMissingGovernanceMetadataAttribute>());
+    }
+
     private static RouteEndpointBuilder CreateEndpointBuilder()
     {
         return new RouteEndpointBuilder(

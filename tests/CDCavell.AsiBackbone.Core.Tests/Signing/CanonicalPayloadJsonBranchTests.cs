@@ -6,7 +6,7 @@ namespace CDCavell.AsiBackbone.Core.Tests.Signing;
 
 public sealed class CanonicalPayloadJsonBranchTests
 {
-    private static readonly string[] content = new[] { "beta", "alpha" };
+    private static readonly string[] content = ["beta", "alpha"];
 
     [Fact]
     public void CreateSerializesSupportedPrimitiveDictionaryAndArrayValues()

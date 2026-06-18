@@ -6,6 +6,8 @@ namespace CDCavell.AsiBackbone.Core.Tests.Signing;
 
 public sealed class CanonicalPayloadJsonBranchTests
 {
+    private static readonly string[] content = new[] { "beta", "alpha" };
+
     [Fact]
     public void CreateSerializesSupportedPrimitiveDictionaryAndArrayValues()
     {
@@ -27,7 +29,7 @@ public sealed class CanonicalPayloadJsonBranchTests
                     ["beta"] = "2",
                     ["alpha"] = "1"
                 },
-                ["stringArray"] = new[] { "beta", "alpha" },
+                ["stringArray"] = content,
                 ["objectArray"] = new object?[] { "gamma", 9, false, null },
                 ["nested"] = new Dictionary<string, object?>
                 {

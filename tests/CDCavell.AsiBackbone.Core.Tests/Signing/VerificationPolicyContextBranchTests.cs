@@ -8,7 +8,7 @@ public sealed class VerificationPolicyContextBranchTests
     [Fact]
     public void CreateNormalizesExpectationsAndMetadata()
     {
-        VerificationPolicyContext context = VerificationPolicyContext.Create(
+        var context = VerificationPolicyContext.Create(
             purpose: " audit-receipt ",
             expectedKeyId: " key-1 ",
             expectedKeyVersion: " v2 ",
@@ -40,7 +40,7 @@ public sealed class VerificationPolicyContextBranchTests
     public void CreateUsesEmptyMetadataForMissingOrBlankEntries()
     {
         VerificationPolicyContext defaultContext = VerificationPolicyContext.Default;
-        VerificationPolicyContext blankOnlyContext = VerificationPolicyContext.Create(
+        var blankOnlyContext = VerificationPolicyContext.Create(
             purpose: " ",
             expectedKeyId: " ",
             expectedKeyVersion: " ",

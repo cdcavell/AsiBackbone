@@ -1,10 +1,13 @@
-- name: Documentation
+- name: Start Here
+  href: index.md
+
+- name: Current Documentation
   href: articles/
 
 - name: API Reference
   href: api/
 
-- name: Quality
+- name: Quality Reports
   href: quality/
 
 - name: Repository

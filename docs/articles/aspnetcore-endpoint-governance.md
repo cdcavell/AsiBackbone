@@ -86,6 +86,8 @@ Failing closed is the default because an endpoint that declares governance inten
 
 When middleware blocks execution and no explicit `FailureResult` is supplied, the default response is a bodyless `403 Forbidden` status result. This low-allocation default is intentional for high-volume rejection traffic such as probing, credential stuffing, or denial flooding, and it avoids exposing governance reason codes or policy details in generic denial responses.
 
+The default endpoint governance service uses this generic 403 path for ordinary denied governance decisions when `DeniedStatusCode` remains `403`. Configuration failures and capability-validator setup failures still return explicit ProblemDetails responses because they indicate host setup issues rather than routine request denial. Non-403 governance outcomes continue to use the HTTP result mapping options.
+
 Custom failure results remain supported. A host-owned governance service can return an explicit `FailureResult`, and that result is executed instead of the generic default. Hosts that prefer richer API responses for generic 403 denials can configure a safe factory:
 
 ```csharp

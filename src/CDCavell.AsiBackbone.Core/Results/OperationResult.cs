@@ -1,3 +1,5 @@
+using System.Collections.ObjectModel;
+
 namespace CDCavell.AsiBackbone.Core.Results;
 
 /// <summary>
@@ -14,6 +16,9 @@ public class OperationResult
     private static readonly IReadOnlyList<string> EmptyWarnings =
         Array.AsReadOnly(Array.Empty<string>());
 
+    private static readonly ReadOnlyCollection<string> EmptyReasonCodes =
+        Array.AsReadOnly(Array.Empty<string>());
+
     /// <summary>
     /// Initializes a new instance of the <see cref="OperationResult"/> class.
     /// </summary>
@@ -28,7 +33,7 @@ public class OperationResult
         Succeeded = succeeded;
         Reasons = reasons;
         Warnings = warnings;
-        ReasonCodes = Array.AsReadOnly([.. reasons.Select(reason => reason.Code)]);
+        ReasonCodes = CreateReasonCodes(reasons);
     }
 
     /// <summary>
@@ -236,13 +241,75 @@ public class OperationResult
     /// <returns>A normalized reason collection.</returns>
     protected static IReadOnlyList<OperationReason> NormalizeReasons(IEnumerable<OperationReason>? reasons)
     {
-        OperationReason[] normalizedReasons = reasons?
-            .Where(reason => reason is not null)
-            .ToArray() ?? [];
+        return NormalizeReasons(reasons, DefaultFailureCode, DefaultFailureMessage);
+    }
 
-        return normalizedReasons.Length == 0
-            ? Array.AsReadOnly([OperationReason.Create(DefaultFailureCode, DefaultFailureMessage)])
-            : Array.AsReadOnly(normalizedReasons);
+    private static ReadOnlyCollection<OperationReason> NormalizeReasons(
+        IEnumerable<OperationReason>? reasons,
+        string fallbackCode,
+        string fallbackMessage)
+    {
+        if (reasons is null)
+        {
+            return CreateFallbackReason(fallbackCode, fallbackMessage);
+        }
+
+        if (reasons is ICollection<OperationReason> collection)
+        {
+            if (collection.Count == 0)
+            {
+                return CreateFallbackReason(fallbackCode, fallbackMessage);
+            }
+
+            var normalizedReasons = new OperationReason[collection.Count];
+            int normalizedCount = 0;
+
+            foreach (OperationReason? reason in collection)
+            {
+                if (reason is not null)
+                {
+                    normalizedReasons[normalizedCount] = reason;
+                    normalizedCount++;
+                }
+            }
+
+            if (normalizedCount == 0)
+            {
+                return CreateFallbackReason(fallbackCode, fallbackMessage);
+            }
+
+            if (normalizedCount == normalizedReasons.Length)
+            {
+                return Array.AsReadOnly(normalizedReasons);
+            }
+
+            var filteredReasons = new OperationReason[normalizedCount];
+            Array.Copy(normalizedReasons, filteredReasons, normalizedCount);
+
+            return Array.AsReadOnly(filteredReasons);
+        }
+
+        List<OperationReason>? normalizedList = null;
+
+        foreach (OperationReason? reason in reasons)
+        {
+            if (reason is not null)
+            {
+                normalizedList ??= [];
+                normalizedList.Add(reason);
+            }
+        }
+
+        return normalizedList is null || normalizedList.Count == 0
+            ? CreateFallbackReason(fallbackCode, fallbackMessage)
+            : Array.AsReadOnly([.. normalizedList]);
+    }
+
+    private static ReadOnlyCollection<OperationReason> CreateFallbackReason(
+        string fallbackCode,
+        string fallbackMessage)
+    {
+        return Array.AsReadOnly([OperationReason.Create(fallbackCode, fallbackMessage)]);
     }
 
     /// <summary>
@@ -260,5 +327,22 @@ public class OperationResult
         return normalizedWarnings.Length == 0
             ? EmptyWarnings
             : Array.AsReadOnly(normalizedWarnings);
+    }
+
+    private static ReadOnlyCollection<string> CreateReasonCodes(IReadOnlyList<OperationReason> reasons)
+    {
+        if (reasons.Count == 0)
+        {
+            return EmptyReasonCodes;
+        }
+
+        string[] reasonCodes = new string[reasons.Count];
+
+        for (int index = 0; index < reasons.Count; index++)
+        {
+            reasonCodes[index] = reasons[index].Code;
+        }
+
+        return Array.AsReadOnly(reasonCodes);
     }
 }

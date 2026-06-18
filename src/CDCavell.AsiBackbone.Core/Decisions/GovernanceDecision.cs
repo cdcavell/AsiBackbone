@@ -32,6 +32,9 @@ public sealed class GovernanceDecision
     private static readonly ReadOnlyCollection<OperationReason> EmptyReasons =
         Array.AsReadOnly(Array.Empty<OperationReason>());
 
+    private static readonly ReadOnlyCollection<string> EmptyReasonCodes =
+        Array.AsReadOnly(Array.Empty<string>());
+
     private GovernanceDecision(
         GovernanceDecisionOutcome outcome,
         IReadOnlyList<OperationReason> reasons,
@@ -42,7 +45,7 @@ public sealed class GovernanceDecision
     {
         Outcome = outcome;
         Reasons = reasons;
-        ReasonCodes = Array.AsReadOnly([.. reasons.Select(reason => reason.Code)]);
+        ReasonCodes = CreateReasonCodes(reasons);
         CorrelationId = NormalizeTelemetryIdentifier(correlationId, MaxCorrelationIdLength);
         TraceId = NormalizeTelemetryIdentifier(traceId, MaxTraceIdLength);
         PolicyVersion = NormalizeOptional(policyVersion);
@@ -405,12 +408,83 @@ public sealed class GovernanceDecision
         string fallbackCode,
         string fallbackMessage)
     {
-        OperationReason[] normalizedReasons = reasons?
-            .Where(reason => reason is not null)
-            .ToArray() ?? [];
+        if (reasons is null)
+        {
+            return CreateFallbackReason(fallbackCode, fallbackMessage);
+        }
 
-        return normalizedReasons.Length == 0
-            ? Array.AsReadOnly([OperationReason.Create(fallbackCode, fallbackMessage)])
-            : Array.AsReadOnly(normalizedReasons);
+        if (reasons is ICollection<OperationReason> collection)
+        {
+            if (collection.Count == 0)
+            {
+                return CreateFallbackReason(fallbackCode, fallbackMessage);
+            }
+
+            var normalizedReasons = new OperationReason[collection.Count];
+            int normalizedCount = 0;
+
+            foreach (OperationReason? reason in collection)
+            {
+                if (reason is not null)
+                {
+                    normalizedReasons[normalizedCount] = reason;
+                    normalizedCount++;
+                }
+            }
+
+            if (normalizedCount == 0)
+            {
+                return CreateFallbackReason(fallbackCode, fallbackMessage);
+            }
+
+            if (normalizedCount == normalizedReasons.Length)
+            {
+                return Array.AsReadOnly(normalizedReasons);
+            }
+
+            var filteredReasons = new OperationReason[normalizedCount];
+            Array.Copy(normalizedReasons, filteredReasons, normalizedCount);
+
+            return Array.AsReadOnly(filteredReasons);
+        }
+
+        List<OperationReason>? normalizedList = null;
+
+        foreach (OperationReason? reason in reasons)
+        {
+            if (reason is not null)
+            {
+                normalizedList ??= [];
+                normalizedList.Add(reason);
+            }
+        }
+
+        return normalizedList is null || normalizedList.Count == 0
+            ? CreateFallbackReason(fallbackCode, fallbackMessage)
+            : Array.AsReadOnly([.. normalizedList]);
+    }
+
+    private static ReadOnlyCollection<OperationReason> CreateFallbackReason(
+        string fallbackCode,
+        string fallbackMessage)
+    {
+        return Array.AsReadOnly([OperationReason.Create(fallbackCode, fallbackMessage)]);
+    }
+
+    private static ReadOnlyCollection<string> CreateReasonCodes(IReadOnlyList<OperationReason> reasons)
+    {
+        if (reasons.Count == 0)
+        {
+            return EmptyReasonCodes;
+        }
+
+        string[] reasonCodes = new string[reasons.Count];
+
+        for (int index = 0; index < reasons.Count; index++)
+        {
+            reasonCodes[index] = reasons[index].Code;
+        }
+
+        return Array.AsReadOnly(reasonCodes);
     }
 }

@@ -223,6 +223,69 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     }
 
     [Fact]
+    public async Task ConstructorDefensivelyCopiesCallerOwnedConstraintList()
+    {
+        TestPolicyContext context = CreateContext();
+        var callerOwnedConstraints = new List<IAsiBackboneConstraint<TestPolicyContext>>
+        {
+            new StaticConstraint(
+                ConstraintEvaluationResult.Warning(
+                    "constraint.initial_warning",
+                    "The original constraint produced a warning."))
+        };
+
+        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(callerOwnedConstraints);
+
+        callerOwnedConstraints.Clear();
+        callerOwnedConstraints.Add(
+            new StaticConstraint(
+                ConstraintEvaluationResult.Deny(
+                    "constraint.later_denied",
+                    "A caller mutation should not affect the evaluator.")));
+
+        GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
+
+        Assert.True(decision.IsWarning);
+        Assert.True(decision.CanProceed);
+        Assert.Contains("constraint.initial_warning", decision.ReasonCodes);
+        Assert.DoesNotContain("constraint.later_denied", decision.ReasonCodes);
+    }
+
+    private static readonly string[] expected = ["first", "second"];
+
+    [Fact]
+    public async Task EvaluateRunsConstraintsInSuppliedOrderAfterArrayMaterialization()
+    {
+        TestPolicyContext context = CreateContext();
+        var observedOrder = new List<string>();
+
+        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+            [
+                new DelegateConstraint(
+                    (_, _) =>
+                    {
+                        observedOrder.Add("first");
+                        return ConstraintEvaluationResult.Allow();
+                    }),
+                new DelegateConstraint(
+                    (_, _) =>
+                    {
+                        observedOrder.Add("second");
+                        return ConstraintEvaluationResult.Warning(
+                            "constraint.warning",
+                            "The second constraint produced a warning.");
+                    })
+            ]);
+
+        GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
+
+        Assert.Equal(expected, observedOrder);
+        Assert.True(decision.IsWarning);
+        Assert.True(decision.CanProceed);
+        Assert.Contains("constraint.warning", decision.ReasonCodes);
+    }
+
+    [Fact]
     public async Task EvaluateHonorsCancellationBeforeConstraintRuns()
     {
         TestPolicyContext context = CreateContext();

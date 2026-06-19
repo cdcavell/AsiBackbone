@@ -17,6 +17,9 @@ These pages are the best first stops for current stable package consumers.
 * [Getting Started](articles/getting-started.md)  
   Project orientation, local build instructions, and stable package direction.
 
+* [Progressive Adoption Ladder](articles/progressive-adoption.md)  
+  The smallest Core-only path first, followed by optional outbox, telemetry, DLP/classification, signing, and analyzer add-ons.
+
 * [First 15 Minutes: Standard API Gating](articles/quickstart-api-gating.md)  
   Practical package-consumer walkthrough for gating one ASP.NET Core endpoint.
 
@@ -68,6 +71,7 @@ Use these pages to understand the vocabulary and decision-flow model.
 
 Use these pages when wiring AsiBackbone into a host application.
 
+* [Progressive Adoption Ladder](articles/progressive-adoption.md)
 * [EF Core Integration Boundary](articles/ef-core-integration-boundary.md)
 * [EF Core Host Ownership and Migration Guidance](articles/ef-core-host-ownership-and-migrations.md)
 * [ASP.NET Core Integration Boundary](articles/aspnetcore-integration-boundary.md)

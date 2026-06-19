@@ -1,13 +1,13 @@
 # Managed-Key Signing Provider
 
-Issue: #210.
+Issue: #210, updated for #253.
 
-This article documents the `CDCavell.AsiBackbone.Signing.ManagedKey` provider package.
+This article documents the released `CDCavell.AsiBackbone.Signing.ManagedKey` provider package.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone provides provider-neutral signing, verification, and audit metadata seams. It does not provide immutable storage, external anchoring, blockchain, legal evidence guarantees, compliance certification, or tamper-evidence by itself.
 
 > [!IMPORTANT]
-> The managed-key package is a provider adapter and client boundary. It does not include a live Azure Key Vault, Managed HSM, cloud KMS, certificate store, or HSM implementation by default. Host applications supply the actual managed-key client and credentials.
+> The managed-key package is a stable `1.1.0` provider adapter and client boundary. It does not include a live Azure Key Vault, Managed HSM, cloud KMS, certificate store, or HSM implementation by default. Host applications supply the actual managed-key client, credentials, verification path, monitoring, and operational policy.
 
 ## Purpose
 
@@ -26,6 +26,16 @@ Host application managed-key client
 ```
 
 Core remains provider-neutral. Provider packages reference Core, not the reverse.
+
+## Released boundary
+
+| Boundary | Status | Notes |
+| --- | --- | --- |
+| Managed-key adapter package | Released stable package in `1.1.0`. | Provides options, DI registration, signing service, and client abstraction. |
+| `IManagedKeySigningClient` | Host-owned implementation boundary. | The host implementation may call Azure Key Vault, Managed HSM, cloud KMS, an HSM appliance, or an organization-owned signing service. |
+| Concrete cloud/HSM/KMS client | Not shipped by default. | Host-owned or future provider-specific package work. |
+| Verification service | Separate host/provider responsibility. | Signed metadata is preserved for later verification, but hosts must provide a matching verification path when trust is required. |
+| Production tamper-evidence | Not provided by default. | Requires signing, verification, protected key management, durable storage controls, retention, monitoring, and operational procedures. |
 
 ## Key boundary
 
@@ -136,7 +146,9 @@ Timeouts and non-retryable provider errors are surfaced as failure metadata or t
 
 ## Verification boundary
 
-This issue implements signing. Verification remains separate. Downstream verifiers can use the preserved metadata:
+This package implements signing through a managed-key adapter boundary. Verification remains a separate host or provider responsibility.
+
+Downstream verifiers can use the preserved metadata:
 
 - provider name;
 - key ID;
@@ -146,7 +158,7 @@ This issue implements signing. Verification remains separate. Downstream verifie
 - hash algorithm;
 - signed timestamp.
 
-Hosts should provide a matching verification service when signed records must be trusted later.
+Hosts should provide a matching verification service when signed records must be trusted later. A signed artifact should not be treated as verified merely because the managed-key adapter returned signature metadata.
 
 ## Operational prerequisites
 
@@ -170,6 +182,7 @@ Safe wording:
 - "The provider returned key ID, key version, signature algorithm, signature value, and signed timestamp metadata."
 - "Private key material remains outside AsiBackbone Core."
 - "Signing failures are observable and policy-routable."
+- "The managed-key package is a released adapter boundary; the concrete key client is host-owned."
 
 Avoid wording such as:
 
@@ -179,3 +192,12 @@ Avoid wording such as:
 - "The audit trail is legally non-repudiable."
 
 Use **tamper-evident** only when the deployed system includes signing, verification, durable append-only storage controls, audit-chain or anchoring strategy, key-retention policy, monitoring, and incident response.
+
+## Related documentation
+
+- [Production Wording and Stable Signing Boundaries](production-wording-and-alpha-limitations.md)
+- [Signing Provider Package Boundary](signing-provider-package-boundary.md)
+- [Signing-Ready Receipts and Key Handling](signing-ready-receipts-and-key-handling.md)
+- [Signed Audit and Outbox Records](signed-audit-and-outbox-records.md)
+- [Verification Policy and Result Handling](verification-policy-and-result-handling.md)
+- [Cryptographic Security Posture and Production Guidance](cryptographic-security-posture.md)

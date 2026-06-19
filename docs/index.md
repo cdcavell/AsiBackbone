@@ -111,6 +111,7 @@ These pages are strategy/design material. They remain separate from released pro
 
 These pages explain signing-ready artifacts, provider signing, verification, chain models, and safe wording. They do not imply production tamper-evidence unless the host deploys a concrete signing, storage, verification, and key-management path.
 
+* [Production Wording and Stable Signing Boundaries](articles/production-wording-and-alpha-limitations.md)
 * [Signing-Ready Receipts and Key Handling](articles/signing-ready-receipts-and-key-handling.md)
 * [Signed Audit and Outbox Records](articles/signed-audit-and-outbox-records.md)
 * [Verification Policy and Result Handling](articles/verification-policy-and-result-handling.md)
@@ -148,7 +149,6 @@ These records remain available for traceability, but they are separated from cur
 * [Historical Stable API Review](articles/stable-api-review.md)
 * [Historical Alpha Package Boundary](articles/alpha-package-boundary.md)
 * [Historical Core Alpha Readiness Review](articles/core-alpha-readiness-review.md)
-* [Production Wording and Alpha Limitations](articles/production-wording-and-alpha-limitations.md)
 
 ## API reference and repository
 

@@ -1,21 +1,31 @@
 # Signing-Ready Receipts and Key Handling
 
-This article documents the Core-neutral signing and verification strategy for the `1.1.0 - Observability, Outbox, and Governance Emission Providers` milestone.
+This article documents the stable Core-neutral signing and verification primitives released in the `1.1.0 - Observability, Outbox, Signing, and Governance Emission Providers` package family.
 
-Issues: #147, #219.
+Issues: #147, #219, #253.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a governance spine for consequential software decision flow. It is not a signing product, key-management system, immutable ledger, legal certification system, or compliance guarantee by itself.
 
 > [!IMPORTANT]
-> The current Core package is **signing-ready** and **hashing-ready**, not a production tamper-evidence implementation. Production tamper evidence requires a concrete signing provider, protected key management, verification policy, durable storage guarantees, retention policy, and operational procedures outside this Core seam.
+> `CDCavell.AsiBackbone.Core` includes stable signing-ready metadata, canonical payload hashing, signing seams, and verification-policy primitives in `1.1.0`. Those Core primitives make artifacts ready for provider signing and later verification workflows; they do not create production tamper-evidence by themselves. Production tamper evidence requires a concrete signing provider, protected key management, verification policy, durable storage guarantees, retention policy, monitoring, and operational procedures supplied by the host or provider environment.
 
-For production posture, setup guidance, verification-failure behavior, audit-chain wording, capability-token validation, and security non-goals, see [Cryptographic Security Posture and Production Guidance](cryptographic-security-posture.md).
+For released provider boundaries, see [Signing Provider Package Boundary](signing-provider-package-boundary.md), [Managed-Key Signing Provider](managed-key-signing-provider.md), and [Signed Audit and Outbox Records](signed-audit-and-outbox-records.md). For production posture, setup guidance, verification-failure behavior, audit-chain wording, capability-token validation, and security non-goals, see [Cryptographic Security Posture and Production Guidance](cryptographic-security-posture.md).
 
 ## Purpose
 
 AsiBackbone audit residue, audit ledger records, capability-token references, outbox entries, and downstream governance emission envelopes need a stable way to construct deterministic payloads, compute provider-neutral hashes, and carry signing metadata without forcing Core to depend on one key provider.
 
-The signing-ready model gives host applications and future provider packages a neutral contract for building canonical payloads, hashing deterministic artifact bytes, signing precomputed hashes, recording signature metadata on audit receipts, carrying key identifier and key version references, and verifying signatures downstream.
+The signing-ready model gives host applications and provider packages a neutral contract for building canonical payloads, hashing deterministic artifact bytes, signing precomputed hashes, recording signature metadata on audit receipts, carrying key identifier and key version references, and verifying signatures downstream.
+
+## Released signing boundaries
+
+| Boundary | `1.1.0` status | Wording limit |
+| --- | --- | --- |
+| Core signing-ready primitives | Stable in `CDCavell.AsiBackbone.Core`. | Current behavior. Do not describe it as future-only. |
+| Local-development signer | Stable package: `CDCavell.AsiBackbone.Signing.LocalDevelopment`. | Local/test/sample/wiring proof path only, not production key custody. |
+| Managed-key signing adapter | Stable package: `CDCavell.AsiBackbone.Signing.ManagedKey`. | Adapter boundary only. The host supplies the actual managed-key client and operational policy. |
+| Concrete Azure Key Vault, Managed HSM, cloud KMS, HSM, or certificate-store clients | Host-owned or future provider-specific work unless separately released. | Do not imply these concrete integrations ship by default. |
+| Tamper-evidence, immutability, external anchoring, legal non-repudiation, or compliance certification | Not provided by default. | Requires deployed signing, verification, protected key management, durable storage controls, retention, monitoring, and operational process. |
 
 ## Added Core abstractions
 
@@ -32,8 +42,8 @@ The signing-ready model gives host applications and future provider packages a n
 | `SigningResult` | Provider-neutral result containing signing metadata. |
 | `SignatureVerificationRequest` | Provider-neutral request to verify signing metadata against a precomputed artifact hash. |
 | `SignatureVerificationResult` | Provider-neutral verification result. |
-| `IAsiBackboneSigningService` | Async signing boundary implemented by host applications or future provider packages. |
-| `IAsiBackboneSignatureVerificationService` | Async verification boundary implemented by host applications or future provider packages. |
+| `IAsiBackboneSigningService` | Async signing boundary implemented by host applications or provider packages. |
+| `IAsiBackboneSignatureVerificationService` | Async verification boundary implemented by host applications or provider packages. |
 
 ## Canonical payload hashing
 
@@ -94,12 +104,18 @@ Signing providers should:
 
 Core does not require a particular signing algorithm such as RSA, ECDSA, HMAC, EdDSA, or a provider-specific managed key operation.
 
+A signed artifact should not be treated as trusted merely because a signature value is present. Hosts that require trust should explicitly run verification and apply verification policy before execution, emission, or audit review.
+
 ## Test seams
 
 The Core tests use deterministic canonical payload builders, stable hash assertions, and fake signer/verifier implementations to prove the seams without live key-management resources. Live Azure Key Vault, HSM, or cloud signing tests should be optional, explicitly configured, and excluded from default CI.
 
 ## Related documentation
 
+- [Production Wording and Stable Signing Boundaries](production-wording-and-alpha-limitations.md)
+- [Signing Provider Package Boundary](signing-provider-package-boundary.md)
+- [Managed-Key Signing Provider](managed-key-signing-provider.md)
+- [Signed Audit and Outbox Records](signed-audit-and-outbox-records.md)
 - [Cryptographic Security Posture and Production Guidance](cryptographic-security-posture.md)
 - [Privacy and Signing Boundaries](privacy-and-signing-boundaries.md)
 - [Governance Emission Contract](governance-emission-contract.md)

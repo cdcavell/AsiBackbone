@@ -155,14 +155,17 @@ These pages describe currently released provider or provider-adjacent packages. 
   Documents the concrete `CDCavell.AsiBackbone.OpenTelemetry` provider package and host-owned exporter boundary.
 
 * [Signing Provider Package Boundary](signing-provider-package-boundary.md)  
-  Documents the concrete signing-provider package boundary, local-development signer posture, and managed-key provider direction.
+  Documents the released signing-provider package boundary, local-development signer posture, and managed-key adapter direction.
 
 * [Managed-Key Signing Provider](managed-key-signing-provider.md)  
-  Documents the managed-key signing adapter package and host-owned managed-key client boundary.
+  Documents the released managed-key signing adapter package and host-owned managed-key client boundary.
 
 ## Security and cryptographic boundaries
 
 These pages describe signing, verification, capability, and cryptographic-hardening posture. They do not imply production tamper-evidence unless a concrete signing/storage/key-management path is deployed by the host.
+
+* [Production Wording and Stable Signing Boundaries](production-wording-and-alpha-limitations.md)  
+  Distinguishes stable Core signing-ready primitives, the local-development signer, the managed-key adapter boundary, future concrete provider packages, and unsupported production tamper-evidence claims.
 
 * [Signing-Ready Receipts and Key Handling](signing-ready-receipts-and-key-handling.md)  
   Documents Core-neutral signing and verification abstractions, signing-ready audit receipt metadata, and key identifier/version handling.
@@ -183,7 +186,7 @@ These pages describe signing, verification, capability, and cryptographic-harden
   Documents the append-only hash-chain integrity model and safe wording around chained records versus externally anchored tamper-evidence.
 
 * [Cryptographic Security Posture and Production Guidance](cryptographic-security-posture.md)  
-  Documents signing-ready versus signed, verified, chained, and externally anchored records; production key-management guidance; local signer limits; and security non-goals.
+  Documents signing-ready versus signed, verified, chained, and externally anchored records; production key-management guidance; local signer and managed-key adapter limits; and security non-goals.
 
 * [Cryptographic Security Hardening Roadmap](cryptographic-security-hardening-roadmap.md)  
   Splits cryptographic hardening into child issues while preserving Core provider neutrality.
@@ -243,6 +246,3 @@ These pages are retained for traceability. They are separated from current stabl
 
 * [Historical Core Alpha Readiness Review](core-alpha-readiness-review.md)  
   Retains the historical alpha-readiness review.
-
-* [Production Wording and Alpha Limitations](production-wording-and-alpha-limitations.md)  
-  Retains wording guidance that helps distinguish stable implementation claims from historical alpha limitations.

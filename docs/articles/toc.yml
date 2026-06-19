@@ -103,6 +103,8 @@
 
 - name: Security and Cryptographic Boundaries
   items:
+    - name: Production Wording and Stable Signing Boundaries
+      href: production-wording-and-alpha-limitations.md
     - name: Signing-Ready Receipts and Key Handling
       href: signing-ready-receipts-and-key-handling.md
     - name: Signed Audit and Outbox Records
@@ -163,5 +165,3 @@
       href: alpha-package-boundary.md
     - name: Historical Core Alpha Readiness Review
       href: core-alpha-readiness-review.md
-    - name: Production Wording and Alpha Limitations
-      href: production-wording-and-alpha-limitations.md

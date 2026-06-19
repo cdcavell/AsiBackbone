@@ -1,6 +1,6 @@
 # Signed Audit and Outbox Records
 
-Issue: #221.
+Issue: #221, updated for #253.
 
 This article documents the implemented signing flow for audit receipts, audit ledger records, audit residue lifecycle events, governance emission envelopes, and governance outbox entries.
 
@@ -8,6 +8,17 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 
 > [!IMPORTANT]
 > A signed record is not automatically a verified record. A signed record is also not automatically tamper-evident. Verification, hash chaining, durable write controls, immutable/object-lock storage, external anchoring, retention, monitoring, and incident response remain host or provider responsibilities.
+
+## Released signing context
+
+`1.1.0` includes stable Core signing helpers and stable signing-provider package boundaries:
+
+| Surface | Status | Limit |
+| --- | --- | --- |
+| Core canonical payload and signed-artifact helpers | Stable in `CDCavell.AsiBackbone.Core`. | Produces signing-ready, unsigned, or signed artifact wrappers; does not own key custody or storage controls. |
+| Local-development signing provider | Stable package: `CDCavell.AsiBackbone.Signing.LocalDevelopment`. | Test/sample/local validation only. Not production signing. |
+| Managed-key signing adapter | Stable package: `CDCavell.AsiBackbone.Signing.ManagedKey`. | Host supplies the concrete managed-key client, credentials, verification path, and operational controls. |
+| Future concrete cloud/HSM/KMS packages | Future or host-owned unless separately released. | Not implied by this article. |
 
 ## Selected signable artifacts
 
@@ -172,6 +183,8 @@ Safe wording:
 - "The signed artifact carries metadata needed for later verification."
 - "Unsigned, signing-ready, and signed states are represented separately."
 - "Verification must be explicitly performed before a signature is trusted."
+- "Local-development signing is a released test/sample proof path, not production key custody."
+- "Managed-key signing uses a released adapter boundary with a host-owned managed-key client."
 
 Avoid wording such as:
 
@@ -180,6 +193,7 @@ Avoid wording such as:
 - "The outbox is immutable by default."
 - "Signed means verified."
 - "A signature alone makes the full audit trail tamper-evident."
+- "The managed-key adapter ships Azure Key Vault, Managed HSM, or cloud KMS support by default."
 
 Use the phrase **tamper-evident** only when the deployed system also includes verification, durable storage controls, hash chaining or equivalent integrity strategy, and any required external anchoring.
 
@@ -195,3 +209,12 @@ Provider packages implement `IAsiBackboneSigningService`. Host applications deci
 - whether verification is required before persistence, emission, or review;
 - how signing failures affect decision flow;
 - whether signed metadata is stored in audit ledger rows, outbox rows, lifecycle rows, external records, or all of them.
+
+## Related documentation
+
+- [Production Wording and Stable Signing Boundaries](production-wording-and-alpha-limitations.md)
+- [Signing-Ready Receipts and Key Handling](signing-ready-receipts-and-key-handling.md)
+- [Signing Provider Package Boundary](signing-provider-package-boundary.md)
+- [Managed-Key Signing Provider](managed-key-signing-provider.md)
+- [Verification Policy and Result Handling](verification-policy-and-result-handling.md)
+- [Cryptographic Security Posture and Production Guidance](cryptographic-security-posture.md)

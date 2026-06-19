@@ -5,6 +5,8 @@
   items:
     - name: Getting Started
       href: getting-started.md
+    - name: Progressive Adoption Ladder
+      href: progressive-adoption.md
     - name: "First 15 Minutes: Standard API Gating"
       href: quickstart-api-gating.md
     - name: Terminology Map

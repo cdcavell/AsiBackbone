@@ -1,36 +1,40 @@
 # Signing Provider Package Boundary
 
-This article documents the signing-provider package boundary for AsiBackbone.
+This article documents the stable signing-provider package boundary for AsiBackbone `1.1.0`.
+
+Issue: #253.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a governance spine for consequential software decision flow. It is not a signing appliance, key-management system, immutable ledger, blockchain service, legal non-repudiation system, or compliance certification service by itself.
 
 > [!IMPORTANT]
-> Signing support does not make records tamper-evident, immutable, legally non-repudiable, or compliance-certified by default. Those claims require concrete signing, verification, durable storage controls, key management, retention, monitoring, and operational procedures supplied by the host or provider environment.
+> `1.1.0` releases signing-related package surfaces, but signing support does not make records tamper-evident, immutable, legally non-repudiable, or compliance-certified by default. Those claims require concrete signing, verification, durable storage controls, key management, retention, monitoring, and operational procedures supplied by the host or provider environment.
 
 ## Purpose
 
 Core exposes provider-neutral signing and verification seams while concrete key-management integrations live outside `CDCavell.AsiBackbone.Core`.
 
-The signing-provider boundary exists so hosts can choose a local-development signer, managed-key provider, HSM-backed provider, or organization-owned signing implementation without forcing every AsiBackbone consumer to take dependencies on Azure, cloud KMS SDKs, certificate stores, hardware security modules, local key files, or blockchain services.
+The signing-provider boundary exists so hosts can choose a local-development signer, managed-key adapter, future HSM-backed provider, or organization-owned signing implementation without forcing every AsiBackbone consumer to take dependencies on Azure, cloud KMS SDKs, certificate stores, hardware security modules, local key files, or blockchain services.
 
-## Current source package posture
+## Released package posture
 
-Current source includes the following signing-provider package projects:
+`1.1.0` includes the following stable signing-related package surfaces:
 
 | Package | Purpose | Production posture |
 | --- | --- | --- |
-| `CDCavell.AsiBackbone.Signing.LocalDevelopment` | Local-development RSA signing and verification for tests, samples, and wiring proof paths. | Not production. No protected key custody. |
+| `CDCavell.AsiBackbone.Core` | Provider-neutral signing-ready metadata, canonical payload/hash contracts, signing request/result contracts, verification request/result contracts, and verification-policy primitives. | Stable primitives only. Core does not own production key custody, concrete provider clients, immutable storage, or compliance guarantees. |
+| `CDCavell.AsiBackbone.Signing.LocalDevelopment` | Local-development RSA signing and verification for tests, samples, deterministic local validation, and wiring proof paths. | Not production. No protected key custody. Not appropriate for production tamper-evidence. |
 | `CDCavell.AsiBackbone.Signing.ManagedKey` | Provider-neutral managed-key signing adapter that delegates actual signing to a host-owned managed-key client. | Production-capable only when the host supplies a secure managed-key client, credentials, policies, monitoring, and verification path. |
 
-Future provider areas may include Azure Key Vault, Managed HSM, cloud KMS, HSM-backed, or organization-owned signing implementations. Those should remain outside Core and should be reviewed as separate package boundaries.
+Future provider areas may include Azure Key Vault, Managed HSM, cloud KMS, HSM-backed, certificate-store, or organization-owned signing implementation packages. Those should remain outside Core and should be reviewed as separate package boundaries before being documented as stable.
 
 ## Ownership boundaries
 
 | Layer | Owns | Must not own |
 | --- | --- | --- |
-| Core | `IAsiBackboneSigningService`, `IAsiBackboneSignatureVerificationService`, signing requests/results, signing metadata, provider-neutral canonical payload/hash contracts, and safe metadata fields. | Azure SDKs, HSM SDKs, cloud KMS clients, local key-file production handling, certificate stores, credentials, raw keys, managed identity tokens, immutable storage, blockchain anchoring, legal interpretation, or compliance certification. |
-| Signing provider package | Concrete signer/verifier implementation, provider options, DI registration helpers, algorithm mapping, key reference resolution, provider diagnostics, and provider-specific failure handling. | Host policy decisions, host authentication, host authorization, durable audit ownership, database migrations, retention policy, or claims that records are tamper-evident by default. |
-| Host application | Configuration source, key identity, provider credentials or managed identity, production failure policy, logging policy, persistence lifecycle, deployment, monitoring, and incident response. | Requiring Core to know provider secrets or making Core responsible for operational key management. |
+| Core | `IAsiBackboneSigningService`, `IAsiBackboneSignatureVerificationService`, signing requests/results, signing metadata, provider-neutral canonical payload/hash contracts, verification-policy primitives, and safe metadata fields. | Azure SDKs, HSM SDKs, cloud KMS clients, local key-file production handling, certificate stores, credentials, raw keys, managed identity tokens, immutable storage, blockchain anchoring, legal interpretation, or compliance certification. |
+| Local-development signing provider | Deterministic local signing/verification proof path, test/sample wiring, and local metadata assertions. | Production key custody, managed-key behavior, legal non-repudiation, immutability, or tamper-evidence. |
+| Managed-key adapter package | Adapter service, provider options, DI registration helpers, algorithm mapping, key reference validation, provider diagnostics, and provider-specific failure handling around a host-owned client. | Concrete Azure Key Vault/HSM/KMS client implementation by default, host policy decisions, host authentication, host authorization, durable audit ownership, database migrations, retention policy, or claims that records are tamper-evident by default. |
+| Host application | Configuration source, key identity, managed-key client implementation, provider credentials or managed identity, production failure policy, logging policy, persistence lifecycle, deployment, monitoring, verification path, and incident response. | Requiring Core to know provider secrets or making Core responsible for operational key management. |
 | Samples/tests | Non-production proof path for wiring, fake/local signatures, and stable metadata assertions. | Production security claims. |
 
 ## Required provider responsibilities
@@ -99,7 +103,7 @@ Hashing and signing should remain separate steps. A hashed record is not signed.
 
 ## Local-development signer boundary
 
-`CDCavell.AsiBackbone.Signing.LocalDevelopment` is useful for:
+`CDCavell.AsiBackbone.Signing.LocalDevelopment` is a released stable package for:
 
 - proving DI registration and host wiring;
 - exercising signing metadata flow in samples;
@@ -116,7 +120,7 @@ It must remain clearly marked:
 
 ## Managed-key provider boundary
 
-`CDCavell.AsiBackbone.Signing.ManagedKey` provides an adapter boundary. It does not include Azure Key Vault, Managed HSM, cloud KMS, certificate store, or HSM behavior by default.
+`CDCavell.AsiBackbone.Signing.ManagedKey` is a released stable adapter boundary. It does not include Azure Key Vault, Managed HSM, cloud KMS, certificate store, or HSM behavior by default.
 
 A production managed-key host should:
 
@@ -150,6 +154,7 @@ Provider packages should avoid ambiguous failure behavior.
 This boundary does not provide:
 
 - Azure Key Vault or Managed HSM integration by default;
+- cloud KMS, HSM, certificate-store, or hardware signing integration by default;
 - automatic key rotation;
 - automatic verification policy;
 - immutable storage;
@@ -160,6 +165,7 @@ This boundary does not provide:
 
 ## Related articles
 
+- [Production Wording and Stable Signing Boundaries](production-wording-and-alpha-limitations.md)
 - [Managed-Key Signing Provider](managed-key-signing-provider.md)
 - [Signing-Ready Receipts and Key Handling](signing-ready-receipts-and-key-handling.md)
 - [Signed Audit and Outbox Records](signed-audit-and-outbox-records.md)

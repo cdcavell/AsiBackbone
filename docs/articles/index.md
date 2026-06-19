@@ -144,6 +144,9 @@ These pages cover the additive `1.1.0` governance-emission and durability surfac
 * [DLP and Classification Failure Policy](dlp-classification-failure-policy.md)  
   Documents provider-neutral policy behavior for DLP/classification outages, timeouts, indeterminate results, and blocked/classified results.
 
+* [DLP and Classification Scanner Integration](dlp-classification-scanner-integration.md)  
+  Shows where host-owned scanners fit, how scanner outcomes map into `DlpFailurePolicyContext`, and how the resolver returns a `GovernanceDecision`.
+
 ## Released provider package documentation
 
 These pages describe currently released provider or provider-adjacent packages. OpenTelemetry is the only concrete released governance emission provider package in `1.1.0`.

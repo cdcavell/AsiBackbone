@@ -20,6 +20,9 @@ These pages are the best entry point for current package consumers.
 * [Getting Started](getting-started.md)  
   Project orientation, local build instructions, and stable package direction.
 
+* [Progressive Adoption Ladder](progressive-adoption.md)  
+  Shows the smallest Core-only path first, then outbox, telemetry, DLP/classification, signing, and analyzer add-ons as optional levels.
+
 * [First 15 Minutes: Standard API Gating](quickstart-api-gating.md)  
   A practical quickstart for gating one ASP.NET Core API endpoint with a simple constraint, allowed/denied paths, and local audit residue.
 

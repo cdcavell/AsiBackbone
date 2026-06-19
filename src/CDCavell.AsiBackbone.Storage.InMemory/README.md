@@ -4,7 +4,9 @@ Non-durable in-memory storage helpers for Accountable Systems Infrastructure loc
 
 This package provides non-durable storage implementations that make it easy to exercise ASI Backbone governance flows without requiring a database, EF Core provider, or host infrastructure.
 
-> [!IMPORTANT]
+> **New to AsiBackbone?** Start with the concept, not this package: [Intent to Execution: An Accountability Pattern](https://cdcavell.github.io/AsiBackbone/articles/intent-to-execution-pattern.html) and the [documentation site](https://cdcavell.github.io/AsiBackbone/). This README covers one package in the family.
+
+> **Important:**
 > This package is not durable storage. Do not use it as a production audit ledger, compliance archive, tamper-evident store, or long-term accountability store.
 
 ## What this package provides

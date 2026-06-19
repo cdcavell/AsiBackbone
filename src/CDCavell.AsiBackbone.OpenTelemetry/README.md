@@ -4,6 +4,8 @@
 
 The package implements `IAsiBackboneGovernanceEmitter` without making `CDCavell.AsiBackbone.Core` depend on OpenTelemetry exporters, Azure SDKs, SIEM SDKs, Event Hubs, Purview, robotics packages, or cloud-provider dependencies.
 
+> **New to AsiBackbone?** Start with the concept, not this package: [Intent to Execution: An Accountability Pattern](https://cdcavell.github.io/AsiBackbone/articles/intent-to-execution-pattern.html) and the [documentation site](https://cdcavell.github.io/AsiBackbone/). This README covers one package in the family.
+
 ## Boundary
 
 This package emits governance envelopes through:

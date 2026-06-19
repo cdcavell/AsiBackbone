@@ -31,6 +31,21 @@ Add the OpenTelemetry provider only when the host intends to emit governance env
 
 Do not add provider packages merely because they are documented as future directions. Event Hubs, Purview, Azure-specific, signing-provider, gateway, robotics, and immutable-storage packages are not part of this stable package family unless separately released.
 
+## Progressive upgrade path
+
+Treat `1.1.0` capabilities as optional layers. You can upgrade package versions first, verify the existing `1.0.0`-style flow, and then choose add-ons one at a time.
+
+| Need | Add now? | First document |
+| --- | --- | --- |
+| Keep existing policy evaluation and audit residue | Yes, if already used | [First 15 Minutes: Standard API Gating](quickstart-api-gating.md) |
+| Understand minimum Core-only use | Optional learning path | [Progressive Adoption Ladder](progressive-adoption.md) |
+| Durable audit/outbox records | Only when local records must survive restarts or provider outages | [Durable Audit and Outbox Persistence](durable-audit-outbox-persistence.md) |
+| Hosted outbox drain | Only after a durable outbox store exists | [Hosted Governance Outbox Drain](hosted-governance-outbox-drain.md) |
+| OpenTelemetry projection | Only when the host wants diagnostics projection | [OpenTelemetry Governance Emission Provider](opentelemetry-governance-emission-provider.md) |
+| DLP/classification failure policy | Only when host-owned screening can fail, timeout, block, or classify | [DLP and Classification Failure Policy](dlp-classification-failure-policy.md) |
+| Signing-ready or managed-key integration | Only when signing and verification responsibilities are defined | [Signing Provider Package Boundary](signing-provider-package-boundary.md) |
+| Roslyn analyzers | Optional build-time safety rails | [Roslyn Analyzers](roslyn-analyzers.md) |
+
 ## Existing 1.0.0 consumers
 
 Existing consumers can continue to use the 1.0.0-style flow:
@@ -218,42 +233,3 @@ Before upgrading a production host:
 - [ ] Update package references to `1.1.0` in a development branch.
 - [ ] Build and test existing 1.0.0 flows without enabling new provider behavior.
 - [ ] Decide whether durable outbox persistence is required.
-- [ ] If EF Core durable outbox is adopted, generate and review host-owned migrations.
-- [ ] Decide whether OpenTelemetry emission is required.
-- [ ] Configure OpenTelemetry exporters in the host, not in Core.
-- [ ] Define DLP/classification failure behavior before external emission.
-- [ ] Confirm no raw secrets, raw tokens, raw prompts, protected records, or unredacted sensitive data are emitted as telemetry attributes.
-- [ ] Treat no-op and in-memory paths as development/test proof paths only.
-- [ ] Avoid signing, immutability, or tamper-evidence claims unless concrete signing/storage controls are implemented.
-- [ ] Run release or consumer smoke validation before deployment.
-
-## Suggested validation commands
-
-Run validation from a clean working tree after package references and host configuration are updated.
-
-```powershell
-dotnet restore
-dotnet build -c Release
-dotnet test -c Release
-```
-
-For this repository, release validation should include:
-
-```powershell
-dotnet format AsiBackbone.slnx
-dotnet build AsiBackbone.slnx -c Release
-```
-
-When validating package-shaped usage, also run the repository's release validation or external consumer smoke-test workflow so the host verifies package consumption rather than only project references.
-
-## Related documentation
-
-- [1.1.0 Release Notes](release-notes-110.md)
-- [Observability and Governance Emission Architecture](observability-and-governance-emission-architecture.md)
-- [Governance Emission Contract](governance-emission-contract.md)
-- [Durable Audit and Outbox Persistence](durable-audit-outbox-persistence.md)
-- [Hosted Governance Outbox Drain](hosted-governance-outbox-drain.md)
-- [OpenTelemetry Governance Emission Provider](opentelemetry-governance-emission-provider.md)
-- [DLP and Classification Failure Policy](dlp-classification-failure-policy.md)
-- [Signing-Ready Receipts and Key Handling](signing-ready-receipts-and-key-handling.md)
-- [API Compatibility and SemVer](api-compatibility-and-semver.md)

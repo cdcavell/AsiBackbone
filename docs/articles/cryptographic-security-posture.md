@@ -2,12 +2,12 @@
 
 This article documents the AsiBackbone cryptographic security posture for signing-ready records, signed artifacts, verification, audit-chain integrity, key management, capability tokens, and production wording.
 
-Issue: #216.
+Issue: #216, updated for #253.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone provides governance infrastructure around consequential software decision flow. It is not a key-management system, immutable ledger, blockchain product, legal evidence system, compliance certification service, or tamper-proof storage system by itself.
 
 > [!IMPORTANT]
-> AsiBackbone can carry signing-ready metadata and can expose seams for signing and verification. Production cryptographic assurance requires a host-owned or provider-owned implementation that signs canonical artifacts, protects keys, verifies signatures, stores records durably, monitors failures, manages retention, and defines operational response procedures.
+> `1.1.0` includes stable Core signing-ready metadata, canonical payload hashing, signing seams, verification-policy primitives, a local-development signing provider, and a managed-key adapter boundary. Production cryptographic assurance still requires a host-owned or provider-owned implementation that signs canonical artifacts, protects keys, verifies signatures, stores records durably, monitors failures, manages retention, and defines operational response procedures.
 
 ## Security posture summary
 
@@ -25,11 +25,13 @@ The strongest accurate statement is the narrowest one the deployed system can pr
 
 ## Default package boundary
 
-The stable package family provides governance primitives and metadata surfaces. By default it does not:
+The stable package family provides governance primitives and metadata surfaces. In `1.1.0`, this includes stable Core signing-ready primitives, the local-development signing provider, and the managed-key signing adapter boundary.
+
+By default the package family does not:
 
 - generate production signing keys;
 - store private keys or symmetric signing secrets;
-- configure Azure Key Vault, HSM, certificate stores, or cloud KMS resources;
+- configure Azure Key Vault, HSM, certificate stores, or cloud KMS resources by itself;
 - guarantee key rotation;
 - verify every persisted record automatically;
 - make database rows immutable;
@@ -38,6 +40,16 @@ The stable package family provides governance primitives and metadata surfaces. 
 - replace legal, compliance, security, privacy, or operational review.
 
 The host application remains responsible for deciding whether a given workflow requires unsigned records, signed records, verified records, chained records, or externally anchored records.
+
+## Released signing package boundaries
+
+| Surface | `1.1.0` status | Production boundary |
+| --- | --- | --- |
+| `CDCavell.AsiBackbone.Core` signing primitives | Stable. | Signing-ready metadata, canonical hashing, signing seams, verification seams, and verification-policy primitives. No production key custody. |
+| `CDCavell.AsiBackbone.Signing.LocalDevelopment` | Stable local-development provider. | Tests, samples, local validation, and wiring proof paths only. Not production signing. |
+| `CDCavell.AsiBackbone.Signing.ManagedKey` | Stable managed-key adapter. | Adapter boundary only. Host supplies the actual managed-key client, credentials, verification path, monitoring, and operational policy. |
+| Concrete Azure Key Vault, Managed HSM, cloud KMS, HSM, or certificate-store implementation | Host-owned or future package unless separately released. | Do not imply this ships by default. |
+| Production tamper-evidence, immutability, external anchoring, legal non-repudiation, or compliance certification | Not provided by default. | Requires a deployed end-to-end operational trust design. |
 
 ## Recommended production configuration
 
@@ -270,7 +282,7 @@ For high-risk workflows, token validation failure should usually deny or escalat
 
 ## Local-development signer limitations
 
-A local signer can be useful for samples, smoke tests, and development workflows, but it should be described narrowly.
+`CDCavell.AsiBackbone.Signing.LocalDevelopment` is a released local-development provider package. It can be useful for samples, smoke tests, and development workflows, but it should be described narrowly.
 
 Local-development signers are appropriate for:
 
@@ -296,6 +308,19 @@ Local signer guidance:
 - Never reuse sample keys in production.
 - Mark local signatures with a provider descriptor such as `local-development` or `sample-only`.
 - Exclude live cloud signing tests from default CI unless the workflow is explicitly configured with protected credentials and clear opt-in behavior.
+
+## Managed-key adapter limitations
+
+`CDCavell.AsiBackbone.Signing.ManagedKey` is a released adapter boundary, not a complete key-management implementation.
+
+Hosts using it in production should:
+
+- supply the concrete managed-key client;
+- keep private keys inside the managed-key/HSM/KMS boundary;
+- control credentials and managed identity configuration;
+- define signing and verification permissions;
+- document failure policy and monitoring;
+- provide the verification path required to trust signed records later.
 
 ## Host responsibilities
 
@@ -384,7 +409,7 @@ Cryptographic posture should reinforce the existing AsiBackbone governance flow 
 
 Safe release wording:
 
-> AsiBackbone provides signing-ready metadata, provider-neutral signing and verification seams, and production guidance for hosts that need signed or verified governance artifacts. Production tamper-evidence, immutability, blockchain anchoring, and non-repudiation are not provided by default and require concrete host or provider configuration.
+> AsiBackbone `1.1.0` provides stable Core signing-ready metadata, canonical hashing, provider-neutral signing and verification seams, a local-development signing provider, a managed-key signing adapter boundary, and production guidance for hosts that need signed or verified governance artifacts. Production tamper-evidence, immutability, blockchain anchoring, and non-repudiation are not provided by default and require concrete host or provider configuration.
 
 Avoid wording such as:
 
@@ -393,10 +418,15 @@ Avoid wording such as:
 - "AsiBackbone guarantees legal non-repudiation."
 - "AsiBackbone proves user consent."
 - "AsiBackbone handles key management automatically."
+- "The managed-key adapter provides Azure Key Vault, Managed HSM, or cloud KMS support by default."
 
 ## Related documentation
 
+- [Production Wording and Stable Signing Boundaries](production-wording-and-alpha-limitations.md)
 - [Signing-Ready Receipts and Key Handling](signing-ready-receipts-and-key-handling.md)
+- [Signing Provider Package Boundary](signing-provider-package-boundary.md)
+- [Managed-Key Signing Provider](managed-key-signing-provider.md)
+- [Signed Audit and Outbox Records](signed-audit-and-outbox-records.md)
 - [Privacy and Signing Boundaries](privacy-and-signing-boundaries.md)
 - [Governance Emission Contract](governance-emission-contract.md)
 - [Durable Audit and Outbox Persistence](durable-audit-outbox-persistence.md)

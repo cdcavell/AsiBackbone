@@ -28,6 +28,10 @@ It is meant to be useful whether you adopt the packages or simply study the patt
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**.
 
+## Why this repository exists even if you never install it
+
+AsiBackbone is also intended as a concrete reference specimen for discussing accountable decision flow: how intent becomes policy-reviewed action, how acknowledgment is captured, how authority is scoped, how audit residue is preserved, and where execution remains host-owned. The packages are one implementation path; the pattern is the larger conversation.
+
 ## The shape of the idea
 
 A typical AsiBackbone flow:
@@ -95,10 +99,6 @@ The host application remains responsible for execution behavior and operational 
 - Platform engineering workflows that need clear allow, deny, defer, acknowledgment, or escalation decisions before external execution.
 - Applications that need capability-scoped grants instead of broad, long-lived authority.
 - Teams who want a concrete reference for what an intent-to-execution audit trail can look like, whether or not they take the dependency.
-
-## Why this repository exists even if you never install it
-
-AsiBackbone is also intended as a concrete reference specimen for discussing accountable decision flow: how intent becomes policy-reviewed action, how acknowledgment is captured, how authority is scoped, how audit residue is preserved, and where execution remains host-owned. The packages are one implementation path; the pattern is the larger conversation.
 
 ## The package family
 

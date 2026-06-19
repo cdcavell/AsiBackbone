@@ -129,7 +129,7 @@ $expectedPackages = @(
         Id = 'CDCavell.AsiBackbone.Core'
         Description = 'Framework-neutral Accountable Systems Infrastructure governance primitives for consequential .NET decision flow.'
         Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'decision-flow', 'constraint-evaluation', 'audit', 'acknowledgment', 'capability-token')
-        ReadmeMustContain = @('Accountable Systems Infrastructure', 'Stable `1.1.0` package family')
+        ReadmeMustContain = @('Accountable Systems Infrastructure', 'Stable `1.1.x` package family')
     },
     [pscustomobject]@{
         Id = 'CDCavell.AsiBackbone.Analyzers'

@@ -89,6 +89,8 @@
       href: audit-residue-observability-schema.md
     - name: DLP and Classification Failure Policy
       href: dlp-classification-failure-policy.md
+    - name: DLP and Classification Scanner Integration
+      href: dlp-classification-scanner-integration.md
 
 - name: Released Provider Package Documentation
   items:

@@ -53,6 +53,76 @@ Intent or request
 
 The point of interest is the **decision boundary**: the moment between proposed intent and host execution. AsiBackbone focuses there, and deliberately leaves execution itself to the host.
 
+## First code path
+
+The snippet below is an intentionally small README slice, not a complete `Program.cs`. It shows the primary governance path: build safe context, evaluate policy, write audit residue, and let the host execute only after the decision allows it. The full compile-ready walkthrough lives in [First 15 Minutes: Standard API Gating](https://cdcavell.github.io/AsiBackbone/articles/quickstart-api-gating.html).
+
+```csharp
+// Registration: Core evaluator + one host-owned rule + local in-memory audit sink.
+builder.Services.AddAsiBackboneAspNetCore();
+builder.Services.AddSingleton<InMemoryAuditLedger>();
+builder.Services.AddSingleton<IAsiBackboneAuditSink>(sp =>
+    sp.GetRequiredService<InMemoryAuditLedger>());
+builder.Services.AddSingleton<IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>, AllowedRegionConstraint>();
+builder.Services.AddSingleton<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>>(sp =>
+    new DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>(
+        sp.GetServices<IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>>(),
+        decisionPolicy: null,
+        options: new AsiBackbonePolicyEvaluatorOptions { DenyWhenNoConstraints = true }));
+
+app.MapPost("/api/orders/{region}/approve", async (
+    string region,
+    HttpContext httpContext,
+    IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext> evaluator,
+    IAsiBackboneAuditSink auditSink,
+    CancellationToken cancellationToken) =>
+{
+    var metadata = new Dictionary<string, string>(StringComparer.Ordinal)
+    {
+        ["operation"] = "orders.approve",
+        ["region"] = region,
+        ["risk"] = "routine-api-write"
+    };
+
+    var context = new AsiBackboneConstraintEvaluationContext(
+        correlationId: httpContext.TraceIdentifier,
+        policyVersion: "policy-v1",
+        policyHash: "policy-hash-v1",
+        metadata: metadata);
+
+    GovernanceDecision decision = await evaluator.EvaluateAsync(context, cancellationToken);
+
+    AuditResidue residue = AuditResidue.FromDecision(
+        AsiBackboneActorContext.Human("example-user", "Example User"),
+        operationName: "orders.approve",
+        decision,
+        metadata: context.Metadata);
+
+    await auditSink.WriteAsync(residue, cancellationToken);
+
+    if (!decision.CanProceed)
+    {
+        return Results.Json(new
+        {
+            allowed = false,
+            decision = decision.Outcome.ToString(),
+            decision.ReasonCodes,
+            auditEventId = residue.EventId
+        }, statusCode: StatusCodes.Status403Forbidden);
+    }
+
+    // Host-owned execution starts here. AsiBackbone does not approve the order itself.
+    return Results.Ok(new
+    {
+        allowed = true,
+        message = "Host order approval would run after this governance decision.",
+        auditEventId = residue.EventId
+    });
+});
+```
+
+For production-style hosts, add durable audit/outbox persistence, signing or verification, DLP/classification, provider emission, and operational monitoring only where the host has explicitly chosen and configured those boundaries.
+
 ## What is AsiBackbone?
 
 AsiBackbone helps a host application evaluate intent before execution, apply policy constraints, require acknowledgment when needed, preserve audit records, and optionally scope follow-on execution through short-lived capability tokens. It is designed for systems where consequential actions need to be governed, explained, audited, constrained, preserved locally, and optionally projected into observability or governance systems before the host application executes or reviews them.

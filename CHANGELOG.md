@@ -4,6 +4,109 @@ All notable changes to this project are documented in this file.
 
 This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/) and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2026-06-20
+
+### Release summary
+
+`1.1.1` is a compatible patch release for the stable `1.1.x` package family.
+
+This release focuses on post-`1.1.0` hardening, documentation clarity, endpoint-governance safety, telemetry bounds, allocation reduction, coverage enforcement, and test expansion. No breaking public API changes are intended.
+
+`AssemblyVersion` remains fixed at `1.0.0.0` for the compatible stable `1.x` line. Package `Version`, `FileVersion`, and `InformationalVersion` move to `1.1.1`.
+
+### Added
+
+* Added optional ASP.NET Core endpoint-governance strict mode through `RequireGovernanceMetadata`.
+* Added explicit public/excluded endpoint metadata so hosts can allow known public endpoints when strict endpoint-governance mode is enabled.
+* Added `AllowMissingGovernanceMetadataAttribute` for explicit host-owned endpoint exclusions.
+* Added Core-only branch coverage enforcement with a stricter branch coverage expectation for `CDCavell.AsiBackbone.Core`.
+* Added focused test coverage for endpoint governance route-builder behavior.
+* Added additional branch and behavior tests for:
+
+  * capability grant validation;
+  * capability token grant behavior;
+  * canonical payload construction and hashing;
+  * signing and verification policy handling;
+  * governance emission branches;
+  * governance outbox behavior;
+  * DLP/classification policy branches;
+  * audit integrity verification;
+  * operation and decision result behavior.
+* Added documentation for:
+
+  * progressive adoption and onboarding;
+  * API-gating quickstart guidance;
+  * host-owned execution enforcement;
+  * DLP/classification scanner integration seams;
+  * safe audit and telemetry data;
+  * outbox drain reliability and alerting;
+  * outbox multi-worker concurrency boundaries;
+  * terminology mapping for .NET developers.
+
+### Changed
+
+* Clarified stable `1.x` API compatibility and semantic versioning guidance.
+* Clarified that `1.1.1` is a patch release that preserves the stable `1.x` binary identity by keeping `AssemblyVersion` at `1.0.0.0`.
+* Reorganized documentation navigation to emphasize current stable usage, package-selection guidance, provider boundaries, quality reports, and historical records.
+* Reframed alpha-era documents as historical records rather than current release guidance.
+* Reconciled production wording around signing, verification, and tamper-evidence boundaries.
+* Clarified design-only provider documentation boundaries for Event Hubs, Purview, Azure-specific adapters, robotics, immutable-storage, and future provider packages.
+* Clarified that OpenTelemetry is the released governance emission provider in the `1.1.x` package family, while other provider pages remain design-only or strategy-only unless separately released.
+* Updated quality documentation to distinguish repository-wide line coverage, Core-only branch coverage, and targeted mutation analysis.
+* Updated release validation and readiness guidance so it can be reused for future stable `1.x` patch and minor releases.
+* Improved documentation around durable audit/outbox persistence, hosted outbox drain reliability, and host-owned concurrency expectations.
+
+### Fixed
+
+* Bounded normalized `GovernanceDecision` correlation and trace identifiers to deterministic 256-character maximums.
+* Preserved existing blank-to-null telemetry identifier behavior while trimming and truncating overlong telemetry identifiers safely.
+* Corrected stale namespace references from earlier capability-token documentation.
+* Reduced ambiguity in API compatibility documentation around released stable provider packages versus future/design-only provider plans.
+* Clarified that endpoint governance does not replace ASP.NET Core authentication, authorization, routing, middleware enforcement, persistence, UI, or execution controls.
+
+### Performance
+
+* Reduced default ASP.NET Core middleware 403 allocation pressure by using a cached, bodyless forbidden result by default.
+* Added an opt-in forbidden-result factory so hosts can still return richer safe responses when desired.
+* Reduced avoidable Core allocation overhead in reason handling for `GovernanceDecision`, `ConstraintEvaluationResult`, and `OperationResult`.
+* Replaced LINQ-based reason-code projections with exact-sized arrays populated by simple loops.
+* Snapshot policy evaluator constraints into an exact-sized private array to avoid repeated caller-owned collection wrapping while preserving evaluator safety.
+
+### Security and governance hardening
+
+* Added optional fail-closed endpoint governance behavior for hosts that require every selected endpoint to carry explicit AsiBackbone governance metadata.
+* Preserved existing default endpoint-governance behavior for backward compatibility.
+* Reinforced host-owned execution boundaries: AsiBackbone can evaluate, record, emit, and gate governance decisions, but the consuming host still owns authentication, authorization, business execution, persistence, deployment, and operational enforcement.
+* Clarified DLP/classification scanner integration boundaries: hosts own scanner implementation and normalization; AsiBackbone supplies the governance policy response after scanner outcomes are mapped into policy context.
+* Clarified fail-open versus fail-closed DLP/classification behavior by risk level.
+* Replaced the vulnerable/deprecated SQLite native transitive restore path used by SQLite-backed sample and test projects.
+* Added explicit `SQLitePCLRaw.bundle_e_sqlite3` references for the Plain ASP.NET Core host sample and EntityFrameworkCore test project.
+* Pinned `SQLitePCLRaw.bundle_e_sqlite3` to the maintained `3.x` package line through central package management.
+* Preserved SQLite-backed EF Core sample behavior and SQLite test coverage while removing restore-time vulnerability noise from the solution.
+
+### Documentation
+
+* Added a progressive adoption ladder showing the smallest Core-only decision path first.
+* Added package-selection guidance so consumers can adopt only the packages required for their scenario.
+* Expanded DLP/classification scanner integration guidance with host-owned scanner examples and policy-resolution flow.
+* Added safe audit and telemetry guidance to help hosts avoid leaking sensitive data into governance records or provider emissions.
+* Added outbox drain reliability and alerting guidance.
+* Added outbox multi-worker concurrency guidance documenting that pending/retry-ready queries return delivery candidates, not durable claimed work items.
+* Added host-owned execution enforcement documentation to distinguish governance decisions from actual execution controls.
+* Updated `1.1.0` release-note wording where needed to make the post-release package boundary clearer for `1.1.x` consumers.
+* Improved documentation links across the README, article index, documentation home page, upgrade guide, and table of contents.
+
+### Compatibility notes
+
+* Existing `1.1.0` consumers should be able to upgrade to `1.1.1` without required source-code changes.
+* Endpoint-governance strict mode is opt-in. Existing default behavior is preserved unless the host explicitly enables strict metadata enforcement.
+* New documentation pages describing future provider directions do not imply those providers have shipped as stable NuGet packages.
+* Event Hubs, Purview, Azure-specific SDK adapters, robotics, immutable-storage, and additional provider packages remain outside the stable package contract unless separately reviewed and released.
+* `AssemblyVersion` remains `1.0.0.0` for the compatible stable `1.x` line.
+* `FileVersion` should be updated to `1.1.1.0`.
+* Package `Version` and `InformationalVersion` should be updated to `1.1.1`.
+* SQLite dependency hardening is limited to non-packable sample and test projects and does not add SQLite as a required dependency for the stable runtime package surface.
+
 ## [1.1.0] - 2026-06-16
 
 ### Added

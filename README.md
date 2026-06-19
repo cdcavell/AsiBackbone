@@ -96,6 +96,10 @@ The host application remains responsible for execution behavior and operational 
 - Applications that need capability-scoped grants instead of broad, long-lived authority.
 - Teams who want a concrete reference for what an intent-to-execution audit trail can look like, whether or not they take the dependency.
 
+## Why this repository exists even if you never install it
+
+AsiBackbone is also intended as a concrete reference specimen for discussing accountable decision flow: how intent becomes policy-reviewed action, how acknowledgment is captured, how authority is scoped, how audit residue is preserved, and where execution remains host-owned. The packages are one implementation path; the pattern is the larger conversation.
+
 ## The package family
 
 Stable `1.1.x` package family. `1.1.1` is the current patch release; `1.1.0` expanded the original `1.0.0` boundary (Core, in-memory storage, EF Core, ASP.NET Core) with analyzer, OpenTelemetry, and signing-provider packages for the compatible `1.x` line.

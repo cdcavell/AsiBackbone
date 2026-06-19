@@ -6,6 +6,13 @@ configuration="${CONFIGURATION:-Release}"
 package_output="${STABLE_SMOKE_PACKAGE_OUTPUT:-artifacts/stable-smoke-packages}"
 work_root="${STABLE_SMOKE_WORK_ROOT:-${RUNNER_TEMP:-/tmp}/asi-backbone-stable-package-integration-smoke}"
 
+get_central_package_version() {
+  local package_id="$1"
+
+  sed -nE "s/.*PackageVersion Include=\"$package_id\" Version=\"([^\"]+)\".*/\1/p" \
+    "$repo_root/Directory.Packages.props" | head -n 1
+}
+
 make_absolute_path() {
   local path="$1"
 
@@ -77,6 +84,14 @@ dotnet new xunit \
 
 pushd "$work_root" > /dev/null
 
+ef_sqlite_version="$(get_central_package_version "Microsoft.EntityFrameworkCore.Sqlite")"
+sqlitepclraw_version="$(get_central_package_version "SQLitePCLRaw.bundle_e_sqlite3")"
+
+if [ -z "$ef_sqlite_version" ] || [ -z "$sqlitepclraw_version" ]; then
+  echo "Unable to resolve smoke-test SQLite package versions from Directory.Packages.props."
+  exit 1
+fi
+
 dotnet add "$smoke_project" package CDCavell.AsiBackbone.Core --version "$package_version"
 dotnet add "$smoke_project" package CDCavell.AsiBackbone.AspNetCore --version "$package_version"
 dotnet add "$smoke_project" package CDCavell.AsiBackbone.EntityFrameworkCore --version "$package_version"
@@ -86,7 +101,8 @@ dotnet add "$smoke_project" package CDCavell.AsiBackbone.OpenTelemetry --version
 dotnet add "$smoke_project" package CDCavell.AsiBackbone.Signing.LocalDevelopment --version "$package_version"
 dotnet add "$smoke_project" package CDCavell.AsiBackbone.Signing.ManagedKey --version "$package_version"
 dotnet add "$smoke_project" package Microsoft.AspNetCore.TestHost
-dotnet add "$smoke_project" package Microsoft.EntityFrameworkCore.Sqlite
+dotnet add "$smoke_project" package Microsoft.EntityFrameworkCore.Sqlite --version "$ef_sqlite_version"
+dotnet add "$smoke_project" package SQLitePCLRaw.bundle_e_sqlite3 --version "$sqlitepclraw_version"
 
 popd > /dev/null
 

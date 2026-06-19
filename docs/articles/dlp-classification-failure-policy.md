@@ -19,6 +19,9 @@ The Core model defines a neutral policy resolver so host applications can decide
 
 This keeps the behavior policy-driven and provider-neutral. Purview, custom classifiers, internal compliance APIs, SIEM enrichment, or future DLP services can all normalize into the same Core vocabulary without making Core depend on a provider SDK.
 
+> [!NOTE]
+> AsiBackbone supplies the governance policy response after the host reports a scanner outcome. It does not run the scanner. For a host-owned scanner integration example, see [DLP and Classification Scanner Integration](dlp-classification-scanner-integration.md).
+
 ## Core-neutral model
 
 The model lives in `CDCavell.AsiBackbone.Core` under provider-neutral classification language.
@@ -39,6 +42,8 @@ Core owns:
 
 Core does not own:
 
+* scanner execution;
+* scanner selection;
 * Microsoft Purview SDK dependencies;
 * Azure SDK dependencies;
 * OpenTelemetry exporters;
@@ -104,6 +109,21 @@ DlpFailurePolicyResolution resolution = await resolver.ResolveAsync(context, can
 ```
 
 The resulting reason code is `dlp.timeout`. The reason metadata includes the failure kind, risk level, resolved behavior, and timeout milliseconds when supplied.
+
+## Scanner integration seam
+
+Host applications should invoke their chosen scanner before provider emission or governed execution. The scanner may be a regex/local scanner, Azure AI Content Safety, Microsoft Purview/DLP-adjacent service, proprietary classifier, or another host-defined service.
+
+```text
+Host scanner
+  -> provider-specific result or exception
+  -> DlpFailurePolicyContext
+  -> IAsiBackboneDlpFailurePolicyResolver
+  -> DlpFailurePolicyResolution
+  -> GovernanceDecision
+```
+
+The scanner should return or throw provider-specific outcomes. The host adapter then normalizes those outcomes into `DlpFailurePolicyContext`. See [DLP and Classification Scanner Integration](dlp-classification-scanner-integration.md) for a minimal fake scanner sample, an external-provider pseudo-sample, and fail-open/fail-closed guidance.
 
 ## Provider boundary
 
@@ -173,6 +193,7 @@ These tests do not require Purview, Azure SDKs, OpenTelemetry, external DLP serv
 
 ## Related documentation
 
+- [DLP and Classification Scanner Integration](dlp-classification-scanner-integration.md)
 - [Observability and Governance Emission Architecture](observability-and-governance-emission-architecture.md)
 - [Governance Emission Contract](governance-emission-contract.md)
 - [Durable Audit and Outbox Persistence](durable-audit-outbox-persistence.md)

@@ -12,3 +12,6 @@
 
 - name: External Consumer Smoke Test
   href: external-consumer-smoke-test.md
+
+- name: EF Core Outbox Concurrency Validation
+  href: ef-core-outbox-concurrency-validation.md

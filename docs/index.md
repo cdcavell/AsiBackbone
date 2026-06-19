@@ -29,11 +29,11 @@ These pages are the best first stops, whether you came to understand the idea or
 * [Terminology Map](articles/terminology-map.md)  
   Quick vocabulary bridge for .NET and application-architecture readers.
 
-* [1.1.0 Release Notes](articles/release-notes-110.md)  
-  Current stable package-family boundary for the compatible `1.x` line.
+* [1.1.x Release Notes](articles/release-notes-110.md)  
+  Current stable package-family boundary for the compatible `1.x` line. `1.1.1` is a patch release on the `1.1.0` API surface.
 
 * [Upgrade Guide: 1.0.0 to 1.1.0](articles/upgrade-100-to-110.md)  
-  Incremental adoption guidance for existing `1.0.0` consumers.
+  Incremental adoption guidance for existing `1.0.0` consumers moving into the compatible `1.1.x` line.
 
 * [Documentation Articles](articles/)  
   Categorized article index separating current usage, package integration, provider docs, design-only strategy, scenarios, release process, and historical records.
@@ -43,7 +43,7 @@ These pages are the best first stops, whether you came to understand the idea or
 
 ## Current stable package family
 
-Stable `1.1.0` covers these packages:
+Stable `1.1.x` is the current compatible release line. `1.1.1` is the current patch release on the `1.1.0` API surface and covers these packages:
 
 ```text
 CDCavell.AsiBackbone.Core
@@ -90,7 +90,7 @@ Use these pages when wiring AsiBackbone into a host application.
 
 ### Observability, outbox, signing, and governance emission
 
-These pages cover the additive `1.1.0` durability and governance-emission surface.
+These pages cover the additive `1.1.x` durability and governance-emission surface introduced in `1.1.0` and maintained by compatible patches such as `1.1.1`.
 
 * [Observability and Governance Emission Architecture](articles/observability-and-governance-emission-architecture.md)
 * [Governance Emission Contract](articles/governance-emission-contract.md)

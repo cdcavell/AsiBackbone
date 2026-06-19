@@ -2,7 +2,7 @@
 
 This article defines the public API compatibility promise for the stable AsiBackbone `1.x` package family and documents how semantic versioning applies after stabilization.
 
-It complements the historical stable API review tracked in [issue #13](https://github.com/cdcavell/AsiBackbone/issues/13). That review established the original `1.0.0` public type names, namespaces, package boundaries, dependency direction, and extension points. The released `1.1.0` package family expands the stable contract with additive analyzer, OpenTelemetry, and signing-provider package surfaces.
+It complements the historical stable API review tracked in [issue #13](https://github.com/cdcavell/AsiBackbone/issues/13). That review established the original `1.0.0` public type names, namespaces, package boundaries, dependency direction, and extension points. The released `1.1.0` package family expands the stable contract with additive analyzer, OpenTelemetry, and signing-provider package surfaces. `1.1.1` is a compatible patch release on that `1.1.0` API surface.
 
 ## Compatibility promise for the stable `1.x` line
 
@@ -34,11 +34,11 @@ The initial stable `1.0.0` package family established the first compatible `1.x`
 | `CDCavell.AsiBackbone.Storage.InMemory` | Non-durable in-memory storage helpers for tests, samples, and local validation. |
 | `CDCavell.AsiBackbone.EntityFrameworkCore` | EF Core model configuration and host-owned persistence integration. |
 
-### Expanded `1.1.0` stable family
+### Expanded `1.1.x` stable family
 
-The released `1.1.0` package family keeps the `1.0.0` packages compatible and adds stable additive package surfaces:
+The released `1.1.0` package family keeps the `1.0.0` packages compatible and adds stable additive package surfaces. `1.1.1` is the current patch release on the same API surface.
 
-| Package | `1.1.0` stable role |
+| Package | `1.1.x` stable role |
 | --- | --- |
 | `CDCavell.AsiBackbone.Core` | Adds provider-neutral governance emission contracts, durable outbox contracts, DLP/classification policy primitives, signing-ready metadata abstractions, canonical hashing/signing seams, verification-policy primitives, and lifecycle/audit additions while preserving the compatible `1.x` Core line. |
 | `CDCavell.AsiBackbone.Storage.InMemory` | Adds non-durable lifecycle and outbox proof paths for tests, samples, and local validation. |
@@ -108,13 +108,13 @@ Additive artifact fields are normally acceptable in a compatible minor release w
 
 ## Provider and future package guidance
 
-Released provider packages have their own stable contract within the compatible `1.x` line once they are published as stable packages. In `1.1.0`, that includes:
+Released provider packages have their own stable contract within the compatible `1.x` line once they are published as stable packages. In `1.1.x`, that includes:
 
 - `CDCavell.AsiBackbone.OpenTelemetry`;
 - `CDCavell.AsiBackbone.Signing.LocalDevelopment`;
 - `CDCavell.AsiBackbone.Signing.ManagedKey`.
 
-The analyzer package is also part of the released `1.1.0` stable package family, but analyzer diagnostics are build-time guidance rather than runtime enforcement.
+The analyzer package is also part of the released `1.1.x` stable package family, but analyzer diagnostics are build-time guidance rather than runtime enforcement.
 
 Provider packages planned for later milestones should not be described as part of the stable contract until they complete their own API review and stable release checklist.
 
@@ -146,7 +146,7 @@ Before cutting a stable release or stable package-family expansion, the release 
 ## Related documentation
 
 - [Historical Stable API Review](stable-api-review.md)
-- [1.1.0 Release Notes](release-notes-110.md)
+- [1.1.x Release Notes](release-notes-110.md)
 - [Upgrade Guide: 1.0.0 to 1.1.0](upgrade-100-to-110.md)
 - [Schema Versioning](schema-versioning.md)
 - [API Baseline and Boundary Checks](api-baseline-and-boundary-checks.md)

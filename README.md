@@ -29,7 +29,7 @@ It is designed for systems where consequential actions need to be governed, expl
 AsiBackbone should be understood as **governance infrastructure**, not an intelligence engine.
 
 > [!IMPORTANT]
-> These packages do **not** implement an intelligence engine, host AI models, train AI models, control physical systems, certify compliance, or prove the Eden/Backbone framework. They provide framework-neutral building blocks and host integration seams for governing consequential actions in software systems.
+> These packages do **not** implement an intelligence engine, host AI models, train AI models, control physical systems, certify compliance, prove the Eden/Backbone framework, or provide production tamper-evidence by default. They provide framework-neutral building blocks and host integration seams for governing consequential actions in software systems.
 
 ## Package family
 
@@ -44,7 +44,7 @@ Stable `1.1.0` package family includes the original `1.0.0` Core, in-memory stor
 | `CDCavell.AsiBackbone.Analyzers` | Roslyn analyzer safety rails for governance persistence and continuation flows. |
 | `CDCavell.AsiBackbone.OpenTelemetry` | Released OpenTelemetry governance emission provider that projects provider-neutral envelopes into .NET diagnostics. |
 | `CDCavell.AsiBackbone.Signing.LocalDevelopment` | Local-development signing and verification provider for tests, samples, and wiring proof paths only. Not for production key custody. |
-| `CDCavell.AsiBackbone.Signing.ManagedKey` | Managed-key signing adapter boundary. The host supplies the actual managed-key client, credentials, key operations, and operational policy. |
+| `CDCavell.AsiBackbone.Signing.ManagedKey` | Managed-key signing adapter boundary. The host supplies the actual managed-key client, credentials, key operations, verification path, monitoring, and operational policy. |
 
 Package-specific READMEs and release notes define which surfaces are stable, optional, local-only, or future-facing. The stable `1.x` compatibility policy is documented in [API Compatibility and SemVer](docs/articles/api-compatibility-and-semver.md), with the historical `1.0.0` review and `1.1.0` addendum in [Historical Stable API Review](docs/articles/stable-api-review.md). Future Event Hubs, Purview, Azure-specific, gateway, robotics, immutable-storage, or additional provider packages are not part of the stable contract unless separately reviewed and released.
 
@@ -94,8 +94,8 @@ Core benefits include:
 | Durable outbox baseline | Governance events can be preserved locally before optional downstream provider emission. |
 | Capability-scoped execution | Follow-on execution can be represented as a short-lived, scoped permission grant. |
 | OpenTelemetry projection | Governance envelopes can be projected into host-configured OpenTelemetry pipelines without binding Core to a cloud provider when the released OpenTelemetry provider package is adopted. |
-| Signing provider boundary | Signing and verification can be wired through provider packages while Core remains provider-neutral. |
-| Host-owned integration | Applications keep ownership of the web host, persistence lifecycle, migrations, deployment, exporter configuration, key management, and execution behavior. |
+| Signing provider boundary | Signing and verification can be wired through provider packages while Core remains provider-neutral. Signing alone is not production tamper-evidence. |
+| Host-owned integration | Applications keep ownership of the web host, persistence lifecycle, migrations, deployment, exporter configuration, key management, verification policy, and execution behavior. |
 | Framework-neutral core | Core primitives can be used without requiring ASP.NET Core, EF Core, NetCoreApplicationTemplate, AI packages, robotics dependencies, observability providers, or signing providers. |
 
 See [Why AsiBackbone?](docs/articles/why-asi-backbone.md) for a fuller benefits overview.
@@ -122,8 +122,8 @@ AsiBackbone does not:
 - Host, train, run, or orchestrate AI models.
 - Implement an intelligence engine.
 - Perform host operational actions by itself.
-- Own the consuming application's database, migrations, deployment, observability backend, exporter configuration, key-management boundary, or operational policy.
-- Provide production tamper-evidence, immutability, or non-repudiation by default.
+- Own the consuming application's database, migrations, deployment, observability backend, exporter configuration, key-management boundary, verification path, or operational policy.
+- Provide production tamper-evidence, immutability, legal non-repudiation, external anchoring, or compliance certification by default.
 - Replace legal review, AI safety governance, organizational accountability, operational security, DLP review, or key-management controls.
 
 The host application remains responsible for execution behavior and operational controls.
@@ -135,6 +135,8 @@ Stable `1.1.0` is the current released package family for the compatible `1.x` l
 The repository includes the Core foundation, in-memory validation storage, EF Core host-owned persistence, ASP.NET Core integration, analyzers, OpenTelemetry provider implementation, local-development signing provider, managed-key signing adapter boundary, samples, release validation, and host-validation documentation.
 
 The stable API contract for the compatible `1.x` line is documented in [API Compatibility and SemVer](docs/articles/api-compatibility-and-semver.md). The [Historical Stable API Review](docs/articles/stable-api-review.md) records the original `1.0.0` API baseline and the `1.1.0` stable package-family addendum.
+
+The [Production Wording and Stable Signing Boundaries](docs/articles/production-wording-and-alpha-limitations.md) page distinguishes stable Core signing-ready primitives, the local-development signer, the managed-key adapter boundary, future concrete provider packages, and unsupported production tamper-evidence claims.
 
 ## Package roles
 
@@ -168,7 +170,7 @@ Provides local-development RSA signing and verification for tests, samples, and 
 
 ### CDCavell.AsiBackbone.Signing.ManagedKey
 
-Provides a managed-key signing adapter boundary. The package does not include live Azure Key Vault, Managed HSM, cloud KMS, HSM, or certificate-store implementation by default. The host supplies the managed-key client and operational controls.
+Provides a managed-key signing adapter boundary. The package does not include live Azure Key Vault, Managed HSM, cloud KMS, HSM, or certificate-store implementation by default. The host supplies the managed-key client, verification path, and operational controls.
 
 ## Documentation
 
@@ -203,6 +205,8 @@ Key documentation pages:
 - [Signing Provider Package Boundary](docs/articles/signing-provider-package-boundary.md)
 - [Managed-Key Signing Provider](docs/articles/managed-key-signing-provider.md)
 - [Signed Audit and Outbox Records](docs/articles/signed-audit-and-outbox-records.md)
+- [Cryptographic Security Posture and Production Guidance](docs/articles/cryptographic-security-posture.md)
+- [Production Wording and Stable Signing Boundaries](docs/articles/production-wording-and-alpha-limitations.md)
 - [Verification Policy and Result Handling](docs/articles/verification-policy-and-result-handling.md)
 - [Capability Grant Hardening](docs/articles/capability-grant-hardening.md)
 - [Event Hubs Governance Emission Provider Design](docs/articles/event-hubs-governance-emission-provider-design.md)

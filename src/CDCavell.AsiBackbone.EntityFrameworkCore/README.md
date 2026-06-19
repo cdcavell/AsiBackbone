@@ -4,7 +4,9 @@ Entity Framework Core model configuration and host-owned persistence helpers for
 
 This package contributes provider-neutral EF Core model configuration, persistence entities, EF Core-backed audit ledger storage, EF Core-backed audit residue lifecycle storage, and EF Core-backed durable governance outbox storage while preserving host ownership of the application database.
 
-> [!IMPORTANT]
+> **New to AsiBackbone?** Start with the concept, not this package: [Intent to Execution: An Accountability Pattern](https://cdcavell.github.io/AsiBackbone/articles/intent-to-execution-pattern.html) and the [documentation site](https://cdcavell.github.io/AsiBackbone/). This README covers one package in the family.
+
+> **Important:**
 > This package does not provide or require a package-owned `DbContext`, database provider, connection string, migration set, schema deployment workflow, tamper-evident storage, signing provider, downstream emission provider, or compliance guarantee. The host application owns those concerns.
 
 ## What this package provides

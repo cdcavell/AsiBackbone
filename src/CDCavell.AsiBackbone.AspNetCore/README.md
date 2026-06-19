@@ -4,7 +4,9 @@ ASP.NET Core host adapters for Accountable Systems Infrastructure governance pri
 
 This package acts as a thin web-host adapter around `CDCavell.AsiBackbone.Core`.
 
-> [!IMPORTANT]
+> **New to AsiBackbone?** Start with the concept, not this package: [Intent to Execution: An Accountability Pattern](https://cdcavell.github.io/AsiBackbone/articles/intent-to-execution-pattern.html) and the [documentation site](https://cdcavell.github.io/AsiBackbone/). This README covers one package in the family.
+
+> **Important:**
 > This package provides host adapters only. Low-level helpers do not enforce decisions automatically; endpoint-governance middleware acts only when the host explicitly adds it to the pipeline and registers the required host-owned policy, capability, audit, persistence, and transaction services. Attributes and route-builder calls do not by themselves make audit records durable, immutable, tamper-evident, or transactionally safe.
 
 ## Service registration

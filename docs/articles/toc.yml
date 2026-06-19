@@ -20,6 +20,8 @@
 
 - name: Core Concepts and Domain Language
   items:
+    - name: "Intent to Execution: An Accountability Pattern"
+      href: intent-to-execution-pattern.md
     - name: ASI Backbone Concept Synopsis
       href: asi-backbone-concept.md
     - name: Core Domain Language

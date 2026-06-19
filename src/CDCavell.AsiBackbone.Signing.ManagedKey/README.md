@@ -4,9 +4,12 @@ Provider-neutral managed-key signing adapter for AsiBackbone governance artifact
 
 This package keeps `CDCavell.AsiBackbone.Core` provider-neutral while allowing host applications to connect signing flow to a managed key system, HSM, cloud KMS, Azure Key Vault / Managed HSM adapter, or organization-owned signing service.
 
-## Important boundary
+> **New to AsiBackbone?** Start with the concept, not this package: [Intent to Execution: An Accountability Pattern](https://cdcavell.github.io/AsiBackbone/articles/intent-to-execution-pattern.html) and the [documentation site](https://cdcavell.github.io/AsiBackbone/). This README covers one package in the family.
 
-This package does **not** include a live Azure Key Vault, HSM, cloud KMS, certificate store, or blockchain implementation by default. It defines the managed-key signing adapter and a host-owned client boundary:
+> **Important:**
+> This package does not include a live Azure Key Vault, HSM, cloud KMS, certificate store, or blockchain implementation by default. Host applications provide the client and credentials; private keys, tokens, secrets, and raw key material must not be returned to AsiBackbone.
+
+## Boundary
 
 ```csharp
 public interface IManagedKeySigningClient

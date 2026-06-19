@@ -42,11 +42,11 @@ Stable `1.1.0` package family includes the original `1.0.0` Core, in-memory stor
 | `CDCavell.AsiBackbone.EntityFrameworkCore` | EF Core model configuration and host-owned persistence for audit ledger, acknowledgments, lifecycle events, and governance outbox records. |
 | `CDCavell.AsiBackbone.AspNetCore` | ASP.NET Core host adapters for actor context, request correlation, audit enrichment, HTTP result mapping, acknowledgment challenge flows, endpoint governance, and hosted outbox drain integration. |
 | `CDCavell.AsiBackbone.Analyzers` | Roslyn analyzer safety rails for governance persistence and continuation flows. |
-| `CDCavell.AsiBackbone.OpenTelemetry` | OpenTelemetry-friendly governance emission provider that projects provider-neutral envelopes into .NET diagnostics. |
+| `CDCavell.AsiBackbone.OpenTelemetry` | Released OpenTelemetry governance emission provider that projects provider-neutral envelopes into .NET diagnostics. |
 | `CDCavell.AsiBackbone.Signing.LocalDevelopment` | Local-development signing and verification provider for tests, samples, and wiring proof paths only. Not for production key custody. |
 | `CDCavell.AsiBackbone.Signing.ManagedKey` | Managed-key signing adapter boundary. The host supplies the actual managed-key client, credentials, key operations, and operational policy. |
 
-Package-specific READMEs and release notes define which surfaces are stable, optional, local-only, or future-facing. Future Event Hubs, Purview, Azure-specific, gateway, robotics, immutable-storage, or additional provider packages are not part of the stable contract unless separately reviewed and released.
+Package-specific READMEs and release notes define which surfaces are stable, optional, local-only, or future-facing. The stable `1.x` compatibility policy is documented in [API Compatibility and SemVer](docs/articles/api-compatibility-and-semver.md), with the historical `1.0.0` review and `1.1.0` addendum in [Historical Stable API Review](docs/articles/stable-api-review.md). Future Event Hubs, Purview, Azure-specific, gateway, robotics, immutable-storage, or additional provider packages are not part of the stable contract unless separately reviewed and released.
 
 ## What problem does this solve?
 
@@ -93,7 +93,7 @@ Core benefits include:
 | Audit residue | Decisions can preserve reason codes, policy version, policy hash, correlation ID, timestamp, and metadata. |
 | Durable outbox baseline | Governance events can be preserved locally before optional downstream provider emission. |
 | Capability-scoped execution | Follow-on execution can be represented as a short-lived, scoped permission grant. |
-| OpenTelemetry projection | Governance envelopes can be projected into host-configured OpenTelemetry pipelines without binding Core to a cloud provider when the optional provider package is adopted. |
+| OpenTelemetry projection | Governance envelopes can be projected into host-configured OpenTelemetry pipelines without binding Core to a cloud provider when the released OpenTelemetry provider package is adopted. |
 | Signing provider boundary | Signing and verification can be wired through provider packages while Core remains provider-neutral. |
 | Host-owned integration | Applications keep ownership of the web host, persistence lifecycle, migrations, deployment, exporter configuration, key management, and execution behavior. |
 | Framework-neutral core | Core primitives can be used without requiring ASP.NET Core, EF Core, NetCoreApplicationTemplate, AI packages, robotics dependencies, observability providers, or signing providers. |
@@ -134,6 +134,8 @@ Stable `1.1.0` is the current released package family for the compatible `1.x` l
 
 The repository includes the Core foundation, in-memory validation storage, EF Core host-owned persistence, ASP.NET Core integration, analyzers, OpenTelemetry provider implementation, local-development signing provider, managed-key signing adapter boundary, samples, release validation, and host-validation documentation.
 
+The stable API contract for the compatible `1.x` line is documented in [API Compatibility and SemVer](docs/articles/api-compatibility-and-semver.md). The [Historical Stable API Review](docs/articles/stable-api-review.md) records the original `1.0.0` API baseline and the `1.1.0` stable package-family addendum.
+
 ## Package roles
 
 ### CDCavell.AsiBackbone.Core
@@ -158,7 +160,7 @@ Provides Roslyn analyzer safety rails for governance persistence and continuatio
 
 ### CDCavell.AsiBackbone.OpenTelemetry
 
-Provides the optional OpenTelemetry governance emission provider package. It projects provider-neutral governance envelopes into `ActivitySource` activity events, stable `asibackbone.*` tags, and `Meter` metrics. Exporters such as Azure Monitor remain host-configured.
+Provides the released OpenTelemetry governance emission provider package. It projects provider-neutral governance envelopes into `ActivitySource` activity events, stable `asibackbone.*` tags, and `Meter` metrics. Exporters such as Azure Monitor remain host-configured.
 
 ### CDCavell.AsiBackbone.Signing.LocalDevelopment
 
@@ -182,6 +184,8 @@ Key documentation pages:
 - [1.0.0 Release Notes](docs/articles/release-notes-100.md)
 - [1.1.0 Release Notes](docs/articles/release-notes-110.md)
 - [Upgrade Guide: 1.0.0 to 1.1.0](docs/articles/upgrade-100-to-110.md)
+- [API Compatibility and SemVer](docs/articles/api-compatibility-and-semver.md)
+- [Historical Stable API Review](docs/articles/stable-api-review.md)
 - [Quality Reports](docs/quality/index.md)
 - [Core Branch Coverage Quality Gate](docs/quality/core-branch-coverage.md)
 - [Mutation Coverage Scope and Deferrals](docs/quality/mutation-coverage-scope.md)
@@ -205,7 +209,6 @@ Key documentation pages:
 - [Purview Governance and Lineage Enrichment Strategy](docs/articles/purview-governance-lineage-enrichment-strategy.md)
 - [Historical Alpha Package Boundary](docs/articles/alpha-package-boundary.md)
 - [Schema Versioning](docs/articles/schema-versioning.md)
-- [API Compatibility and SemVer](docs/articles/api-compatibility-and-semver.md)
 - [EF Core Integration Boundary](docs/articles/ef-core-integration-boundary.md)
 - [EF Core Host Ownership and Migration Guidance](docs/articles/ef-core-host-ownership-and-migrations.md)
 - [ASP.NET Core Integration Boundary](docs/articles/aspnetcore-integration-boundary.md)

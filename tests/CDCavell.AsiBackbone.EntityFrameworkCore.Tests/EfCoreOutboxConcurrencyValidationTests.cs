@@ -108,7 +108,7 @@ public sealed class EfCoreOutboxConcurrencyValidationTests
             Assert.IsAssignableFrom<DbUpdateConcurrencyException>(exception));
         Assert.NotNull(persistedEntry);
         Assert.Equal(GovernanceEmissionStatus.Delivered, persistedEntry.Status);
-        Assert.Empty(pendingEntries.Where(entry => entry.OutboxEntryId == outboxEntryId));
+        Assert.DoesNotContain(pendingEntries, entry => entry.OutboxEntryId == outboxEntryId);
     }
 
     /// <summary>
@@ -308,7 +308,7 @@ public sealed class EfCoreOutboxConcurrencyValidationTests
             int observedEmissionCount = Interlocked.Increment(ref emissionCount);
             if (observedEmissionCount >= expectedEmissionCount)
             {
-                allExpectedEmissionsArrived.TrySetResult();
+                _ = allExpectedEmissionsArrived.TrySetResult();
             }
 
             await allExpectedEmissionsArrived.Task.WaitAsync(TimeSpan.FromSeconds(10), cancellationToken).ConfigureAwait(false);

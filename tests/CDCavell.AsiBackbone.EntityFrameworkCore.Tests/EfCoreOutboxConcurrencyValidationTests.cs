@@ -1,3 +1,4 @@
+using System.Globalization;
 using CDCavell.AsiBackbone.Core.Audit;
 using CDCavell.AsiBackbone.Core.Emissions;
 using CDCavell.AsiBackbone.Core.Outbox;
@@ -267,7 +268,7 @@ public sealed class EfCoreOutboxConcurrencyValidationTests
             metadata: new Dictionary<string, string>(StringComparer.Ordinal)
             {
                 ["validation"] = "efcore-outbox-concurrency",
-                ["index"] = index.ToString("D3")
+                ["index"] = index.ToString("D3", CultureInfo.InvariantCulture)
             });
     }
 
@@ -285,7 +286,7 @@ public sealed class EfCoreOutboxConcurrencyValidationTests
             metadata: new Dictionary<string, string>(StringComparer.Ordinal)
             {
                 ["validation"] = "efcore-outbox-concurrency",
-                ["index"] = index.ToString("D3")
+                ["index"] = index.ToString("D3", CultureInfo.InvariantCulture)
             });
     }
 
@@ -319,7 +320,7 @@ public sealed class EfCoreOutboxConcurrencyValidationTests
                 new Dictionary<string, string>(StringComparer.Ordinal)
                 {
                     ["validation"] = "coordinated-drain-contention",
-                    ["emission.count"] = observedEmissionCount.ToString("D3")
+                    ["emission.count"] = observedEmissionCount.ToString("D3", CultureInfo.InvariantCulture)
                 });
         }
     }

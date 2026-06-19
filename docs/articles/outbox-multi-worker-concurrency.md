@@ -12,6 +12,22 @@ The existing APIs are safe for single active worker usage and for local/test val
 
 A future release may add an explicit claim/lease abstraction, but that should be designed deliberately because it affects schema shape, migrations, provider-specific SQL, retry semantics, and host deployment operations.
 
+## Repeatable validation path
+
+Issue #311 adds a CI-friendly EF Core validation path for concurrent outbox/lifecycle writes, retryable drain failures, and drain-worker contention:
+
+```text
+tests/CDCavell.AsiBackbone.EntityFrameworkCore.Tests/EfCoreOutboxConcurrencyValidationTests.cs
+```
+
+The validation deliberately confirms both sides of the current reliability story:
+
+- EF Core-backed local outbox and lifecycle records can be preserved under concurrent host-owned context writes in the tested SQLite relational path.
+- Retryable provider failures remain represented as local outbox state and can be queried as retry-ready work.
+- Two drain workers can still reach the same pending entry before final state is saved, so the current drain should not be described as exactly-once or duplicate-proof.
+
+See [EF Core Outbox Concurrency Validation](../quality/ef-core-outbox-concurrency-validation.md) for the local command and interpretation guidance.
+
 ## Current behavior
 
 | Area | Current behavior | Multi-worker implication |

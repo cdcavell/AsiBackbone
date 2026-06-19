@@ -7,6 +7,7 @@
 [![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://cdcavell.github.io/AsiBackbone/)
 [![.NET](https://img.shields.io/badge/.NET-10.0-purple)](https://dotnet.microsoft.com/)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE.txt)
+[![Security Policy](https://img.shields.io/badge/security-policy-blue)](SECURITY.md)
 [![GitHub Release](https://img.shields.io/github/v/release/cdcavell/AsiBackbone?sort=semver&display_name=tag&label=release)](https://github.com/cdcavell/AsiBackbone/releases)
 [![Zenodo DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.20546032-blue)](https://doi.org/10.5281/zenodo.20546032)
 
@@ -142,6 +143,12 @@ Stable `1.1.x` is the current released line for the compatible `1.x` API, with `
 
 The stable API contract is documented in [API Compatibility and SemVer](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/api-compatibility-and-semver.md); the original `1.0.0` baseline and `1.1.0` addendum are recorded in the [Historical Stable API Review](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/stable-api-review.md). The [Production Wording and Stable Signing Boundaries](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/production-wording-and-alpha-limitations.md) page distinguishes stable signing-ready primitives, the local-development signer, the managed-key adapter boundary, future concrete provider packages, and unsupported production tamper-evidence claims.
 
+## Security and vulnerability reporting
+
+Please report vulnerabilities or sensitive concerns through the repository [Security Policy](SECURITY.md). The policy defines the supported `1.x` release line, reporting expectations, and boundaries around compliance certification, production tamper-evidence, legal protection, host-owned execution, persistence, deployment, key custody, and production hardening.
+
+Do not include exploit details, secrets, private keys, customer data, or other sensitive operational information in a public issue or pull request.
+
 ## Relationship to NetCoreApplicationTemplate
 
 NetCoreApplicationTemplate may be used as a preferred host baseline during development and validation, but AsiBackbone does not require it.
@@ -191,4 +198,3 @@ Avoid language such as:
 ## License
 
 MIT. See [LICENSE.txt](https://github.com/cdcavell/AsiBackbone/blob/main/LICENSE.txt).
-

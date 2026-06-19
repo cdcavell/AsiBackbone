@@ -54,6 +54,20 @@ A documentation page can describe a future provider direction without meaning a 
 | Purview governance and lineage enrichment | **Strategy-only future enrichment direction.** | The Purview page is planning guidance only; no Purview NuGet package or SDK adapter is released in `1.1.0`. |
 | Signing provider packages | **Released provider boundaries.** | Local-development signing and managed-key adapter packages are released, but production trust guarantees remain host-owned. |
 
+## API compatibility and stable review status
+
+`1.1.0` is a backward-compatible minor release in the stable `1.x` line. The original `1.0.0` stable package family remains part of the compatible contract, and `1.1.0` adds stable package surfaces for analyzers, OpenTelemetry, local-development signing, and managed-key signing adapter boundaries.
+
+The stable API review remains historical for the initial `1.0.0` package-family baseline, with a `1.1.0` addendum documenting the expanded stable package family. See [API Compatibility and SemVer](api-compatibility-and-semver.md) and [Historical Stable API Review](stable-api-review.md).
+
+SemVer interpretation for this release:
+
+- existing `1.0.0` consumers can upgrade without required source-code changes when they do not adopt new features;
+- additive public APIs and new stable packages are allowed in a compatible minor release;
+- stable provider packages released in `1.1.0` are part of the compatible `1.x` contract for those packages;
+- future/design-only Event Hubs, Purview, Azure-specific SDK adapters, robotics, immutable-storage, and additional provider packages remain outside the stable contract unless separately reviewed and released;
+- compatible patch releases such as `1.1.1` should keep `AssemblyVersion` at `1.0.0.0` while updating package `Version`, `FileVersion`, and `InformationalVersion`.
+
 ## What changed since 1.0.0
 
 ### Provider-neutral governance emission
@@ -215,19 +229,21 @@ That coverage-hardening work is separate from mutation-testing scope expansion. 
 
 ## SemVer and compatibility
 
-`1.1.0` is SemVer-compatible with `1.0.0` consumers.
+`1.1.0` is SemVer-compatible with `1.0.0` consumers and expands the stable package family for the compatible `1.x` line.
 
 Compatibility expectations:
 
 - existing `1.0.0` package references can be upgraded to `1.1.0` without required source-code changes for consumers that do not use new features;
 - new public APIs are additive;
-- new provider package adoption is optional;
+- new stable packages in `1.1.0` are covered by their own package-specific stable contracts;
 - analyzer adoption is optional and should not be required for runtime use;
 - signing-provider adoption is optional;
 - new persisted fields and schema additions should be treated as additive migration work owned by the host;
-- preview or future provider packages remain outside the stable compatibility promise until separately released as stable.
+- preview, design-only, strategy-only, or future provider packages remain outside the stable compatibility promise until separately released as stable.
 
 Hosts using EF Core should still review generated migrations before deployment because durable outbox and lifecycle records add storage surfaces that the host owns.
+
+See [API Compatibility and SemVer](api-compatibility-and-semver.md) and [Historical Stable API Review](stable-api-review.md) for the stable `1.x` compatibility policy, package-family expansion, and `AssemblyVersion` guidance.
 
 ## Accepted deferrals
 
@@ -284,6 +300,8 @@ For future releases, rerun validation against the final release candidate before
 ## Related documentation
 
 - [Upgrade Guide: 1.0.0 to 1.1.0](upgrade-100-to-110.md)
+- [API Compatibility and SemVer](api-compatibility-and-semver.md)
+- [Historical Stable API Review](stable-api-review.md)
 - [Quality Reports](../quality/index.md)
 - [Mutation Coverage Scope and Deferrals](../quality/mutation-coverage-scope.md)
 - [Observability and Governance Emission Architecture](observability-and-governance-emission-architecture.md)
@@ -301,4 +319,3 @@ For future releases, rerun validation against the final release candidate before
 - [Verification Policy and Result Handling](verification-policy-and-result-handling.md)
 - [Key Rotation and Retired-Key Verification](key-rotation-and-retired-key-verification.md)
 - [Capability Grant Hardening](capability-grant-hardening.md)
-- [API Compatibility and SemVer](api-compatibility-and-semver.md)

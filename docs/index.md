@@ -90,6 +90,7 @@ These pages cover the additive `1.1.0` durability and governance-emission surfac
 * [Safe Audit and Telemetry Data](articles/safe-audit-telemetry-data.md)
 * [Audit Residue Observability Schema](articles/audit-residue-observability-schema.md)
 * [DLP and Classification Failure Policy](articles/dlp-classification-failure-policy.md)
+* [DLP and Classification Scanner Integration](articles/dlp-classification-scanner-integration.md)
 
 ### Released provider package documentation
 

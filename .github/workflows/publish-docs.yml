@@ -69,6 +69,16 @@ jobs:
             -assemblyfilters:"-*.Tests" `
             -filefilters:"-**/bin/**;-**/obj/**;-**/*.g.cs"
 
+      - name: Generate Core branch coverage report
+        shell: pwsh
+        run: |
+          dotnet reportgenerator `
+            -reports:"${{ env.CORE_COVERAGE_OUTPUT }}/coverage.cobertura.xml" `
+            -targetdir:"./artifacts/core-branch-coverage-report" `
+            -reporttypes:"Html;MarkdownSummaryGithub;Cobertura" `
+            -assemblyfilters:"+CDCavell.AsiBackbone.Core;-*.Tests" `
+            -filefilters:"-**/bin/**;-**/obj/**;-**/*.g.cs"
+
       - name: Preserve deployed mutation reports
         shell: bash
         run: |
@@ -109,6 +119,12 @@ jobs:
         run: |
           New-Item -ItemType Directory -Path "./docs/_site/coverage" -Force | Out-Null
           Copy-Item -Path "./artifacts/coverage-report/*" -Destination "./docs/_site/coverage" -Recurse -Force
+
+      - name: Copy Core branch coverage report to DocFX output
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path "./docs/_site/coverage/core" -Force | Out-Null
+          Copy-Item -Path "./artifacts/core-branch-coverage-report/*" -Destination "./docs/_site/coverage/core" -Recurse -Force
 
       - name: Restore deployed mutation reports to DocFX output
         shell: bash

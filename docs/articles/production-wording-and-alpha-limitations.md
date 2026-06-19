@@ -2,12 +2,14 @@
 
 This article defines the documentation wording boundary for current AsiBackbone capabilities, stable `1.1.0` signing-related package surfaces, durable local/outbox behavior, optional provider integrations, historical alpha limitations, and future production-grade tamper-evidence.
 
-Issue: #148, updated for #253.
+Issue: #148, updated for #253 and #306.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a governance spine for consequential software decision flow. It is not an artificial superintelligence implementation, AI model host, robot controller, signing appliance, key-management system, compliance product, immutable ledger, cloud governance platform, or legal guarantee by itself.
 
 > [!IMPORTANT]
 > Documentation should describe only implemented and released behavior as current behavior. `1.1.0` includes stable Core signing-ready and verification primitives, a stable local-development signing provider, and a stable managed-key adapter boundary. Those released surfaces must still be described with their limits: local-development signing is not production key custody, the managed-key package is an adapter rather than a concrete Azure Key Vault/HSM/KMS implementation, and signing alone does not provide tamper-evidence, immutability, legal non-repudiation, or compliance certification.
+
+For vulnerability reporting and sensitive security concerns, use the repository [Security Policy and Vulnerability Disclosure](https://github.com/cdcavell/AsiBackbone/blob/main/SECURITY.md). This article defines production wording boundaries; it is not a private vulnerability reporting channel and does not certify compliance, legal protection, or production tamper-evidence.
 
 ## Current-stage wording rules
 
@@ -153,6 +155,7 @@ Before merging documentation for provider or security work, confirm:
 
 ## Related documentation
 
+- [Security Policy and Vulnerability Disclosure](https://github.com/cdcavell/AsiBackbone/blob/main/SECURITY.md)
 - [Privacy and Signing Boundaries](privacy-and-signing-boundaries.md)
 - [Signing-Ready Receipts and Key Handling](signing-ready-receipts-and-key-handling.md)
 - [Signing Provider Package Boundary](signing-provider-package-boundary.md)

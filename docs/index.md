@@ -38,6 +38,9 @@ These pages are the best first stops, whether you came to understand the idea or
 * [Documentation Articles](articles/)  
   Categorized article index separating current usage, package integration, provider docs, design-only strategy, scenarios, release process, and historical records.
 
+* [Security Policy and Vulnerability Disclosure](https://github.com/cdcavell/AsiBackbone/blob/main/SECURITY.md)  
+  Supported release-line posture and responsible reporting guidance for vulnerabilities or sensitive concerns.
+
 ## Current stable package family
 
 Stable `1.1.0` covers these packages:
@@ -118,8 +121,9 @@ These pages are strategy/design material. They remain separate from released pro
 
 ### Security and cryptographic boundaries
 
-These pages explain signing-ready artifacts, provider signing, verification, chain models, and safe wording. They do not imply production tamper-evidence unless the host deploys a concrete signing, storage, verification, and key-management path.
+These pages explain signing-ready artifacts, provider signing, verification, chain models, vulnerability disclosure, and safe wording. They do not imply production tamper-evidence unless the host deploys a concrete signing, storage, verification, and key-management path.
 
+* [Security Policy and Vulnerability Disclosure](https://github.com/cdcavell/AsiBackbone/blob/main/SECURITY.md)
 * [Production Wording and Stable Signing Boundaries](articles/production-wording-and-alpha-limitations.md)
 * [Signing-Ready Receipts and Key Handling](articles/signing-ready-receipts-and-key-handling.md)
 * [Signed Audit and Outbox Records](articles/signed-audit-and-outbox-records.md)

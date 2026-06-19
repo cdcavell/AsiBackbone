@@ -1,35 +1,40 @@
-# Alpha Package Boundary
+# Historical Alpha Package Boundary
 
-This article defines the intended `0.1.0-alpha.1` boundary for `CDCavell.AsiBackbone.Core`.
+This article is a historical stable-era reference for the original intended `0.1.0-alpha.1` boundary for `CDCavell.AsiBackbone.Core`.
 
-`0.1.0-alpha.1` should establish the first stable language for the package family. It should not try to deliver persistence, web integration, signing infrastructure, robotics integration, or AI model functionality.
+> [!NOTE]
+> This page is preserved for project history and early package-boundary rationale. It describes the alpha planning posture before the stable `1.x` package family. Current stable package guidance is documented in [1.1.0 Release Notes](release-notes-110.md), [API Compatibility and Semantic Versioning](api-compatibility-and-semver.md), and [Historical Stable API Review](stable-api-review.md).
+
+At the alpha stage, `0.1.0-alpha.1` was intended to establish the first shared language for the package family. It was not intended to deliver persistence, web integration, signing infrastructure, robotics integration, or AI model functionality.
 
 > [!IMPORTANT]
-> The alpha package is a governance and policy-control foundation. It is not an ASI implementation and does not host, train, run, or orchestrate AI models.
+> The alpha package was planned as a governance and policy-control foundation. It was not an ASI implementation and did not host, train, run, or orchestrate AI models.
 
-## Release intent
+## Historical release intent
 
-The first alpha should answer one question:
+The first alpha was intended to answer one question:
 
 > What are the shared framework-neutral primitives that future AsiBackbone packages will build on?
 
-It should provide enough vocabulary for later implementation issues to reference the same concepts consistently.
+It was expected to provide enough vocabulary for later implementation issues to reference the same concepts consistently.
 
-## Required boundary statements
+## Historical boundary statements
 
-The alpha documentation and package metadata should preserve these boundaries:
+The alpha documentation and package metadata were expected to preserve these boundaries:
 
-* Core has no ASP.NET Core dependency.
-* Core has no Entity Framework Core dependency.
-* Core has no database-provider dependency.
-* Core has no NetCoreApplicationTemplate dependency.
-* Core has no AI model dependency.
-* Core has no robotics or physical execution dependency.
-* Core remains framework-neutral and host-neutral.
+* Core had no ASP.NET Core dependency.
+* Core had no Entity Framework Core dependency.
+* Core had no database-provider dependency.
+* Core had no NetCoreApplicationTemplate dependency.
+* Core had no AI model dependency.
+* Core had no robotics or physical execution dependency.
+* Core remained framework-neutral and host-neutral.
+
+These boundaries later informed the stable `1.x` package-family direction. Current stable package boundaries are documented in [API Compatibility and Semantic Versioning](api-compatibility-and-semver.md) and [1.1.0 Release Notes](release-notes-110.md).
 
 ## Initial package responsibility
 
-`CDCavell.AsiBackbone.Core` is responsible for defining the first set of shared abstractions and primitives around:
+At the alpha planning stage, `CDCavell.AsiBackbone.Core` was responsible for defining the first set of shared abstractions and primitives around:
 
 * governance spine
 * intent/request evaluation
@@ -45,9 +50,11 @@ The alpha documentation and package metadata should preserve these boundaries:
 * policy version and hash tracking
 * correlation IDs
 
+The stable `1.x` Core surface has since expanded beyond this initial list while keeping the same host-neutral and provider-neutral direction.
+
 ## Suggested first vertical slice
 
-The first useful vertical slice should be testable without a web host or database.
+The first useful vertical slice was intended to be testable without a web host or database.
 
 ```text
 Create intent/request
@@ -57,7 +64,7 @@ Create intent/request
   -> Produce audit receipt shape
 ```
 
-The initial unit tests should cover:
+The initial unit tests were expected to cover:
 
 * allow
 * deny
@@ -71,7 +78,7 @@ The initial unit tests should cover:
 
 ## Non-goals for `0.1.0-alpha.1`
 
-The first alpha should not include:
+The first alpha was not intended to include:
 
 * EF Core entity mappings
 * migrations
@@ -86,11 +93,11 @@ The first alpha should not include:
 * external system gateway SDKs
 * AI inference or training APIs
 
-Those may be future package responsibilities after the Core language stabilizes.
+Those areas were expected to become later package responsibilities after the Core language stabilized. In the stable `1.1.0` line, several of those areas are now represented as explicit package boundaries or host-owned integration seams, while AI inference, robotics control, production tamper-evidence, and compliance guarantees remain outside the default package claim.
 
-## Future implementation sequence
+## Historical implementation sequence
 
-A practical implementation sequence is:
+The early practical implementation sequence was:
 
 1. Core abstractions and value objects
 2. Policy pipeline contracts
@@ -105,17 +112,29 @@ A practical implementation sequence is:
 11. Gateway examples
 12. Robotics or high-risk external execution examples
 
-## Alpha acceptance checklist
+This sequence is retained as planning history. Current package status should be read from [1.1.0 Release Notes](release-notes-110.md) and the current package documentation.
 
-Before `0.1.0-alpha.1`, the repository should be able to show:
+## Historical alpha acceptance checklist
+
+Before `0.1.0-alpha.1`, the repository was expected to show:
 
 * documented Core domain language
 * documented Core package boundary
-* README language that avoids overclaiming
+* README language that avoided overclaiming
 * no Core dependency on ASP.NET Core, EF Core, NetCoreApplicationTemplate, or AI model packages
-* XML documentation for public Core primitives as they are introduced
-* tests proving basic decision outcome behavior once implementation begins
+* XML documentation for public Core primitives as they were introduced
+* tests proving basic decision outcome behavior once implementation began
 
 ## Stable-release caution
 
-Names introduced in alpha may change before a stable `1.0.0` release. However, the conceptual boundary should remain stable: Core defines host-neutral governance primitives; integration packages own persistence, web, signing, storage, samples, and external execution concerns.
+Names introduced in alpha were allowed to change before a stable `1.0.0` release. The conceptual boundary was expected to remain stable: Core defines host-neutral governance primitives; integration packages own persistence, web, signing, storage, samples, and external execution concerns.
+
+That stable-era boundary is now tracked through the current stable documentation rather than this historical alpha note.
+
+## Related documentation
+
+- [1.1.0 Release Notes](release-notes-110.md)
+- [API Compatibility and Semantic Versioning](api-compatibility-and-semver.md)
+- [Historical Stable API Review](stable-api-review.md)
+- [Core Domain Language](core-domain-language.md)
+- [Historical Core Alpha Readiness Review](core-alpha-readiness-review.md)

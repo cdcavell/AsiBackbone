@@ -1,10 +1,10 @@
 # API Compatibility and Semantic Versioning
 
-This article defines the public API compatibility promise for the first stable `1.0.0` AsiBackbone package family and documents how semantic versioning is expected to apply after stabilization.
+This article defines the public API compatibility promise for the stable AsiBackbone `1.x` package family and documents how semantic versioning applies after stabilization.
 
-It complements the stable API review tracked in [issue #13](https://github.com/cdcavell/AsiBackbone/issues/13). That review verifies the public type names, namespaces, package boundaries, dependency direction, and extension points before the package family commits to a stable surface.
+It complements the historical stable API review tracked in [issue #13](https://github.com/cdcavell/AsiBackbone/issues/13). That review established the original `1.0.0` public type names, namespaces, package boundaries, dependency direction, and extension points. The released `1.1.0` package family expands the stable contract with additive analyzer, OpenTelemetry, and signing-provider package surfaces.
 
-## Compatibility promise for `1.0.0`
+## Compatibility promise for the stable `1.x` line
 
 Starting with `1.0.0`, packages identified as stable are expected to preserve their documented public API surface for consumers within the same major version.
 
@@ -14,26 +14,46 @@ The compatibility promise applies to:
 - public namespaces intended for consumer use;
 - documented extension points and service registration methods;
 - documented option shapes and default behavior;
-- durable artifact shapes that are explicitly described as stable, including their schema version where applicable.
+- durable artifact shapes that are explicitly described as stable, including their schema version where applicable;
+- package boundaries and dependency direction described as stable for the released package family.
 
 The promise does not mean implementation internals will never change. Internal code, private members, tests, documentation wording, samples, and non-public implementation details may change in minor or patch releases when the public contract remains compatible.
 
-## Stable package scope
+## Stable package scope by release
 
-At `1.0.0`, the stable contract should be limited to packages explicitly released as stable.
+Stable compatibility is package-specific. A package becomes part of the stable contract when it is released as a stable package and documented as part of the stable package family.
 
-The expected initial stable package line may include the package surfaces that have completed stable API review, such as:
+### Original `1.0.0` stable family
 
-- `CDCavell.AsiBackbone.Core`
-- `CDCavell.AsiBackbone.AspNetCore`
-- `CDCavell.AsiBackbone.Storage.InMemory`
-- `CDCavell.AsiBackbone.EntityFrameworkCore`
+The initial stable `1.0.0` package family established the first compatible `1.x` baseline:
 
-Future or provider-specific packages are not automatically part of the stable Core contract. Packages such as signing providers, external gateway providers, robotics examples, cloud-specific emitters, telemetry providers, or other later integrations may remain preview even when Core is stable. Those packages should communicate their own stability level through package versioning, README guidance, and documentation.
+| Package | Stable role |
+| --- | --- |
+| `CDCavell.AsiBackbone.Core` | Framework-neutral governance primitives, decisions, constraints, actor context, audit residue, acknowledgment, capability-token abstractions, and operation results. |
+| `CDCavell.AsiBackbone.AspNetCore` | ASP.NET Core host adapters for actor context, request correlation, HTTP result mapping, and acknowledgment challenge support. |
+| `CDCavell.AsiBackbone.Storage.InMemory` | Non-durable in-memory storage helpers for tests, samples, and local validation. |
+| `CDCavell.AsiBackbone.EntityFrameworkCore` | EF Core model configuration and host-owned persistence integration. |
+
+### Expanded `1.1.0` stable family
+
+The released `1.1.0` package family keeps the `1.0.0` packages compatible and adds stable additive package surfaces:
+
+| Package | `1.1.0` stable role |
+| --- | --- |
+| `CDCavell.AsiBackbone.Core` | Adds provider-neutral governance emission contracts, durable outbox contracts, DLP/classification policy primitives, signing-ready metadata abstractions, canonical hashing/signing seams, verification-policy primitives, and lifecycle/audit additions while preserving the compatible `1.x` Core line. |
+| `CDCavell.AsiBackbone.Storage.InMemory` | Adds non-durable lifecycle and outbox proof paths for tests, samples, and local validation. |
+| `CDCavell.AsiBackbone.EntityFrameworkCore` | Adds host-owned durable persistence surfaces for audit residue lifecycle and governance outbox records. |
+| `CDCavell.AsiBackbone.AspNetCore` | Adds endpoint governance and hosted outbox drain integration while keeping host ownership explicit. |
+| `CDCavell.AsiBackbone.Analyzers` | Stable build-time analyzer safety rails for governance persistence and continuation-flow patterns. |
+| `CDCavell.AsiBackbone.OpenTelemetry` | Stable concrete governance emission provider that projects provider-neutral envelopes into .NET diagnostics primitives such as `ActivitySource` and `Meter`. |
+| `CDCavell.AsiBackbone.Signing.LocalDevelopment` | Stable local-development signing and verification provider for tests, samples, and wiring proof paths only. Not production key custody. |
+| `CDCavell.AsiBackbone.Signing.ManagedKey` | Stable managed-key signing adapter boundary. The host supplies the actual managed-key client and operational controls. |
+
+Stable package status does not imply that every future provider idea is stable. Event Hubs, Purview, Azure-specific SDK adapters, robotics, immutable storage, and additional provider packages remain outside the stable contract unless separately reviewed and released as stable packages.
 
 ## What counts as a breaking change
 
-After `1.0.0`, a breaking change should require a new major version when it affects a stable package contract. Examples include:
+A breaking change should require a new major version when it affects a stable package contract. Examples include:
 
 - removing or renaming a public type, member, enum value, interface, namespace, or package;
 - changing public method signatures, constructor signatures, generic constraints, or return types;
@@ -41,8 +61,9 @@ After `1.0.0`, a breaking change should require a new major version when it affe
 - making previously optional configuration required;
 - changing stable serialized or persisted artifact shapes without a compatible reader, migration path, or schema-versioned transition;
 - changing service registration behavior in a way that breaks existing host startup code;
-- changing package dependency direction or adding a framework dependency that violates a documented package boundary;
-- changing documented exception behavior where callers are expected to handle that behavior.
+- changing package dependency direction or adding a framework/provider dependency that violates a documented package boundary;
+- changing documented exception behavior where callers are expected to handle that behavior;
+- converting a host-owned integration responsibility into a package-owned requirement without a compatible opt-in path.
 
 A change is not usually breaking when it only adds new optional APIs, adds new optional configuration, improves implementation behavior without changing the public contract, fixes a bug to match documented behavior, or updates documentation and samples.
 
@@ -52,9 +73,9 @@ AsiBackbone follows Semantic Versioning expectations after stabilization:
 
 | Version segment | Expected behavior |
 | --- | --- |
-| Major | May include intentional breaking changes to stable public APIs or stable artifact contracts. Breaking changes should be documented with migration notes. |
-| Minor | Adds backward-compatible public APIs, options, adapters, or features. Existing stable APIs should continue to compile and behave compatibly. |
-| Patch | Fixes bugs, documentation issues, packaging issues, or implementation defects without adding breaking public API changes. |
+| Major | May include intentional breaking changes to stable public APIs, stable package boundaries, or stable artifact contracts. Breaking changes should be documented with migration notes. |
+| Minor | Adds backward-compatible public APIs, options, adapters, packages, or features. Existing stable APIs should continue to compile and behave compatibly. |
+| Patch | Fixes bugs, documentation issues, packaging issues, or implementation defects without adding breaking public API changes. Patch releases can also clarify documentation and strengthen tests. |
 | Preview suffix | Indicates packages or features that are still under review and may change before stable release. |
 
 Before `1.0.0`, alpha or preview packages may still make breaking changes as the API is shaped. Those changes should remain visible in the changelog and release notes.
@@ -72,9 +93,10 @@ Expected stable-line behavior:
 | `1.0.0` | `1.0.0` | `1.0.0.0` | `1.0.0.0` | `1.0.0+...` |
 | `1.0.1` | `1.0.1` | `1.0.0.0` | `1.0.1.0` | `1.0.1+...` |
 | `1.1.0` | `1.1.0` | `1.0.0.0` | `1.1.0.0` | `1.1.0+...` |
+| `1.1.1` | `1.1.1` | `1.0.0.0` | `1.1.1.0` | `1.1.1+...` |
 | `2.0.0` | `2.0.0` | `2.0.0.0` | `2.0.0.0` | `2.0.0+...` |
 
-Before cutting `1.0.0`, the release-readiness checklist should verify that `AssemblyVersion`, `FileVersion`, `InformationalVersion`, package metadata, release notes, and repository tags match this policy.
+Before cutting stable releases, release validation should verify that `AssemblyVersion`, `FileVersion`, `InformationalVersion`, package metadata, release notes, and repository tags match this policy.
 
 ## Durable artifact and schema-version policy
 
@@ -82,29 +104,50 @@ Stable persisted or exported governance artifacts should carry an explicit schem
 
 Schema versioning does not replace package versioning. Package versions describe the released library. Schema versions describe durable payload shapes that may outlive a single package release.
 
+Additive artifact fields are normally acceptable in a compatible minor release when existing readers can continue operating or when schema-versioned handling is documented. Incompatible durable shape changes should use schema-version guidance, migration documentation, and a major-version boundary when needed.
+
 ## Provider and future package guidance
 
-Provider packages planned for later milestones should not be described as part of the stable Core contract until they complete their own API review and stable release checklist.
+Released provider packages have their own stable contract within the compatible `1.x` line once they are published as stable packages. In `1.1.0`, that includes:
 
-Examples of packages that may remain preview while the main package line stabilizes include:
+- `CDCavell.AsiBackbone.OpenTelemetry`;
+- `CDCavell.AsiBackbone.Signing.LocalDevelopment`;
+- `CDCavell.AsiBackbone.Signing.ManagedKey`.
 
-- signing and key-management providers;
-- cloud or observability emission packages;
-- external system gateway integrations;
-- robotics or physical execution examples;
+The analyzer package is also part of the released `1.1.0` stable package family, but analyzer diagnostics are build-time guidance rather than runtime enforcement.
+
+Provider packages planned for later milestones should not be described as part of the stable contract until they complete their own API review and stable release checklist.
+
+Examples of packages or integrations outside the current stable contract include:
+
+- Event Hubs governance emission provider packages;
+- Purview governance and lineage enrichment provider packages;
+- Azure Monitor-specific SDK adapters, beyond host-configured OpenTelemetry exporter guidance;
+- Azure Key Vault, Managed HSM, cloud KMS, HSM, or certificate-store implementations beyond the managed-key adapter boundary;
+- robotics or physical execution packages;
+- immutable-storage, timestamping, or external anchoring providers;
 - specialized persistence providers beyond the documented host-owned EF Core path.
 
-Documentation should state whether each package is stable, preview, experimental, sample-only, or host-owned integration guidance.
+Documentation should state whether each package is stable, preview, experimental, design-only, strategy-only, sample-only, or host-owned integration guidance.
 
 ## Release readiness checklist reference
 
-Before cutting a stable `1.0.0` release, the release readiness checklist should confirm that:
+Before cutting a stable release or stable package-family expansion, the release readiness checklist should confirm that:
 
-- the stable API review in [issue #13](https://github.com/cdcavell/AsiBackbone/issues/13) is complete or intentionally deferred with follow-up issues;
 - the stable package list is identified;
 - public APIs for stable packages are reviewed for naming, namespace, dependency direction, and extension-point clarity;
 - breaking changes found during review are resolved before release or captured for a future major version;
 - stable serialized artifacts have documented schema-version behavior;
 - the `AssemblyVersion` strategy is resolved and reflected in build metadata;
-- preview/provider packages are not implied to be part of the stable Core contract;
+- stable provider packages are clearly distinguished from future/design-only provider pages;
+- preview, strategy-only, design-only, or sample-only packages are not implied to be part of the stable contract;
 - the changelog and release notes include the compatibility promise and migration guidance where needed.
+
+## Related documentation
+
+- [Historical Stable API Review](stable-api-review.md)
+- [1.1.0 Release Notes](release-notes-110.md)
+- [Upgrade Guide: 1.0.0 to 1.1.0](upgrade-100-to-110.md)
+- [Schema Versioning](schema-versioning.md)
+- [API Baseline and Boundary Checks](api-baseline-and-boundary-checks.md)
+- [Release Validation](release-validation.md)

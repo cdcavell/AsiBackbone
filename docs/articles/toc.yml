@@ -13,7 +13,7 @@
       href: terminology-map.md
     - name: Why AsiBackbone?
       href: why-asi-backbone.md
-    - name: 1.1.0 Release Notes
+    - name: 1.1.x Release Notes
       href: release-notes-110.md
     - name: "Upgrade Guide: 1.0.0 to 1.1.0"
       href: upgrade-100-to-110.md
@@ -73,7 +73,7 @@
     - name: Privacy and Signing Boundaries
       href: privacy-and-signing-boundaries.md
 
-- name: "1.1.0 Observability, Outbox, Signing, and Governance Emission"
+- name: "1.1.x Observability, Outbox, Signing, and Governance Emission"
   items:
     - name: Observability and Governance Emission Architecture
       href: observability-and-governance-emission-architecture.md

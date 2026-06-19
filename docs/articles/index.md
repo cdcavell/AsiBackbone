@@ -42,6 +42,9 @@ These pages are the best entry point for current package consumers.
 
 These pages explain the framework-neutral language used across the package family.
 
+* [Intent to Execution: An Accountability Pattern](intent-to-execution-pattern.md)  
+  The intent-to-execution accountability pattern on its own terms, with no .NET prerequisite. A stack-neutral entry point to the idea.
+
 * [ASI Backbone Concept Synopsis](asi-backbone-concept.md)  
   Finalized concept synopsis for Accountable Systems Infrastructure, controlled decision flow, active policy structure, and safe wording boundaries.
 

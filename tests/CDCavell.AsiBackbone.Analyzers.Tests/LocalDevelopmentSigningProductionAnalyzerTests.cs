@@ -1,0 +1,208 @@
+using System.Collections.Immutable;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Diagnostics;
+using Xunit;
+
+namespace CDCavell.AsiBackbone.Analyzers.Tests;
+
+public sealed class LocalDevelopmentSigningProductionAnalyzerTests
+{
+    [Fact]
+    public async Task LocalDevelopmentSignerRegisteredInsideProductionBranchReportsASIB002()
+    {
+        string source = SourceWithProductionBody("services.AddSingleton<LocalDevelopmentSigningService>();");
+
+        ImmutableArray<Diagnostic> diagnostics = await GetAnalyzerDiagnosticsAsync(source);
+
+        Diagnostic diagnostic = Assert.Single(diagnostics);
+        Assert.Equal(LocalDevelopmentSigningProductionAnalyzer.DiagnosticId, diagnostic.Id);
+    }
+
+    [Fact]
+    public async Task LocalDevelopmentSignerConstructedInsideProductionBranchReportsASIB002()
+    {
+        string source = SourceWithProductionBody("_ = new LocalDevelopmentSigningService();");
+
+        ImmutableArray<Diagnostic> diagnostics = await GetAnalyzerDiagnosticsAsync(source);
+
+        Diagnostic diagnostic = Assert.Single(diagnostics);
+        Assert.Equal(LocalDevelopmentSigningProductionAnalyzer.DiagnosticId, diagnostic.Id);
+    }
+
+    [Fact]
+    public async Task LocalDevelopmentOptionsRegisteredInsideProductionBranchReportsASIB002()
+    {
+        string source = SourceWithProductionBody("services.AddSingleton(LocalDevelopmentSigningOptions.Create());");
+
+        ImmutableArray<Diagnostic> diagnostics = await GetAnalyzerDiagnosticsAsync(source);
+
+        Diagnostic diagnostic = Assert.Single(diagnostics);
+        Assert.Equal(LocalDevelopmentSigningProductionAnalyzer.DiagnosticId, diagnostic.Id);
+    }
+
+    [Fact]
+    public async Task LocalDevelopmentSignerRegisteredInsideDevelopmentBranchDoesNotReport()
+    {
+        string source = SourceWithBody("""
+            if (environment.IsDevelopment())
+            {
+                services.AddSingleton<LocalDevelopmentSigningService>();
+            }
+            """);
+
+        ImmutableArray<Diagnostic> diagnostics = await GetAnalyzerDiagnosticsAsync(source);
+
+        Assert.Empty(diagnostics);
+    }
+
+    [Fact]
+    public async Task ProductionEnvironmentNameComparisonReportsASIB002()
+    {
+        string source = SourceWithBody("""
+            if (environment.EnvironmentName == "Production")
+            {
+                services.AddSingleton<LocalDevelopmentSigningService>();
+            }
+            """);
+
+        ImmutableArray<Diagnostic> diagnostics = await GetAnalyzerDiagnosticsAsync(source);
+
+        Diagnostic diagnostic = Assert.Single(diagnostics);
+        Assert.Equal(LocalDevelopmentSigningProductionAnalyzer.DiagnosticId, diagnostic.Id);
+    }
+
+    [Fact]
+    public async Task ProductionConfigurationReviewedMarkerSuppressesASIB002()
+    {
+        string source = SourceWithBody("""
+            [AsiBackboneProductionConfigurationReviewed]
+            static void Configure(IServiceCollection services, IHostEnvironment environment)
+            {
+                if (environment.IsProduction())
+                {
+                    services.AddSingleton<LocalDevelopmentSigningService>();
+                }
+            }
+            "", includeConfigureWrapper: false);
+
+        ImmutableArray<Diagnostic> diagnostics = await GetAnalyzerDiagnosticsAsync(source);
+
+        Assert.Empty(diagnostics);
+    }
+
+    private static string SourceWithProductionBody(string body)
+    {
+        return SourceWithBody($$"""
+            if (environment.IsProduction())
+            {
+                {{body}}
+            }
+            """);
+    }
+
+    private static string SourceWithBody(string body, bool includeConfigureWrapper = true)
+    {
+        string configureCode = includeConfigureWrapper
+            ? $$"""
+                public static class Sample
+                {
+                    public static void Configure(IServiceCollection services, IHostEnvironment environment)
+                    {
+                        {{body}}
+                    }
+                }
+                """
+            : $$"""
+                public static class Sample
+                {
+                    {{body}}
+                }
+                """;
+
+        return $$"""
+            using System;
+            using CDCavell.AsiBackbone.Signing.LocalDevelopment;
+            using Microsoft.Extensions.DependencyInjection;
+            using Microsoft.Extensions.Hosting;
+
+            [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
+            internal sealed class AsiBackboneProductionConfigurationReviewedAttribute : Attribute;
+
+            {{configureCode}}
+
+            namespace CDCavell.AsiBackbone.Signing.LocalDevelopment
+            {
+                public sealed class LocalDevelopmentSigningService
+                {
+                }
+
+                public sealed class LocalDevelopmentSigningOptions
+                {
+                    public static LocalDevelopmentSigningOptions Create() => new();
+                }
+            }
+
+            namespace Microsoft.Extensions.DependencyInjection
+            {
+                public interface IServiceCollection
+                {
+                }
+
+                public static class ServiceCollectionServiceExtensions
+                {
+                    public static IServiceCollection AddSingleton<TService>(this IServiceCollection services) => services;
+
+                    public static IServiceCollection AddSingleton<TService>(this IServiceCollection services, TService instance) => services;
+                }
+            }
+
+            namespace Microsoft.Extensions.Hosting
+            {
+                public interface IHostEnvironment
+                {
+                    string EnvironmentName { get; }
+                }
+
+                public static class HostingEnvironmentExtensions
+                {
+                    public static bool IsProduction(this IHostEnvironment environment) => true;
+
+                    public static bool IsDevelopment(this IHostEnvironment environment) => false;
+                }
+            }
+            """;
+    }
+
+    private static async Task<ImmutableArray<Diagnostic>> GetAnalyzerDiagnosticsAsync(string source)
+    {
+        SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(
+            source,
+            new CSharpParseOptions(LanguageVersion.Preview));
+
+        var compilation = CSharpCompilation.Create(
+            "AnalyzerTestAssembly",
+            [syntaxTree],
+            GetMetadataReferences(),
+            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+        Diagnostic[] compilerErrors = [.. compilation.GetDiagnostics().Where(diagnostic => diagnostic.Severity == DiagnosticSeverity.Error)];
+
+        Assert.Empty(compilerErrors);
+
+        CompilationWithAnalyzers compilationWithAnalyzers = compilation.WithAnalyzers(
+            [new LocalDevelopmentSigningProductionAnalyzer()]);
+
+        return await compilationWithAnalyzers.GetAnalyzerDiagnosticsAsync();
+    }
+
+    private static PortableExecutableReference[] GetMetadataReferences()
+    {
+        string trustedPlatformAssemblies = (string?)AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES")
+            ?? throw new InvalidOperationException("Trusted platform assemblies were not available for analyzer test compilation.");
+
+        return [.. trustedPlatformAssemblies
+            .Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries)
+            .Select(path => MetadataReference.CreateFromFile(path))];
+    }
+}

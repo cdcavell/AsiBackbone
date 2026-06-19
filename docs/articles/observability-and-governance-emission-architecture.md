@@ -1,8 +1,6 @@
 # Observability and Governance Emission Architecture
 
-This article documents the forward `1.1.0` architecture direction for observability, durable outbox persistence, and optional governance emission providers.
-
-Target milestone: `1.1.0 - Observability, Outbox, and Governance Emission Providers`.
+This article documents the released `1.1.0` observability, durable outbox, signing, and governance emission architecture boundary plus the future provider directions that remain design-only.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a governance spine for consequential software decision flow. It is not an artificial superintelligence implementation, AI model host, robot controller, compliance product, signing product, or cloud governance platform by itself.
 
@@ -10,10 +8,12 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 > Provider-specific integrations depend on Core. Core must never depend on provider-specific integrations.
 >
 > `CDCavell.AsiBackbone.Core` remains framework-neutral and vendor-neutral. Observability platforms, streaming systems, governance catalogs, signing systems, storage providers, and cloud-specific enrichment belong in optional packages or host applications.
+>
+> `CDCavell.AsiBackbone.OpenTelemetry` is the only concrete released governance emission provider package in `1.1.0`. Event Hubs, Purview, Azure Monitor-specific SDK adapters, immutable-storage providers, and additional Azure-specific packages remain design-only or host-owned guidance unless a future release separately reviews and ships them. See [1.1.0 Release Notes - Accepted deferrals](release-notes-110.md#accepted-deferrals).
 
 ## Purpose
 
-The `1.1.0` integration direction is to preserve AsiBackbone's neutral governance spine while allowing host applications to emit structured decision records into operational and governance systems.
+The `1.1.0` integration direction preserves AsiBackbone's neutral governance spine while allowing host applications to emit structured decision records into operational and governance systems.
 
 The primary architecture path is:
 
@@ -28,6 +28,18 @@ Decision
 ```
 
 This sequence keeps the source-of-truth governance record local and durable before downstream emission occurs. External systems may enrich, search, alert, stream, classify, or catalog the event, but they should not become the only place where the governance decision exists.
+
+## Released versus design-only provider boundary
+
+| Provider path | `1.1.0` status | Appropriate responsibility | Not appropriate responsibility |
+| --- | --- | --- | --- |
+| OpenTelemetry | **Released package**: `CDCavell.AsiBackbone.OpenTelemetry`. | Convert neutral governance emission envelopes into .NET diagnostics through `ActivitySource`, activity events, tags, and `Meter` metrics. | Configure exporters, redefine Core decision semantics, or require Core to reference OpenTelemetry packages. |
+| Azure Monitor / Log Analytics | **Host-configured exporter guidance** through OpenTelemetry. No Azure Monitor-specific AsiBackbone package is released. | Receive telemetry through the host's OpenTelemetry exporter pipeline. | Become the only audit store or force Azure SDK dependencies into Core. |
+| Event Hubs | **Design-only future provider strategy.** No Event Hubs package is released in `1.1.0`. | Future optional streaming adapter for minimized governance events after durable outbox persistence. | Replace local durability or imply a current Event Hubs NuGet package exists. |
+| Purview | **Strategy-only future enrichment direction.** No Purview package is released in `1.1.0`. | Future optional governance/catalog/lineage enrichment for selected, summarized, classified events. | Store raw audit records by default, become the primary audit ledger, or imply a current Purview NuGet package exists. |
+| Signing providers | **Released package boundaries** for local-development and managed-key adapter packages. | Attach signing/verification behavior through provider packages and host-owned key operations. | Claim tamper-evidence without deployed signing, verification, key management, storage, and retention controls. |
+
+Provider-specific packages must depend on Core. Core must not depend on provider packages.
 
 ## High-level architecture
 
@@ -49,13 +61,16 @@ Durable local store / outbox
   | retries provider emission safely
   | records provider failure and classification state
   v
-Optional provider packages or host adapters
+Released provider packages or host adapters
   |
-  | OpenTelemetry export
-  | Azure Monitor / Log Analytics emission
-  | Event Hubs streaming
-  | Purview governance / lineage enrichment
-  | signing or immutable storage provider
+  | OpenTelemetry projection through CDCavell.AsiBackbone.OpenTelemetry
+  | host-configured Azure Monitor / Log Analytics exporter
+  |\  v
+Design-only / future provider strategy
+  |
+  | Event Hubs streaming provider design
+  | Purview governance / lineage enrichment strategy
+  | future Azure-specific or immutable-storage providers
 ```
 
 The local outbox is the reliability boundary. Provider emission is downstream of that boundary.
@@ -73,9 +88,8 @@ Core-neutral concerns include:
 - acknowledgment challenge and acknowledgment record shapes;
 - scoped capability token result shapes;
 - audit residue / decision receipt contracts;
-- gateway result contracts;
-- provider-neutral event envelope abstractions, if added later;
-- provider-neutral outbox contracts, if added later.
+- governance emission envelopes and provider-neutral results;
+- durable outbox contracts and drain primitives.
 
 Core should not contain:
 
@@ -87,108 +101,69 @@ Core should not contain:
 - provider-specific data classification, DLP, or lineage rules;
 - signing-provider implementation or key-management logic.
 
-## Provider-specific enrichment
-
-Provider packages or host adapters translate the neutral governance record into provider-specific payloads.
-
-| Provider path | Appropriate responsibility | Not appropriate responsibility |
-| --- | --- | --- |
-| OpenTelemetry | Convert neutral decision and audit residue fields into spans, events, metrics, and attributes. | Redefine Core decision semantics or require Core to reference OpenTelemetry packages. |
-| Azure Monitor / Log Analytics | Emit operationally useful records for search, alerting, dashboards, and incident review. | Become the only audit store or force Azure dependencies into Core. |
-| Event Hubs | Stream governance events to downstream processing systems. | Replace local durability or bypass policy, acknowledgment, and gateway records. |
-| Purview | Enrich governance records with classification, lineage, catalog, or policy-context metadata. | Store raw audit records by default or become the primary audit ledger. |
-| Signing / immutable storage | Add cryptographic verification or tamper-evidence when implemented. | Claim tamper-evidence before signing, verification, key management, and storage guarantees exist. |
-
-Provider-specific packages must depend on Core. Core must not depend on provider packages.
-
 ## Durable outbox baseline
 
 External emission should follow an outbox-style pattern so host applications do not lose governance records when downstream providers are unavailable.
 
-A durable outbox record should capture enough information to retry or inspect provider emission without recomputing the original decision.
+The durable outbox record should capture enough information to retry or inspect provider emission without recomputing the original decision. The outbox should be durable before provider emission. A process crash, provider outage, network failure, rate limit, or DLP failure should not erase the original decision residue.
 
-Suggested fields:
+Recommended sequence:
 
-| Field | Purpose |
-| --- | --- |
-| `OutboxRecordId` | Stable local identifier for the emission attempt. |
-| `EventId` | Stable governance event identifier. |
-| `EventType` | Decision, acknowledgment, capability token, gateway result, audit residue, or provider emission event. |
-| `SchemaVersion` | Version of the serialized event envelope. |
-| `CorrelationId` | Links the event to the host request or workflow. |
-| `TraceId` | Links the event to distributed tracing when available. |
-| `ActorId` | Host-provided actor identifier, preferably opaque and minimized. |
-| `OperationName` | Host-provided operation name or workflow code. |
-| `DecisionOutcome` | Neutral decision result. |
-| `ReasonCodes` | Neutral reason code list. |
-| `PolicyVersion` | Policy version used for the decision. |
-| `PolicyHash` | Policy hash used for the decision, when available. |
-| `AcknowledgmentId` | Links acknowledgment challenge and response when applicable. |
-| `CapabilityTokenId` | Links scoped execution grant when applicable. |
-| `GatewayRecordId` | Links gateway execution boundary result when applicable. |
-| `ClassificationState` | Unclassified, classified, redacted, blocked, quarantined, or failed. |
-| `EmissionStatus` | Pending, ready, emitted, failed-retryable, failed-terminal, or quarantined. |
-| `ProviderName` | Optional provider target such as OpenTelemetry, Azure Monitor, Event Hubs, or Purview. |
-| `ProviderRecordId` | Provider-side identifier after successful emission, when available. |
-| `AttemptCount` | Retry tracking. |
-| `NextAttemptUtc` | Retry scheduling. |
-| `LastErrorCode` | Normalized provider or classification error code. |
-| `CreatedUtc` / `UpdatedUtc` | Operational lifecycle timestamps. |
+```text
+Audit residue / lifecycle event
+  -> host-owned durable store
+  -> GovernanceEmissionEnvelope
+  -> IAsiBackboneGovernanceOutboxStore
+  -> AsiBackboneGovernanceOutboxDrain
+  -> IAsiBackboneGovernanceEmitter
+  -> provider result
+  -> delivered / failed / retryable / deferred / dead-letter outbox state
+```
 
-The outbox should be durable before provider emission. A process crash, provider outage, network failure, rate limit, or DLP failure should not erase the original decision residue.
+## OpenTelemetry as the released governance emission provider
 
-## OpenTelemetry as the neutral observability path
-
-OpenTelemetry is the preferred neutral observability path because it can represent traces, metrics, logs, spans, events, and attributes without binding Core to a single cloud provider.
+`CDCavell.AsiBackbone.OpenTelemetry` is the concrete released governance emission provider package for `1.1.0`.
 
 Preferred placement:
 
 ```text
-Core neutral decision and audit residue
-  -> host or optional OpenTelemetry adapter
-  -> OpenTelemetry spans/events/metrics
+Core neutral governance emission envelope
+  -> CDCavell.AsiBackbone.OpenTelemetry
+  -> ActivitySource / Meter
+  -> host OpenTelemetry SDK pipeline
   -> selected exporter/backend
 ```
 
-Recommended OpenTelemetry mapping:
-
-| AsiBackbone concept | OpenTelemetry mapping |
-| --- | --- |
-| `CorrelationId` / `TraceId` | Trace context or span attributes. |
-| Decision evaluation | Span event or structured log event. |
-| Decision outcome | Attribute such as `asi.decision.outcome`. |
-| Reason codes | Attribute list or structured event field. |
-| Policy version/hash | Attributes such as `asi.policy.version` and `asi.policy.hash`. |
-| Acknowledgment challenge | Span event or linked event. |
-| Capability token issuance | Span event with minimized token identifier only. |
-| Gateway execution result | Span event or child span. |
-| Outbox emission | Span event or metric for pending, emitted, failed, and quarantined records. |
+The OpenTelemetry package is responsible for provider-neutral envelope projection into .NET diagnostics primitives. The host remains responsible for exporter selection, Azure Monitor connection settings, sampling, retention, backend routing, and operational alerting.
 
 Telemetry payloads should remain metadata-minimized. Do not place secrets, raw tokens, raw personal data, protected records, prompt bodies, document contents, or sensitive payloads into telemetry attributes.
 
-## Azure Monitor / Log Analytics provider path
+## Azure Monitor / Log Analytics guidance
 
-Azure Monitor and Log Analytics are possible backend targets or optional provider paths. They are useful for operational search, dashboards, alerts, and incident response.
+Azure Monitor and Log Analytics are backend targets reached through the host-owned OpenTelemetry exporter pipeline. No Azure Monitor-specific AsiBackbone package is included in `1.1.0`.
 
-Appropriate Azure Monitor / Log Analytics usage:
+Accurate `1.1.0` wording:
 
-- emit minimized decision and audit residue metadata;
-- support dashboards for decision outcomes, escalation rates, acknowledgment rates, gateway denials, and provider emission failures;
-- support operational alerts for repeated denials, DLP failures, outbox backlog growth, or provider outage patterns;
-- preserve correlation and trace fields so host logs and governance records can be joined during incident review.
+```text
+CDCavell.AsiBackbone.OpenTelemetry
+  -> ActivitySource / Meter
+  -> host OpenTelemetry SDK pipeline
+  -> host-configured Azure Monitor exporter
+  -> Azure Monitor / Application Insights / Log Analytics
+```
 
 Boundary limits:
 
 - Azure Monitor / Log Analytics should not be described as the authoritative audit ledger unless the host explicitly designs it that way;
 - provider emission should not replace durable local/outbox persistence;
-- Azure dependencies belong in an optional provider package or host-owned adapter, not in Core;
+- Azure dependencies belong in host exporter configuration or a future optional provider package, not in Core;
 - provider payloads must be classified, minimized, and redacted according to host policy before emission.
 
-## Event Hubs streaming provider path
+## Design-only: Event Hubs streaming provider path
 
-Event Hubs is an optional streaming provider for organizations that need downstream processing, security analytics, cross-system integration, or near-real-time governance feeds.
+Event Hubs is a design-only future provider strategy in the current documentation set. It is not a released AsiBackbone NuGet package in `1.1.0`.
 
-Appropriate Event Hubs usage:
+Appropriate future Event Hubs usage:
 
 - stream minimized governance event envelopes after local outbox persistence;
 - partition by stable low-sensitivity keys such as tenant, region, operation group, or event type when appropriate;
@@ -199,16 +174,17 @@ Boundary limits:
 
 - Event Hubs is not the local source of truth;
 - event streaming should not bypass acknowledgment, capability token, or gateway boundaries;
-- payloads should avoid raw sensitive data unless the host has explicitly classified, approved, encrypted, and governed that data path.
+- payloads should avoid raw sensitive data unless the host has explicitly classified, approved, encrypted, and governed that data path;
+- the presence of [Design-Only: Event Hubs Governance Emission Provider](event-hubs-governance-emission-provider-design.md) does not imply a released Event Hubs provider package exists.
 
-## Purview governance and lineage enrichment
+## Strategy-only: Purview governance and lineage enrichment
 
-Purview should be treated as optional governance and lineage enrichment, not raw audit storage by default.
+Purview is a strategy-only future enrichment direction in the current documentation set. It is not a released AsiBackbone NuGet package in `1.1.0`.
 
-Appropriate Purview usage:
+Appropriate future Purview usage:
 
-- map governance events to classified assets, data products, workflows, or lineage nodes;
-- attach classification labels or policy-context metadata to emitted records;
+- map selected governance events to classified assets, data products, workflows, or lineage nodes;
+- attach classification labels or policy-context metadata to summarized records;
 - enrich investigation workflows with catalog context;
 - provide governance discovery for where consequential decisions interact with sensitive resources.
 
@@ -216,7 +192,8 @@ Boundary limits:
 
 - raw audit records should remain in the host-owned durable store unless the host explicitly chooses another authoritative audit store;
 - Purview should not receive raw personal data, protected records, prompts, secrets, or full payloads by default;
-- Purview enrichment failures should be captured in the outbox and handled according to policy without erasing the original local record.
+- Purview enrichment failures should be captured in the outbox and handled according to policy without erasing the original local record;
+- the presence of [Strategy-Only: Purview Governance and Lineage Enrichment](purview-governance-lineage-enrichment-strategy.md) does not imply a released Purview provider package exists.
 
 ## DLP and classification failure policy
 
@@ -233,95 +210,67 @@ At minimum, the host should define policy for:
 - which event types require signing before external emission;
 - which provider failures are retryable, terminal, or escalation-worthy.
 
-Suggested failure behavior:
-
-| Failure condition | Recommended default |
-| --- | --- |
-| Classifier unavailable | Do not emit sensitive or unclassified payloads. Keep the outbox record pending, deferred, or quarantined according to policy. |
-| Classification inconclusive | Emit only a minimized safe envelope, or defer emission until review. |
-| DLP violation | Block provider emission, retain local audit residue, and mark the outbox record as blocked or quarantined. |
-| Provider unavailable | Retain local record and retry with backoff. |
-| Provider rejects payload | Record normalized error, stop or retry according to error class, and avoid repeated unsafe emission attempts. |
-| Purview enrichment unavailable | Continue preserving local governance record; retry enrichment if policy allows. |
-| Signing required but signing unavailable | Do not claim tamper-evidence. Defer, quarantine, or emit unsigned only if host policy explicitly permits it. |
-
 DLP and classification are host-owned responsibilities unless a future package explicitly implements a classifier integration boundary.
 
 ## Signing-ready and current limitations
 
-The `1.0.0` package family already carries fields that are useful for future signing and verification, such as schema version, event ID, record ID, timestamps, correlation ID, trace ID, policy version, and policy hash.
+The `1.1.0` package family includes signing-ready abstractions and provider signing boundaries, but signing alone does not prove tamper-evidence.
 
-Those fields are signing-ready, not signed.
+Do not describe records as:
 
-Do not describe current records as:
-
-- cryptographically signed;
-- tamper-evident;
 - tamper-proof;
 - immutable;
 - non-repudiable;
 - legally certified;
-- compliance-approved.
+- compliance-approved;
+- externally anchored by default.
 
-Accurate wording for the current boundary:
+Accurate wording:
 
-- records include fields that can support future signing providers;
-- durable local/outbox records can carry policy and schema version identifiers;
-- hosts may apply their own signing, hashing, timestamping, immutable storage, or retention controls;
-- future provider packages may add explicit signing behavior after their own stable API and security review.
+- records can carry signing-ready metadata;
+- artifact hashes can be signed through configured provider packages or host-owned signing services;
+- verification policy can classify signature outcomes;
+- production tamper-evidence requires deployed signing, verification, protected key management, durable append-only or otherwise controlled storage, retention policy, monitoring, and incident response.
 
-## Candidate package boundaries
+## Candidate and released package boundaries
 
-These names are planning examples, not release promises.
-
-| Candidate boundary | Role | Dependency direction |
+| Boundary | Current status | Role |
 | --- | --- | --- |
-| `CDCavell.AsiBackbone.Core` | Neutral governance primitives, decision contracts, acknowledgment, capability, audit residue, and future provider-neutral seams. | No provider dependencies. |
-| `CDCavell.AsiBackbone.Storage.InMemory` | Development and test storage. | Depends on Core. |
-| `CDCavell.AsiBackbone.EntityFrameworkCore` | Host-owned EF Core persistence and durable local storage support. | Depends on Core. |
-| `CDCavell.AsiBackbone.Outbox` | Provider-neutral outbox contracts and processing helpers, if split from Core. | Depends on Core. |
-| `CDCavell.AsiBackbone.Observability.OpenTelemetry` | OpenTelemetry adapter package. | Depends on Core. |
-| `CDCavell.AsiBackbone.Observability.AzureMonitor` | Azure Monitor / Log Analytics adapter package. | Depends on Core and Azure SDKs. |
-| `CDCavell.AsiBackbone.Streaming.EventHubs` | Event Hubs streaming adapter package. | Depends on Core and Azure SDKs. |
-| `CDCavell.AsiBackbone.Governance.Purview` | Purview catalog, classification, and lineage enrichment adapter package. | Depends on Core and Microsoft Purview SDKs/APIs. |
-| `CDCavell.AsiBackbone.Signing.*` | Signing, verification, key, or immutable storage adapters. | Depends on Core and selected signing/storage providers. |
+| `CDCavell.AsiBackbone.Core` | Released | Neutral governance primitives, decision contracts, acknowledgment, capability, audit residue, emission contracts, outbox contracts, signing-ready seams, and verification policy. |
+| `CDCavell.AsiBackbone.Storage.InMemory` | Released | Development, test, sample, and local-validation storage. |
+| `CDCavell.AsiBackbone.EntityFrameworkCore` | Released | Host-owned EF Core persistence and durable local storage support. |
+| `CDCavell.AsiBackbone.AspNetCore` | Released | ASP.NET Core host integration and hosted outbox drain support. |
+| `CDCavell.AsiBackbone.Analyzers` | Released | Build-time governance safety rails. |
+| `CDCavell.AsiBackbone.OpenTelemetry` | Released | Concrete OpenTelemetry governance emission provider. |
+| `CDCavell.AsiBackbone.Signing.LocalDevelopment` | Released | Local-development signing and verification proof path. |
+| `CDCavell.AsiBackbone.Signing.ManagedKey` | Released | Managed-key signing adapter boundary with host-owned managed-key client. |
+| `CDCavell.AsiBackbone.Streaming.EventHubs` | Design-only candidate | Future Event Hubs streaming adapter package. |
+| `CDCavell.AsiBackbone.Governance.Purview` | Strategy-only candidate | Future Purview catalog, classification, and lineage enrichment adapter package. |
+| `CDCavell.AsiBackbone.Observability.AzureMonitor` | Future/host-owned guidance | Azure Monitor should currently be reached through host OpenTelemetry exporter configuration. |
 
 Future package names may change. The architectural rule should not change: provider packages depend on Core; Core never depends on provider packages.
 
-## Implementation phases
-
-The milestone should be implemented in phases so documentation does not imply integrations are already available.
-
-| Phase | Focus | Outcome |
-| --- | --- | --- |
-| Phase 0 | Stable `1.0.0` foundation | Core decision flow, acknowledgment, capability, audit residue, storage, and ASP.NET Core host seams remain the baseline. |
-| Phase 1 | Architecture documentation | Publish this architecture direction and link it from documentation navigation. |
-| Phase 2 | Durable outbox model | Define host-owned durable/outbox persistence contracts, record status values, retry expectations, and privacy boundaries. |
-| Phase 3 | Neutral observability | Add OpenTelemetry guidance or optional adapter surface without binding Core to a cloud provider. |
-| Phase 4 | Azure provider paths | Add optional Azure Monitor / Log Analytics and Event Hubs provider packages or samples. |
-| Phase 5 | Governance enrichment | Add optional Purview enrichment guidance or provider package for catalog, classification, and lineage context. |
-| Phase 6 | Signing and tamper-evidence | Add signing/verification providers only after key management, verification, rotation, storage, and wording boundaries are documented. |
-
-Until a phase is implemented and released, describe it as planned, optional, preview, sample-only, or host-owned guidance.
-
 ## Release wording checklist
 
-Use this checklist when documenting `1.1.0` provider work:
+Use this checklist when documenting provider work:
 
 - State that AsiBackbone is a governance spine, not an intelligence engine.
 - State that Core remains vendor-neutral and framework-neutral.
 - State that provider packages depend on Core, never the reverse.
 - State that durable local/outbox persistence is the reliability baseline before external emission.
-- State that OpenTelemetry is the preferred neutral observability path.
-- State that Azure Monitor / Log Analytics is an optional backend target or provider path.
-- State that Event Hubs is optional streaming, not a replacement for local durability.
-- State that Purview is optional governance/lineage enrichment, not raw audit storage by default.
+- State that OpenTelemetry is the concrete released governance emission provider in `1.1.0`.
+- State that Azure Monitor / Log Analytics is reached through host-configured OpenTelemetry exporter guidance unless a future package says otherwise.
+- State that Event Hubs is design-only future streaming provider strategy, not a released package in `1.1.0`.
+- State that Purview is strategy-only future governance/lineage enrichment, not a released package in `1.1.0`.
 - State that DLP/classification policy is host-owned unless a future provider explicitly implements it.
-- State that current records are signing-ready, not automatically signed or tamper-evident.
-- List implementation phases instead of implying all integrations already exist.
+- State that signed does not automatically mean verified, tamper-evident, immutable, or legally non-repudiable.
 
 ## Related documentation
 
+- [1.1.0 Release Notes - Accepted deferrals](release-notes-110.md#accepted-deferrals)
+- [Released: OpenTelemetry Governance Emission Provider](opentelemetry-governance-emission-provider.md)
+- [Design-Only: Event Hubs Governance Emission Provider](event-hubs-governance-emission-provider-design.md)
+- [Strategy-Only: Purview Governance and Lineage Enrichment](purview-governance-lineage-enrichment-strategy.md)
 - [Privacy and Signing Boundaries](privacy-and-signing-boundaries.md)
 - [Policy Evaluator Pipeline](policy-evaluator-pipeline.md)
 - [Core Domain Language](core-domain-language.md)

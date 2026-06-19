@@ -1,25 +1,32 @@
-# Event Hubs Governance Emission Provider Design
+# Design-Only: Event Hubs Governance Emission Provider
 
-This article documents the design for an optional Event Hubs governance emission provider for the `1.1.0 - Observability, Outbox, and Governance Emission Providers` milestone.
+This article documents a **design-only** future provider strategy for an optional Event Hubs governance emission provider. It is retained as planning guidance after the released `1.1.0 - Observability, Outbox, Signing, and Governance Emission Providers` package-family boundary.
 
 Issue: #145.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a governance spine for consequential software decision flow. It is not an AI model host, robot controller, streaming platform, SIEM product, cloud governance platform, signing product, or compliance guarantee by itself.
 
 > [!IMPORTANT]
+> This page does **not** document a released NuGet package. No Event Hubs provider package, Azure Event Hubs SDK adapter, Azure-specific emission package, or Event Hubs publishing implementation is included in the `1.1.0` stable package family.
+>
+> `CDCavell.AsiBackbone.OpenTelemetry` is the only concrete released governance emission provider package in `1.1.0`. Event Hubs remains a future/design-only provider direction unless a later release separately reviews and ships it.
+>
+> See [1.1.0 Release Notes - Accepted deferrals](release-notes-110.md#accepted-deferrals) for the current release boundary.
+
+> [!NOTE]
 > Event Hubs is a downstream streaming boundary. It must not replace durable local audit residue, durable outbox persistence, policy evaluation, acknowledgment, capability-token, or gateway records.
 
 ## Purpose
 
-The Event Hubs provider gives hosts an optional Azure streaming path for replayable governance event delivery to downstream monitoring, compliance, lineage, SIEM, enrichment, or analytics consumers.
+The Event Hubs provider design gives hosts a possible future Azure streaming path for replayable governance event delivery to downstream monitoring, compliance, lineage, SIEM, enrichment, or analytics consumers.
 
-The provider should adapt provider-neutral governance emission envelopes into Event Hubs messages without making `CDCavell.AsiBackbone.Core` depend on Azure SDKs, Azure resource concepts, Event Hubs namespaces, Purview, SIEM products, or provider-specific retry clients.
+A future provider should adapt provider-neutral governance emission envelopes into Event Hubs messages without making `CDCavell.AsiBackbone.Core` depend on Azure SDKs, Azure resource concepts, Event Hubs namespaces, Purview, SIEM products, or provider-specific retry clients.
 
 ```text
 Audit residue / lifecycle event / gateway result
   -> GovernanceEmissionEnvelope
   -> durable governance outbox
-  -> Event Hubs governance emitter
+  -> future Event Hubs governance emitter
   -> Azure Event Hubs namespace / event hub
   -> downstream monitoring, compliance, lineage, SIEM, enrichment, or analytics consumers
 ```
@@ -28,7 +35,7 @@ The durable local audit and outbox records remain the reliability and accountabi
 
 ## Package boundary
 
-Recommended provider package name:
+Candidate provider package name:
 
 ```text
 CDCavell.AsiBackbone.Streaming.EventHubs
@@ -42,7 +49,9 @@ CDCavell.AsiBackbone.Azure.EventHubs
 CDCavell.AsiBackbone.Observability.EventHubs
 ```
 
-The package should depend on:
+These names are planning candidates only. They are not part of the released `1.1.0` package list.
+
+A future package should depend on:
 
 * `CDCavell.AsiBackbone.Core`;
 * Event Hubs client abstractions needed to publish to Azure Event Hubs;
@@ -50,7 +59,7 @@ The package should depend on:
 * `Microsoft.Extensions.Options` for provider configuration;
 * `Microsoft.Extensions.Logging.Abstractions` for safe provider diagnostics if needed.
 
-The package should not depend on:
+The future package should not depend on:
 
 * OpenTelemetry exporters;
 * Azure Monitor, Application Insights, Log Analytics, Purview, Sentinel, or SIEM SDKs;
@@ -74,7 +83,7 @@ Core already owns the provider-neutral contracts:
 * `IAsiBackboneGovernanceOutboxStore`
 * `AsiBackboneGovernanceOutboxDrain`
 
-The Event Hubs provider should implement the neutral emitter seam:
+A future Event Hubs provider should implement the neutral emitter seam:
 
 ```text
 IAsiBackboneGovernanceEmitter
@@ -122,7 +131,7 @@ The first implementation should keep the envelope shape stable and versioned. Br
 
 ## Event Hubs message mapping
 
-The provider should map stable envelope fields to Event Hubs message properties so downstream processors can route and correlate without parsing the full message body first.
+A future provider should map stable envelope fields to Event Hubs message properties so downstream processors can route and correlate without parsing the full message body first.
 
 | Event Hubs field/property | Source | Guidance |
 | --- | --- | --- |
@@ -159,7 +168,7 @@ Avoid actor IDs, raw user IDs, audit residue IDs, event IDs, envelope IDs, trace
 
 ## Managed Identity and configuration
 
-The provider should support Managed Identity or Azure token credentials where appropriate. Connection-string configuration may be useful for local development or legacy hosts, but Managed Identity should be the preferred production path when the hosting environment supports it.
+A future provider should support Managed Identity or Azure token credentials where appropriate. Connection-string configuration may be useful for local development or legacy hosts, but Managed Identity should be the preferred production path when the hosting environment supports it.
 
 Recommended options shape:
 
@@ -194,7 +203,7 @@ Recommended host sequence:
 2. Persist audit residue or lifecycle event locally.
 3. Build a `GovernanceEmissionEnvelope`.
 4. Enqueue the envelope in `IAsiBackboneGovernanceOutboxStore`.
-5. Drain the outbox through `AsiBackboneGovernanceOutboxDrain` using `EventHubsGovernanceEmitter`.
+5. Drain the outbox through `AsiBackboneGovernanceOutboxDrain` using the future `EventHubsGovernanceEmitter`.
 6. The emitter serializes the envelope, maps safe message properties, and sends to Event Hubs.
 7. The emitter returns `GovernanceEmissionResult.Delivered` when Event Hubs accepts the event or batch.
 8. The outbox marks the entry delivered, deferred, failed, retryable, or dead-lettered according to the result.
@@ -318,13 +327,15 @@ Before implementation begins, confirm:
 | #140 Durable outbox | Event Hubs emission should happen after local durable outbox persistence. |
 | #141 Lifecycle stages | Lifecycle stage and sequence should be present in the envelope and safe message properties. |
 | #142 Audit residue telemetry | Trace, latency, gateway, outbox, and PII-safe identifiers provide provider mapping fields. |
-| #144 OpenTelemetry provider | OpenTelemetry is the neutral telemetry projection path; Event Hubs is the Azure streaming provider path. |
+| #144 OpenTelemetry provider | OpenTelemetry is the released `1.1.0` governance emission provider; Event Hubs remains a future Azure streaming provider design. |
 | #149 Observability architecture | This provider design follows the Core-neutral provider package architecture. |
 | #187 Governance emission contract | The provider implements the neutral `IAsiBackboneGovernanceEmitter` seam. |
 | #193 No-op outbox drain | The no-op proof path validates the drain sequence before this real provider is added. |
 
 ## Related documentation
 
+- [1.1.0 Release Notes - Accepted deferrals](release-notes-110.md#accepted-deferrals)
+- [Released: OpenTelemetry Governance Emission Provider](opentelemetry-governance-emission-provider.md)
 - [Observability and Governance Emission Architecture](observability-and-governance-emission-architecture.md)
 - [Governance Emission Contract](governance-emission-contract.md)
 - [Durable Audit and Outbox Persistence](durable-audit-outbox-persistence.md)
@@ -335,9 +346,10 @@ Before implementation begins, confirm:
 
 ## Non-goals
 
-This provider design does not implement:
+This design-only provider page does not implement:
 
 * Event Hubs publishing code;
+* an Event Hubs NuGet package in the `1.1.0` stable package family;
 * Event Hubs namespace or event hub provisioning;
 * Azure Monitor direct emission;
 * OpenTelemetry export configuration;
@@ -347,4 +359,4 @@ This provider design does not implement:
 * replacement of durable local audit/outbox persistence;
 * legal, compliance, retention, or data-residency guarantees.
 
-The provider should remain an optional streaming adapter for host-owned governance emission pipelines.
+Event Hubs should remain an optional future streaming adapter for host-owned governance emission pipelines unless a later release separately implements and publishes it.

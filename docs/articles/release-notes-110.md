@@ -42,6 +42,18 @@ The released `1.1.0` package line covers the package family below.
 
 Future Event Hubs, Purview, Azure-specific, Azure Key Vault-specific, HSM-specific, gateway, robotics, or immutable-storage packages are not part of the `1.1.0` stable contract unless separately released as stable packages.
 
+## Provider package boundary at a glance
+
+A documentation page can describe a future provider direction without meaning a NuGet package has shipped. Use this table to distinguish released package documentation from design-only or strategy-only guidance.
+
+| Area | `1.1.0` status | Documentation meaning |
+| --- | --- | --- |
+| OpenTelemetry governance emission | **Released package**: `CDCavell.AsiBackbone.OpenTelemetry`. | Concrete implemented provider package for projecting governance envelopes into .NET diagnostics. |
+| Azure Monitor / Log Analytics | **Host-configured exporter guidance.** | Reach Azure Monitor through the host OpenTelemetry SDK/exporter pipeline; no Azure Monitor-specific AsiBackbone package is released. |
+| Event Hubs governance emission | **Design-only future provider strategy.** | The Event Hubs page is planning guidance only; no Event Hubs NuGet package or Azure SDK adapter is released in `1.1.0`. |
+| Purview governance and lineage enrichment | **Strategy-only future enrichment direction.** | The Purview page is planning guidance only; no Purview NuGet package or SDK adapter is released in `1.1.0`. |
+| Signing provider packages | **Released provider boundaries.** | Local-development signing and managed-key adapter packages are released, but production trust guarantees remain host-owned. |
+
 ## What changed since 1.0.0
 
 ### Provider-neutral governance emission
@@ -113,7 +125,7 @@ Endpoint governance remains a host adapter. It does not replace authentication, 
 
 ### OpenTelemetry provider
 
-`CDCavell.AsiBackbone.OpenTelemetry` is the first concrete governance emission provider package.
+`CDCavell.AsiBackbone.OpenTelemetry` is the first concrete governance emission provider package and the only concrete released governance emission provider package in `1.1.0`.
 
 It implements `IAsiBackboneGovernanceEmitter` and projects governance envelopes into OpenTelemetry-friendly .NET diagnostics:
 
@@ -136,7 +148,16 @@ CDCavell.AsiBackbone.OpenTelemetry
   -> Azure Monitor / Application Insights / Log Analytics
 ```
 
-The OpenTelemetry provider should not hold Azure connection strings, instrumentation keys, workspace IDs, tenant IDs, or Azure SDK types.
+The OpenTelemetry provider should not hold Azure connection strings, instrumentation keys, workspace IDs, tenant IDs, or Azure SDK types. No Azure Monitor-specific AsiBackbone provider package is released in `1.1.0`.
+
+### Design-only provider strategy pages
+
+The documentation set includes design-only and strategy-only pages for future provider directions:
+
+- [Design-Only: Event Hubs Governance Emission Provider](event-hubs-governance-emission-provider-design.md)
+- [Strategy-Only: Purview Governance and Lineage Enrichment](purview-governance-lineage-enrichment-strategy.md)
+
+Those pages preserve architectural direction and provider-boundary thinking, but they do not imply released NuGet packages, Azure SDK adapters, production support, or stable implementation contracts. Event Hubs and Purview remain accepted deferrals for `1.1.0` unless a future release separately reviews and ships them.
 
 ### Roslyn analyzer safety rails
 
@@ -214,8 +235,8 @@ The following work is intentionally deferred or documentation/design-only for th
 
 | Area | `1.1.0` status |
 | --- | --- |
-| Event Hubs | Design documentation only. No Event Hubs SDK dependency or implementation package is included in the stable package family. |
-| Purview | Governance and lineage enrichment strategy documentation only. No Purview SDK dependency or implementation package is included in the stable package family. |
+| Event Hubs | Design documentation only. No Event Hubs SDK dependency, Event Hubs NuGet package, Azure Event Hubs adapter, or implementation package is included in the stable package family. |
+| Purview | Governance and lineage enrichment strategy documentation only. No Purview SDK dependency, Purview NuGet package, catalog-ingestion adapter, or implementation package is included in the stable package family. |
 | Azure Monitor | Supported through host-configured OpenTelemetry exporter guidance. No Azure Monitor-specific package is included. |
 | Azure Key Vault / Managed HSM / cloud KMS | Not implemented directly. The managed-key adapter requires a host-owned client and does not ship live cloud SDK integration by default. |
 | Production tamper evidence | Not claimed by default. Requires concrete signing, verification, storage, retention, key-management, monitoring, and operational controls implemented by the host or a future provider package. |
@@ -236,7 +257,8 @@ At a high level:
 6. Use `CDCavell.AsiBackbone.Signing.LocalDevelopment` only for local development, tests, samples, or proof paths.
 7. Use `CDCavell.AsiBackbone.Signing.ManagedKey` only when the host supplies a managed-key client, credentials, key identity, failure policy, monitoring, and verification plan.
 8. Configure Azure Monitor through the host OpenTelemetry pipeline if Azure Monitor is the selected backend.
-9. Do not claim signing, immutability, non-repudiation, or tamper-evidence unless a concrete signing, verification, storage, retention, and key-management design is actually implemented.
+9. Treat Event Hubs and Purview pages as future design/strategy guidance only unless a later release publishes concrete provider packages.
+10. Do not claim signing, immutability, non-repudiation, or tamper-evidence unless a concrete signing, verification, storage, retention, and key-management design is actually implemented.
 
 ## Validation record and reusable commands
 
@@ -268,7 +290,9 @@ For future releases, rerun validation against the final release candidate before
 - [Governance Emission Contract](governance-emission-contract.md)
 - [Durable Audit and Outbox Persistence](durable-audit-outbox-persistence.md)
 - [Hosted Governance Outbox Drain](hosted-governance-outbox-drain.md)
-- [OpenTelemetry Governance Emission Provider](opentelemetry-governance-emission-provider.md)
+- [Released: OpenTelemetry Governance Emission Provider](opentelemetry-governance-emission-provider.md)
+- [Design-Only: Event Hubs Governance Emission Provider](event-hubs-governance-emission-provider-design.md)
+- [Strategy-Only: Purview Governance and Lineage Enrichment](purview-governance-lineage-enrichment-strategy.md)
 - [DLP and Classification Failure Policy](dlp-classification-failure-policy.md)
 - [Signing-Ready Receipts and Key Handling](signing-ready-receipts-and-key-handling.md)
 - [Signing Provider Package Boundary](signing-provider-package-boundary.md)
@@ -277,6 +301,4 @@ For future releases, rerun validation against the final release candidate before
 - [Verification Policy and Result Handling](verification-policy-and-result-handling.md)
 - [Key Rotation and Retired-Key Verification](key-rotation-and-retired-key-verification.md)
 - [Capability Grant Hardening](capability-grant-hardening.md)
-- [Event Hubs Governance Emission Provider Design](event-hubs-governance-emission-provider-design.md)
-- [Purview Governance and Lineage Enrichment Strategy](purview-governance-lineage-enrichment-strategy.md)
 - [API Compatibility and SemVer](api-compatibility-and-semver.md)

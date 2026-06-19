@@ -2,7 +2,7 @@
 
 AsiBackbone uses quality reports to make the validation surface easier to inspect from the documentation site.
 
-Coverage and mutation analysis answer different questions:
+Coverage, mutation analysis, smoke testing, and concurrency validation answer different questions:
 
 | Report | Question answered | Purpose |
 | --- | --- | --- |
@@ -10,8 +10,9 @@ Coverage and mutation analysis answer different questions:
 | Core Branch Coverage | Did Core tests exercise the decision branches that protect governance behavior? | Enforces a stricter branch gate for the framework-neutral Core package without applying that same threshold to every adapter or sample. |
 | Mutation Analysis | Would tests fail if behavior changed? | Checks assertion strength by introducing small code mutations and verifying tests catch them. |
 | External Consumer Smoke Test | Can a clean host consume package-shaped artifacts? | Validates package ergonomics, DI registration, host-owned EF persistence, in-memory audit storage, and HTTP allow/deny/acknowledgment flows. |
+| EF Core Outbox Concurrency Validation | What happens under concurrent EF Core writes, retryable failures, and drain-worker contention? | Provides CI-friendly relational evidence for outbox/lifecycle persistence and documents the current non-claiming drain boundary. |
 
-For a governance package, both views matter. Coverage helps show that policy, acknowledgment, audit, capability-token, DLP/classification, provider-neutral emission, durable outbox, signing, verification, and canonical-hashing paths are exercised. The Core branch coverage gate protects the framework-neutral governance engine from missed policy, decision, signing, capability, acknowledgment, audit, emission, outbox, DLP/classification, and verification branches. Mutation analysis helps show that tests are strong enough to detect behavior changes in selected high-value decision logic. External consumer smoke testing helps prove that package-shaped adoption works from outside the repository's normal project-reference graph.
+For a governance package, these views all matter. Coverage helps show that policy, acknowledgment, audit, capability-token, DLP/classification, provider-neutral emission, durable outbox, signing, verification, and canonical-hashing paths are exercised. The Core branch coverage gate protects the framework-neutral governance engine from missed policy, decision, signing, capability, acknowledgment, audit, emission, outbox, DLP/classification, and verification branches. Mutation analysis helps show that tests are strong enough to detect behavior changes in selected high-value decision logic. External consumer smoke testing helps prove that package-shaped adoption works from outside the repository's normal project-reference graph. EF Core outbox concurrency validation adds repeatable evidence for durable outbox behavior under concurrent local persistence and worker contention without claiming exactly-once delivery.
 
 ## Current quality posture
 
@@ -56,6 +57,12 @@ The historical pre-`1.0.0` mutation boundary and accepted `1.x` expansion deferr
 - [External Consumer Smoke Test](external-consumer-smoke-test.md)
 
 The external consumer smoke test packs the repository projects into local NuGet packages, generates a temporary external xUnit project, installs the local packages without project references, and validates Core, ASP.NET Core adapter, EF Core ledger, in-memory audit, and HTTP decision-flow ergonomics.
+
+### EF Core Outbox Concurrency Validation
+
+- [EF Core Outbox Concurrency Validation](ef-core-outbox-concurrency-validation.md)
+
+The EF Core outbox concurrency validation tests run inside `CDCavell.AsiBackbone.EntityFrameworkCore.Tests`. They use SQLite shared in-memory relational persistence to exercise concurrent outbox/lifecycle writes, retryable drain failures, and multi-worker drain contention. The validation intentionally preserves the current boundary: the provider-neutral drain is not an exactly-once delivery system and does not claim or lease work before provider emission.
 
 > [!NOTE]
 > If a report link is unavailable, the related workflow may not have generated that report yet. Generate the reports locally or rerun the **Publish Quality Reports** workflow after the report-producing steps are configured.
@@ -122,6 +129,12 @@ Run the external consumer smoke test from the repository root:
 bash ./eng/smoke-tests/external-consumer-smoke.sh
 ```
 
+Run the EF Core outbox concurrency validation from the repository root:
+
+```bash
+dotnet test ./tests/CDCavell.AsiBackbone.EntityFrameworkCore.Tests/CDCavell.AsiBackbone.EntityFrameworkCore.Tests.csproj --configuration Release --filter FullyQualifiedName~EfCoreOutboxConcurrencyValidationTests
+```
+
 ## Interpreting mutation results
 
 Mutation testing should be reviewed as a quality signal, not as a raw score chase.
@@ -138,3 +151,7 @@ For Issue #134, see [Core Test Triage](core-test-triage.md) for the focused Core
 ## Interpreting external consumer smoke-test results
 
 External consumer smoke-test failures should be treated as package-consumer ergonomics failures first. The generated test project is intentionally outside the solution's normal project-reference graph, so failures can expose packaging, dependency, registration, or host-boundary regressions that normal repository tests may not catch.
+
+## Interpreting EF Core outbox concurrency validation results
+
+EF Core outbox concurrency validation failures should be reviewed as reliability-boundary regressions or documentation-boundary mismatches. Passing results show repeatable evidence for the tested relational path; they do not prove universal production throughput, exactly-once delivery, or distributed locking across all database providers.

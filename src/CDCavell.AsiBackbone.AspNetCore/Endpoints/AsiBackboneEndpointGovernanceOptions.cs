@@ -53,6 +53,26 @@ public sealed class AsiBackboneEndpointGovernanceOptions
     public bool RequireGovernanceMetadata { get; set; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether local-development ProblemDetails diagnostics should be emitted for endpoint governance failures.
+    /// </summary>
+    public bool EnableDevelopmentDiagnostics { get; set; }
+
+    /// <summary>
+    /// Gets or sets the documentation base URL used when development diagnostics include a troubleshooting link.
+    /// </summary>
+    public string? DevelopmentDiagnosticsDocumentationBaseUrl { get; set; }
+
+    /// <summary>
+    /// Gets a collection of metadata keys whose values should be redacted from development diagnostics.
+    /// </summary>
+    public ISet<string> DevelopmentDiagnosticsRedactedMetadataKeys { get; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Gets or sets a value indicating whether non-sensitive metadata values may be included in development diagnostics.
+    /// </summary>
+    public bool IncludeDevelopmentDiagnosticsMetadataValues { get; set; } = true;
+
+    /// <summary>
     /// Gets or sets an optional factory for the generic 403 response used by middleware when no explicit failure result was supplied.
     /// </summary>
     /// <remarks>

@@ -136,7 +136,11 @@ if ($null -ne $expectedAssemblyVersion) {
 
 Assert-Equal (Get-ProjectProperty $directoryBuildPropsPath 'FileVersion') "$directoryVersionPrefix.0" 'Directory.Build.props FileVersion'
 
-$projectFiles = @(Get-ChildItem -LiteralPath (Resolve-RepositoryPath 'src') -Recurse -Filter '*.csproj' -File | Sort-Object FullName)
+$projectFiles = @(
+    Get-ChildItem -LiteralPath (Resolve-RepositoryPath 'src') -Recurse -Filter '*.csproj' -File |
+        Where-Object { $_.FullName -notmatch '[\\/]templates[\\/]' } |
+        Sort-Object FullName
+)
 
 if ($projectFiles.Count -eq 0) {
     Add-Failure 'No package projects were found under src.'

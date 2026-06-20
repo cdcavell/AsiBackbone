@@ -7,6 +7,7 @@
     <Project Path="src/CDCavell.AsiBackbone.Core/CDCavell.AsiBackbone.Core.csproj">
       <Build Solution="Debug|*" Project="false" />
     </Project>
+    <Project Path="src/CDCavell.AsiBackbone.DependencyInjection/CDCavell.AsiBackbone.DependencyInjection.csproj" />
     <Project Path="src/CDCavell.AsiBackbone.EntityFrameworkCore/CDCavell.AsiBackbone.EntityFrameworkCore.csproj">
       <Build Solution="Debug|*" Project="false" />
     </Project>

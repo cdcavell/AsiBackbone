@@ -3,7 +3,7 @@
 This section maps the AsiBackbone documentation set for the stable `1.1.x` Accountable Systems Infrastructure package family.
 
 > [!IMPORTANT]
-> In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is governance infrastructure for accountable software decision flow, not an artificial superintelligence implementation.
+> In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is governance infrastructure for accountable software decision flow, not an artificial superintelligence implementation. See [Project Boundaries and Non-Claims](project-boundaries.md) for the canonical boundary reference.
 
 ## Search and navigation
 
@@ -21,6 +21,7 @@ Released stable package surfaces include Core, DependencyInjection, Storage.InMe
 * [First 15 Minutes: Standard API Gating](quickstart-api-gating.md)
 * [Reference Deployment: Plain ASP.NET Core Host Evidence](reference-deployment.md)
 * [Terminology Map](terminology-map.md)
+* [Project Boundaries and Non-Claims](project-boundaries.md)
 * [Progressive Adoption Ladder](progressive-adoption.md)
 * [Getting Started](getting-started.md)
 * [Core Governance Flow Diagrams](core-governance-flow-diagrams.md)
@@ -96,6 +97,7 @@ These pages cover the additive `1.1.x` governance-emission and durability surfac
 
 These pages describe signing, verification, capability, and cryptographic-hardening posture. They do not imply production tamper-evidence unless a concrete signing, storage, verification, and key-management path is deployed by the host.
 
+* [Project Boundaries and Non-Claims](project-boundaries.md)
 * [Production Wording and Stable Signing Boundaries](production-wording-and-alpha-limitations.md)
 * [Signing-Ready Receipts and Key Handling](signing-ready-receipts-and-key-handling.md)
 * [Signed Audit and Outbox Records](signed-audit-and-outbox-records.md)

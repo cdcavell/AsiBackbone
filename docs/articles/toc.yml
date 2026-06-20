@@ -9,6 +9,8 @@
       href: progressive-adoption.md
     - name: "First 15 Minutes: Standard API Gating"
       href: quickstart-api-gating.md
+    - name: Core Governance Flow Diagrams
+      href: core-governance-flow-diagrams.md
     - name: Terminology Map
       href: terminology-map.md
     - name: Why AsiBackbone?
@@ -22,6 +24,8 @@
   items:
     - name: "Intent to Execution: An Accountability Pattern"
       href: intent-to-execution-pattern.md
+    - name: Core Governance Flow Diagrams
+      href: core-governance-flow-diagrams.md
     - name: ASI Backbone Concept Synopsis
       href: asi-backbone-concept.md
     - name: Core Domain Language
@@ -154,6 +158,8 @@
 
 - name: Quality and Release Process
   items:
+    - name: Quality Reports
+      href: ../quality/index.md
     - name: Release Validation
       href: release-validation.md
     - name: Historical 1.1.0 Release Readiness Record

@@ -36,6 +36,8 @@
       href: host-owned-execution-enforcement.md
     - name: Acknowledgment Workflow
       href: dynamic-liability-handshake.md
+    - name: Endpoint Governance Diagnostics
+      href: endpoint-governance-development-diagnostics.md
     - name: Core Domain Language
       href: core-domain-language.md
     - name: Glossary
@@ -70,6 +72,8 @@
       href: aspnetcore-integration-boundary.md
     - name: ASP.NET Core Endpoint Governance
       href: aspnetcore-endpoint-governance.md
+    - name: Endpoint Governance Diagnostics
+      href: endpoint-governance-development-diagnostics.md
     - name: Testing Harness
       href: testing-harness.md
     - name: Plain ASP.NET Core Host Sample

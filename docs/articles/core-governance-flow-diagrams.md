@@ -64,27 +64,17 @@ flowchart LR
 The Dynamic Liability Handshake is a reflexive acknowledgment pattern for consequential actions. It records that an actor was presented with a structured challenge and responded, but it is not by itself a legal waiver, authorization grant, or production compliance guarantee.
 
 ```mermaid
-sequenceDiagram
-    participant Actor as Actor
-    participant Host as Host application
-    participant Backbone as AsiBackbone policy layer
-    participant Handshake as Acknowledgment challenge service
-    participant Audit as Audit sink or outbox
-
-    Actor->>Host: Proposes or requests consequential action
-    Host->>Backbone: Evaluate policy context
-    Backbone-->>Host: GovernanceDecision AcknowledgmentRequired
-    Host->>Handshake: Create challenge with reason codes and context
-    Handshake-->>Actor: Present consequences and acknowledgment text
-    Actor-->>Handshake: Accepts or rejects challenge
-    Handshake-->>Host: Acknowledgment result
-    Host->>Audit: Persist decision and acknowledgment residue
-
-    alt Accepted and host policy still permits continuation
-        Host->>Host: Continue through host-owned execution boundary
-    else Missing, rejected, expired, or host policy blocks
-        Host-->>Actor: Do not execute governed action
-    end
+flowchart LR
+    Actor["Actor"] -->|"Proposes or requests consequential action"| Host["Host application"]
+    Host -->|"Evaluate policy context"| Backbone["AsiBackbone policy layer"]
+    Backbone -->|"GovernanceDecision: AcknowledgmentRequired"| Host
+    Host -->|"Create challenge with reason codes and context"| Handshake["Acknowledgment challenge service"]
+    Handshake -->|"Present consequences and acknowledgment text"| Actor
+    Actor -->|"Accepts or rejects challenge"| Handshake
+    Handshake -->|"Acknowledgment result"| Host
+    Host -->|"Persist decision and acknowledgment residue"| Audit["Audit sink or outbox"]
+    Host -->|"Accepted and host policy permits"| Execute["Continue through host-owned execution boundary"]
+    Host -->|"Missing, rejected, expired, or host policy blocks"| Stop["Do not execute governed action"]
 ```
 
 **Caption:** The handshake makes acknowledgment explicit and auditable. The host still owns identity, authorization, UI, response handling, persistence, and final execution behavior.

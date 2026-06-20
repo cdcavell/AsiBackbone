@@ -46,25 +46,40 @@ public sealed class CorePackageBoundaryTests
     /// Verifies package dependency direction for the stable package family.
     /// </summary>
     [Fact]
-    public void StableIntegrationPackagesReferenceOnlyCoreProject()
+    public void StablePackagesUseOnlyApprovedProjectReferences()
     {
         var expectedReferencesByProject = new Dictionary<string, string[]>(StringComparer.Ordinal)
         {
+            ["src/CDCavell.AsiBackbone.DependencyInjection/CDCavell.AsiBackbone.DependencyInjection.csproj"] = [],
             ["src/CDCavell.AsiBackbone.Storage.InMemory/CDCavell.AsiBackbone.Storage.InMemory.csproj"] =
             [
-                "../CDCavell.AsiBackbone.Core/CDCavell.AsiBackbone.Core.csproj"
+                "../CDCavell.AsiBackbone.Core/CDCavell.AsiBackbone.Core.csproj",
+                "../CDCavell.AsiBackbone.DependencyInjection/CDCavell.AsiBackbone.DependencyInjection.csproj"
             ],
             ["src/CDCavell.AsiBackbone.EntityFrameworkCore/CDCavell.AsiBackbone.EntityFrameworkCore.csproj"] =
             [
-                "../CDCavell.AsiBackbone.Core/CDCavell.AsiBackbone.Core.csproj"
+                "../CDCavell.AsiBackbone.Core/CDCavell.AsiBackbone.Core.csproj",
+                "../CDCavell.AsiBackbone.DependencyInjection/CDCavell.AsiBackbone.DependencyInjection.csproj"
             ],
             ["src/CDCavell.AsiBackbone.AspNetCore/CDCavell.AsiBackbone.AspNetCore.csproj"] =
             [
-                "../CDCavell.AsiBackbone.Core/CDCavell.AsiBackbone.Core.csproj"
+                "../CDCavell.AsiBackbone.Core/CDCavell.AsiBackbone.Core.csproj",
+                "../CDCavell.AsiBackbone.DependencyInjection/CDCavell.AsiBackbone.DependencyInjection.csproj"
             ],
             ["src/CDCavell.AsiBackbone.OpenTelemetry/CDCavell.AsiBackbone.OpenTelemetry.csproj"] =
             [
-                "../CDCavell.AsiBackbone.Core/CDCavell.AsiBackbone.Core.csproj"
+                "../CDCavell.AsiBackbone.Core/CDCavell.AsiBackbone.Core.csproj",
+                "../CDCavell.AsiBackbone.DependencyInjection/CDCavell.AsiBackbone.DependencyInjection.csproj"
+            ],
+            ["src/CDCavell.AsiBackbone.Signing.LocalDevelopment/CDCavell.AsiBackbone.Signing.LocalDevelopment.csproj"] =
+            [
+                "../CDCavell.AsiBackbone.Core/CDCavell.AsiBackbone.Core.csproj",
+                "../CDCavell.AsiBackbone.DependencyInjection/CDCavell.AsiBackbone.DependencyInjection.csproj"
+            ],
+            ["src/CDCavell.AsiBackbone.Signing.ManagedKey/CDCavell.AsiBackbone.Signing.ManagedKey.csproj"] =
+            [
+                "../CDCavell.AsiBackbone.Core/CDCavell.AsiBackbone.Core.csproj",
+                "../CDCavell.AsiBackbone.DependencyInjection/CDCavell.AsiBackbone.DependencyInjection.csproj"
             ]
         };
 

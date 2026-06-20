@@ -6,17 +6,24 @@ The analyzer package is intentionally separate from `CDCavell.AsiBackbone.Core`.
 
 ## Intent
 
-AsiBackbone keeps persistence, transaction boundaries, outbox behavior, and execution ownership in the host application. That boundary is important, but it also means a host can accidentally create a governance artifact and then continue without preserving audit residue, durable outbox state, acknowledgment evidence, capability-grant checks, or a safe continuation path.
+AsiBackbone keeps persistence, transaction boundaries, outbox behavior, signing key custody, verification paths, and execution ownership in the host application. That boundary is important, but it also means a host can accidentally create a governance artifact and then continue without preserving audit residue, durable outbox state, acknowledgment evidence, capability-grant checks, production signing review, or a safe continuation path.
 
 The analyzer package helps catch simple, recognizable mistakes at build time. It is developer ergonomics, not proof of correctness.
 
-## Rule IDs
+## Rule IDs and severity posture
 
-| Rule | Default severity | Summary |
-| --- | --- | --- |
-| `ASIB001` | Warning | Governance artifact created or returned and then discarded. |
+| Rule | Default severity | Recommended posture | Summary |
+| --- | --- | --- | --- |
+| `ASIB001` | Warning | Advisory safety rail | Governance artifact created or returned and then discarded. |
+| `ASIB002` | Warning | Elevate to error in production CI when local-development signing must be prohibited | Local-development signing is registered, instantiated, or passed through a production branch. |
 
-Future rules may expand this set for audit residue, capability-grant validation, acknowledgment checks, and high-risk endpoint persistence boundaries.
+The package does not make builds fail by default. Hosts that want build-breaking behavior should configure it explicitly:
+
+```ini
+dotnet_diagnostic.ASIB002.severity = error
+```
+
+Keep exploratory or workflow guidance as warnings unless the host has decided a rule represents a production release gate.
 
 ## ASIB001 - Persist or continue AsiBackbone governance artifact
 
@@ -62,9 +69,55 @@ return decision;
 
 The analyzer intentionally starts conservatively. It does not try to prove that every stored or returned artifact is durably persisted. Runtime tests, transaction tests, and integration tests still matter.
 
+## ASIB002 - Do not wire local-development signing in production branches
+
+`ASIB002` warns when a recognized local-development signing type is used under an explicit production environment branch.
+
+Examples of recognized local-development types include:
+
+- `LocalDevelopmentSigningService`
+- `LocalDevelopmentSigningOptions`
+- other public types under `CDCavell.AsiBackbone.Signing.LocalDevelopment`
+
+### Diagnostic examples
+
+```csharp
+if (builder.Environment.IsProduction())
+{
+    builder.Services.AddSingleton<LocalDevelopmentSigningService>();
+}
+```
+
+```csharp
+if (environment.EnvironmentName == "Production")
+{
+    builder.Services.AddSingleton(LocalDevelopmentSigningOptions.Create());
+}
+```
+
+The rule is intentionally narrow. It looks for a reliable static signal that the local-development provider is being wired under a production branch, such as `IHostEnvironment.IsProduction()` or `EnvironmentName == "Production"`. It does not warn merely because a non-test project references the local-development signing package, because many hosts keep sample, smoke-test, local-only, or documentation proof paths in non-test assemblies.
+
+### Safer examples
+
+```csharp
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddSingleton<LocalDevelopmentSigningService>();
+}
+```
+
+```csharp
+if (builder.Environment.IsProduction())
+{
+    builder.Services.AddSingleton<IAsiBackboneSigningService, HostOwnedManagedKeySigningService>();
+}
+```
+
+For production-like environments, use a host-owned managed-key adapter, HSM-backed provider, cloud key client, or verification boundary that is reviewed as part of the host application's production security model.
+
 ## Suppression and custom host-owned persistence
 
-Prefer fixing the flow. When a custom host architecture already handles persistence or safe continuation in a way the analyzer cannot recognize, use normal Roslyn suppression tools:
+Prefer fixing the flow. When a custom host architecture already handles persistence, safe continuation, or reviewed production configuration in a way the analyzer cannot recognize, use normal Roslyn suppression tools:
 
 ```csharp
 #pragma warning disable ASIB001
@@ -76,15 +129,17 @@ Hosts may also configure severity in `.editorconfig`:
 
 ```ini
 dotnet_diagnostic.ASIB001.severity = warning
+dotnet_diagnostic.ASIB002.severity = error
 ```
 
-or disable it for a specific project:
+or disable a rule for a specific project:
 
 ```ini
 dotnet_diagnostic.ASIB001.severity = none
+dotnet_diagnostic.ASIB002.severity = none
 ```
 
-For custom persistence wrappers, the analyzer also honors a host-defined marker attribute named `AsiBackbonePersistenceHandledAttribute` on the containing method or type.
+For custom persistence wrappers, `ASIB001` honors a host-defined marker attribute named `AsiBackbonePersistenceHandledAttribute` on the containing method or type.
 
 ```csharp
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
@@ -98,7 +153,14 @@ public async Task ExecuteThroughCustomPipelineAsync()
 }
 ```
 
-The marker is name-based and host-owned. It is not a runtime contract shipped by Core.
+For rare reviewed production-configuration examples, `ASIB002` honors a host-defined marker attribute named `AsiBackboneProductionConfigurationReviewedAttribute` on the containing method or type.
+
+```csharp
+[AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
+internal sealed class AsiBackboneProductionConfigurationReviewedAttribute : Attribute;
+```
+
+These markers are name-based and host-owned. They are not runtime contracts shipped by Core.
 
 ## Non-goals
 
@@ -108,7 +170,8 @@ The analyzer package does not:
 - require EF Core, ASP.NET Core, or any cloud provider;
 - prove transactional correctness;
 - replace durable audit storage, outbox persistence, transaction tests, or integration tests;
+- provide production key custody or managed-key hardening;
 - block builds by default unless the host chooses to treat analyzer warnings as errors;
 - certify compliance or legal adequacy.
 
-Use the analyzers as early-warning rails around common persistence and continuation mistakes, not as the only safety mechanism.
+Use the analyzers as early-warning rails around common persistence, continuation, and production-configuration mistakes, not as the only safety mechanism.

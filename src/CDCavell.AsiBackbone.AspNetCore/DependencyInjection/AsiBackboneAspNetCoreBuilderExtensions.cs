@@ -1,3 +1,4 @@
+using CDCavell.AsiBackbone.AspNetCore.Outbox;
 using CDCavell.AsiBackbone.DependencyInjection;
 
 namespace CDCavell.AsiBackbone.AspNetCore.DependencyInjection;

@@ -132,6 +132,12 @@ $expectedPackages = @(
         ReadmeMustContain = @('Accountable Systems Infrastructure', 'Stable `1.1.x` package family')
     },
     [pscustomobject]@{
+        Id = 'CDCavell.AsiBackbone.DependencyInjection'
+        Description = 'Explicit AddAsiBackbone builder facade for coordinating host-selected AsiBackbone provider registrations.'
+        Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'dependency-injection', 'builder', 'configuration', 'provider-coordination')
+        ReadmeMustContain = @('Explicit `AddAsiBackbone(...)` builder facade', 'does not register persistence')
+    },
+    [pscustomobject]@{
         Id = 'CDCavell.AsiBackbone.Analyzers'
         Description = 'Roslyn analyzer safety rails for Accountable Systems Infrastructure governance persistence and continuation flows.'
         Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'roslyn', 'analyzer', 'safety-rails', 'audit', 'outbox')

@@ -13,7 +13,7 @@ dotnet new install CDCavell.AsiBackbone.Templates
 ## Create a governed Web API
 
 ```powershell
-dotnet new asibackbone-webapi -n MyGovernedApi --host-style plain
+dotnet new asibackbone-webapi -n MyGovernedApi --hostStyle plain
 ```
 
 Available host styles:

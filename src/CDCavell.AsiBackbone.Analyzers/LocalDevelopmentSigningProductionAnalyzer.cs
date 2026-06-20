@@ -203,8 +203,8 @@ public sealed class LocalDevelopmentSigningProductionAnalyzer : DiagnosticAnalyz
         IOperation left = Unwrap(binaryOperation.LeftOperand);
         IOperation right = Unwrap(binaryOperation.RightOperand);
 
-        return IsEnvironmentNameReference(left) && IsProductionConstant(right)
-            || IsEnvironmentNameReference(right) && IsProductionConstant(left);
+        return (IsEnvironmentNameReference(left) && IsProductionConstant(right))
+            || (IsEnvironmentNameReference(right) && IsProductionConstant(left));
     }
 
     private static bool IsEnvironmentNameReference(IOperation? operation)

@@ -21,6 +21,9 @@ These pages are the best first stops for implementation-first adoption. The opti
 * [First 15 Minutes: Standard API Gating](articles/quickstart-api-gating.md)  
   Practical package-consumer walkthrough for gating one ASP.NET Core endpoint.
 
+* [dotnet new Templates](articles/templates.md)  
+  Installable project templates for generating a governed ASP.NET Core host from a clean directory.
+
 * [Reference Deployment: Plain ASP.NET Core Host Evidence](articles/reference-deployment.md)  
   Repeatable local evidence showing request, decision, audit, signing, ledger, and endpoint-governance output in a realistic host sample.
 
@@ -66,6 +69,8 @@ CDCavell.AsiBackbone.Core
 CDCavell.AsiBackbone.Storage.InMemory
 CDCavell.AsiBackbone.EntityFrameworkCore
 CDCavell.AsiBackbone.AspNetCore
+CDCavell.AsiBackbone.Testing
+CDCavell.AsiBackbone.Templates
 CDCavell.AsiBackbone.Analyzers
 CDCavell.AsiBackbone.OpenTelemetry
 CDCavell.AsiBackbone.Signing.LocalDevelopment
@@ -82,6 +87,7 @@ Use these pages when wiring AsiBackbone into a host application.
 
 * [Implementation-First Adoption Path](articles/implementation-first-adoption.md)
 * [First 15 Minutes: Standard API Gating](articles/quickstart-api-gating.md)
+* [dotnet new Templates](articles/templates.md)
 * [Reference Deployment: Plain ASP.NET Core Host Evidence](articles/reference-deployment.md)
 * [Terminology Map](articles/terminology-map.md)
 * [Project Boundaries and Non-Claims](articles/project-boundaries.md)
@@ -118,6 +124,7 @@ These pages remain available for readers interested in the broader framing, but 
 Use these pages when wiring AsiBackbone into a host application.
 
 * [Reference Deployment: Plain ASP.NET Core Host Evidence](articles/reference-deployment.md)
+* [dotnet new Templates](articles/templates.md)
 * [Aspire AppHost Sample](articles/aspire-apphost-sample.md)
 * [Progressive Adoption Ladder](articles/progressive-adoption.md)
 * [EF Core Integration Boundary](articles/ef-core-integration-boundary.md)
@@ -223,4 +230,4 @@ It should be understood as Accountable Systems Infrastructure, not an intelligen
 
 - [Implementation-First Adoption Path](articles/implementation-first-adoption.md)
 - [First 15 Minutes: Standard API Gating](articles/quickstart-api-gating.md)
-- [Documentation Articles](articles/)
+- [dotnet new Templates](articles/templates.md)

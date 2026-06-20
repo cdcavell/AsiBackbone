@@ -88,7 +88,7 @@ jobs:
 
           mkdir -p "$PACKAGE_OUTPUT"
 
-          mapfile -t package_projects < <(find ./src -name '*.csproj' -type f | sort)
+          mapfile -t package_projects < <(find ./src -name '*.csproj' -type f -not -path '*/templates/*' | sort)
 
           if [ "${#package_projects[@]}" -eq 0 ]; then
             echo "No package projects were found under ./src."
@@ -119,6 +119,10 @@ jobs:
       - name: Validate generated NuGet metadata
         shell: pwsh
         run: ./scripts/Validate-NuGetPackageMetadata.ps1 -PackageDirectory "$env:PACKAGE_OUTPUT"
+
+      - name: Validate dotnet new templates
+        shell: bash
+        run: bash ./eng/smoke-tests/template-package-smoke.sh "$PACKAGE_OUTPUT"
 
       - name: Run external consumer smoke test
         shell: bash

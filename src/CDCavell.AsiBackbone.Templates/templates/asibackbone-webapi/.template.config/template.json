@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "CDCavell",
+  "classifications": [
+    "Web",
+    "Web API",
+    "Governance",
+    "AsiBackbone"
+  ],
+  "identity": "CDCavell.AsiBackbone.Templates.WebApi",
+  "name": "AsiBackbone governed ASP.NET Core Web API",
+  "shortName": "asibackbone-webapi",
+  "sourceName": "Company.AsibackboneTemplate",
+  "preferNameDirectory": true,
+  "defaultName": "MyGovernedApi",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "primaryOutputs": [
+    {
+      "path": "Company.AsibackboneTemplate.csproj"
+    }
+  ],
+  "symbols": {
+    "hostStyle": {
+      "type": "parameter",
+      "datatype": "choice",
+      "displayName": "Host style",
+      "description": "Select the generated host style.",
+      "defaultValue": "plain",
+      "replaces": "__HOST_STYLE__",
+      "choices": [
+        {
+          "choice": "plain",
+          "description": "Standard ASP.NET Core Web API structure with direct AsiBackbone package registration."
+        },
+        {
+          "choice": "netcoretemplate",
+          "description": "NetCoreApplicationTemplate-aligned wording and conventions without adding a NetCoreApplicationTemplate dependency."
+        }
+      ]
+    }
+  }
+}

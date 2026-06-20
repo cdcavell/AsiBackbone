@@ -52,7 +52,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
         await middleware.InvokeAsync(
             httpContext,
             new ThrowingEndpointGovernanceService(),
-            Microsoft.Extensions.Options.Options.Create(new AsiBackboneEndpointGovernanceOptions()));
+            Options.Create(new AsiBackboneEndpointGovernanceOptions()));
 
         Assert.True(nextCalled);
     }
@@ -80,7 +80,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
         await middleware.InvokeAsync(
             httpContext,
             new BlockingEndpointGovernanceService(),
-            Microsoft.Extensions.Options.Options.Create(new AsiBackboneEndpointGovernanceOptions()));
+            Options.Create(new AsiBackboneEndpointGovernanceOptions()));
 
         Assert.False(nextCalled);
         Assert.Equal(StatusCodes.Status403Forbidden, httpContext.Response.StatusCode);
@@ -109,7 +109,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
         await middleware.InvokeAsync(
             httpContext,
             new DefaultBlockingEndpointGovernanceService(),
-            Microsoft.Extensions.Options.Options.Create(new AsiBackboneEndpointGovernanceOptions()));
+            Options.Create(new AsiBackboneEndpointGovernanceOptions()));
 
         Assert.False(nextCalled);
         Assert.Equal(StatusCodes.Status403Forbidden, httpContext.Response.StatusCode);
@@ -144,7 +144,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
         await middleware.InvokeAsync(
             httpContext,
             new DecisionDefaultBlockingEndpointGovernanceService(),
-            Microsoft.Extensions.Options.Options.Create(new AsiBackboneEndpointGovernanceOptions
+            Options.Create(new AsiBackboneEndpointGovernanceOptions
             {
                 EnableDevelopmentDiagnostics = true,
                 DevelopmentDiagnosticsDocumentationBaseUrl = "https://cdcavell.github.io/AsiBackbone/articles/"
@@ -187,7 +187,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
         await middleware.InvokeAsync(
             httpContext,
             new DecisionDefaultBlockingEndpointGovernanceService(),
-            Microsoft.Extensions.Options.Options.Create(new AsiBackboneEndpointGovernanceOptions()));
+            Options.Create(new AsiBackboneEndpointGovernanceOptions()));
 
         Assert.False(nextCalled);
         Assert.Equal(StatusCodes.Status403Forbidden, httpContext.Response.StatusCode);
@@ -220,7 +220,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
         await middleware.InvokeAsync(
             httpContext,
             new DecisionDefaultBlockingEndpointGovernanceService(),
-            Microsoft.Extensions.Options.Options.Create(new AsiBackboneEndpointGovernanceOptions
+            Options.Create(new AsiBackboneEndpointGovernanceOptions
             {
                 EnableDevelopmentDiagnostics = true
             }));
@@ -253,7 +253,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
         await middleware.InvokeAsync(
             httpContext,
             new DefaultBlockingEndpointGovernanceService(),
-            Microsoft.Extensions.Options.Options.Create(new AsiBackboneEndpointGovernanceOptions
+            Options.Create(new AsiBackboneEndpointGovernanceOptions
             {
                 DefaultForbiddenResultFactory = _ => Microsoft.AspNetCore.Http.Results.Text(
                     "rich failure response",
@@ -288,7 +288,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
         await middleware.InvokeAsync(
             httpContext,
             new TextBlockingEndpointGovernanceService("custom failure response", StatusCodes.Status409Conflict),
-            Microsoft.Extensions.Options.Options.Create(new AsiBackboneEndpointGovernanceOptions
+            Options.Create(new AsiBackboneEndpointGovernanceOptions
             {
                 DefaultForbiddenResultFactory = _ => Microsoft.AspNetCore.Http.Results.Text(
                     "default factory response",
@@ -427,7 +427,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
         await middleware.InvokeAsync(
             httpContext,
             new ThrowingEndpointGovernanceService(),
-            Microsoft.Extensions.Options.Options.Create(new AsiBackboneEndpointGovernanceOptions
+            Options.Create(new AsiBackboneEndpointGovernanceOptions
             {
                 RequireGovernanceMetadata = true
             }));
@@ -456,7 +456,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
         await middleware.InvokeAsync(
             httpContext,
             new ThrowingEndpointGovernanceService(),
-            Microsoft.Extensions.Options.Options.Create(new AsiBackboneEndpointGovernanceOptions
+            Options.Create(new AsiBackboneEndpointGovernanceOptions
             {
                 RequireGovernanceMetadata = true
             }));

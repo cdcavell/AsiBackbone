@@ -21,7 +21,9 @@
     <Project Path="src/CDCavell.AsiBackbone.Storage.InMemory/CDCavell.AsiBackbone.Storage.InMemory.csproj">
       <Build Solution="Debug|*" Project="false" />
     </Project>
-    <Project Path="src/CDCavell.AsiBackbone.Templates/CDCavell.AsiBackbone.Templates.csproj" />
+    <Project Path="src/CDCavell.AsiBackbone.Templates/CDCavell.AsiBackbone.Templates.csproj">
+      <Build Solution="Debug|*" Project="false" />
+    </Project>
     <Project Path="src/CDCavell.AsiBackbone.Testing/CDCavell.AsiBackbone.Testing.csproj">
       <Build Solution="Debug|*" Project="false" />
     </Project>

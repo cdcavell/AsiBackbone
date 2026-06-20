@@ -195,9 +195,8 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
             policyVersion: currentDecision.PolicyVersion,
             policyHash: currentDecision.PolicyHash);
 
-        if (AsiBackboneEndpointGovernanceDevelopmentDiagnostics.IsEnabled(httpContext, endpointOptions))
-        {
-            return AsiBackboneEndpointGovernanceResult.Block(
+        return AsiBackboneEndpointGovernanceDevelopmentDiagnostics.IsEnabled(httpContext, endpointOptions)
+            ? AsiBackboneEndpointGovernanceResult.Block(
                 AsiBackboneEndpointGovernanceDevelopmentDiagnostics.CreateProblem(
                     httpContext,
                     endpointOptions,
@@ -208,10 +207,8 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
                     detail: message,
                     statusCode: endpointOptions.ConfigurationFailureStatusCode,
                     metadata: metadata),
-                decision);
-        }
-
-        return AsiBackboneEndpointGovernanceResult.Block(
+                decision)
+            : AsiBackboneEndpointGovernanceResult.Block(
             Microsoft.AspNetCore.Http.Results.Problem(
                 title: "Endpoint governance configuration is incomplete.",
                 detail: message,
@@ -241,9 +238,8 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
             policyVersion: currentDecision.PolicyVersion,
             policyHash: currentDecision.PolicyHash);
 
-        if (AsiBackboneEndpointGovernanceDevelopmentDiagnostics.IsEnabled(httpContext, endpointOptions))
-        {
-            return AsiBackboneEndpointGovernanceResult.Block(
+        return AsiBackboneEndpointGovernanceDevelopmentDiagnostics.IsEnabled(httpContext, endpointOptions)
+            ? AsiBackboneEndpointGovernanceResult.Block(
                 AsiBackboneEndpointGovernanceDevelopmentDiagnostics.CreateProblem(
                     httpContext,
                     endpointOptions,
@@ -254,10 +250,8 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
                     detail: message,
                     statusCode: endpointOptions.CapabilityFailureStatusCode,
                     metadata: metadata),
-                decision);
-        }
-
-        return AsiBackboneEndpointGovernanceResult.Block(
+                decision)
+            : AsiBackboneEndpointGovernanceResult.Block(
             Microsoft.AspNetCore.Http.Results.Problem(
                 title: "Endpoint capability grant validation failed.",
                 detail: message,

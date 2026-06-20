@@ -87,9 +87,8 @@ public sealed class AsiBackboneEndpointGovernanceMiddleware(RequestDelegate next
         AsiBackboneEndpointGovernanceResult? result,
         string decisionStage)
     {
-        if (AsiBackboneEndpointGovernanceDevelopmentDiagnostics.IsEnabled(httpContext, options))
-        {
-            return AsiBackboneEndpointGovernanceDevelopmentDiagnostics.CreateProblem(
+        return AsiBackboneEndpointGovernanceDevelopmentDiagnostics.IsEnabled(httpContext, options)
+            ? AsiBackboneEndpointGovernanceDevelopmentDiagnostics.CreateProblem(
                 httpContext,
                 options,
                 descriptor,
@@ -97,10 +96,8 @@ public sealed class AsiBackboneEndpointGovernanceMiddleware(RequestDelegate next
                 decisionStage,
                 title: "Endpoint governance blocked execution.",
                 detail: "Endpoint governance blocked this request before the selected endpoint executed.",
-                statusCode: StatusCodes.Status403Forbidden);
-        }
-
-        return options.DefaultForbiddenResultFactory is null
+                statusCode: StatusCodes.Status403Forbidden)
+            : options.DefaultForbiddenResultFactory is null
             ? DefaultForbiddenResult
             : options.DefaultForbiddenResultFactory(httpContext)
                 ?? throw new InvalidOperationException($"{nameof(AsiBackboneEndpointGovernanceOptions.DefaultForbiddenResultFactory)} must return a non-null result.");

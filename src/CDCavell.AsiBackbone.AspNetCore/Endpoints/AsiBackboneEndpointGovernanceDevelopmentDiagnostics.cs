@@ -156,7 +156,7 @@ internal static class AsiBackboneEndpointGovernanceDevelopmentDiagnostics
 
         string trimmedBaseUrl = baseUrl.Trim();
 
-        return trimmedBaseUrl.EndsWith("/", StringComparison.Ordinal)
+        return trimmedBaseUrl.EndsWith('/')
             ? trimmedBaseUrl + DocumentationArticleName
             : trimmedBaseUrl + "/" + DocumentationArticleName;
     }

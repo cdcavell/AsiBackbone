@@ -1,20 +1,22 @@
 - name: Documentation Home
   href: index.md
 
-- name: Start Here / Current Stable Usage
+- name: Start Here / Implementation-First Usage
   items:
-    - name: Getting Started
-      href: getting-started.md
-    - name: Progressive Adoption Ladder
-      href: progressive-adoption.md
+    - name: Implementation-First Adoption Path
+      href: implementation-first-adoption.md
     - name: "First 15 Minutes: Standard API Gating"
       href: quickstart-api-gating.md
-    - name: Core Governance Flow Diagrams
-      href: core-governance-flow-diagrams.md
     - name: Reference Deployment Evidence
       href: reference-deployment.md
     - name: Terminology Map
       href: terminology-map.md
+    - name: Progressive Adoption Ladder
+      href: progressive-adoption.md
+    - name: Getting Started
+      href: getting-started.md
+    - name: Core Governance Flow Diagrams
+      href: core-governance-flow-diagrams.md
     - name: Why AsiBackbone?
       href: why-asi-backbone.md
     - name: 1.1.x Release Notes
@@ -22,39 +24,29 @@
     - name: "Upgrade Guide: 1.0.0 to 1.1.0"
       href: upgrade-100-to-110.md
 
-- name: Core Concepts and Domain Language
+- name: Core Engineering Concepts and Domain Language
   items:
-    - name: "Intent to Execution: An Accountability Pattern"
-      href: intent-to-execution-pattern.md
-    - name: Core Governance Flow Diagrams
-      href: core-governance-flow-diagrams.md
-    - name: ASI Backbone Concept Synopsis
-      href: asi-backbone-concept.md
-    - name: Core Domain Language
-      href: core-domain-language.md
     - name: Policy Evaluator Pipeline
       href: policy-evaluator-pipeline.md
     - name: Host-Owned Execution Enforcement
       href: host-owned-execution-enforcement.md
-    - name: Dynamic Liability Handshake
+    - name: Acknowledgment Workflow
       href: dynamic-liability-handshake.md
+    - name: Core Domain Language
+      href: core-domain-language.md
+    - name: Glossary
+      href: glossary.md
+
+- name: Optional Conceptual Background
+  items:
+    - name: "Intent to Execution: An Accountability Pattern"
+      href: intent-to-execution-pattern.md
+    - name: ASI Backbone Concept Synopsis
+      href: asi-backbone-concept.md
     - name: Gateway and Regional Policy Flow
       href: gateway-and-regional-policy-flow.md
     - name: Equations and Toy Models
       href: equations-and-toy-models.md
-    - name: Glossary
-      href: glossary.md
-
-- name: Adoption and Use Cases
-  items:
-    - name: Governance Tool Comparisons
-      href: governance-tool-comparisons.md
-    - name: Adoption and Target Use Cases
-      href: use-cases.md
-    - name: Enterprise Adoption Personas
-      href: enterprise-adoption-personas.md
-    - name: Government and Regulated Systems
-      href: government-and-regulated-systems.md
 
 - name: Package Integration Guides
   items:
@@ -83,7 +75,7 @@
     - name: Privacy and Signing Boundaries
       href: privacy-and-signing-boundaries.md
 
-- name: "1.1.x Observability, Outbox, Signing, and Governance Emission"
+- name: Observability, Outbox, Signing, and Governance Emission
   items:
     - name: Observability and Governance Emission Architecture
       href: observability-and-governance-emission-architecture.md
@@ -93,72 +85,23 @@
       href: durable-audit-outbox-persistence.md
     - name: Hosted Governance Outbox Drain
       href: hosted-governance-outbox-drain.md
-    - name: Outbox Multi-Worker Concurrency
-      href: outbox-multi-worker-concurrency.md
-    - name: Outbox Drain Reliability and Alerting
-      href: outbox-drain-reliability-and-alerting.md
-    - name: Safe Audit and Telemetry Data
-      href: safe-audit-telemetry-data.md
-    - name: Audit Residue Observability Schema
-      href: audit-residue-observability-schema.md
-    - name: DLP and Classification Failure Policy
-      href: dlp-classification-failure-policy.md
-    - name: DLP and Classification Scanner Integration
-      href: dlp-classification-scanner-integration.md
-
-- name: Released Provider Package Documentation
-  items:
-    - name: Roslyn Analyzers
-      href: roslyn-analyzers.md
-    - name: "Released: OpenTelemetry Governance Emission Provider"
+    - name: OpenTelemetry Governance Emission Provider
       href: opentelemetry-governance-emission-provider.md
     - name: Signing Provider Package Boundary
       href: signing-provider-package-boundary.md
     - name: Managed-Key Signing Provider
       href: managed-key-signing-provider.md
 
-- name: Security and Cryptographic Boundaries
+- name: Adoption and Optional Scenarios
   items:
-    - name: Production Wording and Stable Signing Boundaries
-      href: production-wording-and-alpha-limitations.md
-    - name: Signing-Ready Receipts and Key Handling
-      href: signing-ready-receipts-and-key-handling.md
-    - name: Signed Audit and Outbox Records
-      href: signed-audit-and-outbox-records.md
-    - name: Verification Policy and Result Handling
-      href: verification-policy-and-result-handling.md
-    - name: Key Rotation and Retired-Key Verification
-      href: key-rotation-and-retired-key-verification.md
-    - name: Capability Grant Hardening
-      href: capability-grant-hardening.md
-    - name: Audit Integrity Chain Model
-      href: audit-integrity-chain-model.md
-    - name: Cryptographic Security Posture and Production Guidance
-      href: cryptographic-security-posture.md
-    - name: Cryptographic Security Hardening Roadmap
-      href: cryptographic-security-hardening-roadmap.md
-
-- name: Design-Only and Future Provider Strategy
-  items:
-    - name: "Design-Only: Event Hubs Governance Emission Provider"
-      href: event-hubs-governance-emission-provider-design.md
-    - name: "Strategy-Only: Purview Governance and Lineage Enrichment"
-      href: purview-governance-lineage-enrichment-strategy.md
-
-- name: Advanced Scenarios
-  items:
-    - name: AI Agent Gateway
-      href: scenarios/ai-agent-gateway.md
-    - name: Human Approval Before AI Tool Execution
-      href: scenarios/human-approval-before-ai-tool-execution.md
-    - name: High-Risk Administrative Action
-      href: scenarios/high-risk-administrative-action.md
-    - name: Sensitive Data Access Request
-      href: scenarios/sensitive-data-access-request.md
-    - name: Deployment or Infrastructure Change Gate
-      href: scenarios/deployment-or-infrastructure-change-gate.md
-    - name: Robotics Operational Gateway
-      href: scenarios/robotics-operational-gateway.md
+    - name: Governance Tool Comparisons
+      href: governance-tool-comparisons.md
+    - name: Adoption and Target Use Cases
+      href: use-cases.md
+    - name: Enterprise Adoption Personas
+      href: enterprise-adoption-personas.md
+    - name: Government and Regulated Systems
+      href: government-and-regulated-systems.md
 
 - name: Quality and Release Process
   items:
@@ -166,14 +109,10 @@
       href: ../quality/index.md
     - name: Release Validation
       href: release-validation.md
-    - name: Historical 1.1.0 Release Readiness Record
-      href: release-readiness-checklist.md
     - name: API Baseline and Boundary Checks
       href: api-baseline-and-boundary-checks.md
     - name: Developer Checklist
       href: developer-checklist.md
-    - name: 1.0.0 Release Notes
-      href: release-notes-100.md
 
 - name: Historical Design Records
   items:

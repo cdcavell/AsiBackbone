@@ -51,7 +51,7 @@ Intent or request
   -> Host application decides whether and how to execute
 ```
 
-The point of interest is the **decision boundary**: the moment between proposed intent and host execution. AsiBackbone focuses there, and deliberately leaves execution itself to the host. A visual walkthrough of the spine, policy pipeline, acknowledgment sequence, capability scope, and outbox/emission path is available in [Core Governance Flow Diagrams](https://cdcavell.github.io/AsiBackbone/articles/core-governance-flow-diagrams.html).
+The point of interest is the **decision boundary**: the moment between proposed intent and host execution. AsiBackbone focuses there, and deliberately leaves execution itself to the host. A visual walkthrough of the spine, policy pipeline, acknowledgment sequence, capability scope, and outbox/emission path is available in [Core Governance Flow Diagrams](https://cdcavell.github.io/AsiBackbone/articles/core-governance-flow-diagrams.html). A repeatable local evidence path is documented in [Reference Deployment: Plain ASP.NET Core Host Evidence](https://cdcavell.github.io/AsiBackbone/articles/reference-deployment.html).
 
 ## First code path
 
@@ -195,6 +195,7 @@ If you came to **understand the idea**:
 
 - [Intent to Execution: An Accountability Pattern](https://cdcavell.github.io/AsiBackbone/articles/intent-to-execution-pattern.html) — start here; the idea with no .NET prerequisite.
 - [Core Governance Flow Diagrams](https://cdcavell.github.io/AsiBackbone/articles/core-governance-flow-diagrams.html) — visual map of the spine, policy pipeline, acknowledgment flow, capability boundary, and outbox/emission path.
+- [Reference Deployment: Plain ASP.NET Core Host Evidence](https://cdcavell.github.io/AsiBackbone/articles/reference-deployment.html) — repeatable local evidence of request, decision, audit, signing, ledger, and endpoint-governance output.
 - [ASI Backbone Concept Synopsis](https://cdcavell.github.io/AsiBackbone/articles/asi-backbone-concept.html) — what the governance spine is and why it is shaped this way.
 - [Dynamic Liability Handshake](https://cdcavell.github.io/AsiBackbone/articles/dynamic-liability-handshake.html) — the acknowledgment-of-intent link, the part most audit trails skip.
 - [Core Domain Language](https://cdcavell.github.io/AsiBackbone/articles/core-domain-language.html) — the vocabulary of decision flow.
@@ -205,6 +206,7 @@ If you came to **wire it into a host**:
 - [Why AsiBackbone?](https://cdcavell.github.io/AsiBackbone/articles/why-asi-backbone.html)
 - [Progressive Adoption Ladder](https://cdcavell.github.io/AsiBackbone/articles/progressive-adoption.html) — smallest Core-only path first, optional add-ons after.
 - [First 15 Minutes: Standard API Gating](https://cdcavell.github.io/AsiBackbone/articles/quickstart-api-gating.html)
+- [Reference Deployment: Plain ASP.NET Core Host Evidence](https://cdcavell.github.io/AsiBackbone/articles/reference-deployment.html)
 - [Testing Harness](https://cdcavell.github.io/AsiBackbone/articles/testing-harness.html)
 - [Terminology Map](https://cdcavell.github.io/AsiBackbone/articles/terminology-map.html)
 

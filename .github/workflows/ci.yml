@@ -122,6 +122,10 @@ jobs:
               /p:ContinuousIntegrationBuild=true
           done
 
+      - name: Validate dotnet new templates
+        shell: bash
+        run: bash ./eng/smoke-tests/template-package-smoke.sh "$PACKAGE_OUTPUT"
+
       - name: Upload package artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:

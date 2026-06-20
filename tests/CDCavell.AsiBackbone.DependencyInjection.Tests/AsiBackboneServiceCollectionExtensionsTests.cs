@@ -1,4 +1,3 @@
-using CDCavell.AsiBackbone.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -37,10 +36,7 @@ public sealed class AsiBackboneServiceCollectionExtensionsTests
     {
         var services = new ServiceCollection();
 
-        _ = services.AddAsiBackbone(backbone =>
-        {
-            backbone.UseMarkerA();
-        });
+        _ = services.AddAsiBackbone(backbone => backbone.UseMarkerA());
 
         ServiceProvider provider = services.BuildServiceProvider();
 
@@ -56,9 +52,9 @@ public sealed class AsiBackboneServiceCollectionExtensionsTests
 
         _ = services.AddAsiBackbone(backbone =>
         {
-            backbone.UseMarkerA();
-            backbone.UseMarkerB();
-            backbone.UseMarkerC();
+            _ = backbone.UseMarkerA();
+            _ = backbone.UseMarkerB();
+            _ = backbone.UseMarkerC();
         });
 
         ServiceProvider provider = services.BuildServiceProvider();

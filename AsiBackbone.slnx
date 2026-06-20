@@ -21,6 +21,9 @@
     <Project Path="src/CDCavell.AsiBackbone.Storage.InMemory/CDCavell.AsiBackbone.Storage.InMemory.csproj">
       <Build Solution="Debug|*" Project="false" />
     </Project>
+    <Project Path="src/CDCavell.AsiBackbone.Testing/CDCavell.AsiBackbone.Testing.csproj">
+      <Build Solution="Debug|*" Project="false" />
+    </Project>
   </Folder>
   <Folder Name="/samples/">
     <Project Path="samples/PlainAspNetCoreHost/CDCavell.AsiBackbone.Samples.PlainAspNetCoreHost.csproj">
@@ -35,6 +38,7 @@
     <Project Path="tests/CDCavell.AsiBackbone.Core.Tests/CDCavell.AsiBackbone.Core.Tests.csproj">
       <Build Solution="Debug|*" Project="false" />
     </Project>
+    <Project Path="tests/CDCavell.AsiBackbone.DependencyInjection.Tests/CDCavell.AsiBackbone.DependencyInjection.Tests.csproj" />
     <Project Path="tests/CDCavell.AsiBackbone.EntityFrameworkCore.Tests/CDCavell.AsiBackbone.EntityFrameworkCore.Tests.csproj">
       <Build Solution="Debug|*" Project="false" />
     </Project>
@@ -45,5 +49,8 @@
       <Build Solution="Debug|*" Project="false" />
     </Project>
     <Project Path="tests/CDCavell.AsiBackbone.Signing.ManagedKey.Tests/CDCavell.AsiBackbone.Signing.ManagedKey.Tests.csproj" />
+    <Project Path="tests/CDCavell.AsiBackbone.Testing.Tests/CDCavell.AsiBackbone.Testing.Tests.csproj">
+      <Build Solution="Debug|*" Project="false" />
+    </Project>
   </Folder>
 </Solution>

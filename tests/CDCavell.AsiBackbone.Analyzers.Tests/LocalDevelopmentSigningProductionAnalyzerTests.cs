@@ -84,7 +84,7 @@ public sealed class LocalDevelopmentSigningProductionAnalyzerTests
                     services.AddSingleton<LocalDevelopmentSigningService>();
                 }
             }
-            "", includeConfigureWrapper: false);
+            """, includeConfigureWrapper: false);
 
         ImmutableArray<Diagnostic> diagnostics = await GetAnalyzerDiagnosticsAsync(source);
 

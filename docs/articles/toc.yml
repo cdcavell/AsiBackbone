@@ -11,6 +11,8 @@
       href: quickstart-api-gating.md
     - name: Core Governance Flow Diagrams
       href: core-governance-flow-diagrams.md
+    - name: Reference Deployment Evidence
+      href: reference-deployment.md
     - name: Terminology Map
       href: terminology-map.md
     - name: Why AsiBackbone?
@@ -56,6 +58,8 @@
 
 - name: Package Integration Guides
   items:
+    - name: Reference Deployment Evidence
+      href: reference-deployment.md
     - name: 1.0.0 Quickstart
       href: quickstart-100.md
     - name: EF Core Integration Boundary

@@ -11,31 +11,37 @@ Stable `1.1.x` is the current compatible package line. `1.1.1` is a patch releas
 
 Released stable package surfaces include Core, DependencyInjection, Storage.InMemory, EntityFrameworkCore, AspNetCore, Testing, Analyzers, OpenTelemetry, Signing.LocalDevelopment, and Signing.ManagedKey. OpenTelemetry is the concrete released governance-emission provider. Event Hubs, Purview, Azure-specific SDK adapters, robotics, immutable-storage, and additional provider packages remain design-only, strategy-only, host-owned, or future-provider work unless a later stable release explicitly ships them.
 
-## Start here / current stable usage
+## Start here / implementation-first usage
 
-* [Getting Started](getting-started.md)
-* [Progressive Adoption Ladder](progressive-adoption.md)
+* [Implementation-First Adoption Path](implementation-first-adoption.md)
 * [First 15 Minutes: Standard API Gating](quickstart-api-gating.md)
-* [Core Governance Flow Diagrams](core-governance-flow-diagrams.md)
 * [Reference Deployment: Plain ASP.NET Core Host Evidence](reference-deployment.md)
-* [AddAsiBackbone Builder Facade](add-asibackbone-builder-facade.md)
 * [Terminology Map](terminology-map.md)
+* [Progressive Adoption Ladder](progressive-adoption.md)
+* [Getting Started](getting-started.md)
+* [Core Governance Flow Diagrams](core-governance-flow-diagrams.md)
+* [AddAsiBackbone Builder Facade](add-asibackbone-builder-facade.md)
 * [Why AsiBackbone?](why-asi-backbone.md)
 * [1.1.x Release Notes](release-notes-110.md)
 * [Upgrade Guide: 1.0.0 to 1.1.0](upgrade-100-to-110.md)
 
-## Core concepts and domain language
+## Core engineering concepts and domain language
 
-* [Intent to Execution: An Accountability Pattern](intent-to-execution-pattern.md)
-* [Core Governance Flow Diagrams](core-governance-flow-diagrams.md)
-* [ASI Backbone Concept Synopsis](asi-backbone-concept.md)
-* [Core Domain Language](core-domain-language.md)
 * [Policy Evaluator Pipeline](policy-evaluator-pipeline.md)
 * [Host-Owned Execution Enforcement](host-owned-execution-enforcement.md)
+* [ASP.NET Core Endpoint Governance](aspnetcore-endpoint-governance.md)
 * [Dynamic Liability Handshake](dynamic-liability-handshake.md)
+* [Core Domain Language](core-domain-language.md)
+* [Glossary](glossary.md)
+
+## Optional conceptual background
+
+These pages remain available for readers who want the broader framing. They are not required before using the packages.
+
+* [Intent to Execution: An Accountability Pattern](intent-to-execution-pattern.md)
+* [ASI Backbone Concept Synopsis](asi-backbone-concept.md)
 * [Gateway and Regional Policy Flow](gateway-and-regional-policy-flow.md)
 * [Equations and Toy Models](equations-and-toy-models.md)
-* [Glossary](glossary.md)
 
 ## Adoption and use-case guidance
 
@@ -104,7 +110,7 @@ These pages remain available as strategy/design material. They are not released 
 
 ## Advanced scenarios
 
-Scenario pages describe applied patterns. They remain available without implying current package implementation beyond the documented seams.
+Scenario pages describe applied patterns. They remain optional and do not imply current package implementation beyond the documented seams.
 
 * [AI Agent Gateway](scenarios/ai-agent-gateway.md)
 * [Human Approval Before AI Tool Execution](scenarios/human-approval-before-ai-tool-execution.md)

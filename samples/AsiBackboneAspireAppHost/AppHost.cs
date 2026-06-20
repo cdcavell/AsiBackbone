@@ -1,4 +1,4 @@
-var builder = DistributedApplication.CreateBuilder(args);
+IDistributedApplicationBuilder builder = DistributedApplication.CreateBuilder(args);
 
 builder.AddProject<Projects.CDCavell_AsiBackbone_Samples_PlainAspNetCoreHost>("asi-backbone-api")
     .WithEnvironment("ConnectionStrings__AsiBackbone", "Data Source=asi-backbone-aspire-sample.db")

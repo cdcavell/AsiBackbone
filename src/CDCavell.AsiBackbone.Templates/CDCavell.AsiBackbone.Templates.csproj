@@ -6,6 +6,8 @@
     <PackageId>CDCavell.AsiBackbone.Templates</PackageId>
     <Title>CDCavell.AsiBackbone.Templates</Title>
     <Description>dotnet new templates for Accountable Systems Infrastructure governed ASP.NET Core hosts.</Description>
+    <Authors>Christopher D. Cavell</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>accountable-systems-infrastructure;asi-backbone;dotnet;governance;templates;dotnet-new;aspnetcore;webapi;endpoint-governance</PackageTags>
     <PackageType>Template</PackageType>
     <PackageReadmeFile>README.md</PackageReadmeFile>

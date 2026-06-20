@@ -173,7 +173,7 @@ The host application remains responsible for execution behavior and operational 
 
 ## The package family
 
-Stable `1.1.x` package family. `1.1.1` is the current patch release; `1.1.0` expanded the original `1.0.0` boundary (Core, in-memory storage, EF Core, ASP.NET Core) with analyzer, OpenTelemetry, and signing-provider packages for the compatible `1.x` line.
+Stable `1.1.x` package family. `1.1.1` is the current patch release; `1.1.0` expanded the original `1.0.0` boundary (Core, in-memory storage, EF Core, ASP.NET Core) with analyzer, OpenTelemetry, signing-provider, and testing-harness packages for the compatible `1.x` line.
 
 | Package | Role |
 | --- | --- |
@@ -181,6 +181,7 @@ Stable `1.1.x` package family. `1.1.1` is the current patch release; `1.1.0` exp
 | `CDCavell.AsiBackbone.Storage.InMemory` | Non-durable in-memory storage helpers for tests, samples, local validation, lifecycle events, and outbox proof paths. |
 | `CDCavell.AsiBackbone.EntityFrameworkCore` | EF Core model configuration and host-owned persistence for audit ledger, acknowledgments, lifecycle events, and governance outbox records. |
 | `CDCavell.AsiBackbone.AspNetCore` | ASP.NET Core host adapters for actor context, request correlation, audit enrichment, HTTP result mapping, acknowledgment challenge flows, endpoint governance, and hosted outbox drain integration. |
+| `CDCavell.AsiBackbone.Testing` | Test-only harness helpers for deterministic endpoint governance, policy results, capability validation, in-memory audit inspection, non-durable outbox storage, and no-signature signing seams. |
 | `CDCavell.AsiBackbone.Analyzers` | Roslyn analyzer safety rails for governance persistence and continuation flows (advisory, build-time; not runtime enforcement). |
 | `CDCavell.AsiBackbone.OpenTelemetry` | Released OpenTelemetry governance emission provider that projects provider-neutral envelopes into .NET diagnostics. |
 | `CDCavell.AsiBackbone.Signing.LocalDevelopment` | Local-development signing and verification for tests, samples, and wiring proof paths only. Not for production key custody. |
@@ -203,13 +204,14 @@ If you came to **wire it into a host**:
 - [Why AsiBackbone?](https://cdcavell.github.io/AsiBackbone/articles/why-asi-backbone.html)
 - [Progressive Adoption Ladder](https://cdcavell.github.io/AsiBackbone/articles/progressive-adoption.html) — smallest Core-only path first, optional add-ons after.
 - [First 15 Minutes: Standard API Gating](https://cdcavell.github.io/AsiBackbone/articles/quickstart-api-gating.html)
+- [Testing Harness](https://cdcavell.github.io/AsiBackbone/articles/testing-harness.html)
 - [Terminology Map](https://cdcavell.github.io/AsiBackbone/articles/terminology-map.html)
 
 The full, categorized documentation set lives at the [documentation site](https://cdcavell.github.io/AsiBackbone/).
 
 ## Current status
 
-Stable `1.1.x` is the current released line for the compatible `1.x` API, with `1.1.1` as the latest patch. The repository includes the Core foundation, in-memory validation storage, EF Core host-owned persistence, ASP.NET Core integration, analyzers, the OpenTelemetry provider, local-development signing, the managed-key signing adapter boundary, samples, release validation, and host-validation documentation.
+Stable `1.1.x` is the current released line for the compatible `1.x` API, with `1.1.1` as the latest patch. The repository includes the Core foundation, in-memory validation storage, EF Core host-owned persistence, ASP.NET Core integration, test harness helpers, analyzers, the OpenTelemetry provider, local-development signing, the managed-key signing adapter boundary, samples, release validation, and host-validation documentation.
 
 The stable API contract is documented in [API Compatibility and SemVer](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/api-compatibility-and-semver.md); the original `1.0.0` baseline and `1.1.0` addendum are recorded in the [Historical Stable API Review](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/stable-api-review.md). The [Production Wording and Stable Signing Boundaries](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/production-wording-and-alpha-limitations.md) page distinguishes stable signing-ready primitives, the local-development signer, the managed-key adapter boundary, future concrete provider packages, and unsupported production tamper-evidence claims.
 
@@ -258,13 +260,3 @@ Avoid language such as:
 - Avoid hidden host assumptions.
 - Prefer explicit integration over magic.
 - Let the host own infrastructure.
-- Let integration packages own persistence, web integration, signing, storage, samples, observability, provider-specific emission, and external execution concerns.
-- Keep package boundaries clear before adding behavior.
-- Treat durable local/outbox persistence as the reliability baseline before external emission.
-- Treat provider signing as one part of an operational trust model, not as tamper-evidence by itself.
-- Treat NetCoreApplicationTemplate as a preferred host, not a parent framework.
-- Treat AsiBackbone as Accountable Systems Infrastructure: governance infrastructure, not an intelligence engine.
-
-## License
-
-MIT. See [LICENSE.txt](https://github.com/cdcavell/AsiBackbone/blob/main/LICENSE.txt).

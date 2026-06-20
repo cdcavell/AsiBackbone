@@ -65,7 +65,7 @@ The Dynamic Liability Handshake is a reflexive acknowledgment pattern for conseq
 
 ```mermaid
 sequenceDiagram
-    actor Actor
+    participant Actor as Actor
     participant Host as Host application
     participant Backbone as AsiBackbone policy layer
     participant Handshake as Acknowledgment challenge service

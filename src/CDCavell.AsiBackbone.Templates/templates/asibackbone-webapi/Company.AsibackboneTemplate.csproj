@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>Company.AsibackboneTemplate-local-dev</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CDCavell.AsiBackbone.AspNetCore" Version="1.1.1" />
+    <PackageReference Include="CDCavell.AsiBackbone.Core" Version="1.1.1" />
+    <PackageReference Include="CDCavell.AsiBackbone.Storage.InMemory" Version="1.1.1" />
+    <PackageReference Include="CDCavell.AsiBackbone.Analyzers" Version="1.1.1" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>

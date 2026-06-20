@@ -20,7 +20,7 @@ dotnet new install ./artifacts/packages/CDCavell.AsiBackbone.Templates.1.1.1.nup
 ## Create a governed Web API
 
 ```powershell
-dotnet new asibackbone-webapi -n MyGovernedApi --host-style plain
+dotnet new asibackbone-webapi -n MyGovernedApi --hostStyle plain
 ```
 
 Then run the generated app:
@@ -33,7 +33,7 @@ dotnet run
 
 ## Host-style selection
 
-The template supports a `--host-style` choice parameter.
+The template supports a `--hostStyle` choice parameter.
 
 | Host style | Use when | Notes |
 | --- | --- | --- |

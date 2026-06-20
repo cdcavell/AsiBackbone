@@ -30,7 +30,7 @@ The terms below are intended to help first-time readers understand the package a
 | Audit sink | The component that receives audit residue. | Logging sink, event sink, or audit writer. | [`IAsiBackboneAuditSink`](xref:CDCavell.AsiBackbone.Core.Audit.IAsiBackboneAuditSink) | Write decision residue to an in-memory ledger during sample validation. |
 | Responsibility or liability handshake | A structured request-and-acknowledgment workflow around consequential action. | A confirm-and-record accountability workflow. | [`LiabilityHandshakeRequest`](xref:CDCavell.AsiBackbone.Core.Handshakes.LiabilityHandshakeRequest), [`LiabilityHandshakeAcknowledgment`](xref:CDCavell.AsiBackbone.Core.Handshakes.LiabilityHandshakeAcknowledgment) | Require the actor to acknowledge a high-risk action before the host proceeds. |
 | Acknowledgment | The actor's response to a challenge. | Accepted confirmation response with metadata. | [`LiabilityHandshakeAcknowledgment`](xref:CDCavell.AsiBackbone.Core.Handshakes.LiabilityHandshakeAcknowledgment), [`AsiBackboneAcknowledgmentChallenge`](xref:CDCavell.AsiBackbone.AspNetCore.Handshakes.AsiBackboneAcknowledgmentChallenge) | Capture who accepted the challenge and when. |
-| Capability token | A scoped grant that represents limited permission to continue. | Short-lived delegated permission or operation-specific permit. | [`AuditLedgerRecord`](xref:CDCavell.AsiBackbone.Core.Audit.AuditLedgerRecord) | Record a token reference showing that a host may continue a specific operation. |
+| Capability token | A scoped grant that represents limited permission to continue. | Short-lived delegated permission or operation-specific permit. | [`CapabilityTokenGrant`](xref:CDCavell.AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant), [`CapabilityGrantValidator`](xref:CDCavell.AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidator) | Record a scoped grant showing that a host may continue a specific operation within explicit constraints. |
 | Policy version | A readable identifier for the policy generation used in evaluation. | Version string for the active ruleset. | [`GovernanceDecision`](xref:CDCavell.AsiBackbone.Core.Decisions.GovernanceDecision) | Store `agent-gateway-v1` with the decision record. |
 | Policy hash | A stable fingerprint of the effective policy content or configuration. | Checksum for a ruleset snapshot. | [`GovernanceDecision`](xref:CDCavell.AsiBackbone.Core.Decisions.GovernanceDecision) | Compare two decisions to see whether they used the same effective policy shape. |
 | Reason codes | Machine-readable explanations for a result. | Error codes or validation codes for governance decisions. | [`GovernanceDecision`](xref:CDCavell.AsiBackbone.Core.Decisions.GovernanceDecision), [`ConstraintEvaluationResult`](xref:CDCavell.AsiBackbone.Core.Constraints.ConstraintEvaluationResult) | Return `risk.high.requires_acknowledgment` for a consequential request. |
@@ -47,8 +47,8 @@ The related API/type links use DocFX cross-reference links so they resolve again
 
 Useful starting points:
 
-- [Core Domain Language and Alpha Boundary](core-domain-language.md)
+- [Implementation-First Adoption Path](implementation-first-adoption.md)
 - [Policy Evaluator Pipeline](policy-evaluator-pipeline.md)
 - [Adoption and Target Use Cases](use-cases.md)
-- [Framework-Neutral Integration and Host-Owned Persistence](integration-boundaries.md)
+- [Project Boundaries and Non-Claims](project-boundaries.md)
 - [AI Agent Gateway Scenario](scenarios/ai-agent-gateway.md)

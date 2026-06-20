@@ -17,6 +17,7 @@ Released stable package surfaces include Core, DependencyInjection, Storage.InMe
 * [Progressive Adoption Ladder](progressive-adoption.md)
 * [First 15 Minutes: Standard API Gating](quickstart-api-gating.md)
 * [Core Governance Flow Diagrams](core-governance-flow-diagrams.md)
+* [Reference Deployment: Plain ASP.NET Core Host Evidence](reference-deployment.md)
 * [AddAsiBackbone Builder Facade](add-asibackbone-builder-facade.md)
 * [Terminology Map](terminology-map.md)
 * [Why AsiBackbone?](why-asi-backbone.md)
@@ -45,6 +46,7 @@ Released stable package surfaces include Core, DependencyInjection, Storage.InMe
 
 ## Package integration guides
 
+* [Reference Deployment: Plain ASP.NET Core Host Evidence](reference-deployment.md)
 * [1.0.0 Quickstart](quickstart-100.md)
 * [EF Core Integration Boundary](ef-core-integration-boundary.md)
 * [EF Core Host Ownership and Migration Guidance](ef-core-host-ownership-and-migrations.md)

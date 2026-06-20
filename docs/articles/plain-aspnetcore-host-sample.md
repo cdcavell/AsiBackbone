@@ -4,6 +4,8 @@ The plain ASP.NET Core host sample is the canonical in-repository validation pat
 
 It exists to prove that AsiBackbone integrates with a standard ASP.NET Core application without requiring `NetCoreApplicationTemplate` or another application template.
 
+For a request/decision/audit walkthrough with representative JSON output, see [Reference Deployment: Plain ASP.NET Core Host Evidence](reference-deployment.md).
+
 ## Location
 
 ```text

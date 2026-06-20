@@ -17,41 +17,38 @@
 
 ---
 
-## The problem this is about
+## The practical problem
 
-Most software can tell you *what* happened. Far less can show that an action's **intent was acknowledged before it executed** — which constraints shaped the decision, who affirmed it, under which policy version, how follow-on authority was scoped, and whether the execution that followed matched the decision that authorized it.
+Most software can tell you *what* happened. Far less can show that an action was evaluated before it executed: which rules shaped the decision, which policy version applied, whether acknowledgment was required, how follow-on authority was scoped, and where the host took responsibility for execution.
 
-As more consequential actions are proposed by agents, services, and automated workflows, the distance between *"we logged it"* and *"we can account for it"* keeps widening. Ordinary authorization answers "is this caller allowed?" Ordinary logging answers "did something occur?" Neither captures the link in between: a deliberate, inspectable record of intent passing through policy into execution.
-
-AsiBackbone is one concrete, .NET-native way to make that link a first-class part of a system. It turns the path from **intent to execution** into an explicit spine — policy context, constraint evaluation, decision, acknowledgment, audit residue, capability scoping — that the host application owns and can later explain.
-
-It is meant to be useful whether you adopt the packages or simply study the pattern. If it gives you a clearer way to talk about accountable decision flow in your own stack, it has done its job.
+AsiBackbone is a .NET package family for that decision boundary. It helps a host application build safe policy context, evaluate constraints, return a structured decision, preserve a decision receipt, optionally scope continuation, and then let the host decide whether and how to execute.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**.
 
-## Why this repository exists even if you never install it
+## Implementation-first mental model
 
-AsiBackbone is also intended as a concrete reference specimen for discussing accountable decision flow: how intent becomes policy-reviewed action, how acknowledgment is captured, how authority is scoped, how audit residue is preserved, and where execution remains host-owned. The packages are one implementation path; the pattern is the larger conversation.
+A normal API adoption path looks like this:
 
-## The shape of the idea
-
-A typical AsiBackbone flow:
-
-```
-Intent or request
-  -> Build policy context
-  -> Evaluate constraints
-  -> Compose decision result
-  -> Require acknowledgment when needed
-  -> Write audit residue
-  -> Issue optional scoped capability token
-  -> Preserve local audit/outbox record when provider emission is used
-  -> Optionally sign or verify governance artifacts when a provider is configured
-  -> Optionally emit a minimized governance envelope to a downstream provider
-  -> Host application decides whether and how to execute
+```text
+HTTP request
+  -> host builds safe evaluation context
+  -> host-owned rules evaluate the request
+  -> AsiBackbone returns a GovernanceDecision
+  -> host writes audit residue / decision receipt
+  -> host continues only when decision.CanProceed is true
 ```
 
-The point of interest is the **decision boundary**: the moment between proposed intent and host execution. AsiBackbone focuses there, and deliberately leaves execution itself to the host. A visual walkthrough of the spine, policy pipeline, acknowledgment sequence, capability scope, and outbox/emission path is available in [Core Governance Flow Diagrams](https://cdcavell.github.io/AsiBackbone/articles/core-governance-flow-diagrams.html). A repeatable local evidence path is documented in [Reference Deployment: Plain ASP.NET Core Host Evidence](https://cdcavell.github.io/AsiBackbone/articles/reference-deployment.html).
+Use plain engineering translations first:
+
+| Project term | Practical meaning |
+| --- | --- |
+| Governance spine | Policy decision pipeline around consequential operations. |
+| Audit residue | Decision receipt or audit-log payload. |
+| Acknowledgment handshake | Confirmation workflow before a risky operation. |
+| Capability grant | Short-lived scoped permission. |
+| Governance outbox | Durable outbox pattern for governance events. |
+| OpenTelemetry projection | Optional traces/metrics projection after local records exist. |
+| Host-owned execution boundary | The application code that performs or refuses the protected operation. |
 
 ## First code path
 
@@ -123,57 +120,9 @@ app.MapPost("/api/orders/{region}/approve", async (
 
 For production-style hosts, add durable audit/outbox persistence, signing or verification, DLP/classification, provider emission, and operational monitoring only where the host has explicitly chosen and configured those boundaries.
 
-## What is AsiBackbone?
+## Package family
 
-AsiBackbone helps a host application evaluate intent before execution, apply policy constraints, require acknowledgment when needed, preserve audit records, and optionally scope follow-on execution through short-lived capability tokens. It is designed for systems where consequential actions need to be governed, explained, audited, constrained, preserved locally, and optionally projected into observability or governance systems before the host application executes or reviews them.
-
-AsiBackbone should be understood as **governance infrastructure**, not an intelligence engine.
-
-> **Important**
->
-> These packages do **not** implement an intelligence engine, host AI models, train AI models, control physical systems, certify compliance, prove the Eden/Backbone framework, or provide production tamper-evidence by default. They provide framework-neutral building blocks and host integration seams for governing consequential actions in software systems.
-
-## What questions does it help a system answer?
-
-Many systems eventually need more than ordinary authorization and application logging. A consequential action may need to answer:
-
-- Is this action allowed right now?
-- Which constraints, policies, and reason codes shaped the decision?
-- Does this request require human acknowledgment before execution?
-- Which policy version and policy hash were active?
-- Can execution be scoped through a short-lived capability token?
-- Was the decision preserved in durable local storage before downstream provider emission?
-- Can signing or verification metadata be attached without forcing Core to own key management?
-- Can a reviewer later understand why the system allowed, warned, denied, deferred, required acknowledgment, recommended escalation, or emitted a governance event?
-
-## What it does *not* do
-
-AsiBackbone does not:
-
-- Replace normal authentication or authorization.
-- Guarantee compliance with any law, regulation, audit framework, or security standard.
-- Host, train, run, or orchestrate AI models.
-- Implement an intelligence engine.
-- Perform host operational actions by itself.
-- Own the consuming application's database, migrations, deployment, observability backend, exporter configuration, key-management boundary, verification path, or operational policy.
-- Provide production tamper-evidence, immutability, legal non-repudiation, external anchoring, or compliance certification by default.
-- Replace legal review, AI safety governance, organizational accountability, operational security, DLP review, or key-management controls.
-
-The host application remains responsible for execution behavior and operational controls.
-
-## Who might find it useful
-
-- Enterprise .NET applications with consequential administrative actions.
-- AI-agent gateways that need policy checks before tool or API execution.
-- Human-in-the-loop workflows where approval or acknowledgment matters.
-- Government, public-sector, education, healthcare, finance, legal, or other regulated systems that need stronger auditability.
-- Platform engineering workflows that need clear allow, deny, defer, acknowledgment, or escalation decisions before external execution.
-- Applications that need capability-scoped grants instead of broad, long-lived authority.
-- Teams who want a concrete reference for what an intent-to-execution audit trail can look like, whether or not they take the dependency.
-
-## The package family
-
-Stable `1.1.x` package family. `1.1.1` is the current patch release; `1.1.0` expanded the original `1.0.0` boundary (Core, in-memory storage, EF Core, ASP.NET Core) with analyzer, OpenTelemetry, signing-provider, and testing-harness packages for the compatible `1.x` line.
+Stable `1.1.x` package family. `1.1.1` is the current patch release; `1.1.0` expanded the original `1.0.0` boundary with analyzer, OpenTelemetry, signing-provider, and testing-harness packages for the compatible `1.x` line.
 
 | Package | Role |
 | --- | --- |
@@ -182,33 +131,31 @@ Stable `1.1.x` package family. `1.1.1` is the current patch release; `1.1.0` exp
 | `CDCavell.AsiBackbone.EntityFrameworkCore` | EF Core model configuration and host-owned persistence for audit ledger, acknowledgments, lifecycle events, and governance outbox records. |
 | `CDCavell.AsiBackbone.AspNetCore` | ASP.NET Core host adapters for actor context, request correlation, audit enrichment, HTTP result mapping, acknowledgment challenge flows, endpoint governance, and hosted outbox drain integration. |
 | `CDCavell.AsiBackbone.Testing` | Test-only harness helpers for deterministic endpoint governance, policy results, capability validation, in-memory audit inspection, non-durable outbox storage, and no-signature signing seams. |
-| `CDCavell.AsiBackbone.Analyzers` | Roslyn analyzer safety rails for governance persistence and continuation flows (advisory, build-time; not runtime enforcement). |
+| `CDCavell.AsiBackbone.Analyzers` | Roslyn analyzer safety rails for governance persistence and continuation flows. |
 | `CDCavell.AsiBackbone.OpenTelemetry` | Released OpenTelemetry governance emission provider that projects provider-neutral envelopes into .NET diagnostics. |
 | `CDCavell.AsiBackbone.Signing.LocalDevelopment` | Local-development signing and verification for tests, samples, and wiring proof paths only. Not for production key custody. |
 | `CDCavell.AsiBackbone.Signing.ManagedKey` | Managed-key signing adapter boundary. The host supplies the actual managed-key client, credentials, key operations, verification path, monitoring, and operational policy. |
 
-Future Event Hubs, Purview, Azure-specific, gateway, robotics, immutable-storage, or additional provider packages are not part of the stable contract unless separately reviewed and released. The stable `1.x` compatibility policy is documented in [API Compatibility and SemVer](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/api-compatibility-and-semver.md).
+Future Event Hubs, Purview, Azure-specific, gateway, robotics, immutable-storage, or additional provider packages are not part of the stable contract unless separately reviewed and released.
 
 ## Start here
 
-If you came to **understand the idea**:
+For **implementation-first adoption**:
 
-- [Intent to Execution: An Accountability Pattern](https://cdcavell.github.io/AsiBackbone/articles/intent-to-execution-pattern.html) — start here; the idea with no .NET prerequisite.
-- [Core Governance Flow Diagrams](https://cdcavell.github.io/AsiBackbone/articles/core-governance-flow-diagrams.html) — visual map of the spine, policy pipeline, acknowledgment flow, capability boundary, and outbox/emission path.
-- [Reference Deployment: Plain ASP.NET Core Host Evidence](https://cdcavell.github.io/AsiBackbone/articles/reference-deployment.html) — repeatable local evidence of request, decision, audit, signing, ledger, and endpoint-governance output.
-- [ASI Backbone Concept Synopsis](https://cdcavell.github.io/AsiBackbone/articles/asi-backbone-concept.html) — what the governance spine is and why it is shaped this way.
-- [Dynamic Liability Handshake](https://cdcavell.github.io/AsiBackbone/articles/dynamic-liability-handshake.html) — the acknowledgment-of-intent link, the part most audit trails skip.
-- [Core Domain Language](https://cdcavell.github.io/AsiBackbone/articles/core-domain-language.html) — the vocabulary of decision flow.
-- [Host-Owned Execution Enforcement](https://cdcavell.github.io/AsiBackbone/articles/host-owned-execution-enforcement.html) — where the spine ends and the host's responsibility begins.
-
-If you came to **wire it into a host**:
-
-- [Why AsiBackbone?](https://cdcavell.github.io/AsiBackbone/articles/why-asi-backbone.html)
-- [Progressive Adoption Ladder](https://cdcavell.github.io/AsiBackbone/articles/progressive-adoption.html) — smallest Core-only path first, optional add-ons after.
+- [Implementation-First Adoption Path](https://cdcavell.github.io/AsiBackbone/articles/implementation-first-adoption.html) — plain engineering translations and the recommended first reading path.
 - [First 15 Minutes: Standard API Gating](https://cdcavell.github.io/AsiBackbone/articles/quickstart-api-gating.html)
 - [Reference Deployment: Plain ASP.NET Core Host Evidence](https://cdcavell.github.io/AsiBackbone/articles/reference-deployment.html)
 - [Testing Harness](https://cdcavell.github.io/AsiBackbone/articles/testing-harness.html)
 - [Terminology Map](https://cdcavell.github.io/AsiBackbone/articles/terminology-map.html)
+
+For **optional conceptual background**:
+
+- [Intent to Execution: An Accountability Pattern](https://cdcavell.github.io/AsiBackbone/articles/intent-to-execution-pattern.html)
+- [Core Governance Flow Diagrams](https://cdcavell.github.io/AsiBackbone/articles/core-governance-flow-diagrams.html)
+- [ASI Backbone Concept Synopsis](https://cdcavell.github.io/AsiBackbone/articles/asi-backbone-concept.html)
+- [Dynamic Liability Handshake](https://cdcavell.github.io/AsiBackbone/articles/dynamic-liability-handshake.html)
+- [Core Domain Language](https://cdcavell.github.io/AsiBackbone/articles/core-domain-language.html)
+- [Host-Owned Execution Enforcement](https://cdcavell.github.io/AsiBackbone/articles/host-owned-execution-enforcement.html)
 
 The full, categorized documentation set lives at the [documentation site](https://cdcavell.github.io/AsiBackbone/).
 
@@ -216,19 +163,17 @@ The full, categorized documentation set lives at the [documentation site](https:
 
 Stable `1.1.x` is the current released line for the compatible `1.x` API, with `1.1.1` as the latest patch. The repository includes the Core foundation, in-memory validation storage, EF Core host-owned persistence, ASP.NET Core integration, test harness helpers, analyzers, the OpenTelemetry provider, local-development signing, the managed-key signing adapter boundary, samples, release validation, and host-validation documentation.
 
-The stable API contract is documented in [API Compatibility and SemVer](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/api-compatibility-and-semver.md); the original `1.0.0` baseline and `1.1.0` addendum are recorded in the [Historical Stable API Review](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/stable-api-review.md). The [Production Wording and Stable Signing Boundaries](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/production-wording-and-alpha-limitations.md) page distinguishes stable signing-ready primitives, the local-development signer, the managed-key adapter boundary, future concrete provider packages, and unsupported production tamper-evidence claims.
+The stable API contract is documented in [API Compatibility and SemVer](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/api-compatibility-and-semver.md); the original `1.0.0` baseline and `1.1.0` addendum are recorded in the [Historical Stable API Review](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/stable-api-review.md).
 
 ## Security and vulnerability reporting
 
-Please report vulnerabilities or sensitive concerns through the repository [Security Policy](SECURITY.md). The policy defines the supported `1.x` release line, reporting expectations, and boundaries around compliance certification, production tamper-evidence, legal protection, host-owned execution, persistence, deployment, key custody, and production hardening.
-
-Do not include exploit details, secrets, private keys, customer data, or other sensitive operational information in a public issue or pull request.
+Please report sensitive concerns through the repository [Security Policy](SECURITY.md).
 
 ## Relationship to NetCoreApplicationTemplate
 
 NetCoreApplicationTemplate may be used as a preferred host baseline during development and validation, but AsiBackbone does not require it.
 
-```
+```text
 NetCoreApplicationTemplate = preferred host baseline
 AsiBackbone               = optional governance/module package family
 Consumer application      = chooses whether to use either or both

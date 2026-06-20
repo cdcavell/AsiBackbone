@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CDCavell.AsiBackbone.Core\CDCavell.AsiBackbone.Core.csproj" />
+    <ProjectReference Include="..\CDCavell.AsiBackbone.DependencyInjection\CDCavell.AsiBackbone.DependencyInjection.csproj" />
   </ItemGroup>
 
 </Project>

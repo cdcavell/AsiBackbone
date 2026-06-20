@@ -26,6 +26,7 @@
     </Project>
   </Folder>
   <Folder Name="/samples/">
+    <Project Path="samples/AsiBackboneAspireAppHost/CDCavell.AsiBackbone.Samples.AspireAppHost.csproj" />
     <Project Path="samples/PlainAspNetCoreHost/CDCavell.AsiBackbone.Samples.PlainAspNetCoreHost.csproj">
       <Build Solution="Debug|*" Project="false" />
     </Project>

@@ -74,13 +74,13 @@ internal static class AsiBackboneEndpointGovernanceDevelopmentDiagnostics
             ["endpointOperationName"] = descriptor.OperationName,
             ["endpointPolicyTypes"] = descriptor.PolicyTypes
                 .Select(static policyType => policyType.FullName ?? policyType.Name)
-                .Order(StringComparer.Ordinal)
+                .OrderBy(static policyType => policyType, StringComparer.Ordinal)
                 .ToArray(),
             ["capabilityScopes"] = descriptor.CapabilityScopes
-                .Order(StringComparer.Ordinal)
+                .OrderBy(static scope => scope, StringComparer.Ordinal)
                 .ToArray(),
             ["metadataKeys"] = metadata.Keys
-                .Order(StringComparer.Ordinal)
+                .OrderBy(static key => key, StringComparer.Ordinal)
                 .ToArray(),
             ["metadata"] = RedactMetadata(options, metadata)
         };

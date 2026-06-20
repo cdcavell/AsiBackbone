@@ -7,6 +7,10 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 > [!IMPORTANT]
 > AsiBackbone does not implement artificial superintelligence, host AI models, control physical systems, certify compliance, or provide production tamper-evidence by itself. It provides framework-neutral building blocks and host integration seams for governing consequential actions in software systems.
 
+## Search, navigation, and source links
+
+The documentation site uses the DocFX search box in the header. Search is enabled in `docs/docfx.json`; if a newly merged page does not appear immediately, wait for the documentation publish workflow to complete and refresh the browser cache. Long pages use the left navigation tree plus the right **In this article** heading rail for local movement. Source for every page lives in the repository under `docs/`, and the top navigation includes a Repository link for viewing or editing documentation files.
+
 ## Start here
 
 These pages are the best first stops for implementation-first adoption. The optional conceptual background remains available later in the documentation set.
@@ -207,3 +211,9 @@ These records remain available for traceability, but they are separated from cur
 AsiBackbone should make consequential software actions easier to govern, audit, constrain, acknowledge, preserve, emit, verify, and explain.
 
 It should be understood as Accountable Systems Infrastructure, not an intelligence engine.
+
+## Read next
+
+- [Implementation-First Adoption Path](articles/implementation-first-adoption.md)
+- [First 15 Minutes: Standard API Gating](articles/quickstart-api-gating.md)
+- [Documentation Articles](articles/)

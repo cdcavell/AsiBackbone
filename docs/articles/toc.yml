@@ -11,6 +11,8 @@
       href: reference-deployment.md
     - name: Terminology Map
       href: terminology-map.md
+    - name: Project Boundaries and Non-Claims
+      href: project-boundaries.md
     - name: Progressive Adoption Ladder
       href: progressive-adoption.md
     - name: Getting Started
@@ -93,6 +95,29 @@
       href: signing-provider-package-boundary.md
     - name: Managed-Key Signing Provider
       href: managed-key-signing-provider.md
+
+- name: Security and Boundaries
+  items:
+    - name: Project Boundaries and Non-Claims
+      href: project-boundaries.md
+    - name: Production Wording and Stable Signing Boundaries
+      href: production-wording-and-alpha-limitations.md
+    - name: Signing-Ready Receipts and Key Handling
+      href: signing-ready-receipts-and-key-handling.md
+    - name: Signed Audit and Outbox Records
+      href: signed-audit-and-outbox-records.md
+    - name: Verification Policy and Result Handling
+      href: verification-policy-and-result-handling.md
+    - name: Key Rotation and Retired-Key Verification
+      href: key-rotation-and-retired-key-verification.md
+    - name: Capability Grant Hardening
+      href: capability-grant-hardening.md
+    - name: Audit Integrity Chain Model
+      href: audit-integrity-chain-model.md
+    - name: Cryptographic Security Posture and Production Guidance
+      href: cryptographic-security-posture.md
+    - name: Cryptographic Security Hardening Roadmap
+      href: cryptographic-security-hardening-roadmap.md
 
 - name: Adoption and Optional Scenarios
   items:

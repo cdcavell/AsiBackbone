@@ -9,7 +9,7 @@ This section maps the AsiBackbone documentation set for the stable `1.1.x` Accou
 
 Stable `1.1.x` is the current compatible package line. `1.1.1` is a patch release on the `1.1.0` API surface.
 
-Released stable package surfaces include Core, DependencyInjection, Storage.InMemory, EntityFrameworkCore, AspNetCore, Analyzers, OpenTelemetry, Signing.LocalDevelopment, and Signing.ManagedKey. OpenTelemetry is the concrete released governance-emission provider. Event Hubs, Purview, Azure-specific SDK adapters, robotics, immutable-storage, and additional provider packages remain design-only, strategy-only, host-owned, or future-provider work unless a later stable release explicitly ships them.
+Released stable package surfaces include Core, DependencyInjection, Storage.InMemory, EntityFrameworkCore, AspNetCore, Testing, Analyzers, OpenTelemetry, Signing.LocalDevelopment, and Signing.ManagedKey. OpenTelemetry is the concrete released governance-emission provider. Event Hubs, Purview, Azure-specific SDK adapters, robotics, immutable-storage, and additional provider packages remain design-only, strategy-only, host-owned, or future-provider work unless a later stable release explicitly ships them.
 
 ## Start here / current stable usage
 
@@ -48,6 +48,7 @@ Released stable package surfaces include Core, DependencyInjection, Storage.InMe
 * [EF Core Host Ownership and Migration Guidance](ef-core-host-ownership-and-migrations.md)
 * [ASP.NET Core Integration Boundary](aspnetcore-integration-boundary.md)
 * [ASP.NET Core Endpoint Governance](aspnetcore-endpoint-governance.md)
+* [Testing Harness](testing-harness.md)
 * [Plain ASP.NET Core Host Sample](plain-aspnetcore-host-sample.md)
 * [NetCoreApplicationTemplate Host Validation](netcoreapplicationtemplate-host-validation.md)
 * [Schema Versioning](schema-versioning.md)

@@ -4,6 +4,9 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+    <IsPackable>false</IsPackable>
+    <PackageId>Company.AsibackboneTemplate</PackageId>
     <UserSecretsId>Company.AsibackboneTemplate-local-dev</UserSecretsId>
   </PropertyGroup>
 

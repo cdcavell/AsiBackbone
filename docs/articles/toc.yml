@@ -52,6 +52,8 @@
   items:
     - name: Reference Deployment Evidence
       href: reference-deployment.md
+    - name: Aspire AppHost Sample
+      href: aspire-apphost-sample.md
     - name: 1.0.0 Quickstart
       href: quickstart-100.md
     - name: EF Core Integration Boundary

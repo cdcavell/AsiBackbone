@@ -9,7 +9,7 @@ This section maps the AsiBackbone documentation set for the stable `1.1.x` Accou
 
 Stable `1.1.x` is the current compatible package line. `1.1.1` is a patch release on the `1.1.0` API surface.
 
-Released stable package surfaces include Core, Storage.InMemory, EntityFrameworkCore, AspNetCore, Analyzers, OpenTelemetry, Signing.LocalDevelopment, and Signing.ManagedKey. OpenTelemetry is the concrete released governance-emission provider. Event Hubs, Purview, Azure-specific SDK adapters, robotics, immutable-storage, and additional provider packages remain design-only, strategy-only, host-owned, or future-provider work unless a later stable release explicitly ships them.
+Released stable package surfaces include Core, DependencyInjection, Storage.InMemory, EntityFrameworkCore, AspNetCore, Analyzers, OpenTelemetry, Signing.LocalDevelopment, and Signing.ManagedKey. OpenTelemetry is the concrete released governance-emission provider. Event Hubs, Purview, Azure-specific SDK adapters, robotics, immutable-storage, and additional provider packages remain design-only, strategy-only, host-owned, or future-provider work unless a later stable release explicitly ships them.
 
 ## Start here / current stable usage
 
@@ -123,4 +123,4 @@ Historical pages are retained for traceability and are separated from current st
 
 * [Historical Stable API Review](stable-api-review.md)
 * [Historical Alpha Package Boundary](alpha-package-boundary.md)
-* [Historical Core Alpha Readiness Review](core-alpha-readiness-review.md)
+* [Historical Core Alpha Readiness Review](core-alpha-core-alpha-readiness-review.md)

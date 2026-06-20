@@ -51,7 +51,7 @@ Intent or request
   -> Host application decides whether and how to execute
 ```
 
-The point of interest is the **decision boundary**: the moment between proposed intent and host execution. AsiBackbone focuses there, and deliberately leaves execution itself to the host.
+The point of interest is the **decision boundary**: the moment between proposed intent and host execution. AsiBackbone focuses there, and deliberately leaves execution itself to the host. A visual walkthrough of the spine, policy pipeline, acknowledgment sequence, capability scope, and outbox/emission path is available in [Core Governance Flow Diagrams](https://cdcavell.github.io/AsiBackbone/articles/core-governance-flow-diagrams.html).
 
 ## First code path
 
@@ -194,6 +194,7 @@ Future Event Hubs, Purview, Azure-specific, gateway, robotics, immutable-storage
 If you came to **understand the idea**:
 
 - [Intent to Execution: An Accountability Pattern](https://cdcavell.github.io/AsiBackbone/articles/intent-to-execution-pattern.html) — start here; the idea with no .NET prerequisite.
+- [Core Governance Flow Diagrams](https://cdcavell.github.io/AsiBackbone/articles/core-governance-flow-diagrams.html) — visual map of the spine, policy pipeline, acknowledgment flow, capability boundary, and outbox/emission path.
 - [ASI Backbone Concept Synopsis](https://cdcavell.github.io/AsiBackbone/articles/asi-backbone-concept.html) — what the governance spine is and why it is shaped this way.
 - [Dynamic Liability Handshake](https://cdcavell.github.io/AsiBackbone/articles/dynamic-liability-handshake.html) — the acknowledgment-of-intent link, the part most audit trails skip.
 - [Core Domain Language](https://cdcavell.github.io/AsiBackbone/articles/core-domain-language.html) — the vocabulary of decision flow.

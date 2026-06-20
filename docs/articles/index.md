@@ -16,6 +16,7 @@ Released stable package surfaces include Core, DependencyInjection, Storage.InMe
 * [Getting Started](getting-started.md)
 * [Progressive Adoption Ladder](progressive-adoption.md)
 * [First 15 Minutes: Standard API Gating](quickstart-api-gating.md)
+* [Core Governance Flow Diagrams](core-governance-flow-diagrams.md)
 * [AddAsiBackbone Builder Facade](add-asibackbone-builder-facade.md)
 * [Terminology Map](terminology-map.md)
 * [Why AsiBackbone?](why-asi-backbone.md)
@@ -25,6 +26,7 @@ Released stable package surfaces include Core, DependencyInjection, Storage.InMe
 ## Core concepts and domain language
 
 * [Intent to Execution: An Accountability Pattern](intent-to-execution-pattern.md)
+* [Core Governance Flow Diagrams](core-governance-flow-diagrams.md)
 * [ASI Backbone Concept Synopsis](asi-backbone-concept.md)
 * [Core Domain Language](core-domain-language.md)
 * [Policy Evaluator Pipeline](policy-evaluator-pipeline.md)

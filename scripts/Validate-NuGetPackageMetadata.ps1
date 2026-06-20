@@ -156,6 +156,12 @@ $expectedPackages = @(
         ReadmeMustContain = @('not durable storage', 'local validation')
     },
     [pscustomobject]@{
+        Id = 'CDCavell.AsiBackbone.Testing'
+        Description = 'Test harness helpers for Accountable Systems Infrastructure endpoint governance, deterministic policy decisions, and in-memory inspection.'
+        Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'testing', 'test-harness', 'aspnetcore', 'policy-evaluation', 'audit')
+        ReadmeMustContain = @('test harness helpers', 'not a production enforcement provider')
+    },
+    [pscustomobject]@{
         Id = 'CDCavell.AsiBackbone.EntityFrameworkCore'
         Description = 'Entity Framework Core model configuration and host-owned persistence helpers for Accountable Systems Infrastructure audit and acknowledgment records.'
         Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'entity-framework-core', 'efcore', 'host-owned-persistence', 'audit-ledger')

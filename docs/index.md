@@ -17,6 +17,9 @@ These pages are the best first stops, whether you came to understand the idea or
 * [Core Governance Flow Diagrams](articles/core-governance-flow-diagrams.md)  
   Visual diagrams for the intent-to-execution spine, policy pipeline, acknowledgment sequence, capability token boundary, and outbox/emission path.
 
+* [Reference Deployment: Plain ASP.NET Core Host Evidence](articles/reference-deployment.md)  
+  Repeatable local evidence showing request, decision, audit, signing, ledger, and endpoint-governance output in a realistic host sample.
+
 * [Why AsiBackbone?](articles/why-asi-backbone.md)  
   High-level purpose, target audience, and adoption rationale.
 
@@ -82,6 +85,7 @@ Use these pages to understand the vocabulary and decision-flow model.
 
 Use these pages when wiring AsiBackbone into a host application.
 
+* [Reference Deployment: Plain ASP.NET Core Host Evidence](articles/reference-deployment.md)
 * [Progressive Adoption Ladder](articles/progressive-adoption.md)
 * [EF Core Integration Boundary](articles/ef-core-integration-boundary.md)
 * [EF Core Host Ownership and Migration Guidance](articles/ef-core-host-ownership-and-migrations.md)

@@ -67,8 +67,7 @@ for host_style in plain netcoretemplate; do
   dotnet new asibackbone-webapi \
     --name "$project_name" \
     --output "$project_dir" \
-    --host-style "$host_style" \
-    --no-restore
+    --hostStyle "$host_style"
 
   if ! grep -q "\"HostStyle\": \"$host_style\"" "$project_dir/appsettings.json"; then
     echo "Generated appsettings.json did not contain selected host style '$host_style'."

@@ -5,6 +5,10 @@ This section maps the AsiBackbone documentation set for the stable `1.1.x` Accou
 > [!IMPORTANT]
 > In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is governance infrastructure for accountable software decision flow, not an artificial superintelligence implementation.
 
+## Search and navigation
+
+Use the header search box for package names, API concepts, and article titles. Search is enabled for the published DocFX site; if a newly merged page is missing from results, wait for the documentation publish workflow to finish and refresh the browser cache. Long pages use the left navigation tree and the right **In this article** rail for local heading navigation. Source files live under `docs/` in the repository, and the site header includes a Repository link for source review or edits.
+
 ## Current stable package posture
 
 Stable `1.1.x` is the current compatible package line. `1.1.1` is a patch release on the `1.1.0` API surface.
@@ -135,3 +139,9 @@ Historical pages are retained for traceability and are separated from current st
 * [Historical Stable API Review](stable-api-review.md)
 * [Historical Alpha Package Boundary](alpha-package-boundary.md)
 * [Historical Core Alpha Readiness Review](core-alpha-readiness-review.md)
+
+## Read next
+
+- [Implementation-First Adoption Path](implementation-first-adoption.md)
+- [First 15 Minutes: Standard API Gating](quickstart-api-gating.md)
+- [Reference Deployment: Plain ASP.NET Core Host Evidence](reference-deployment.md)

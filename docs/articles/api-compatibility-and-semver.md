@@ -5,7 +5,7 @@ This article defines the public API compatibility promise for the stable AsiBack
 It complements the historical stable API review tracked in [issue #13](https://github.com/cdcavell/AsiBackbone/issues/13). That review established the original `1.0.0` public type names, namespaces, package boundaries, dependency direction, and extension points. The released `1.1.0` package family expands the stable contract with additive analyzer, OpenTelemetry, and signing-provider package surfaces. `1.1.1` is a compatible patch release on that `1.1.0` API surface.
 
 > [!NOTE]
-> `1.1.1` included small additive, opt-in endpoint-governance public surface while preserving source and binary compatibility for existing `1.1.0` consumers. That release is documented as a compatibility exception to the expected SemVer policy below. Future additive public API surface should use a minor version bump even when the change is backward-compatible.
+> `1.1.1` included small additive, opt-in endpoint-governance public surface and an additive template package while preserving source and binary compatibility for existing `1.1.0` consumers. That release is documented as a compatibility exception to the expected SemVer policy below. Future additive public API or package surface should use a minor version bump even when the change is backward-compatible.
 
 ## Compatibility promise for the stable `1.x` line
 
@@ -39,14 +39,17 @@ The initial stable `1.0.0` package family established the first compatible `1.x`
 
 ### Expanded `1.1.x` stable family
 
-The released `1.1.0` package family keeps the `1.0.0` packages compatible and adds stable additive package surfaces. `1.1.1` is the current patch release on the same API surface, with the endpoint-governance additive compatibility exception noted above.
+The released `1.1.0` package family keeps the `1.0.0` packages compatible and adds stable additive package surfaces. `1.1.1` is the current patch release on the same API surface, with the endpoint-governance and template-package additive compatibility exception noted above.
 
 | Package | `1.1.x` stable role |
 | --- | --- |
 | `CDCavell.AsiBackbone.Core` | Adds provider-neutral governance emission contracts, durable outbox contracts, DLP/classification policy primitives, signing-ready metadata abstractions, canonical hashing/signing seams, verification-policy primitives, and lifecycle/audit additions while preserving the compatible `1.x` Core line. |
+| `CDCavell.AsiBackbone.DependencyInjection` | Adds the explicit `AddAsiBackbone(...)` builder facade for coordinating host-selected provider registrations without making Core own infrastructure. |
 | `CDCavell.AsiBackbone.Storage.InMemory` | Adds non-durable lifecycle and outbox proof paths for tests, samples, and local validation. |
 | `CDCavell.AsiBackbone.EntityFrameworkCore` | Adds host-owned durable persistence surfaces for audit residue lifecycle and governance outbox records. |
 | `CDCavell.AsiBackbone.AspNetCore` | Adds endpoint governance and hosted outbox drain integration while keeping host ownership explicit. |
+| `CDCavell.AsiBackbone.Testing` | Adds test-only endpoint-governance harness helpers for deterministic policy decisions and in-memory inspection. |
+| `CDCavell.AsiBackbone.Templates` | Adds `dotnet new` templates for generating governed ASP.NET Core host scaffolds. The package is a developer-experience scaffold, not a runtime dependency. |
 | `CDCavell.AsiBackbone.Analyzers` | Stable build-time analyzer safety rails for governance persistence and continuation-flow patterns. |
 | `CDCavell.AsiBackbone.OpenTelemetry` | Stable concrete governance emission provider that projects provider-neutral envelopes into .NET diagnostics primitives such as `ActivitySource` and `Meter`. |
 | `CDCavell.AsiBackbone.Signing.LocalDevelopment` | Stable local-development signing and verification provider for tests, samples, and wiring proof paths only. Not production key custody. |
@@ -81,7 +84,7 @@ AsiBackbone follows Semantic Versioning expectations after stabilization:
 | Patch | Fixes bugs, documentation issues, packaging issues, or implementation defects without adding breaking public API changes. Patch releases can also clarify documentation and strengthen tests. |
 | Preview suffix | Indicates packages or features that are still under review and may change before stable release. |
 
-For future releases, additive public API changes should be grouped into a minor release even when they are opt-in and backward-compatible. Patch releases should be reserved for fixes, documentation, packaging, tests, and implementation hardening that does not expand the stable public surface.
+For future releases, additive public API or package changes should be grouped into a minor release even when they are opt-in and backward-compatible. Patch releases should be reserved for fixes, documentation, packaging, tests, and implementation hardening that does not expand the stable public surface.
 
 Before `1.0.0`, alpha or preview packages may still make breaking changes as the API is shaped. Those changes should remain visible in the changelog and release notes.
 
@@ -119,7 +122,7 @@ Released provider packages have their own stable contract within the compatible 
 - `CDCavell.AsiBackbone.Signing.LocalDevelopment`;
 - `CDCavell.AsiBackbone.Signing.ManagedKey`.
 
-The analyzer package is also part of the released `1.1.x` stable package family, but analyzer diagnostics are build-time guidance rather than runtime enforcement.
+The analyzer package is also part of the released `1.1.x` stable package family, but analyzer diagnostics are build-time guidance rather than runtime enforcement. The templates package is a developer-experience package rather than a runtime provider.
 
 Provider packages planned for later milestones should not be described as part of the stable contract until they complete their own API review and stable release checklist.
 
@@ -156,4 +159,5 @@ Before cutting a stable release or stable package-family expansion, the release 
 - [Schema Versioning](schema-versioning.md)
 - [API Baseline and Boundary Checks](api-baseline-and-boundary-checks.md)
 - [Project Boundaries and Non-Claims](project-boundaries.md)
+- [dotnet new Templates](templates.md)
 - [Release Validation](release-validation.md)

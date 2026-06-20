@@ -1,9 +1,7 @@
 using CDCavell.AsiBackbone.Core.Audit;
-using CDCavell.AsiBackbone.Core.Lifecycle;
 using CDCavell.AsiBackbone.Core.Outbox;
 using CDCavell.AsiBackbone.DependencyInjection;
 using CDCavell.AsiBackbone.EntityFrameworkCore.Audit;
-using CDCavell.AsiBackbone.EntityFrameworkCore.Lifecycle;
 using CDCavell.AsiBackbone.EntityFrameworkCore.Outbox;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,7 +29,7 @@ public static class AsiBackboneEntityFrameworkCoreBuilderExtensions
     }
 
     /// <summary>
-    /// Adds EF Core audit lifecycle storage through the AsiBackbone builder facade.
+    /// Adds EF Core audit residue lifecycle storage through the AsiBackbone builder facade.
     /// </summary>
     public static IAsiBackboneBuilder UseEfCoreAuditLifecycle<TDbContext>(this IAsiBackboneBuilder builder)
         where TDbContext : DbContext

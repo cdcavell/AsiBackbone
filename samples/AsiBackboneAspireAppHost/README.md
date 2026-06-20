@@ -22,8 +22,9 @@ The governed API demonstrates:
 ## Prerequisites
 
 - .NET SDK matching the repository `global.json`.
-- .NET Aspire tooling compatible with the `Aspire.Hosting.AppHost` package version in `Directory.Packages.props`.
 - A browser for the Aspire dashboard.
+
+The AppHost uses the Aspire SDK and hosting package through NuGet references. It does not require installing the deprecated Aspire workload.
 
 ## Run locally
 
@@ -58,6 +59,7 @@ This sample does not:
 - make Aspire a dependency of Core or any stable runtime package,
 - introduce a `CDCavell.AsiBackbone.Aspire` package,
 - require cloud Key Vault, managed keys, or production databases,
+- require the deprecated Aspire workload,
 - provide compliance, durability, production signing, or tamper-evidence by itself,
 - replace host-owned execution, storage, deployment, monitoring, or operational policy.
 

@@ -13,7 +13,7 @@ Use the header search box for package names, API concepts, and article titles. S
 
 Stable `1.1.x` is the current compatible package line. `1.1.1` is a patch release on the `1.1.0` API surface.
 
-Released stable package surfaces include Core, DependencyInjection, Storage.InMemory, EntityFrameworkCore, AspNetCore, Testing, Analyzers, OpenTelemetry, Signing.LocalDevelopment, and Signing.ManagedKey. OpenTelemetry is the concrete released governance-emission provider. Event Hubs, Purview, Azure-specific SDK adapters, Aspire, robotics, immutable-storage, and additional provider packages remain design-only, strategy-only, sample-only, host-owned, or future-provider work unless a later stable release explicitly ships them.
+Released stable package surfaces include Core, DependencyInjection, Storage.InMemory, EntityFrameworkCore, AspNetCore, Testing, Templates, Analyzers, OpenTelemetry, Signing.LocalDevelopment, and Signing.ManagedKey. OpenTelemetry is the concrete released governance-emission provider. Event Hubs, Purview, Azure-specific SDK adapters, Aspire, robotics, immutable-storage, and additional provider packages remain design-only, strategy-only, sample-only, host-owned, or future-provider work unless a later stable release explicitly ships them.
 
 ## Start here / implementation-first usage
 
@@ -26,6 +26,7 @@ Released stable package surfaces include Core, DependencyInjection, Storage.InMe
 * [Getting Started](getting-started.md)
 * [Core Governance Flow Diagrams](core-governance-flow-diagrams.md)
 * [AddAsiBackbone Builder Facade](add-asibackbone-builder-facade.md)
+* [dotnet new Templates](templates.md)
 * [Why AsiBackbone?](why-asi-backbone.md)
 * [1.1.x Release Notes](release-notes-110.md)
 * [Upgrade Guide: 1.0.0 to 1.1.0](upgrade-100-to-110.md)
@@ -58,6 +59,7 @@ These pages remain available for readers who want the broader framing. They are 
 ## Package integration guides
 
 * [Reference Deployment: Plain ASP.NET Core Host Evidence](reference-deployment.md)
+* [dotnet new Templates](templates.md)
 * [Aspire AppHost Sample](aspire-apphost-sample.md)
 * [1.0.0 Quickstart](quickstart-100.md)
 * [EF Core Integration Boundary](ef-core-integration-boundary.md)
@@ -147,4 +149,4 @@ Historical pages are retained for traceability and are separated from current st
 
 - [Implementation-First Adoption Path](implementation-first-adoption.md)
 - [First 15 Minutes: Standard API Gating](quickstart-api-gating.md)
-- [Reference Deployment: Plain ASP.NET Core Host Evidence](reference-deployment.md)
+- [dotnet new Templates](templates.md)

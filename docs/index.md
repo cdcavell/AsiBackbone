@@ -14,6 +14,9 @@ These pages are the best first stops, whether you came to understand the idea or
 * [Intent to Execution: An Accountability Pattern](articles/intent-to-execution-pattern.md)  
   The idea on its own terms, with no .NET prerequisite. Start here if you came to think about the problem.
 
+* [Core Governance Flow Diagrams](articles/core-governance-flow-diagrams.md)  
+  Visual diagrams for the intent-to-execution spine, policy pipeline, acknowledgment sequence, capability token boundary, and outbox/emission path.
+
 * [Why AsiBackbone?](articles/why-asi-backbone.md)  
   High-level purpose, target audience, and adoption rationale.
 
@@ -65,6 +68,7 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 Use these pages to understand the vocabulary and decision-flow model.
 
 * [Intent to Execution: An Accountability Pattern](articles/intent-to-execution-pattern.md)
+* [Core Governance Flow Diagrams](articles/core-governance-flow-diagrams.md)
 * [ASI Backbone Concept Synopsis](articles/asi-backbone-concept.md)
 * [Core Domain Language](articles/core-domain-language.md)
 * [Policy Evaluator Pipeline](articles/policy-evaluator-pipeline.md)

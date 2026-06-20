@@ -83,9 +83,13 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
             {
                 return endpointOptions.FailClosedWhenPolicyEvaluatorMissing
                     ? CreateConfigurationFailure(
+                        httpContext,
+                        descriptor,
+                        endpointMetadata,
                         "endpoint.policy_evaluator.missing",
                         "Endpoint governance policy metadata was present, but no AsiBackbone policy evaluator was registered.",
-                        decision)
+                        decision,
+                        "aspnetcore.endpoint.governance.configuration.policy_evaluator")
                     : AsiBackboneEndpointGovernanceResult.Allow(decision);
             }
 
@@ -103,9 +107,13 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
             {
                 return endpointOptions.FailClosedWhenCapabilityValidatorMissing
                     ? CreateCapabilityFailure(
+                        httpContext,
+                        descriptor,
+                        endpointMetadata,
                         "endpoint.capability_validator.missing",
                         "Endpoint capability metadata was present, but no host-owned endpoint capability validator was registered.",
-                        decision)
+                        decision,
+                        "aspnetcore.endpoint.governance.capability.configuration")
                     : AsiBackboneEndpointGovernanceResult.Allow(decision);
             }
 
@@ -123,9 +131,13 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
             {
                 return endpointOptions.FailClosedWhenAuditSinkMissing
                     ? CreateConfigurationFailure(
+                        httpContext,
+                        descriptor,
+                        endpointMetadata,
                         "endpoint.audit_sink.missing",
                         "Endpoint governance audit emission was requested, but no host-owned audit sink was registered.",
-                        decision)
+                        decision,
+                        "aspnetcore.endpoint.governance.configuration.audit_sink")
                     : AsiBackboneEndpointGovernanceResult.Allow(decision);
             }
 
@@ -167,9 +179,13 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
     }
 
     private AsiBackboneEndpointGovernanceResult CreateConfigurationFailure(
+        HttpContext httpContext,
+        AsiBackboneEndpointGovernanceDescriptor descriptor,
+        IReadOnlyDictionary<string, string> metadata,
         string code,
         string message,
-        GovernanceDecision currentDecision)
+        GovernanceDecision currentDecision,
+        string decisionStage)
     {
         var decision = GovernanceDecision.Deny(
             code,
@@ -179,7 +195,20 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
             policyVersion: currentDecision.PolicyVersion,
             policyHash: currentDecision.PolicyHash);
 
-        return AsiBackboneEndpointGovernanceResult.Block(
+        return AsiBackboneEndpointGovernanceDevelopmentDiagnostics.IsEnabled(httpContext, endpointOptions)
+            ? AsiBackboneEndpointGovernanceResult.Block(
+                AsiBackboneEndpointGovernanceDevelopmentDiagnostics.CreateProblem(
+                    httpContext,
+                    endpointOptions,
+                    descriptor,
+                    decision,
+                    decisionStage,
+                    title: "Endpoint governance configuration is incomplete.",
+                    detail: message,
+                    statusCode: endpointOptions.ConfigurationFailureStatusCode,
+                    metadata: metadata),
+                decision)
+            : AsiBackboneEndpointGovernanceResult.Block(
             Microsoft.AspNetCore.Http.Results.Problem(
                 title: "Endpoint governance configuration is incomplete.",
                 detail: message,
@@ -193,9 +222,13 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
     }
 
     private AsiBackboneEndpointGovernanceResult CreateCapabilityFailure(
+        HttpContext httpContext,
+        AsiBackboneEndpointGovernanceDescriptor descriptor,
+        IReadOnlyDictionary<string, string> metadata,
         string code,
         string message,
-        GovernanceDecision currentDecision)
+        GovernanceDecision currentDecision,
+        string decisionStage)
     {
         var decision = GovernanceDecision.Deny(
             code,
@@ -205,7 +238,20 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
             policyVersion: currentDecision.PolicyVersion,
             policyHash: currentDecision.PolicyHash);
 
-        return AsiBackboneEndpointGovernanceResult.Block(
+        return AsiBackboneEndpointGovernanceDevelopmentDiagnostics.IsEnabled(httpContext, endpointOptions)
+            ? AsiBackboneEndpointGovernanceResult.Block(
+                AsiBackboneEndpointGovernanceDevelopmentDiagnostics.CreateProblem(
+                    httpContext,
+                    endpointOptions,
+                    descriptor,
+                    decision,
+                    decisionStage,
+                    title: "Endpoint capability grant validation failed.",
+                    detail: message,
+                    statusCode: endpointOptions.CapabilityFailureStatusCode,
+                    metadata: metadata),
+                decision)
+            : AsiBackboneEndpointGovernanceResult.Block(
             Microsoft.AspNetCore.Http.Results.Problem(
                 title: "Endpoint capability grant validation failed.",
                 detail: message,

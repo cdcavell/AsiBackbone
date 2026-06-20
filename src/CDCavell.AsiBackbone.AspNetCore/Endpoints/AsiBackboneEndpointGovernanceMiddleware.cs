@@ -45,7 +45,12 @@ public sealed class AsiBackboneEndpointGovernanceMiddleware(RequestDelegate next
         {
             if (options.RequireGovernanceMetadata && !endpointAllowsMissingGovernance)
             {
-                IResult missingGovernanceResult = CreateDefaultForbiddenResult(httpContext, options);
+                IResult missingGovernanceResult = CreateDefaultForbiddenResult(
+                    httpContext,
+                    options,
+                    descriptor,
+                    result: null,
+                    decisionStage: "aspnetcore.endpoint.governance.metadata");
 
                 await missingGovernanceResult.ExecuteAsync(httpContext).ConfigureAwait(false);
                 return;
@@ -65,16 +70,34 @@ public sealed class AsiBackboneEndpointGovernanceMiddleware(RequestDelegate next
             return;
         }
 
-        IResult failureResult = result.FailureResult ?? CreateDefaultForbiddenResult(httpContext, options);
+        IResult failureResult = result.FailureResult ?? CreateDefaultForbiddenResult(
+            httpContext,
+            options,
+            descriptor,
+            result,
+            "aspnetcore.endpoint.governance.decision");
 
         await failureResult.ExecuteAsync(httpContext).ConfigureAwait(false);
     }
 
     private static IResult CreateDefaultForbiddenResult(
         HttpContext httpContext,
-        AsiBackboneEndpointGovernanceOptions options)
+        AsiBackboneEndpointGovernanceOptions options,
+        AsiBackboneEndpointGovernanceDescriptor descriptor,
+        AsiBackboneEndpointGovernanceResult? result,
+        string decisionStage)
     {
-        return options.DefaultForbiddenResultFactory is null
+        return AsiBackboneEndpointGovernanceDevelopmentDiagnostics.IsEnabled(httpContext, options)
+            ? AsiBackboneEndpointGovernanceDevelopmentDiagnostics.CreateProblem(
+                httpContext,
+                options,
+                descriptor,
+                result?.Decision,
+                decisionStage,
+                title: "Endpoint governance blocked execution.",
+                detail: "Endpoint governance blocked this request before the selected endpoint executed.",
+                statusCode: StatusCodes.Status403Forbidden)
+            : options.DefaultForbiddenResultFactory is null
             ? DefaultForbiddenResult
             : options.DefaultForbiddenResultFactory(httpContext)
                 ?? throw new InvalidOperationException($"{nameof(AsiBackboneEndpointGovernanceOptions.DefaultForbiddenResultFactory)} must return a non-null result.");

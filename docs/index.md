@@ -9,16 +9,25 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 
 ## Start here
 
-These pages are the best first stops, whether you came to understand the idea or to adopt the packages.
+These pages are the best first stops for implementation-first adoption. The optional conceptual background remains available later in the documentation set.
 
-* [Intent to Execution: An Accountability Pattern](articles/intent-to-execution-pattern.md)  
-  The idea on its own terms, with no .NET prerequisite. Start here if you came to think about the problem.
+* [Implementation-First Adoption Path](articles/implementation-first-adoption.md)  
+  Plain engineering translations for project terms and the recommended first reading path for .NET adopters.
 
-* [Core Governance Flow Diagrams](articles/core-governance-flow-diagrams.md)  
-  Visual diagrams for the intent-to-execution spine, policy pipeline, acknowledgment sequence, capability token boundary, and outbox/emission path.
+* [First 15 Minutes: Standard API Gating](articles/quickstart-api-gating.md)  
+  Practical package-consumer walkthrough for gating one ASP.NET Core endpoint.
 
 * [Reference Deployment: Plain ASP.NET Core Host Evidence](articles/reference-deployment.md)  
   Repeatable local evidence showing request, decision, audit, signing, ledger, and endpoint-governance output in a realistic host sample.
+
+* [Terminology Map](articles/terminology-map.md)  
+  Quick vocabulary bridge for .NET and application-architecture readers.
+
+* [Intent to Execution: An Accountability Pattern](articles/intent-to-execution-pattern.md)  
+  The idea on its own terms, with no .NET prerequisite. Read this when you want the broader framing after the implementation route is clear.
+
+* [Core Governance Flow Diagrams](articles/core-governance-flow-diagrams.md)  
+  Visual diagrams for the intent-to-execution spine, policy pipeline, acknowledgment sequence, capability token boundary, and outbox/emission path.
 
 * [Why AsiBackbone?](articles/why-asi-backbone.md)  
   High-level purpose, target audience, and adoption rationale.
@@ -28,12 +37,6 @@ These pages are the best first stops, whether you came to understand the idea or
 
 * [Progressive Adoption Ladder](articles/progressive-adoption.md)  
   The smallest Core-only path first, followed by optional outbox, telemetry, DLP/classification, signing, and analyzer add-ons.
-
-* [First 15 Minutes: Standard API Gating](articles/quickstart-api-gating.md)  
-  Practical package-consumer walkthrough for gating one ASP.NET Core endpoint.
-
-* [Terminology Map](articles/terminology-map.md)  
-  Quick vocabulary bridge for .NET and application-architecture readers.
 
 * [1.1.x Release Notes](articles/release-notes-110.md)  
   Current stable package-family boundary for the compatible `1.x` line. `1.1.1` is a patch release on the `1.1.0` API surface.
@@ -66,20 +69,40 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 
 ## Major documentation areas
 
+### Implementation-first adoption
+
+Use these pages when wiring AsiBackbone into a host application.
+
+* [Implementation-First Adoption Path](articles/implementation-first-adoption.md)
+* [First 15 Minutes: Standard API Gating](articles/quickstart-api-gating.md)
+* [Reference Deployment: Plain ASP.NET Core Host Evidence](articles/reference-deployment.md)
+* [Terminology Map](articles/terminology-map.md)
+* [Progressive Adoption Ladder](articles/progressive-adoption.md)
+* [ASP.NET Core Endpoint Governance](articles/aspnetcore-endpoint-governance.md)
+* [Plain ASP.NET Core Host Sample](articles/plain-aspnetcore-host-sample.md)
+* [NetCoreApplicationTemplate Host Validation](articles/netcoreapplicationtemplate-host-validation.md)
+* [Schema Versioning](articles/schema-versioning.md)
+* [API Compatibility and SemVer](articles/api-compatibility-and-semver.md)
+
 ### Core concepts and domain language
 
-Use these pages to understand the vocabulary and decision-flow model.
+Use these pages to understand the vocabulary and decision-flow model after the first runnable path is clear.
 
-* [Intent to Execution: An Accountability Pattern](articles/intent-to-execution-pattern.md)
 * [Core Governance Flow Diagrams](articles/core-governance-flow-diagrams.md)
-* [ASI Backbone Concept Synopsis](articles/asi-backbone-concept.md)
 * [Core Domain Language](articles/core-domain-language.md)
 * [Policy Evaluator Pipeline](articles/policy-evaluator-pipeline.md)
 * [Host-Owned Execution Enforcement](articles/host-owned-execution-enforcement.md)
 * [Dynamic Liability Handshake](articles/dynamic-liability-handshake.md)
+* [Glossary](articles/glossary.md)
+
+### Optional conceptual background
+
+These pages remain available for readers interested in the broader framing, but they are not required for package adoption.
+
+* [Intent to Execution: An Accountability Pattern](articles/intent-to-execution-pattern.md)
+* [ASI Backbone Concept Synopsis](articles/asi-backbone-concept.md)
 * [Gateway and Regional Policy Flow](articles/gateway-and-regional-policy-flow.md)
 * [Equations and Toy Models](articles/equations-and-toy-models.md)
-* [Glossary](articles/glossary.md)
 
 ### Package integration guides
 
@@ -144,7 +167,7 @@ These pages explain signing-ready artifacts, provider signing, verification, cha
 
 ### Advanced scenarios
 
-Scenario pages describe applied patterns. They do not imply current physical execution, robotics control, or model-hosting behavior beyond the documented package seams.
+Scenario pages describe applied patterns. They remain optional and do not imply current physical execution, robotics control, or model-hosting behavior beyond the documented package seams.
 
 * [AI Agent Gateway](articles/scenarios/ai-agent-gateway.md)
 * [Human Approval Before AI Tool Execution](articles/scenarios/human-approval-before-ai-tool-execution.md)

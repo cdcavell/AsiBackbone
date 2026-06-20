@@ -11,12 +11,13 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <NoDefaultExcludes>true</NoDefaultExcludes>
     <NoWarn>$(NoWarn);NU5128</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="templates\**\*.cs" />
-    <Content Include="templates\**\*" Exclude="templates\**\bin\**;templates\**\obj\**" Pack="true" PackagePath="content\" />
+    <Compile Remove="templates/**/*.cs" />
+    <Content Include="templates/**/*" Exclude="templates/**/bin/**;templates/**/obj/**" Pack="true" PackagePath="content/" />
     <None Update="README.md" Pack="true" PackagePath="/" />
   </ItemGroup>
 

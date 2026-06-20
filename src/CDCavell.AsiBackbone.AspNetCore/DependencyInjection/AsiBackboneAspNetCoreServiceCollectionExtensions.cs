@@ -121,6 +121,7 @@ public static class AsiBackboneAspNetCoreServiceCollectionExtensions
             }, "Endpoint governance options must be valid.")
             .ValidateOnStart();
 
+        _ = services.AddLogging();
         _ = services.AddHttpContextAccessor();
         _ = services.AddScoped<IAsiBackboneHttpActorContextResolver, HttpContextAsiBackboneActorContextResolver>();
         _ = services.AddScoped<IAsiBackboneHttpRequestCorrelationResolver, HttpContextAsiBackboneRequestCorrelationResolver>();

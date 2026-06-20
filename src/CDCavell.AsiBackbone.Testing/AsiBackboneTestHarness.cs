@@ -4,7 +4,6 @@ using CDCavell.AsiBackbone.Core.Constraints;
 using CDCavell.AsiBackbone.Core.Decisions;
 using CDCavell.AsiBackbone.Core.Evaluation;
 using CDCavell.AsiBackbone.Core.Outbox;
-using CDCavell.AsiBackbone.Core.Results;
 using CDCavell.AsiBackbone.Core.Signing;
 using CDCavell.AsiBackbone.Storage.InMemory.Outbox;
 using Microsoft.AspNetCore.Http;
@@ -190,14 +189,14 @@ public static class AsiBackboneTestHarnessServiceCollectionExtensions
         configure(options);
         options.Validate();
 
-        services.AddSingleton(options);
-        services.AddSingleton<AsiBackboneTestAuditSink>();
-        services.AddSingleton<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>, AsiBackboneTestHarnessPolicyEvaluator>();
-        services.AddSingleton<IAsiBackboneEndpointCapabilityGrantValidator, AsiBackboneTestHarnessEndpointCapabilityGrantValidator>();
+        _ = services.AddSingleton(options);
+        _ = services.AddSingleton<AsiBackboneTestAuditSink>();
+        _ = services.AddSingleton<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>, AsiBackboneTestHarnessPolicyEvaluator>();
+        _ = services.AddSingleton<IAsiBackboneEndpointCapabilityGrantValidator, AsiBackboneTestHarnessEndpointCapabilityGrantValidator>();
 
         if (options.RegisterInMemoryAuditSink)
         {
-            services.AddSingleton<IAsiBackboneAuditSink>(static serviceProvider =>
+            _ = services.AddSingleton<IAsiBackboneAuditSink>(static serviceProvider =>
                 serviceProvider.GetRequiredService<AsiBackboneTestAuditSink>());
         }
 
@@ -220,18 +219,13 @@ public static class AsiBackboneTestHarnessServiceCollectionExtensions
 /// <summary>
 /// Deterministic policy evaluator used by the test harness.
 /// </summary>
-public sealed class AsiBackboneTestHarnessPolicyEvaluator : IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>
+/// <remarks>
+/// Initializes a new instance of the <see cref="AsiBackboneTestHarnessPolicyEvaluator" /> class.
+/// </remarks>
+public sealed class AsiBackboneTestHarnessPolicyEvaluator(AsiBackboneTestHarnessOptions options) : IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>
 {
     private const string PolicyTypesMetadataKey = "endpoint.policy_types";
-    private readonly AsiBackboneTestHarnessOptions options;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AsiBackboneTestHarnessPolicyEvaluator" /> class.
-    /// </summary>
-    public AsiBackboneTestHarnessPolicyEvaluator(AsiBackboneTestHarnessOptions options)
-    {
-        this.options = options ?? throw new ArgumentNullException(nameof(options));
-    }
+    private readonly AsiBackboneTestHarnessOptions options = options ?? throw new ArgumentNullException(nameof(options));
 
     /// <inheritdoc />
     public ValueTask<GovernanceDecision> EvaluateAsync(
@@ -249,17 +243,14 @@ public sealed class AsiBackboneTestHarnessPolicyEvaluator : IAsiBackbonePolicyEv
             }
         }
 
-        if (options.RequireExplicitPolicyResults)
-        {
-            return ValueTask.FromResult(GovernanceDecision.Deny(
+        return options.RequireExplicitPolicyResults
+            ? ValueTask.FromResult(GovernanceDecision.Deny(
                 "test_harness.policy_result.missing",
                 "The AsiBackbone test harness requires an explicit policy result for this endpoint policy marker.",
                 correlationId: context.CorrelationId,
                 policyVersion: context.PolicyVersion,
-                policyHash: context.PolicyHash));
-        }
-
-        return ValueTask.FromResult(AsiBackboneTestHarnessDecisionFactory.WithTelemetry(options.DefaultPolicyDecision, context));
+                policyHash: context.PolicyHash))
+            : ValueTask.FromResult(AsiBackboneTestHarnessDecisionFactory.WithTelemetry(options.DefaultPolicyDecision, context));
     }
 
     private static IEnumerable<string> ResolvePolicyTokens(AsiBackboneConstraintEvaluationContext context)
@@ -283,17 +274,12 @@ public sealed class AsiBackboneTestHarnessPolicyEvaluator : IAsiBackbonePolicyEv
 /// <summary>
 /// Deterministic capability-grant validator used by the test harness.
 /// </summary>
-public sealed class AsiBackboneTestHarnessEndpointCapabilityGrantValidator : IAsiBackboneEndpointCapabilityGrantValidator
+/// <remarks>
+/// Initializes a new instance of the <see cref="AsiBackboneTestHarnessEndpointCapabilityGrantValidator" /> class.
+/// </remarks>
+public sealed class AsiBackboneTestHarnessEndpointCapabilityGrantValidator(AsiBackboneTestHarnessOptions options) : IAsiBackboneEndpointCapabilityGrantValidator
 {
-    private readonly AsiBackboneTestHarnessOptions options;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AsiBackboneTestHarnessEndpointCapabilityGrantValidator" /> class.
-    /// </summary>
-    public AsiBackboneTestHarnessEndpointCapabilityGrantValidator(AsiBackboneTestHarnessOptions options)
-    {
-        this.options = options ?? throw new ArgumentNullException(nameof(options));
-    }
+    private readonly AsiBackboneTestHarnessOptions options = options ?? throw new ArgumentNullException(nameof(options));
 
     /// <inheritdoc />
     public ValueTask<GovernanceDecision> ValidateAsync(
@@ -321,7 +307,7 @@ public sealed class AsiBackboneTestHarnessEndpointCapabilityGrantValidator : IAs
 /// </summary>
 public sealed class AsiBackboneTestAuditSink : IAsiBackboneAuditSink
 {
-    private readonly object gate = new();
+    private readonly Lock gate = new();
     private readonly List<IAsiBackboneAuditResidue> entries = [];
 
     /// <summary>

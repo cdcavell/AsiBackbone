@@ -38,6 +38,7 @@
     <Project Path="tests/CDCavell.AsiBackbone.Core.Tests/CDCavell.AsiBackbone.Core.Tests.csproj">
       <Build Solution="Debug|*" Project="false" />
     </Project>
+    <Project Path="tests/CDCavell.AsiBackbone.DependencyInjection.Tests/CDCavell.AsiBackbone.DependencyInjection.Tests.csproj" />
     <Project Path="tests/CDCavell.AsiBackbone.EntityFrameworkCore.Tests/CDCavell.AsiBackbone.EntityFrameworkCore.Tests.csproj">
       <Build Solution="Debug|*" Project="false" />
     </Project>

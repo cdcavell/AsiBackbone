@@ -4,7 +4,6 @@ using CDCavell.AsiBackbone.Core.Constraints;
 using CDCavell.AsiBackbone.Core.Decisions;
 using CDCavell.AsiBackbone.Core.Evaluation;
 using CDCavell.AsiBackbone.Core.Signing;
-using CDCavell.AsiBackbone.Testing;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -20,13 +19,13 @@ public sealed class AsiBackboneTestHarnessTests
             .AddAsiBackboneAspNetCore()
             .AddAsiBackboneTestHarness(harness =>
             {
-                harness.AllowAllPolicies();
-                harness.AllowCapabilityGrants();
+                _ = harness.AllowAllPolicies();
+                _ = harness.AllowCapabilityGrants();
             })
             .BuildServiceProvider(validateScopes: true);
 
         using IServiceScope scope = services.CreateScope();
-        var httpContext = CreateHttpContext(scope.ServiceProvider, "trace-protected");
+        DefaultHttpContext httpContext = CreateHttpContext(scope.ServiceProvider, "trace-protected");
         var endpoint = new Endpoint(
             static _ => Task.CompletedTask,
             new EndpointMetadataCollection(
@@ -47,7 +46,7 @@ public sealed class AsiBackboneTestHarnessTests
         Assert.True(result.Decision.IsAllowed);
 
         AsiBackboneTestAuditSink auditSink = scope.ServiceProvider.GetRequiredService<AsiBackboneTestAuditSink>();
-        Assert.Single(auditSink.Entries);
+        _ = Assert.Single(auditSink.Entries);
         Assert.Equal("testing.protected", auditSink.Entries[0].OperationName);
     }
 
@@ -58,15 +57,15 @@ public sealed class AsiBackboneTestHarnessTests
             .AddAsiBackboneAspNetCore()
             .AddAsiBackboneTestHarness(harness =>
             {
-                harness.AllowAllPolicies();
-                harness.SetPolicyResult<StrictPolicy>(GovernanceDecision.Deny(
+                _ = harness.AllowAllPolicies();
+                _ = harness.SetPolicyResult<StrictPolicy>(GovernanceDecision.Deny(
                     "test.denied",
                     "Denied by test harness."));
             })
             .BuildServiceProvider(validateScopes: true);
 
         using IServiceScope scope = services.CreateScope();
-        var httpContext = CreateHttpContext(scope.ServiceProvider, "trace-denied");
+        DefaultHttpContext httpContext = CreateHttpContext(scope.ServiceProvider, "trace-denied");
         var endpoint = new Endpoint(
             static _ => Task.CompletedTask,
             new EndpointMetadataCollection(new RequireGovernancePolicyAttribute(typeof(StrictPolicy))),
@@ -90,10 +89,7 @@ public sealed class AsiBackboneTestHarnessTests
     {
         using ServiceProvider services = new ServiceCollection()
             .AddAsiBackboneAspNetCore()
-            .AddAsiBackboneTestHarness(harness =>
-            {
-                harness.DenyAllPolicies("test.default_denied", "Default denied by test harness.");
-            })
+            .AddAsiBackboneTestHarness(harness => harness.DenyAllPolicies("test.default_denied", "Default denied by test harness."))
             .BuildServiceProvider(validateScopes: true);
 
         using IServiceScope scope = services.CreateScope();
@@ -103,7 +99,7 @@ public sealed class AsiBackboneTestHarnessTests
             correlationId: "correlation-1",
             metadata: new Dictionary<string, string>(StringComparer.Ordinal)
             {
-                ["endpoint.policy_types"] = typeof(SamplePolicy).FullName ?? typeof(SamplePolicy).Name
+                ["endpoint.policy_types"] = typeof(SamplePolicy).FullName ?? nameof(SamplePolicy)
             });
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
@@ -118,10 +114,7 @@ public sealed class AsiBackboneTestHarnessTests
     {
         using ServiceProvider services = new ServiceCollection()
             .AddAsiBackboneAspNetCore()
-            .AddAsiBackboneTestHarness(harness =>
-            {
-                harness.RequirePolicyResult<StrictPolicy>(GovernanceDecision.Allow());
-            })
+            .AddAsiBackboneTestHarness(harness => harness.RequirePolicyResult<StrictPolicy>(GovernanceDecision.Allow()))
             .BuildServiceProvider(validateScopes: true);
 
         using IServiceScope scope = services.CreateScope();
@@ -130,7 +123,7 @@ public sealed class AsiBackboneTestHarnessTests
         var context = new AsiBackboneConstraintEvaluationContext(
             metadata: new Dictionary<string, string>(StringComparer.Ordinal)
             {
-                ["endpoint.policy_types"] = typeof(SamplePolicy).FullName ?? typeof(SamplePolicy).Name
+                ["endpoint.policy_types"] = typeof(SamplePolicy).FullName ?? nameof(SamplePolicy)
             });
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
@@ -146,13 +139,13 @@ public sealed class AsiBackboneTestHarnessTests
             .AddAsiBackboneAspNetCore()
             .AddAsiBackboneTestHarness(harness =>
             {
-                harness.AllowAllPolicies();
-                harness.DenyCapabilityGrants("test.capability_denied", "Capability denied by test harness.");
+                _ = harness.AllowAllPolicies();
+                _ = harness.DenyCapabilityGrants("test.capability_denied", "Capability denied by test harness.");
             })
             .BuildServiceProvider(validateScopes: true);
 
         using IServiceScope scope = services.CreateScope();
-        var httpContext = CreateHttpContext(scope.ServiceProvider, "trace-capability");
+        DefaultHttpContext httpContext = CreateHttpContext(scope.ServiceProvider, "trace-capability");
         var endpoint = new Endpoint(
             static _ => Task.CompletedTask,
             new EndpointMetadataCollection(

@@ -75,7 +75,7 @@ jobs:
         shell: pwsh
         run: |
           dotnet reportgenerator `
-            -reports:"${{ env.CORE_COVERAGE_OUTPUT }}/coverage.cobertura.xml" `
+            -reports:"./artifacts/test-results/**/coverage.cobertura.xml" `
             -targetdir:"./artifacts/core-branch-coverage-report" `
             -reporttypes:"Html;MarkdownSummaryGithub;Cobertura" `
             -assemblyfilters:"+CDCavell.AsiBackbone.Core;-*.Tests" `

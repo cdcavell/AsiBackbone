@@ -162,6 +162,12 @@ $expectedPackages = @(
         ReadmeMustContain = @('test harness helpers', 'not a production enforcement provider')
     },
     [pscustomobject]@{
+        Id = 'CDCavell.AsiBackbone.Templates'
+        Description = 'dotnet new templates for Accountable Systems Infrastructure governed ASP.NET Core hosts.'
+        Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'templates', 'dotnet-new', 'aspnetcore', 'webapi', 'endpoint-governance')
+        ReadmeMustContain = @('dotnet new asibackbone-webapi', 'not a runtime dependency')
+    },
+    [pscustomobject]@{
         Id = 'CDCavell.AsiBackbone.EntityFrameworkCore'
         Description = 'Entity Framework Core model configuration and host-owned persistence helpers for Accountable Systems Infrastructure audit and acknowledgment records.'
         Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'entity-framework-core', 'efcore', 'host-owned-persistence', 'audit-ledger')

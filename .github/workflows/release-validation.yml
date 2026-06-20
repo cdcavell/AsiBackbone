@@ -120,6 +120,10 @@ jobs:
         shell: pwsh
         run: ./scripts/Validate-NuGetPackageMetadata.ps1 -PackageDirectory "$env:PACKAGE_OUTPUT"
 
+      - name: Validate dotnet new templates
+        shell: bash
+        run: bash ./eng/smoke-tests/template-package-smoke.sh "$PACKAGE_OUTPUT"
+
       - name: Run external consumer smoke test
         shell: bash
         run: bash ./eng/smoke-tests/external-consumer-smoke.sh

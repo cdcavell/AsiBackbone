@@ -46,7 +46,9 @@ internal static class AsiBackboneEndpointGovernanceDevelopmentDiagnostics
         ArgumentException.ThrowIfNullOrWhiteSpace(title);
         ArgumentException.ThrowIfNullOrWhiteSpace(detail);
 
-        IReadOnlyDictionary<string, string> diagnosticMetadata = metadata ?? descriptor.ToMetadata();
+        Dictionary<string, string> diagnosticMetadata = metadata is null
+            ? new Dictionary<string, string>(descriptor.ToMetadata(), StringComparer.Ordinal)
+            : new Dictionary<string, string>(metadata, StringComparer.Ordinal);
         Dictionary<string, object?> extensions = CreateExtensions(
             options,
             descriptor,
@@ -54,7 +56,7 @@ internal static class AsiBackboneEndpointGovernanceDevelopmentDiagnostics
             decisionStage,
             diagnosticMetadata);
 
-        return Results.Problem(
+        return Microsoft.AspNetCore.Http.Results.Problem(
             title: title,
             detail: detail,
             statusCode: statusCode,
@@ -105,7 +107,7 @@ internal static class AsiBackboneEndpointGovernanceDevelopmentDiagnostics
         return extensions;
     }
 
-    private static IReadOnlyDictionary<string, string> RedactMetadata(
+    private static Dictionary<string, string> RedactMetadata(
         AsiBackboneEndpointGovernanceOptions options,
         IReadOnlyDictionary<string, string> metadata)
     {

@@ -5,7 +5,7 @@ Welcome to the AsiBackbone documentation site.
 In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a .NET governance and policy-control package family inspired by broader Eden/Backbone governance concepts, but implemented as practical software infrastructure. The project is a **governance spine**, not an intelligence engine.
 
 > [!IMPORTANT]
-> AsiBackbone does not implement artificial superintelligence, host AI models, control physical systems, certify compliance, or provide production tamper-evidence by itself. It provides framework-neutral building blocks and host integration seams for governing consequential actions in software systems.
+> AsiBackbone does not implement artificial superintelligence, host AI models, control physical systems, certify compliance, or provide production tamper-evidence by itself. It provides framework-neutral building blocks and host integration seams for governing consequential actions in software systems. For the canonical boundary reference, see [Project Boundaries and Non-Claims](articles/project-boundaries.md).
 
 ## Search, navigation, and source links
 
@@ -26,6 +26,9 @@ These pages are the best first stops for implementation-first adoption. The opti
 
 * [Terminology Map](articles/terminology-map.md)  
   Quick vocabulary bridge for .NET and application-architecture readers.
+
+* [Project Boundaries and Non-Claims](articles/project-boundaries.md)  
+  Canonical short reference for what AsiBackbone is, what it is not, and what the host still owns.
 
 * [Intent to Execution: An Accountability Pattern](articles/intent-to-execution-pattern.md)  
   The idea on its own terms, with no .NET prerequisite. Read this when you want the broader framing after the implementation route is clear.
@@ -81,6 +84,7 @@ Use these pages when wiring AsiBackbone into a host application.
 * [First 15 Minutes: Standard API Gating](articles/quickstart-api-gating.md)
 * [Reference Deployment: Plain ASP.NET Core Host Evidence](articles/reference-deployment.md)
 * [Terminology Map](articles/terminology-map.md)
+* [Project Boundaries and Non-Claims](articles/project-boundaries.md)
 * [Progressive Adoption Ladder](articles/progressive-adoption.md)
 * [ASP.NET Core Endpoint Governance](articles/aspnetcore-endpoint-governance.md)
 * [Plain ASP.NET Core Host Sample](articles/plain-aspnetcore-host-sample.md)
@@ -160,6 +164,7 @@ These pages are strategy/design material. They remain separate from released pro
 
 These pages explain signing-ready artifacts, provider signing, verification, chain models, vulnerability disclosure, and safe wording. They do not imply production tamper-evidence unless the host deploys a concrete signing, storage, verification, and key-management path.
 
+* [Project Boundaries and Non-Claims](articles/project-boundaries.md)
 * [Security Policy and Vulnerability Disclosure](https://github.com/cdcavell/AsiBackbone/blob/main/SECURITY.md)
 * [Production Wording and Stable Signing Boundaries](articles/production-wording-and-alpha-limitations.md)
 * [Signing-Ready Receipts and Key Handling](articles/signing-ready-receipts-and-key-handling.md)

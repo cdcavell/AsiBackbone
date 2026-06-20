@@ -13,7 +13,7 @@ Use the header search box for package names, API concepts, and article titles. S
 
 Stable `1.1.x` is the current compatible package line. `1.1.1` is a patch release on the `1.1.0` API surface.
 
-Released stable package surfaces include Core, DependencyInjection, Storage.InMemory, EntityFrameworkCore, AspNetCore, Testing, Analyzers, OpenTelemetry, Signing.LocalDevelopment, and Signing.ManagedKey. OpenTelemetry is the concrete released governance-emission provider. Event Hubs, Purview, Azure-specific SDK adapters, robotics, immutable-storage, and additional provider packages remain design-only, strategy-only, host-owned, or future-provider work unless a later stable release explicitly ships them.
+Released stable package surfaces include Core, DependencyInjection, Storage.InMemory, EntityFrameworkCore, AspNetCore, Testing, Analyzers, OpenTelemetry, Signing.LocalDevelopment, and Signing.ManagedKey. OpenTelemetry is the concrete released governance-emission provider. Event Hubs, Purview, Azure-specific SDK adapters, Aspire, robotics, immutable-storage, and additional provider packages remain design-only, strategy-only, sample-only, host-owned, or future-provider work unless a later stable release explicitly ships them.
 
 ## Start here / implementation-first usage
 
@@ -57,6 +57,7 @@ These pages remain available for readers who want the broader framing. They are 
 ## Package integration guides
 
 * [Reference Deployment: Plain ASP.NET Core Host Evidence](reference-deployment.md)
+* [Aspire AppHost Sample](aspire-apphost-sample.md)
 * [1.0.0 Quickstart](quickstart-100.md)
 * [EF Core Integration Boundary](ef-core-integration-boundary.md)
 * [EF Core Host Ownership and Migration Guidance](ef-core-host-ownership-and-migrations.md)

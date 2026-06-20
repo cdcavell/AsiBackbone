@@ -84,6 +84,7 @@ Use these pages when wiring AsiBackbone into a host application.
 * [Progressive Adoption Ladder](articles/progressive-adoption.md)
 * [ASP.NET Core Endpoint Governance](articles/aspnetcore-endpoint-governance.md)
 * [Plain ASP.NET Core Host Sample](articles/plain-aspnetcore-host-sample.md)
+* [Aspire AppHost Sample](articles/aspire-apphost-sample.md)
 * [NetCoreApplicationTemplate Host Validation](articles/netcoreapplicationtemplate-host-validation.md)
 * [Schema Versioning](articles/schema-versioning.md)
 * [API Compatibility and SemVer](articles/api-compatibility-and-semver.md)
@@ -113,6 +114,7 @@ These pages remain available for readers interested in the broader framing, but 
 Use these pages when wiring AsiBackbone into a host application.
 
 * [Reference Deployment: Plain ASP.NET Core Host Evidence](articles/reference-deployment.md)
+* [Aspire AppHost Sample](articles/aspire-apphost-sample.md)
 * [Progressive Adoption Ladder](articles/progressive-adoption.md)
 * [EF Core Integration Boundary](articles/ef-core-integration-boundary.md)
 * [EF Core Host Ownership and Migration Guidance](articles/ef-core-host-ownership-and-migrations.md)

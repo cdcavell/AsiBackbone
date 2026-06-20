@@ -123,4 +123,4 @@ Historical pages are retained for traceability and are separated from current st
 
 * [Historical Stable API Review](stable-api-review.md)
 * [Historical Alpha Package Boundary](alpha-package-boundary.md)
-* [Historical Core Alpha Readiness Review](core-alpha-core-alpha-readiness-review.md)
+* [Historical Core Alpha Readiness Review](core-alpha-readiness-review.md)

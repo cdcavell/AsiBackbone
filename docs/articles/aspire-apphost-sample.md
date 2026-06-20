@@ -28,6 +28,19 @@ The sample AppHost references the existing Plain ASP.NET Core host sample:
 samples/PlainAspNetCoreHost/
 ```
 
+## Project shape
+
+The AppHost uses the Aspire SDK and hosting package through NuGet references. It does not require the deprecated Aspire workload.
+
+```xml
+<Project Sdk="Microsoft.NET.Sdk">
+  <Sdk Name="Aspire.AppHost.Sdk" Version="13.4.6" />
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.AppHost" />
+  </ItemGroup>
+</Project>
+```
+
 ## What the AppHost models
 
 ```mermaid
@@ -94,11 +107,11 @@ Aspire is valuable for distributed local development, but it should not change t
 - `CDCavell.AsiBackbone.Core` stays dependency-light.
 - ASP.NET Core and EF Core remain separate provider/integration packages.
 - Aspire stays in `samples/` and in documentation.
-- Cloud Key Vault, production databases, managed keys, and external telemetry backends are not required for this local path.
+- Cloud Key Vault, production databases, managed keys, deprecated Aspire workloads, and external telemetry backends are not required for this local path.
 
 ## CI validation posture
 
-The AppHost project is included in the solution so normal restore/build validation can catch compile issues. The CI workflow does not need to start the AppHost or require containers, cloud resources, production databases, or managed keys.
+The AppHost project is included in the solution so normal restore/build validation can catch compile issues. The CI workflow does not need to start the AppHost or require containers, cloud resources, production databases, managed keys, or the deprecated Aspire workload.
 
 ## Related documentation
 

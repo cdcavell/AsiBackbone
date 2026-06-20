@@ -35,7 +35,9 @@ public sealed class LocalDevelopmentSigningProductionAnalyzer : DiagnosticAnalyz
     {
         var invocation = (IInvocationOperation)context.Operation;
 
-        if (IsSuppressedByHostMarker(context.ContainingSymbol) || !IsInsideProductionBranch(invocation))
+        if (IsSuppressedByHostMarker(context.ContainingSymbol)
+            || !IsInsideProductionBranch(invocation)
+            || IsNestedInsideInvocationThatAlreadyReferencesLocalDevelopment(invocation))
         {
             return;
         }
@@ -73,6 +75,12 @@ public sealed class LocalDevelopmentSigningProductionAnalyzer : DiagnosticAnalyz
                 Rule,
                 objectCreation.Syntax.GetLocation(),
                 localDevelopmentType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat)));
+    }
+
+    private static bool IsNestedInsideInvocationThatAlreadyReferencesLocalDevelopment(IInvocationOperation invocation)
+    {
+        return invocation.Parent is IArgumentOperation { Parent: IInvocationOperation parentInvocation }
+            && FindReferencedLocalDevelopmentType(parentInvocation) is not null;
     }
 
     private static ITypeSymbol? FindReferencedLocalDevelopmentType(IInvocationOperation invocation)

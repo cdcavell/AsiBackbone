@@ -62,6 +62,8 @@
       href: aspnetcore-integration-boundary.md
     - name: ASP.NET Core Endpoint Governance
       href: aspnetcore-endpoint-governance.md
+    - name: Testing Harness
+      href: testing-harness.md
     - name: Plain ASP.NET Core Host Sample
       href: plain-aspnetcore-host-sample.md
     - name: NetCoreApplicationTemplate Host Validation

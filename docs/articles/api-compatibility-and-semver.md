@@ -4,6 +4,9 @@ This article defines the public API compatibility promise for the stable AsiBack
 
 It complements the historical stable API review tracked in [issue #13](https://github.com/cdcavell/AsiBackbone/issues/13). That review established the original `1.0.0` public type names, namespaces, package boundaries, dependency direction, and extension points. The released `1.1.0` package family expands the stable contract with additive analyzer, OpenTelemetry, and signing-provider package surfaces. `1.1.1` is a compatible patch release on that `1.1.0` API surface.
 
+> [!NOTE]
+> `1.1.1` included small additive, opt-in endpoint-governance public surface while preserving source and binary compatibility for existing `1.1.0` consumers. That release is documented as a compatibility exception to the expected SemVer policy below. Future additive public API surface should use a minor version bump even when the change is backward-compatible.
+
 ## Compatibility promise for the stable `1.x` line
 
 Starting with `1.0.0`, packages identified as stable are expected to preserve their documented public API surface for consumers within the same major version.
@@ -36,7 +39,7 @@ The initial stable `1.0.0` package family established the first compatible `1.x`
 
 ### Expanded `1.1.x` stable family
 
-The released `1.1.0` package family keeps the `1.0.0` packages compatible and adds stable additive package surfaces. `1.1.1` is the current patch release on the same API surface.
+The released `1.1.0` package family keeps the `1.0.0` packages compatible and adds stable additive package surfaces. `1.1.1` is the current patch release on the same API surface, with the endpoint-governance additive compatibility exception noted above.
 
 | Package | `1.1.x` stable role |
 | --- | --- |
@@ -49,7 +52,7 @@ The released `1.1.0` package family keeps the `1.0.0` packages compatible and ad
 | `CDCavell.AsiBackbone.Signing.LocalDevelopment` | Stable local-development signing and verification provider for tests, samples, and wiring proof paths only. Not production key custody. |
 | `CDCavell.AsiBackbone.Signing.ManagedKey` | Stable managed-key signing adapter boundary. The host supplies the actual managed-key client and operational controls. |
 
-Stable package status does not imply that every future provider idea is stable. Event Hubs, Purview, Azure-specific SDK adapters, robotics, immutable storage, and additional provider packages remain outside the stable contract unless separately reviewed and released as stable packages.
+Stable package status does not imply that every future provider idea is stable. Event Hubs, Purview, Azure-specific SDK adapters, Aspire, robotics, immutable storage, and additional provider packages remain outside the stable contract unless separately reviewed and released as stable packages.
 
 ## What counts as a breaking change
 
@@ -77,6 +80,8 @@ AsiBackbone follows Semantic Versioning expectations after stabilization:
 | Minor | Adds backward-compatible public APIs, options, adapters, packages, or features. Existing stable APIs should continue to compile and behave compatibly. |
 | Patch | Fixes bugs, documentation issues, packaging issues, or implementation defects without adding breaking public API changes. Patch releases can also clarify documentation and strengthen tests. |
 | Preview suffix | Indicates packages or features that are still under review and may change before stable release. |
+
+For future releases, additive public API changes should be grouped into a minor release even when they are opt-in and backward-compatible. Patch releases should be reserved for fixes, documentation, packaging, tests, and implementation hardening that does not expand the stable public surface.
 
 Before `1.0.0`, alpha or preview packages may still make breaking changes as the API is shaped. Those changes should remain visible in the changelog and release notes.
 
@@ -150,4 +155,5 @@ Before cutting a stable release or stable package-family expansion, the release 
 - [Upgrade Guide: 1.0.0 to 1.1.0](upgrade-100-to-110.md)
 - [Schema Versioning](schema-versioning.md)
 - [API Baseline and Boundary Checks](api-baseline-and-boundary-checks.md)
+- [Project Boundaries and Non-Claims](project-boundaries.md)
 - [Release Validation](release-validation.md)

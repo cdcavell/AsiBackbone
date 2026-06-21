@@ -35,6 +35,9 @@ Examples of unacceptable behavior:
 * Other conduct which could reasonably be considered inappropriate in a
   professional setting
 
+> AsiBackbone adheres to and enforces the .NET Foundation Code of Conduct. 
+> For more information, see https://dotnetfoundation.org/code-of-conduct.
+
 ## Enforcement Responsibilities
 
 Project maintainers are responsible for clarifying and enforcing our standards

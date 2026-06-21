@@ -70,6 +70,16 @@ Host applications remain responsible for deciding how AsiBackbone decisions are 
 
 Signing-ready metadata, signed records, verification results, hash chains, and externally anchored evidence are distinct states. Do not assume that a record is tamper-evident, immutable, legally non-repudiable, externally anchored, or compliance-certified unless the host has deployed and verified the full operational trust design that proves that claim.
 
+## Package signing status
+
+AsiBackbone NuGet packages are not currently Authenticode-signed or repository-signed by the project maintainer.
+
+Published packages include NuGet repository metadata and Source Link commit metadata where applicable, but package signing is not currently part of the release process. Consumers should validate package identity through the official NuGet package source, package version, repository metadata, checksums supplied by NuGet tooling, and the corresponding GitHub release/tag.
+
+If AsiBackbone is accepted into the .NET Foundation, package signing may transition to .NET Foundation-supported release infrastructure or another reviewed signing process as part of project onboarding.
+
+Until such signing is adopted and documented, AsiBackbone should not be described as providing signed release artifacts, tamper-evident packages, or non-repudiable distribution guarantees by default.
+
 ## Sensitive data guidance for reports
 
 When reporting a concern:

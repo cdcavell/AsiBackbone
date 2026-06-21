@@ -2,10 +2,10 @@
 
 This article defines the public API compatibility promise for the stable AsiBackbone `1.x` package family and documents how semantic versioning applies after stabilization.
 
-It complements the historical stable API review tracked in [issue #13](https://github.com/cdcavell/AsiBackbone/issues/13). That review established the original `1.0.0` public type names, namespaces, package boundaries, dependency direction, and extension points. The released `1.1.0` package family expands the stable contract with additive analyzer, OpenTelemetry, and signing-provider package surfaces. `1.1.1` is a compatible patch release on that `1.1.0` API surface.
+It complements the historical stable API review tracked in [issue #13](https://github.com/cdcavell/AsiBackbone/issues/13). That review established the original `1.0.0` public type names, namespaces, package boundaries, dependency direction, and extension points. The released `1.1.0` package family expanded the stable contract with additive analyzer, OpenTelemetry, and signing-provider package surfaces. `1.2.0` is a compatible minor release that formalizes additive adoption, diagnostics, testing, templates, samples, and documentation-alignment surfaces on the stable `1.x` contract.
 
 > [!NOTE]
-> `1.1.1` included small additive, opt-in endpoint-governance public surface and an additive template package while preserving source and binary compatibility for existing `1.1.0` consumers. That release is documented as a compatibility exception to the expected SemVer policy below. Future additive public API or package surface should use a minor version bump even when the change is backward-compatible.
+> `1.1.1` included small additive, opt-in endpoint-governance public surface and an additive template package while preserving source and binary compatibility for existing `1.1.0` consumers. That release is documented as a compatibility exception to the expected SemVer policy below. Future additive public API or package surface should use a minor version bump even when the change is backward-compatible. `1.2.0` resumes that expectation by grouping additive public/package surfaces under a minor release.
 
 ## Compatibility promise for the stable `1.x` line
 
@@ -39,7 +39,7 @@ The initial stable `1.0.0` package family established the first compatible `1.x`
 
 ### Expanded `1.1.x` stable family
 
-The released `1.1.0` package family keeps the `1.0.0` packages compatible and adds stable additive package surfaces. `1.1.1` is the current patch release on the same API surface, with the endpoint-governance and template-package additive compatibility exception noted above.
+The released `1.1.0` package family kept the `1.0.0` packages compatible and added stable additive package surfaces. `1.1.1` is a patch release on the same API surface, with the endpoint-governance and template-package additive compatibility exception noted above.
 
 | Package | `1.1.x` stable role |
 | --- | --- |
@@ -55,7 +55,25 @@ The released `1.1.0` package family keeps the `1.0.0` packages compatible and ad
 | `CDCavell.AsiBackbone.Signing.LocalDevelopment` | Stable local-development signing and verification provider for tests, samples, and wiring proof paths only. Not production key custody. |
 | `CDCavell.AsiBackbone.Signing.ManagedKey` | Stable managed-key signing adapter boundary. The host supplies the actual managed-key client and operational controls. |
 
-Stable package status does not imply that every future provider idea is stable. Event Hubs, Purview, Azure-specific SDK adapters, Aspire, robotics, immutable storage, and additional provider packages remain outside the stable contract unless separately reviewed and released as stable packages.
+### Current `1.2.0` stable family
+
+`1.2.0` is the current stable minor release for the compatible `1.x` line. It preserves the `1.0.0` and `1.1.x` contracts while formalizing additive adoption, diagnostics, testing, templates, sample, and documentation-alignment surfaces as the current package-family boundary.
+
+| Package | `1.2.0` stable role |
+| --- | --- |
+| `CDCavell.AsiBackbone.Core` | Continues the framework-neutral governance primitive surface and durable artifact contracts from the compatible `1.x` line. |
+| `CDCavell.AsiBackbone.DependencyInjection` | Provides the explicit builder facade and host-selected provider registration composition path. |
+| `CDCavell.AsiBackbone.Storage.InMemory` | Provides non-durable storage helpers for tests, samples, local validation, lifecycle events, and outbox proof paths. |
+| `CDCavell.AsiBackbone.EntityFrameworkCore` | Provides EF Core host-owned persistence helpers for audit, acknowledgment, lifecycle, and outbox records. |
+| `CDCavell.AsiBackbone.AspNetCore` | Provides ASP.NET Core host adapters, endpoint governance, development diagnostics, and hosted outbox drain integration. |
+| `CDCavell.AsiBackbone.Testing` | Provides test-only harness helpers for deterministic governance and package-wiring tests. |
+| `CDCavell.AsiBackbone.Templates` | Provides developer-experience `dotnet new` templates for governed ASP.NET Core host scaffolding. |
+| `CDCavell.AsiBackbone.Analyzers` | Provides build-time analyzer safety rails, including production-signing configuration guidance. |
+| `CDCavell.AsiBackbone.OpenTelemetry` | Provides the released OpenTelemetry governance emission provider. |
+| `CDCavell.AsiBackbone.Signing.LocalDevelopment` | Provides local-development signing and verification for tests, samples, and wiring proof paths only. |
+| `CDCavell.AsiBackbone.Signing.ManagedKey` | Provides the managed-key signing adapter boundary where the host supplies the concrete managed-key client and operational controls. |
+
+Stable package status does not imply that every future provider idea is stable. Event Hubs, Purview, Azure-specific SDK adapters, Aspire runtime packages, robotics, immutable storage, and additional provider packages remain outside the stable contract unless separately reviewed and released as stable packages.
 
 ## What counts as a breaking change
 
@@ -102,6 +120,7 @@ Expected stable-line behavior:
 | `1.0.1` | `1.0.1` | `1.0.0.0` | `1.0.1.0` | `1.0.1+...` |
 | `1.1.0` | `1.1.0` | `1.0.0.0` | `1.1.0.0` | `1.1.0+...` |
 | `1.1.1` | `1.1.1` | `1.0.0.0` | `1.1.1.0` | `1.1.1+...` |
+| `1.2.0` | `1.2.0` | `1.0.0.0` | `1.2.0.0` | `1.2.0+...` |
 | `2.0.0` | `2.0.0` | `2.0.0.0` | `2.0.0.0` | `2.0.0+...` |
 
 Before cutting stable releases, release validation should verify that `AssemblyVersion`, `FileVersion`, `InformationalVersion`, package metadata, release notes, and repository tags match this policy.
@@ -116,13 +135,13 @@ Additive artifact fields are normally acceptable in a compatible minor release w
 
 ## Provider and future package guidance
 
-Released provider packages have their own stable contract within the compatible `1.x` line once they are published as stable packages. In `1.1.x`, that includes:
+Released provider packages have their own stable contract within the compatible `1.x` line once they are published as stable packages. In `1.2.0`, that includes:
 
 - `CDCavell.AsiBackbone.OpenTelemetry`;
 - `CDCavell.AsiBackbone.Signing.LocalDevelopment`;
 - `CDCavell.AsiBackbone.Signing.ManagedKey`.
 
-The analyzer package is also part of the released `1.1.x` stable package family, but analyzer diagnostics are build-time guidance rather than runtime enforcement. The templates package is a developer-experience package rather than a runtime provider.
+The analyzer package is also part of the released stable package family, but analyzer diagnostics are build-time guidance rather than runtime enforcement. The testing package is a test-harness package rather than runtime enforcement. The templates package is a developer-experience package rather than a runtime provider.
 
 Provider packages planned for later milestones should not be described as part of the stable contract until they complete their own API review and stable release checklist.
 
@@ -154,6 +173,7 @@ Before cutting a stable release or stable package-family expansion, the release 
 ## Related documentation
 
 - [Historical Stable API Review](stable-api-review.md)
+- [1.2.0 Release Notes](release-notes-120.md)
 - [1.1.x Release Notes](release-notes-110.md)
 - [Upgrade Guide: 1.0.0 to 1.1.0](upgrade-100-to-110.md)
 - [Schema Versioning](schema-versioning.md)

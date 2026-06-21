@@ -51,11 +51,11 @@ These pages are the best first stops for implementation-first adoption. The opti
 * [Progressive Adoption Ladder](articles/progressive-adoption.md)  
   The smallest Core-only path first, followed by optional outbox, telemetry, DLP/classification, signing, and analyzer add-ons.
 
-* [1.1.x Release Notes](articles/release-notes-110.md)  
-  Current stable package-family boundary for the compatible `1.x` line. `1.1.1` is a patch release on the `1.1.0` API surface.
+* [1.2.0 Release Notes](articles/release-notes-120.md)  
+  Current stable package-family boundary for the compatible `1.x` line. `1.2.0` is a minor release that formalizes additive adoption, diagnostics, templates, testing, and documentation-alignment surfaces.
 
 * [Upgrade Guide: 1.0.0 to 1.1.0](articles/upgrade-100-to-110.md)  
-  Incremental adoption guidance for existing `1.0.0` consumers moving into the compatible `1.1.x` line.
+  Incremental adoption guidance for existing `1.0.0` consumers moving into the compatible `1.x` line.
 
 * [Documentation Articles](articles/)  
   Categorized article index separating current usage, package integration, provider docs, design-only strategy, scenarios, release process, and historical records.
@@ -65,7 +65,7 @@ These pages are the best first stops for implementation-first adoption. The opti
 
 ## Current stable package family
 
-Stable `1.1.x` is the current compatible release line. `1.1.1` is the current patch release on the `1.1.0` API surface and covers these packages:
+Stable `1.2.x` is the current compatible release line. `1.2.0` is the current minor release and covers these packages:
 
 ```text
 CDCavell.AsiBackbone.Core
@@ -143,7 +143,7 @@ Use these pages when wiring AsiBackbone into a host application.
 
 ### Observability, outbox, signing, and governance emission
 
-These pages cover the additive `1.1.x` durability and governance-emission surface introduced in `1.1.0` and maintained by compatible patches such as `1.1.1`.
+These pages cover the durability and governance-emission surface introduced in `1.1.x` and carried forward into the current `1.2.x` stable package family.
 
 * [Observability and Governance Emission Architecture](articles/observability-and-governance-emission-architecture.md)
 * [Governance Emission Contract](articles/governance-emission-contract.md)
@@ -205,6 +205,7 @@ These pages support maintainers and release validation.
 
 * [Quality Reports](quality/)
 * [Release Validation](articles/release-validation.md)
+* [1.2.0 Release Readiness Record](articles/release-readiness-120.md)
 * [Historical 1.1.0 Release Readiness Record](articles/release-readiness-checklist.md)
 * [API Baseline and Boundary Checks](articles/api-baseline-and-boundary-checks.md)
 * [Developer Checklist](articles/developer-checklist.md)
@@ -219,20 +220,4 @@ These records remain available for traceability, but they are separated from cur
 
 ## API reference and repository
 
-* [API Reference](api/CDCavell.AsiBackbone.Core.html)  
-  Generated API documentation for public types.
-
-* [Repository](https://github.com/cdcavell/AsiBackbone)  
-  Source code, issues, pull requests, and release history.
-
-## Design principle
-
-AsiBackbone should make consequential software actions easier to govern, audit, constrain, acknowledge, preserve, emit, verify, and explain.
-
-It should be understood as Accountable Systems Infrastructure, not an intelligence engine.
-
-## Read next
-
-- [Implementation-First Adoption Path](articles/implementation-first-adoption.md)
-- [First 15 Minutes: Standard API Gating](articles/quickstart-api-gating.md)
-- [dotnet new Templates](articles/templates.md)
+Use the top navigation for API reference, quality reports, and repository source links.

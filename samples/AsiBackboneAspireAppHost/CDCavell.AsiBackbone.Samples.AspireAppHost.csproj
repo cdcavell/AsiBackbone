@@ -16,6 +16,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\PlainAspNetCoreHost\CDCavell.AsiBackbone.Samples.PlainAspNetCoreHost.csproj" />
   </ItemGroup>
 

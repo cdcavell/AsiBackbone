@@ -16,6 +16,9 @@
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
+# Local NuGet / Source Link verification output
+nuget-sourcelink-check-*/
+
 # DocFX generated output
 docs/_site/
 docs/api/

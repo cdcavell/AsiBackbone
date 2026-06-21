@@ -191,6 +191,8 @@ A consumer should be able to use AsiBackbone in an application generated from Ne
 
 In this repository, ASI means **Accountable Systems Infrastructure**. AsiBackbone documentation may reference the broader Eden/Backbone framework as conceptual inspiration, but implementation claims should remain grounded in practical software governance.
 
+> Current NuGet packages are not signed release artifacts from the project maintainer. Package signing may be adopted later through .NET Foundation-supported infrastructure or another reviewed release-signing process.
+
 Safe language:
 
 - AsiBackbone stands for Accountable Systems Infrastructure Backbone.

@@ -7,11 +7,11 @@ Issue: #207.
 In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a governance spine for consequential software decision flow. It is not an intelligence engine, signing appliance, key-management system, immutable ledger, blockchain product, compliance certification service, or legal evidence system by itself.
 
 > [!IMPORTANT]
-> The current signing seam is **signing-ready**. Production security claims must remain narrow until concrete hashing, signing, verification, durable storage, key handling, and integrity-chain behavior are implemented and tested.
+> Status note: the stable `1.1.x` package family includes released surfaces for canonical hashing/signing seams, provider-neutral signing and verification abstractions, local-development signing, managed-key adapter boundaries, signed audit/outbox metadata, and verification-policy/result handling. This roadmap is retained for traceability of the hardening sequence. Those released surfaces still do **not** create production tamper-evidence, immutability, legal non-repudiation, or compliance certification by themselves; production claims require concrete host storage, signing, verification, key-management, rotation, retention, and operational controls.
 
 ## Roadmap goals
 
-The cryptographic hardening roadmap should turn signing-ready abstractions into production-capable features without coupling `CDCavell.AsiBackbone.Core` to one provider or platform.
+The cryptographic hardening roadmap turns signing-ready abstractions into progressively stronger implementation surfaces without coupling `CDCavell.AsiBackbone.Core` to one provider or platform.
 
 Primary goals:
 
@@ -49,24 +49,24 @@ Core should not own Azure Key Vault integration, HSM or cloud KMS integration, l
 
 Concrete provider work should live in provider packages, host integrations, samples, or documented future packages after boundary review.
 
-## Child issue plan
+## Child issue plan and status
 
-| Order | Issue | Focus | Depends on |
+| Order | Issue | Focus | Status in `1.1.x` documentation/package line |
 | --- | --- | --- | --- |
-| 1 | #219 | Canonical payload hashing and deterministic signing payloads. | #207 |
-| 2 | #220 | Concrete signing-provider package boundary. | #219 |
-| 3 | #221 | Signing audit receipts and governance outbox records. | #219, #220 |
-| 4 | #222 | Verification policy APIs and verification result handling. | #219, #221 |
-| 5 | #223 | Key rotation and retired-key verification guidance. | #220, #222 |
-| 6 | #224 | Append-only hash-chain or Merkle audit integrity model. | #219, #221, #222 |
-| 7 | #225 | Capability-token signing, validation, and reuse checks. | #219, #220, #222 |
-| Done / parallel | #216 | Production security posture, non-goals, and careful wording. | #207 |
+| 1 | #219 | Canonical payload hashing and deterministic signing payloads. | Released provider-neutral surface and tests exist; not production tamper-evidence by itself. |
+| 2 | #220 | Concrete signing-provider package boundary. | Released package-boundary documentation plus LocalDevelopment and ManagedKey provider surfaces. |
+| 3 | #221 | Signing audit receipts and governance outbox records. | Released signing metadata/canonicalization support for selected governance artifacts. |
+| 4 | #222 | Verification policy APIs and verification result handling. | Released verification-policy/result handling surface. |
+| 5 | #223 | Key rotation and retired-key verification guidance. | Guidance/hardening path; host/provider-owned operational controls remain required. |
+| 6 | #224 | Append-only hash-chain or Merkle audit integrity model. | Documented model/guidance; concrete immutable/external anchoring providers remain outside the stable package boundary. |
+| 7 | #225 | Capability-token signing, validation, and reuse checks. | Capability-token primitives exist; production replay/custody/issuer validation remains host/provider-owned. |
+| Done / parallel | #216 | Production security posture, non-goals, and careful wording. | Released documentation boundary. |
 
 ## Implementation phases
 
 ### Phase 1: Canonical payload foundation
 
-Child issue: #219.
+Child issue: #219. Status: released provider-neutral surface in the stable `1.1.x` line.
 
 Define how selected artifacts become deterministic payloads before hashing. Candidate artifacts include audit receipts, audit ledger records, audit residue lifecycle events, governance outbox entries, governance emission envelopes, and capability-token grants.
 
@@ -76,12 +76,12 @@ Exit criteria:
 
 - repeated canonicalization produces the same hash for equivalent payloads;
 - meaningful changes produce different hashes;
-- hash metadata can be passed to the existing signing seam;
+- hash metadata can be passed to the signing seam;
 - documentation states that hashing is not signing and not tamper-evidence by itself.
 
 ### Phase 2: Signing provider boundary
 
-Child issue: #220.
+Child issue: #220. Status: released provider-boundary documentation and provider packages in the stable `1.1.x` line.
 
 Define where concrete signing implementations live. Keep Core provider-neutral, treat managed-key providers as separate package work, require key ID and key version to flow with signatures, and never expose private keys, symmetric keys, credentials, connection strings, or managed identity tokens to Core.
 
@@ -89,11 +89,11 @@ Exit criteria:
 
 - package boundary and provider responsibilities are documented;
 - concrete provider work does not leak into Core;
-- local-development signing, if included, is explicitly marked non-production.
+- local-development signing is explicitly marked non-production.
 
 ### Phase 3: Signed audit and outbox artifacts
 
-Child issue: #221.
+Child issue: #221. Status: released signing metadata/canonicalization surfaces for selected governance artifacts in the stable `1.1.x` line.
 
 Decide which artifacts can be signed and where signing occurs in the flow.
 
@@ -119,7 +119,7 @@ Exit criteria:
 
 ### Phase 4: Verification policy
 
-Child issue: #222.
+Child issue: #222. Status: released verification-policy and result-handling surfaces in the stable `1.1.x` line.
 
 Verification should produce explicit outcomes that can be routed through policy.
 
@@ -144,7 +144,7 @@ Exit criteria:
 
 ### Phase 5: Key rotation and retired-key verification
 
-Child issue: #223.
+Child issue: #223. Status: guidance/hardening path; production behavior remains host/provider-owned.
 
 Production signatures often outlive active signing keys. Retired keys or historical key material must remain resolvable for verification during the retention period.
 
@@ -164,7 +164,7 @@ Exit criteria:
 
 ### Phase 6: Audit-chain integrity
 
-Child issue: #224.
+Child issue: #224. Status: documented model/guidance; concrete immutable storage and external anchoring providers remain outside the stable package boundary.
 
 Evaluate append-only hash chains, per-stream chains, Merkle roots, or batch-root integrity models.
 
@@ -185,7 +185,7 @@ Exit criteria:
 
 ### Phase 7: Capability-token hardening
 
-Child issue: #225.
+Child issue: #225. Status: capability-token primitives exist; production issuer/custody/replay validation remains host/provider-owned.
 
 Capability tokens should remain short-lived, scoped, and checked at the execution boundary.
 
@@ -202,7 +202,7 @@ Exit criteria:
 
 Issue #147 and PR #206 introduced signing-ready abstractions and metadata boundaries. This roadmap treats that work as the seam, not the completed security model.
 
-Issue #216 covers production security posture documentation and non-goals. That work should remain documentation-focused and should not be treated as an implementation of signing, verification, key management, or tamper-evidence.
+Issue #216 covers production security posture documentation and non-goals. That work should remain documentation-focused and should not be treated as a complete implementation of production signing, verification, key management, tamper-evidence, or immutable storage.
 
 The roadmap continues the existing governance-spine sequence:
 
@@ -217,44 +217,3 @@ Policy pipeline
 ```
 
 Cryptographic hardening strengthens this flow but does not replace it.
-
-## Release wording guidance
-
-Safe wording:
-
-> AsiBackbone provides provider-neutral cryptographic hardening seams and a roadmap for canonical hashing, signing, verification, key rotation, audit-chain integrity, and capability-token validation. Production tamper-evidence, immutability, external anchoring, blockchain backing, and legal non-repudiation are not provided by default and require concrete host or provider configuration.
-
-Avoid wording:
-
-- "AsiBackbone makes records tamper-proof."
-- "AsiBackbone provides blockchain-backed audit trails."
-- "AsiBackbone automatically manages keys."
-- "AsiBackbone guarantees legal non-repudiation."
-- "Signed records are verified by default."
-- "Hash chains are immutable by themselves."
-
-## Completion checklist for #207
-
-- [x] Child issue created for canonical payload hashing: #219.
-- [x] Child issue created for signing-provider package boundary: #220.
-- [x] Child issue created for signing audit/outbox artifacts: #221.
-- [x] Child issue created for verification APIs/result handling: #222.
-- [x] Child issue created for key rotation and retired-key verification: #223.
-- [x] Child issue created for audit-chain/Merkle integrity model: #224.
-- [x] Child issue created for capability-token hardening: #225.
-- [x] Existing production security posture documentation issue identified: #216.
-- [x] Documentation distinguishes signing-ready, hashed, signed, verified, chained, externally anchored, and tamper-evident behavior.
-- [x] Core provider-neutrality is preserved as a roadmap constraint.
-- [x] Roadmap preserves the governance-spine framing.
-
-## Related documentation
-
-- [Cryptographic Security Posture and Production Guidance](cryptographic-security-posture.md)
-- [Signing-Ready Receipts and Key Handling](signing-ready-receipts-and-key-handling.md)
-- [Privacy and Signing Boundaries](privacy-and-signing-boundaries.md)
-- [Governance Emission Contract](governance-emission-contract.md)
-- [Durable Audit and Outbox Persistence](durable-audit-outbox-persistence.md)
-- [Hosted Governance Outbox Drain](hosted-governance-outbox-drain.md)
-- [DLP and Classification Failure Policy](dlp-classification-failure-policy.md)
-- [Policy Evaluator Pipeline](policy-evaluator-pipeline.md)
-- [Core Domain Language](core-domain-language.md)

@@ -1,10 +1,10 @@
 # Stable Release Validation
 
-This article documents the reusable release-blocking validation path for the stable `1.x` release line. The current released stable package family is `1.1.0`; future `1.x` maintenance releases should continue to use the same validation posture unless a later release note supersedes it.
+This article documents the reusable release-blocking validation path for the stable `1.x` release line. The current released stable package family is `1.1.x`, with `1.1.1` as the current patch release; future `1.x` maintenance releases should continue to use the same validation posture unless a later release note supersedes it.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. Release validation should confirm that the package family remains practical governance infrastructure and that implementation claims stay within the documented software boundary.
 
-The [1.1.0 Release Readiness Record](release-readiness-checklist.md) is retained as the historical release-candidate control sheet for the `1.1.0` release. Treat this article as the reusable validation process for future release candidates and maintenance releases.
+The [1.1.0 Release Readiness Record](release-readiness-checklist.md) is retained as the historical release-candidate control sheet for the `1.1.0` release. Treat this article as the reusable validation process for current and future `1.x` release candidates and maintenance releases.
 
 ## Required checks before tagging a stable release
 
@@ -17,9 +17,10 @@ Before cutting a stable release tag, confirm the following checks have passed on
 | Build | CI, stable release validation, package publish | Confirms all release projects compile in Release configuration and configured analyzers run through the build. |
 | Formatting | CI, stable release validation, package publish | Confirms source formatting is stable before release. |
 | Tests | CI, stable release validation, package publish | Confirms the solution test suite passes before packaging or publishing. |
-| Package creation | CI, stable release validation, package publish | Confirms every package project under `src` can be packed. |
+| Package creation | CI, stable release validation, package publish | Confirms every package project under `src`, excluding template-content projects, can be packed. |
 | Package version validation | stable release validation, package publish | Confirms generated package versions and, on tag builds, tag identity align with repository version metadata. |
 | NuGet metadata validation | stable release validation, package publish | Confirms generated `.nupkg` metadata, README files, IDs, descriptions, tags, license metadata, project URL, and repository URL align with the stable package boundary. |
+| Template package smoke validation | CI, stable release validation | Confirms the packed `CDCavell.AsiBackbone.Templates` package can be installed, generate supported host styles, restore, and build. |
 | Documentation build | publish docs, stable release validation, package publish | Confirms DocFX can build the documentation included in the release posture. |
 | External consumer smoke tests | external consumer smoke workflow, stable release validation | Confirms clean consumer-style projects can reference and wire the package family. |
 | CodeQL and dependency review | CI | Confirms configured static/security checks run on pull requests where applicable. |
@@ -28,10 +29,10 @@ Before cutting a stable release tag, confirm the following checks have passed on
 
 The following workflows formed the `1.1.0` release gate and remain the reusable gate for future stable `1.x` release candidates:
 
-- `CI` validates dependency review for pull requests, solution restore/build/test, formatting, package creation, coverage output, and CodeQL analysis.
+- `CI` validates dependency review for pull requests, solution restore/build/test, formatting, package creation, template package smoke validation, coverage output, and CodeQL analysis.
 - `External Consumer Smoke Test` validates package-consumer wiring through the external consumer and stable package integration smoke scripts.
 - `Publish Documentation` validates the DocFX build used for the documentation site.
-- `Stable Release Validation` provides a single release-candidate gate for version metadata, restore, build, formatting, tests, DocFX, package creation, generated package version validation, generated NuGet metadata validation, and smoke checks.
+- `Stable Release Validation` provides a single release-candidate gate for version metadata, restore, build, formatting, tests, DocFX, package creation, generated package version validation, generated NuGet metadata validation, template package smoke validation, and smoke checks.
 - `Publish AsiBackbone Packages` repeats release-critical validation before package publish. The publish job depends on the validation-and-pack job, so a failed validation step blocks package publication.
 
 ## Tagging rule
@@ -59,12 +60,13 @@ The workflow validates:
 6. Full solution tests.
 7. .NET tool restore.
 8. DocFX documentation build.
-9. Package creation for all projects under `src`.
+9. Package creation for package projects under `src`, excluding template-content projects under `*/templates/*`.
 10. Generated package version metadata, including tag matching on tag builds.
 11. Generated NuGet package metadata.
-12. External consumer smoke test.
-13. Stable package integration smoke test.
-14. Package artifact upload.
+12. Template package installation, generation, restore, and build smoke validation.
+13. External consumer smoke test.
+14. Stable package integration smoke test.
+15. Package artifact upload.
 
 ## Package publish validation
 
@@ -77,7 +79,7 @@ The package publish workflow performs release-critical validation before publish
 5. Run tests.
 6. Restore .NET tools.
 7. Build DocFX documentation.
-8. Pack every package project under `src`.
+8. Pack every package project under `src`, excluding template-content projects under `*/templates/*`.
 9. Validate generated package versions.
 10. Validate generated NuGet metadata.
 11. Upload package artifacts.
@@ -96,7 +98,7 @@ This keeps package publication behind restore, build, test, documentation, packa
 - MIT license metadata;
 - project URL and repository URL metadata;
 - README metadata and packaged README presence;
-- package-specific README wording anchors, such as non-durable storage language for `Storage.InMemory`, provider-neutral wording for `OpenTelemetry`, and local-development/managed-key boundaries for signing packages.
+- package-specific README wording anchors, such as non-durable storage language for `Storage.InMemory`, provider-neutral wording for `OpenTelemetry`, local-development/managed-key boundaries for signing packages, test-harness boundaries for `Testing`, and template-scaffold boundaries for `Templates`.
 
 This check catches release-blocking NuGet metadata mistakes before package publication because NuGet package metadata for a published version cannot be overwritten.
 
@@ -128,10 +130,11 @@ Deferred checks should be rare for a stable release.
 
 ## Related documentation
 
-- [1.1.0 Release Readiness Record](release-readiness-checklist.md)
-- [1.1.0 Release Notes](release-notes-110.md)
+- [Historical 1.1.0 Release Readiness Record](release-readiness-checklist.md)
+- [1.1.x Release Notes](release-notes-110.md)
 - [Upgrade Guide: 1.0.0 to 1.1.0](upgrade-100-to-110.md)
 - [Developer Checklist](developer-checklist.md)
 - [API Compatibility and SemVer](api-compatibility-and-semver.md)
 - [Schema Versioning](schema-versioning.md)
 - [Privacy and Signing Boundaries](privacy-and-signing-boundaries.md)
+- [dotnet new Templates](templates.md)

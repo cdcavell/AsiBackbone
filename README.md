@@ -122,11 +122,12 @@ For production-style hosts, add durable audit/outbox persistence, signing or ver
 
 ## Package family
 
-Stable `1.1.x` package family. `1.1.1` is the current patch release; `1.1.0` expanded the original `1.0.0` boundary with analyzer, OpenTelemetry, signing-provider, and testing-harness packages for the compatible `1.x` line.
+Stable `1.1.x` package family. `1.1.1` is the current patch release; the `1.1.x` line expands the original `1.0.0` boundary with builder-facade, analyzer, OpenTelemetry, signing-provider, testing-harness, and template package surfaces for the compatible `1.x` line.
 
 | Package | Role |
 | --- | --- |
 | `CDCavell.AsiBackbone.Core` | Framework-neutral governance primitives: decisions, constraints, acknowledgments, audit residue, lifecycle events, capability-token abstractions, durable outbox contracts, provider-neutral emission contracts, DLP/classification policy primitives, signing-ready metadata, canonical hashing/signing seams, and verification-policy primitives. |
+| `CDCavell.AsiBackbone.DependencyInjection` | Explicit `AddAsiBackbone(...)` builder facade for coordinating host-selected provider registrations without making Core own infrastructure. |
 | `CDCavell.AsiBackbone.Storage.InMemory` | Non-durable in-memory storage helpers for tests, samples, local validation, lifecycle events, and outbox proof paths. |
 | `CDCavell.AsiBackbone.EntityFrameworkCore` | EF Core model configuration and host-owned persistence for audit ledger, acknowledgments, lifecycle events, and governance outbox records. |
 | `CDCavell.AsiBackbone.AspNetCore` | ASP.NET Core host adapters for actor context, request correlation, audit enrichment, HTTP result mapping, acknowledgment challenge flows, endpoint governance, and hosted outbox drain integration. |
@@ -145,10 +146,13 @@ For **implementation-first adoption**:
 
 - [Implementation-First Adoption Path](https://cdcavell.github.io/AsiBackbone/articles/implementation-first-adoption.html) — plain engineering translations and the recommended first reading path.
 - [First 15 Minutes: Standard API Gating](https://cdcavell.github.io/AsiBackbone/articles/quickstart-api-gating.html)
+- [AddAsiBackbone Builder Facade](https://cdcavell.github.io/AsiBackbone/articles/add-asibackbone-builder-facade.html)
 - [dotnet new Templates](https://cdcavell.github.io/AsiBackbone/articles/templates.html)
 - [Reference Deployment: Plain ASP.NET Core Host Evidence](https://cdcavell.github.io/AsiBackbone/articles/reference-deployment.html)
 - [Testing Harness](https://cdcavell.github.io/AsiBackbone/articles/testing-harness.html)
+- [Project Boundaries and Non-Claims](https://cdcavell.github.io/AsiBackbone/articles/project-boundaries.html)
 - [Terminology Map](https://cdcavell.github.io/AsiBackbone/articles/terminology-map.html)
+- [Progressive Adoption Ladder](https://cdcavell.github.io/AsiBackbone/articles/progressive-adoption.html)
 
 For **optional conceptual background**:
 
@@ -163,7 +167,7 @@ The full, categorized documentation set lives at the [documentation site](https:
 
 ## Current status
 
-Stable `1.1.x` is the current released line for the compatible `1.x` API, with `1.1.1` as the latest patch. The repository includes the Core foundation, in-memory validation storage, EF Core host-owned persistence, ASP.NET Core integration, test harness helpers, dotnet new templates, analyzers, the OpenTelemetry provider, local-development signing, the managed-key signing adapter boundary, samples, release validation, and host-validation documentation.
+Stable `1.1.x` is the current released line for the compatible `1.x` API, with `1.1.1` as the latest patch. The repository includes the Core foundation, builder-facade registration surface, in-memory validation storage, EF Core host-owned persistence, ASP.NET Core integration, test harness helpers, dotnet new templates, analyzers, the OpenTelemetry provider, local-development signing, the managed-key signing adapter boundary, samples, release validation, and host-validation documentation.
 
 The stable API contract is documented in [API Compatibility and SemVer](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/api-compatibility-and-semver.md); the original `1.0.0` baseline and `1.1.0` addendum are recorded in the [Historical Stable API Review](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/stable-api-review.md).
 

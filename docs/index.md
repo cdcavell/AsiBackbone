@@ -21,6 +21,9 @@ These pages are the best first stops for implementation-first adoption. The opti
 * [First 15 Minutes: Standard API Gating](articles/quickstart-api-gating.md)  
   Practical package-consumer walkthrough for gating one ASP.NET Core endpoint.
 
+* [AddAsiBackbone Builder Facade](articles/add-asibackbone-builder-facade.md)  
+  Explicit host-selected provider registration without hidden infrastructure defaults.
+
 * [dotnet new Templates](articles/templates.md)  
   Installable project templates for generating a governed ASP.NET Core host from a clean directory.
 
@@ -66,6 +69,7 @@ Stable `1.1.x` is the current compatible release line. `1.1.1` is the current pa
 
 ```text
 CDCavell.AsiBackbone.Core
+CDCavell.AsiBackbone.DependencyInjection
 CDCavell.AsiBackbone.Storage.InMemory
 CDCavell.AsiBackbone.EntityFrameworkCore
 CDCavell.AsiBackbone.AspNetCore
@@ -87,6 +91,7 @@ Use these pages when wiring AsiBackbone into a host application.
 
 * [Implementation-First Adoption Path](articles/implementation-first-adoption.md)
 * [First 15 Minutes: Standard API Gating](articles/quickstart-api-gating.md)
+* [AddAsiBackbone Builder Facade](articles/add-asibackbone-builder-facade.md)
 * [dotnet new Templates](articles/templates.md)
 * [Reference Deployment: Plain ASP.NET Core Host Evidence](articles/reference-deployment.md)
 * [Terminology Map](articles/terminology-map.md)

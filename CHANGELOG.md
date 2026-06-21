@@ -4,6 +4,56 @@ All notable changes to this project are documented in this file.
 
 This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/) and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-06-20
+
+### Release summary
+
+`1.2.0` is a compatible minor release for the stable `1.x` package family.
+
+This release promotes post-`1.1.x` adoption, diagnostics, testing, templates, samples, documentation alignment, and project-governance work into the current stable release line. No breaking public API changes are intended.
+
+`AssemblyVersion` remains fixed at `1.0.0.0` for the compatible stable `1.x` line. Package `Version`, `FileVersion`, and `InformationalVersion` move to `1.2.0`.
+
+### Added
+
+* Added `CDCavell.AsiBackbone.DependencyInjection` with an explicit `AddAsiBackbone(...)` builder facade for host-selected provider registration.
+* Added `CDCavell.AsiBackbone.Testing` as a test-only package for deterministic endpoint-governance harnesses, policy-result shaping, in-memory inspection, and no-signature signing seams.
+* Added `CDCavell.AsiBackbone.Templates` with `dotnet new asibackbone-webapi` scaffolding for governed ASP.NET Core hosts.
+* Added opt-in ASP.NET Core endpoint-governance development diagnostics gated by explicit configuration and development-environment checks.
+* Added a sample-first .NET Aspire AppHost path without introducing an Aspire runtime package.
+* Added reference-deployment evidence for the Plain ASP.NET Core host sample.
+* Added visual governance flow diagrams for intent-to-execution, policy evaluation, acknowledgment, capability tokens, and durable outbox/emission.
+* Added `1.2.0` release notes and a `1.2.0` release readiness record.
+* Added project governance and contribution documentation, including code of conduct and governance process documentation.
+
+### Changed
+
+* Promoted central package version metadata from `1.1.1` to `1.2.0` while preserving `AssemblyVersion` as `1.0.0.0` for the compatible `1.x` line.
+* Updated README, documentation home, article index, table of contents, release validation, API compatibility, citation metadata, and Zenodo metadata for the `1.2.0` package family.
+* Clarified that `1.2.0` is a minor release because it includes additive public/package surfaces and developer-experience tooling.
+* Improved implementation-first documentation, search/navigation guidance, release-readiness guidance, and package-family wording.
+* Clarified that Aspire remains a sample path, not a runtime package boundary.
+
+### Fixed
+
+* Fixed DocFX/Mermaid rendering for the Dynamic Liability Handshake diagram.
+* Fixed the documentation workflow Core coverage input path so Core branch coverage report generation consumes the docs workflow test output.
+* Corrected documentation evaluation findings around package-family listings, glossary wording, and SemVer expectations.
+
+### Validation
+
+* Release-candidate validation is expected to pass through CI, Stable Release Validation, package metadata validation, template package smoke validation, external consumer smoke tests, stable package integration smoke tests, and DocFX build before tagging.
+* Version-consistency validation should pass for `1.2.0`, including `Directory.Build.props`, `CITATION.cff`, `.zenodo.json`, optional tag `v1.2.0`, and generated package filenames when package artifacts are supplied.
+
+### Compatibility notes
+
+* Existing stable `1.x` consumers should be able to upgrade to `1.2.0` without required source-code changes for existing APIs.
+* `1.2.0` is a minor release because it includes additive public APIs, packages, diagnostics, samples, templates, and documentation alignment.
+* `AssemblyVersion` remains `1.0.0.0` for the compatible stable `1.x` line.
+* `FileVersion` should be updated to `1.2.0.0`.
+* Package `Version` and `InformationalVersion` should be updated to `1.2.0`.
+* Event Hubs, Purview, Azure-specific SDK adapters, robotics, immutable-storage, and additional provider packages remain outside the stable package contract unless separately reviewed and released.
+
 ## [1.1.1] - 2026-06-20
 
 ### Release summary
@@ -21,27 +71,8 @@ This release focuses on post-`1.1.0` hardening, documentation clarity, endpoint-
 * Added `AllowMissingGovernanceMetadataAttribute` for explicit host-owned endpoint exclusions.
 * Added Core-only branch coverage enforcement with a stricter branch coverage expectation for `CDCavell.AsiBackbone.Core`.
 * Added focused test coverage for endpoint governance route-builder behavior.
-* Added additional branch and behavior tests for:
-
-  * capability grant validation;
-  * capability token grant behavior;
-  * canonical payload construction and hashing;
-  * signing and verification policy handling;
-  * governance emission branches;
-  * governance outbox behavior;
-  * DLP/classification policy branches;
-  * audit integrity verification;
-  * operation and decision result behavior.
-* Added documentation for:
-
-  * progressive adoption and onboarding;
-  * API-gating quickstart guidance;
-  * host-owned execution enforcement;
-  * DLP/classification scanner integration seams;
-  * safe audit and telemetry data;
-  * outbox drain reliability and alerting;
-  * outbox multi-worker concurrency boundaries;
-  * terminology mapping for .NET developers.
+* Added additional branch and behavior tests for capability grants, signing and verification, canonical payloads, governance emission, outbox behavior, DLP/classification policy, audit integrity, and operation/decision results.
+* Added documentation for progressive adoption, API-gating, host-owned execution, DLP/classification scanner seams, safe audit/telemetry data, outbox reliability, outbox concurrency, and terminology mapping.
 
 ### Changed
 
@@ -51,10 +82,8 @@ This release focuses on post-`1.1.0` hardening, documentation clarity, endpoint-
 * Reframed alpha-era documents as historical records rather than current release guidance.
 * Reconciled production wording around signing, verification, and tamper-evidence boundaries.
 * Clarified design-only provider documentation boundaries for Event Hubs, Purview, Azure-specific adapters, robotics, immutable-storage, and future provider packages.
-* Clarified that OpenTelemetry is the released governance emission provider in the `1.1.x` package family, while other provider pages remain design-only or strategy-only unless separately released.
 * Updated quality documentation to distinguish repository-wide line coverage, Core-only branch coverage, and targeted mutation analysis.
 * Updated release validation and readiness guidance so it can be reused for future stable `1.x` patch and minor releases.
-* Improved documentation around durable audit/outbox persistence, hosted outbox drain reliability, and host-owned concurrency expectations.
 
 ### Fixed
 
@@ -69,43 +98,20 @@ This release focuses on post-`1.1.0` hardening, documentation clarity, endpoint-
 * Reduced default ASP.NET Core middleware 403 allocation pressure by using a cached, bodyless forbidden result by default.
 * Added an opt-in forbidden-result factory so hosts can still return richer safe responses when desired.
 * Reduced avoidable Core allocation overhead in reason handling for `GovernanceDecision`, `ConstraintEvaluationResult`, and `OperationResult`.
-* Replaced LINQ-based reason-code projections with exact-sized arrays populated by simple loops.
-* Snapshot policy evaluator constraints into an exact-sized private array to avoid repeated caller-owned collection wrapping while preserving evaluator safety.
 
 ### Security and governance hardening
 
 * Added optional fail-closed endpoint governance behavior for hosts that require every selected endpoint to carry explicit AsiBackbone governance metadata.
 * Preserved existing default endpoint-governance behavior for backward compatibility.
-* Reinforced host-owned execution boundaries: AsiBackbone can evaluate, record, emit, and gate governance decisions, but the consuming host still owns authentication, authorization, business execution, persistence, deployment, and operational enforcement.
-* Clarified DLP/classification scanner integration boundaries: hosts own scanner implementation and normalization; AsiBackbone supplies the governance policy response after scanner outcomes are mapped into policy context.
-* Clarified fail-open versus fail-closed DLP/classification behavior by risk level.
+* Reinforced host-owned execution boundaries.
+* Clarified DLP/classification scanner integration boundaries and fail-open/fail-closed behavior by risk level.
 * Replaced the vulnerable/deprecated SQLite native transitive restore path used by SQLite-backed sample and test projects.
-* Added explicit `SQLitePCLRaw.bundle_e_sqlite3` references for the Plain ASP.NET Core host sample and EntityFrameworkCore test project.
-* Pinned `SQLitePCLRaw.bundle_e_sqlite3` to the maintained `3.x` package line through central package management.
-* Preserved SQLite-backed EF Core sample behavior and SQLite test coverage while removing restore-time vulnerability noise from the solution.
-
-### Documentation
-
-* Added a progressive adoption ladder showing the smallest Core-only decision path first.
-* Added package-selection guidance so consumers can adopt only the packages required for their scenario.
-* Expanded DLP/classification scanner integration guidance with host-owned scanner examples and policy-resolution flow.
-* Added safe audit and telemetry guidance to help hosts avoid leaking sensitive data into governance records or provider emissions.
-* Added outbox drain reliability and alerting guidance.
-* Added outbox multi-worker concurrency guidance documenting that pending/retry-ready queries return delivery candidates, not durable claimed work items.
-* Added host-owned execution enforcement documentation to distinguish governance decisions from actual execution controls.
-* Updated `1.1.0` release-note wording where needed to make the post-release package boundary clearer for `1.1.x` consumers.
-* Improved documentation links across the README, article index, documentation home page, upgrade guide, and table of contents.
 
 ### Compatibility notes
 
 * Existing `1.1.0` consumers should be able to upgrade to `1.1.1` without required source-code changes.
-* Endpoint-governance strict mode is opt-in. Existing default behavior is preserved unless the host explicitly enables strict metadata enforcement.
-* New documentation pages describing future provider directions do not imply those providers have shipped as stable NuGet packages.
+* Endpoint-governance strict mode is opt-in.
 * Event Hubs, Purview, Azure-specific SDK adapters, robotics, immutable-storage, and additional provider packages remain outside the stable package contract unless separately reviewed and released.
-* `AssemblyVersion` remains `1.0.0.0` for the compatible stable `1.x` line.
-* `FileVersion` should be updated to `1.1.1.0`.
-* Package `Version` and `InformationalVersion` should be updated to `1.1.1`.
-* SQLite dependency hardening is limited to non-packable sample and test projects and does not add SQLite as a required dependency for the stable runtime package surface.
 
 ## [1.1.0] - 2026-06-16
 
@@ -168,271 +174,6 @@ This release focuses on post-`1.1.0` hardening, documentation clarity, endpoint-
 * `1.0.0` remains Accountable Systems Infrastructure and governance spine infrastructure, not an artificial superintelligence implementation, AI model host, robot controller, legal/compliance guarantee, or tamper-evident ledger provider.
 * Future signing, gateway, cloud observability, and robotics/provider packages remain outside the stable `1.0.0` contract unless separately released as stable.
 
-## [0.4.0-alpha.3] - 2026-06-13
+## Earlier alpha releases
 
-### Added
-
-* Added an external consumer smoke-test workflow for package ergonomics validation.
-* Added `eng/smoke-tests/external-consumer-smoke.sh` to pack local package artifacts, generate a clean temporary xUnit consumer project, install AsiBackbone packages from a local NuGet source, and run HTTP-based smoke assertions.
-* Added external consumer validation for:
-
-  * Core + ASP.NET Core adapter registration through `AddAsiBackboneAspNetCore()`.
-  * host-owned `DbContext` integration for the EF Core audit ledger path.
-  * in-memory audit storage for minimal non-durable hosts.
-  * allow, deny, and acknowledgment-required HTTP decision flows.
-* Added external consumer smoke-test documentation under Quality Reports.
-* Added the external consumer smoke test to quality documentation navigation.
-* Added focused Core mutation-survivor triage documentation covering evaluator, decision, audit, and handshake behavior.
-* Added mutation-focused Core tests for:
-
-  * deny-wins evaluator composition and reason aggregation.
-  * warning-only evaluator composition.
-  * full constraint-result visibility to decision policy.
-  * cancellation between evaluator constraints.
-  * non-allow governance decision factory propagation.
-  * read-only decision reason snapshots.
-  * audit residue trace, policy, metadata, and actor propagation.
-  * liability handshake request and acknowledgment boundary behavior.
-* Added governance tool comparison documentation comparing Azure Policy, Open Policy Agent, Microsoft Agent Governance Toolkit, and AsiBackbone as complementary governance layers.
-
-### Changed
-
-* Updated quality documentation to include external consumer smoke-test guidance.
-* Updated quality documentation to link Core test triage from the Quality Reports index.
-* Updated the external consumer smoke-test workflow to run on pull requests, pushes to `main`, and manual dispatch.
-* Updated the external consumer smoke-test script to run the generated consumer project outside the repository tree, preventing inheritance of repository Central Package Management settings.
-* Updated the external consumer smoke-test script to normalize package output paths before use.
-* Updated PR validation expectations to include the external consumer package smoke test as a required confidence check.
-
-### Fixed
-
-* Fixed CI formatting failures in Core mutation-focused test files.
-* Fixed external consumer smoke-test path resolution so generated project paths remain valid after directory changes.
-* Fixed external consumer smoke-test package installation failures caused by generated projects inheriting repository `Directory.Packages.props` settings.
-
-### Validation
-
-* Confirmed the Release test suite passes with 385 tests, 0 failed, and 0 skipped after formatting cleanup.
-* Added package-shaped validation that verifies a clean consumer-style host can wire AsiBackbone packages without project references.
-* Verified the smoke-test design exercises allow, deny, and acknowledgment-required flows through HTTP.
-* Verified host-owned persistence boundaries remain explicit for the EF Core ledger path.
-
-### Boundary Notes
-
-* The external consumer smoke test is a package-consumer ergonomics check, not a production host template.
-* The generated smoke project intentionally avoids repository project references.
-* EF Core persistence remains host-owned: the host supplies the `DbContext`, provider, connection string, schema lifecycle, and migration strategy.
-* In-memory audit storage remains non-durable and intended for tests, samples, and local validation.
-* AsiBackbone remains Accountable Systems Infrastructure and governance spine infrastructure, not an intelligence engine, AI model host, or artificial superintelligence implementation.
-
-## [0.4.0-alpha.2] - 2026-06-12
-
-### Added
-
-* Added Stryker.NET as a local .NET tool for mutation-analysis validation.
-* Added an initial Core test-project Stryker configuration for evaluator and policy-pipeline mutation testing.
-* Added an ASP.NET Core test-project Stryker configuration for acknowledgment challenge mutation testing.
-* Added mutation-focused ASP.NET Core acknowledgment challenge tests covering safe-default challenge shaping and response conversion.
-* Added a Quality Reports landing page for coverage and mutation-analysis reports.
-* Added Quality to the DocFX top navigation.
-
-### Changed
-
-* Updated the documentation publishing workflow to generate and publish the Core mutation report alongside the existing coverage report.
-* Updated the release/manual quality workflow to generate separate Core and ASP.NET Core mutation reports.
-* Updated DocFX content configuration so the Quality Reports landing page is included in the documentation site.
-
-### Documentation
-
-* Clarified that ASI means **Accountable Systems Infrastructure** within the AsiBackbone software project.
-* Updated the README, documentation index, Getting Started guide, Why AsiBackbone article, and Core domain language article to frame AsiBackbone as governance infrastructure rather than artificial superintelligence.
-* Added Accountable Systems Infrastructure to the core domain language and alignment guidance.
-
-### Boundary Notes
-
-* Reinforced that AsiBackbone does not implement artificial superintelligence, host or train AI models, control robots, or prove the Eden/Backbone framework.
-* Clarified that broader Eden/Backbone concepts may inspire the package while implementation claims remain limited to practical software governance.
-
-## [0.4.0-alpha.1] - 2026-06-11
-
-### Samples and Host Validation
-
-### Added
-
-* Added `samples/PlainAspNetCoreHost` as the canonical in-repository ASP.NET Core validation sample.
-* Added a plain ASP.NET Core sample project demonstrating:
-
-  * `AddAsiBackboneAspNetCore()` registration.
-  * host-defined constraint evaluation.
-  * host-defined decision policy behavior.
-  * acknowledgment-required decision flow.
-  * in-memory audit residue capture.
-  * EF Core audit ledger persistence through a host-owned `DbContext`.
-  * SQLite-based local validation.
-* Added sample documentation for the plain ASP.NET Core host.
-* Added DocFX article for the plain ASP.NET Core host sample.
-* Added DocFX article documenting `NetCoreApplicationTemplate` as an optional external local validation host.
-* Added package-reference and local project-reference guidance for validating AsiBackbone against a `NetCoreApplicationTemplate`-generated host.
-* Added host-owned EF Core integration guidance showing `ApplyAsiBackboneConfigurations()`.
-* Added temporary validation endpoint sketch for external host validation.
-* Added targeted branch coverage tests for:
-
-  * ASP.NET Core options.
-  * request correlation resolution.
-  * acknowledgment challenge handling.
-  * EF Core audit ledger edge paths.
-
-### Changed
-
-* Updated documentation navigation to include sample and host-validation guidance.
-* Updated README links to reference the new sample and host-validation documentation.
-* Clarified that the plain ASP.NET Core host sample is the canonical in-repository validation baseline.
-* Clarified that `NetCoreApplicationTemplate` is a preferred external validation host, not a required dependency or parent framework.
-
-### Validation
-
-* Confirmed the solution builds successfully in Release configuration.
-* Confirmed the full test suite passes in Release configuration.
-* Regenerated local coverage after targeted branch coverage additions.
-
-### Boundary Notes
-
-* No AsiBackbone project references `NetCoreApplicationTemplate`.
-* No in-repository `NetCoreApplicationTemplate` sample was added.
-* `NetCoreApplicationTemplate` remains optional and external.
-* AsiBackbone remains governance infrastructure, not an intelligence engine, AI model host, or ASI implementation.
-
-## [0.3.0-alpha.1] - 2026-06-11
-
-### Added
-
-* Added the initial `CDCavell.AsiBackbone.AspNetCore` alpha integration package.
-* Added ASP.NET Core service registration extensions through `AddAsiBackboneAspNetCore(...)`.
-* Added configurable ASP.NET Core integration options with startup validation.
-* Added an HTTP actor context adapter for resolving Core-compatible actor context from `HttpContext.User`.
-* Added configurable claim mapping for actor identifiers, display names, and actor type.
-* Added safe unauthenticated actor handling without throwing during normal request flow.
-* Added ASP.NET Core request correlation support for resolving correlation identifiers, trace identifiers, and safe request metadata.
-* Added audit enrichment helpers for creating Core audit residue from HTTP request correlation data.
-* Added HTTP result mapping helpers for Core `GovernanceDecision` and `OperationResult` values.
-* Added host-overridable HTTP result mapping options for allowed, warning, denied, deferred, acknowledgment-required, escalation-recommended, and failed operation outcomes.
-* Added Problem Details-style responses for non-success governance and operation outcomes.
-* Added safe default response behavior that preserves reason codes and correlation identifiers while hiding reason messages, trace identifiers, policy versions, and policy hashes unless explicitly enabled.
-* Added ASP.NET Core acknowledgment challenge models and service support for Core `AcknowledgmentRequired` governance decisions.
-* Added acknowledgment challenge response handling that round-trips accepted or rejected responses into Core `LiabilityHandshakeAcknowledgment` values.
-* Added tests for service registration, actor context resolution, request correlation, audit enrichment, HTTP result mapping, and acknowledgment challenge handling.
-
-### Documentation
-
-* Added ASP.NET Core integration boundary documentation.
-* Added ASP.NET Core package README guidance for service registration, request correlation, audit enrichment, HTTP result mapping, and acknowledgment challenge usage.
-* Documented the package as a thin web-host adapter around Core governance primitives.
-* Documented that hosts remain responsible for authentication, authorization, persistence, routing, UI rendering, endpoint exposure, and operational execution.
-
-### Boundaries
-
-* The ASP.NET Core package keeps Core framework-neutral and free of ASP.NET Core dependencies.
-* The ASP.NET Core package does not register EF Core, persistence stores, authentication handlers, MVC, Razor Pages, Minimal API endpoints, middleware enforcement, policy evaluators, or NetCoreApplicationTemplate dependencies by default.
-* HTTP result mapping and acknowledgment challenge helpers are explicit host adapters and do not enforce decisions automatically.
-* Hosts choose how to render, store, protect, and round-trip acknowledgment challenge state.
-
-### Notes
-
-* This alpha release establishes the first web-host integration layer for the AsiBackbone package family.
-* The implementation is intentionally adapter-focused: it translates ASP.NET Core request context into Core governance language and translates Core outcomes into HTTP-friendly shapes when explicitly used by the host.
-
-## [0.2.0-alpha.1] - 2026-06-10
-
-### Added
-
-* Added EF Core `ModelBuilder` extension support for host-owned persistence integration.
-* Added `ApplyAsiBackboneConfigurations(this ModelBuilder modelBuilder)` for applying AsiBackbone EF Core model contributions from a consuming application's `DbContext`.
-* Added tests proving the extension can be called from a host-owned `DbContext`.
-* Added argument validation for null `ModelBuilder` usage.
-* Added provider-neutral EF Core persistence entities and configurations for audit ledger records, reason codes, metadata, handshake requests, and handshake acknowledgments.
-* Added an EF Core-backed audit ledger store for append-oriented accountability persistence through a host-owned `DbContext`.
-* Added EF Core tests proving host-owned DbContext integration, model metadata, keys, relationships, indexes, enum conversion, and basic persistence behavior.
-* Added SQLite-backed EF Core integration tests proving relational schema creation, persistence/readback, and query behavior without package-owned migrations.
-* Added EF Core host ownership and migration guidance documentation.
-* Added package-specific README files for the EF Core and in-memory storage packages.
-
-### Fixed
-
-* Updated EF Core documentation samples to show host applications calling the extension from `OnModelCreating`.
-* Aligned EF Core documentation with the implemented `CDCavell.AsiBackbone.EntityFrameworkCore` package name.
-* Normalized EF Core configuration folder and file paths.
-* Updated the root README to describe the current 0.2 persistence package status.
-* Cleared the EF Core change tracker after audit ledger append failures so failed append entities do not remain tracked in the host-owned context.
-
-### Notes
-
-* The EF Core integration preserves host ownership of the `DbContext`, database provider, connection string, migrations, deployment process, and schema lifecycle.
-* AsiBackbone contributes model configuration; the consuming application remains the persistence composition root.
-* Wired the configurations through the existing `ApplyAsiBackboneConfigurations` `ModelBuilder` extension.
-* The in-memory storage package remains non-durable and intended only for tests, samples, and local validation hosts.
-
-## [0.1.0-alpha.2] - 2026-06-09
-
-### Added
-
-* Added a host-neutral Core policy evaluator contract and default policy evaluator implementation.
-* Added a decision policy extension point for raising composed decisions to deferred, acknowledgment-required, or escalation-recommended outcomes.
-* Added an audit sink contract for writing audit residue without requiring a database or web host.
-* Added an in-memory audit ledger project for local validation, samples, and tests.
-* Added branch-focused unit tests for `AuditLedgerRecord.FromResidue`.
-* Added branch-focused unit tests for `DefaultAsiBackbonePolicyEvaluator<TContext>`.
-* Added end-to-end policy evaluator tests covering allow, deny, warning, acknowledgment-required, escalation-recommended, deferred, and not-applicable constraint scenarios.
-* Added policy evaluator pipeline documentation with a minimal in-memory usage example.
-
-### Fixed
-
-* Aligned policy evaluator tests with the intended constraint-versus-decision-policy boundary.
-* Preserved elevated-risk warnings as constraint-layer results instead of replacing them in the decision policy layer.
-* Updated test expectations to match current `AsiBackbone` assembly casing.
-* Added explicit switch handling for low-risk and elevated-risk document policy scenarios.
-
-### Boundaries
-
-* The evaluator remains framework-neutral and does not depend on ASP.NET Core, Entity Framework Core, robotics packages, database providers, or AI model hosting.
-* The in-memory ledger is non-durable and intended only for tests, samples, and local validation hosts.
-
-## [0.1.0-alpha.1] - 2026-06-04
-
-### Added
-
-* Introduced the initial `CDCavell.AsiBackbone.Core` alpha package boundary.
-* Added framework-neutral domain primitives for governance-oriented decision flow.
-* Added actor context primitives for describing who or what is requesting an operation.
-* Added entity identity and optimistic-concurrency abstractions.
-* Added operation result primitives for package execution outcomes.
-* Added reason code primitives for explainable result and decision handling.
-* Added constraint evaluation primitives for allow, deny, warning, and not-applicable outcomes.
-* Added governance decision primitives for allowed, warning, denied, deferred, acknowledgment-required, and escalation-recommended outcomes.
-* Added audit residue primitives for capturing decision traces, reason codes, policy version/hash, correlation data, timestamps, actor data, and metadata.
-* Added persistent audit ledger record shape and framework-neutral storage contract.
-* Added liability/responsibility handshake primitives for acknowledgment before consequential execution.
-* Added capability-token abstractions for scoped, time-bound, traceable permission grants.
-* Added assembly marker support for discovery-friendly package references.
-* Added XML documentation coverage for public Core types and members.
-* Added unit tests for introduced Core primitives.
-
-### Documentation
-
-* Added README documentation describing AsiBackbone as a governance spine rather than an intelligence engine.
-* Added Core domain language documentation for the initial alpha boundary.
-* Added package boundary documentation clarifying what belongs in Core versus future integration packages.
-* Added EF Core integration boundary documentation for future host-owned persistence support.
-* Added alpha readiness review documentation.
-
-### Boundaries
-
-* Core does not implement artificial superintelligence.
-* Core does not host, train, or run AI models.
-* Core does not prove the ASI Backbone concept or the Eden Hypothesis.
-* Core does not depend on ASP.NET Core, Entity Framework Core, NetCoreApplicationTemplate, robotics packages, or AI model dependencies.
-* Core does not provide middleware, endpoint mapping, database storage, signing implementation, robotics control, or provider-specific persistence behavior.
-
-### Notes
-
-* This alpha release establishes the foundational language and primitives for the AsiBackbone package family.
-* Future packages may provide ASP.NET Core integration, EF Core persistence integration, in-memory storage, signing support, samples, and later gateway or robotics examples.
+Earlier alpha entries from `0.1.0-alpha.1` through `0.4.0-alpha.3` are preserved in repository history and historical design records. They covered the initial Core boundary, policy evaluator, in-memory storage, EF Core integration, ASP.NET Core adapter, sample host validation, quality-report publishing, mutation-testing setup, and external consumer smoke-test validation that led into the stable `1.0.0` release.

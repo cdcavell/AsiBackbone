@@ -1,10 +1,10 @@
 # Stable Release Validation
 
-This article documents the reusable release-blocking validation path for the stable `1.x` release line. The current released stable package family is `1.1.x`, with `1.1.1` as the current patch release; future `1.x` maintenance releases should continue to use the same validation posture unless a later release note supersedes it.
+This article documents the reusable release-blocking validation path for the stable `1.x` release line. The current released stable package family is `1.2.x`, with `1.2.0` as the current minor release; future `1.x` maintenance releases should continue to use the same validation posture unless a later release note supersedes it.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. Release validation should confirm that the package family remains practical governance infrastructure and that implementation claims stay within the documented software boundary.
 
-The [1.1.0 Release Readiness Record](release-readiness-checklist.md) is retained as the historical release-candidate control sheet for the `1.1.0` release. Treat this article as the reusable validation process for current and future `1.x` release candidates and maintenance releases.
+The [1.2.0 Release Readiness Record](release-readiness-120.md) is the current release-candidate control sheet for the `1.2.0` release. The [Historical 1.1.0 Release Readiness Record](release-readiness-checklist.md) is retained for traceability and checklist-shape history.
 
 ## Required checks before tagging a stable release
 
@@ -27,7 +27,7 @@ Before cutting a stable release tag, confirm the following checks have passed on
 
 ## Release-blocking workflows
 
-The following workflows formed the `1.1.0` release gate and remain the reusable gate for future stable `1.x` release candidates:
+The following workflows form the reusable gate for stable `1.x` release candidates:
 
 - `CI` validates dependency review for pull requests, solution restore/build/test, formatting, package creation, template package smoke validation, coverage output, and CodeQL analysis.
 - `External Consumer Smoke Test` validates package-consumer wiring through the external consumer and stable package integration smoke scripts.
@@ -130,6 +130,8 @@ Deferred checks should be rare for a stable release.
 
 ## Related documentation
 
+- [1.2.0 Release Readiness Record](release-readiness-120.md)
+- [1.2.0 Release Notes](release-notes-120.md)
 - [Historical 1.1.0 Release Readiness Record](release-readiness-checklist.md)
 - [1.1.x Release Notes](release-notes-110.md)
 - [Upgrade Guide: 1.0.0 to 1.1.0](upgrade-100-to-110.md)

@@ -62,7 +62,7 @@ Pack local release artifacts for inspection:
 
 ```bash
 mkdir -p artifacts/packages
-find ./src -name '*.csproj' -type f | sort | while read project; do
+find ./src -name '*.csproj' -type f -not -path '*/templates/*' | sort | while read project; do
   dotnet pack "$project" --configuration Release --output artifacts/packages /p:ContinuousIntegrationBuild=true
 done
 ```

@@ -266,6 +266,11 @@ else {
             else {
                 Assert-Equal $repositoryNode.GetAttribute('type') 'git' "$($package.Name) repository type"
                 Assert-Equal $repositoryNode.GetAttribute('url') $expectedRepositoryUrl "$($package.Name) repository URL"
+
+                $repositoryCommit = $repositoryNode.GetAttribute('commit')
+                if ([string]::IsNullOrWhiteSpace($repositoryCommit)) {
+                    Add-Failure "$($package.Name) repository commit metadata was not found."
+                }
             }
 
             $actualTags = @((Get-NuspecElementValue $metadata 'tags') -split '[;\s]+' | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })

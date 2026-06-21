@@ -11,10 +11,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CDCavell.AsiBackbone.AspNetCore" Version="1.1.1" />
-    <PackageReference Include="CDCavell.AsiBackbone.Core" Version="1.1.1" />
-    <PackageReference Include="CDCavell.AsiBackbone.Storage.InMemory" Version="1.1.1" />
-    <PackageReference Include="CDCavell.AsiBackbone.Analyzers" Version="1.1.1" PrivateAssets="all" />
+    <PackageReference Include="CDCavell.AsiBackbone.AspNetCore" Version="1.2.0" />
+    <PackageReference Include="CDCavell.AsiBackbone.Core" Version="1.2.0" />
+    <PackageReference Include="CDCavell.AsiBackbone.Storage.InMemory" Version="1.2.0" />
+    <PackageReference Include="CDCavell.AsiBackbone.Analyzers" Version="1.2.0" PrivateAssets="all" />
   </ItemGroup>
 
 </Project>

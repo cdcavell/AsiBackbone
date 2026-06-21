@@ -124,3 +124,20 @@ For stable release work, confirm:
 Do not include secrets, credentials, tokens, private keys, passwords, confidential data, or raw sensitive records in issues, pull requests, examples, tests, screenshots, or documentation.
 
 Use synthetic examples and opaque identifiers in documentation and tests.
+
+## Contributor License Agreement
+
+By submitting a contribution (including but not limited to code, documentation, tests, or configuration files) to AsiBackbone via pull request, patch, or any other means, you ("Contributor") agree to the following terms:
+
+1. **Grant of copyright license.** You grant Christopher D. Cavell, as current project steward for AsiBackbone, and all recipients of software distributed by the project a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable copyright license to reproduce, prepare derivative works of, publicly display, publicly perform, sublicense, and distribute your contribution and such derivative works under the terms of the license identified in the project's LICENSE file.
+
+2. **Grant of patent license.** You grant Christopher D. Cavell, as current project steward for AsiBackbone, and all recipients of software distributed by the project a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable patent license to make, have made, use, offer to sell, sell, import, and otherwise transfer the project, where such license applies only to those patent claims licensable by you that are necessarily infringed by your contribution alone or by combination of your contribution with the project.
+
+3. **Representations.** You represent that (a) you are legally entitled to grant the above licenses; (b) if your employer has rights to intellectual property you create, you have received permission to make this contribution on behalf of your employer; and (c) your contribution is your original creation or you have sufficient rights to submit it.
+
+4. **No warranty.** Except as required by applicable law, you provide your contribution on an "AS IS" basis, without warranties or conditions of any kind, either express or implied.
+
+If AsiBackbone is accepted into the .NET Foundation, contribution licensing may transition to the .NET Foundation's CLA and automated CLA bot process as part of onboarding.
+
+Questions about this agreement may be directed to [cdcavell@gmail.com](mailto:cdcavell@gmail.com).
+

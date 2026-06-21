@@ -16,7 +16,7 @@ app.MapPost("/robotics/execute", () => Results.Ok())
     .EmitGovernanceAudit();
 ```
 
-Without the harness, the ASP.NET Core package intentionally fails closed when host-owned governance services are missing. That behavior remains correct for production. The harness gives tests an explicit one-call registration path for deterministic behavior.
+Without the harness, the ASP.NET Core package intentionally fails closed when an endpoint declares governance metadata but required host-owned governance services are missing. That behavior remains correct for production. The harness gives tests an explicit one-call registration path for deterministic behavior.
 
 ## Basic service registration
 
@@ -103,4 +103,4 @@ The sink is in-memory and process-local. It is designed for test assertions, not
 
 ## Boundary notes
 
-The testing package does not weaken the fail-closed defaults in `CDCavell.AsiBackbone.AspNetCore`; it only supplies explicit test registrations when a test chooses to use them. It also does not make `CDCavell.AsiBackbone.Core` depend on ASP.NET Core, EF Core, or testing packages.
+The testing package does not change `CDCavell.AsiBackbone.AspNetCore` production behavior. Endpoints without AsiBackbone governance metadata remain opt-in/pass-through by default unless the host enables strict metadata enforcement with `RequireGovernanceMetadata`. Endpoints that do declare governance metadata still fail closed when required host-owned services are missing. The harness only supplies explicit deterministic test registrations when a test chooses to use them, and it does not make `CDCavell.AsiBackbone.Core` depend on ASP.NET Core, EF Core, or testing packages.

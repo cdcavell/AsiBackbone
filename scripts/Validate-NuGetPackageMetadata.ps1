@@ -123,13 +123,20 @@ if ([string]::IsNullOrWhiteSpace($ExpectedVersion)) {
 
 $expectedProjectUrl = 'https://cdcavell.github.io/AsiBackbone/'
 $expectedRepositoryUrl = 'https://github.com/cdcavell/AsiBackbone'
+$expectedVersionParts = $ExpectedVersion -split '\.'
+$expectedStablePackageFamily = if ($expectedVersionParts.Count -ge 2) {
+    'Stable `' + $expectedVersionParts[0] + '.' + $expectedVersionParts[1] + '.x` package family'
+}
+else {
+    'Stable `' + $ExpectedVersion + '` package family'
+}
 
 $expectedPackages = @(
     [pscustomobject]@{
         Id = 'CDCavell.AsiBackbone.Core'
         Description = 'Framework-neutral Accountable Systems Infrastructure governance primitives for consequential .NET decision flow.'
         Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'decision-flow', 'constraint-evaluation', 'audit', 'acknowledgment', 'capability-token')
-        ReadmeMustContain = @('Accountable Systems Infrastructure', 'Stable `1.1.x` package family')
+        ReadmeMustContain = @('Accountable Systems Infrastructure', $expectedStablePackageFamily)
     },
     [pscustomobject]@{
         Id = 'CDCavell.AsiBackbone.DependencyInjection'

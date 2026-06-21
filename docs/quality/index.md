@@ -16,9 +16,9 @@ For a governance package, these views all matter. Coverage helps show that polic
 
 ## Current quality posture
 
-The `1.1.0` stable package family expanded the quality surface beyond the original `1.0.0` decision/audit/acknowledgment baseline. Current Core coverage now includes provider-neutral governance emission contracts, durable outbox contracts, DLP/classification failure policy primitives, signing-ready metadata, canonical hashing/signing seams, verification-policy primitives, and capability grant hardening.
+The `1.2.0` stable package family carries forward the `1.1.x` quality surface and adds release-readiness coverage around additive adoption, diagnostics, testing harness, templates, sample orchestration, documentation alignment, and project-governance documentation.
 
-The post-`1.1.0` / `1.1.1` hardening direction is focused on meaningful xUnit line and branch coverage for public Core behavior, not an automatic expansion of mutation-testing scope. The targeted mutation reports remain quality signals for selected high-value behavior; they are not full-repository certification.
+Current Core coverage includes provider-neutral governance emission contracts, durable outbox contracts, DLP/classification failure policy primitives, signing-ready metadata, canonical hashing/signing seams, verification-policy primitives, and capability grant hardening. The targeted mutation reports remain quality signals for selected high-value behavior; they are not full-repository certification.
 
 Tracked Core coverage-hardening work includes:
 

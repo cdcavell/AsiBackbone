@@ -1,14 +1,14 @@
 # Mutation Coverage Scope and Deferrals
 
-This page records the historical mutation-testing scope accepted for the `1.0.0` release boundary and the current `1.x` guidance after the `1.1.0` package-family expansion.
+This page records the historical mutation-testing scope accepted for the `1.0.0` release boundary and the current `1.x` guidance after the `1.2.0` package-family release.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. Mutation testing is used as a quality signal for implemented governance behavior; it is not a compliance certification and does not make the package family an execution engine, AI model host, robot controller, or production audit guarantee.
 
 ## Current 1.x quality context
 
-The `1.1.0` stable package family added more Core behavior than the original `1.0.0` mutation baseline covered directly. The expanded Core surface includes provider-neutral governance emission contracts, durable outbox contracts, DLP/classification failure policy primitives, signing-ready metadata, canonical hashing/signing seams, verification-policy primitives, and capability grant hardening.
+The `1.2.0` stable package family carries forward the expanded Core behavior added in `1.1.x` and formalizes additive adoption, diagnostics, testing harness, template, sample, and documentation-alignment surfaces. The expanded Core surface includes provider-neutral governance emission contracts, durable outbox contracts, DLP/classification failure policy primitives, signing-ready metadata, canonical hashing/signing seams, verification-policy primitives, and capability grant hardening.
 
-Post-`1.1.0` / `1.1.1` hardening work is primarily xUnit line and branch coverage work for public Core behavior. It is not automatically a mutation-testing scope expansion. A line or branch coverage issue can improve confidence that public behavior is exercised while mutation scope remains targeted to high-value decision behavior.
+Post-`1.1.0` hardening work remains primarily xUnit line and branch coverage work for public Core behavior. It is not automatically a mutation-testing scope expansion. A line or branch coverage issue can improve confidence that public behavior is exercised while mutation scope remains targeted to high-value decision behavior.
 
 Current coverage-hardening references:
 
@@ -41,7 +41,7 @@ Normal documentation publishing preserves already-deployed mutation reports so t
 
 ## Historical pre-`1.0.0` deferrals
 
-The following areas were intentionally not expanded into mutation validation before the stable `1.0.0` tag. They remain useful historical context, but they should not be read as the complete current `1.1.0` quality plan.
+The following areas were intentionally not expanded into mutation validation before the stable `1.0.0` tag. They remain useful historical context, but they should not be read as the complete current `1.2.0` quality plan.
 
 | Deferred area | Current validation path | Deferral decision |
 | --- | --- | --- |

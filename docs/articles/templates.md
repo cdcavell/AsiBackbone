@@ -14,7 +14,7 @@ dotnet new install CDCavell.AsiBackbone.Templates
 For local repository validation, install the generated `.nupkg` from the package artifact directory instead:
 
 ```powershell
-dotnet new install ./artifacts/packages/CDCavell.AsiBackbone.Templates.1.1.1.nupkg
+dotnet new install ./artifacts/packages/CDCavell.AsiBackbone.Templates.1.2.0.nupkg
 ```
 
 ## Create a governed Web API

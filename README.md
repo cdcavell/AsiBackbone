@@ -122,7 +122,7 @@ For production-style hosts, add durable audit/outbox persistence, signing or ver
 
 ## Package family
 
-Stable `1.1.x` package family. `1.1.1` is the current patch release; the `1.1.x` line expands the original `1.0.0` boundary with builder-facade, analyzer, OpenTelemetry, signing-provider, testing-harness, and template package surfaces for the compatible `1.x` line.
+Stable `1.2.x` package family. `1.2.0` is the current minor release; the `1.2.x` line formalizes the compatible `1.x` governance-spine surface with builder-facade, analyzer, OpenTelemetry, signing-provider, testing-harness, template package, endpoint diagnostics, sample, and documentation-alignment surfaces.
 
 | Package | Role |
 | --- | --- |
@@ -167,9 +167,9 @@ The full, categorized documentation set lives at the [documentation site](https:
 
 ## Current status
 
-Stable `1.1.x` is the current released line for the compatible `1.x` API, with `1.1.1` as the latest patch. The repository includes the Core foundation, builder-facade registration surface, in-memory validation storage, EF Core host-owned persistence, ASP.NET Core integration, test harness helpers, dotnet new templates, analyzers, the OpenTelemetry provider, local-development signing, the managed-key signing adapter boundary, samples, release validation, and host-validation documentation.
+Stable `1.2.x` is the current released line for the compatible `1.x` API, with `1.2.0` as the current minor release. The repository includes the Core foundation, builder-facade registration surface, in-memory validation storage, EF Core host-owned persistence, ASP.NET Core integration, test harness helpers, dotnet new templates, analyzers, the OpenTelemetry provider, local-development signing, the managed-key signing adapter boundary, samples, release validation, and host-validation documentation.
 
-The stable API contract is documented in [API Compatibility and SemVer](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/api-compatibility-and-semver.md); the original `1.0.0` baseline and `1.1.0` addendum are recorded in the [Historical Stable API Review](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/stable-api-review.md).
+The stable API contract is documented in [API Compatibility and SemVer](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/api-compatibility-and-semver.md); the original `1.0.0` baseline, `1.1.0` addendum, and `1.2.0` release boundary are recorded in the [Historical Stable API Review](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/stable-api-review.md), [1.1.x Release Notes](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/release-notes-110.md), and [1.2.0 Release Notes](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/release-notes-120.md).
 
 ## Security and vulnerability reporting
 

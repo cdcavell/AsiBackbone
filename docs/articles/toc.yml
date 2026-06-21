@@ -23,8 +23,8 @@
       href: templates.md
     - name: Why AsiBackbone?
       href: why-asi-backbone.md
-    - name: 1.1.x Release Notes
-      href: release-notes-110.md
+    - name: 1.2.0 Release Notes
+      href: release-notes-120.md
     - name: "Upgrade Guide: 1.0.0 to 1.1.0"
       href: upgrade-100-to-110.md
 
@@ -144,13 +144,19 @@
       href: ../quality/index.md
     - name: Release Validation
       href: release-validation.md
+    - name: 1.2.0 Release Readiness Record
+      href: release-readiness-120.md
     - name: API Baseline and Boundary Checks
       href: api-baseline-and-boundary-checks.md
     - name: Developer Checklist
       href: developer-checklist.md
+    - name: 1.1.x Release Notes
+      href: release-notes-110.md
 
 - name: Historical Design Records
   items:
+    - name: Historical 1.1.0 Release Readiness Record
+      href: release-readiness-checklist.md
     - name: Historical Stable API Review
       href: stable-api-review.md
     - name: Historical Alpha Package Boundary

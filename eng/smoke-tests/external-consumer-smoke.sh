@@ -46,7 +46,7 @@ fi
 rm -rf "$package_output" "$work_root"
 mkdir -p "$package_output" "$work_root"
 
-mapfile -t package_projects < <(find "$repo_root/src" -name '*.csproj' -type f | sort)
+mapfile -t package_projects < <(find "$repo_root/src" -name '*.csproj' -type f -not -path '*/templates/*' | sort)
 
 if [ "${#package_projects[@]}" -eq 0 ]; then
   echo "No package projects were found under ./src."

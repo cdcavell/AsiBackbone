@@ -16,7 +16,7 @@ For a governance package, these views all matter. Coverage helps show that polic
 
 ## Current quality posture
 
-The `1.2.0` stable package family carries forward the `1.1.x` quality surface and adds release-readiness coverage around additive adoption, diagnostics, testing harness, templates, sample orchestration, documentation alignment, and project-governance documentation.
+The `1.2.1` stable package family carries forward the `1.2.0` quality surface and adds release-readiness coverage around Source Link repository-commit metadata, package metadata validation, package-signing wording, GitHub Actions dependency refresh, workflow line-ending normalization, documentation alignment, and project-governance readiness.
 
 Current Core coverage includes provider-neutral governance emission contracts, durable outbox contracts, DLP/classification failure policy primitives, signing-ready metadata, canonical hashing/signing seams, verification-policy primitives, and capability grant hardening. The targeted mutation reports remain quality signals for selected high-value behavior; they are not full-repository certification.
 

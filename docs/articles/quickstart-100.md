@@ -170,15 +170,9 @@ See [EF Core Host Ownership and Migrations](ef-core-host-ownership-and-migration
 
 The `1.0.0` release path is intended to stabilize the public package surface for the implemented governance spine: Core primitives, in-memory validation storage, ASP.NET Core host adapters, and EF Core host-owned persistence.
 
-Later `1.1.0` or preview provider work may add specialized integrations such as:
+Later release lines have added several of these capabilities as stable package surfaces. This `1.0.0` quickstart remains a historical minimum-path guide. For the current package family, see [1.2.1 Release Notes](release-notes-121.md) and [Progressive Adoption Ladder](progressive-adoption.md).
 
-- signing or key-management providers;
-- external gateway provider packages;
-- cloud observability or governance enrichment packages;
-- outbox or external emission patterns;
-- robotics or physical execution examples.
-
-Those later provider packages should not be treated as required for the `1.0.0` quickstart. They should complete their own API review, package boundary review, and release documentation before being considered stable.
+Those later provider packages should not be treated as required for the `1.0.0` quickstart. Later package areas should be considered stable only for the release lines where they completed their own API review, package boundary review, and release documentation.
 
 ## Next steps
 

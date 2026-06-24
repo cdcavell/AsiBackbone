@@ -122,7 +122,9 @@ AsiBackbone does not need to replace Azure Policy, OPA, or Agent Governance Tool
 
 ## Observability and governance emission providers
 
-AsiBackbone 1.1.0 roadmap extends the governance spine with observability, durable outbox, and governance emission provider patterns. These providers should be understood as downstream emission or enrichment surfaces, not as replacements for the core decision pipeline.
+The current AsiBackbone `1.2.x` package family includes observability, durable outbox, and governance emission provider patterns. These providers should be understood as downstream emission or enrichment surfaces, not as replacements for the core decision pipeline.
+
+OpenTelemetry is the released governance-emission provider. Azure Monitor can be reached through host-configured OpenTelemetry exporters. Event Hubs, Purview, SIEM, and other downstream systems remain host-owned, strategy-only, design-only, or future-provider integrations unless a later release explicitly ships them as stable packages.
 
 The intended boundary is:
 
@@ -209,4 +211,4 @@ Use Azure Policy for cloud resource governance, OPA for shared policy decisions,
 - [Why AsiBackbone?](why-asi-backbone.md)
 - [AI Agent Gateway Scenario](scenarios/ai-agent-gateway.md)
 - [Policy Evaluator Pipeline](policy-evaluator-pipeline.md)
-- [Core Domain Language and Alpha Boundary](core-domain-language.md)
+- [Core Domain Language](core-domain-language.md)

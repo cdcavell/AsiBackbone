@@ -10,7 +10,7 @@
 
 [CmdletBinding()]
 param(
-    [string]$Version = '1.2.0',
+    [string]$Version = '1.2.1',
     [switch]$KeepArtifacts
 )
 

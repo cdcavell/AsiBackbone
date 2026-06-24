@@ -1,10 +1,10 @@
 # Stable Release Validation
 
-This article documents the reusable release-blocking validation path for the stable `1.x` release line. The current released stable package family is `1.2.x`, with `1.2.0` as the current minor release; future `1.x` maintenance releases should continue to use the same validation posture unless a later release note supersedes it.
+This article documents the reusable release-blocking validation path for the stable `1.x` release line. The current released stable package family is `1.2.x`, with `1.2.1` as the current patch release on the `1.2.0` minor-release boundary; future `1.x` maintenance releases should continue to use the same validation posture unless a later release note supersedes it.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. Release validation should confirm that the package family remains practical governance infrastructure and that implementation claims stay within the documented software boundary.
 
-The [1.2.0 Release Readiness Record](release-readiness-120.md) is the current release-candidate control sheet for the `1.2.0` release. The [Historical 1.1.0 Release Readiness Record](release-readiness-checklist.md) is retained for traceability and checklist-shape history.
+The [1.2.1 Release Readiness Record](release-readiness-121.md) is the current release-candidate control sheet for the `1.2.1` release. The [1.2.0 Release Readiness Record](release-readiness-120.md) and [Historical 1.1.0 Release Readiness Record](release-readiness-checklist.md) are retained for traceability and checklist-shape history.
 
 ## Required checks before tagging a stable release
 
@@ -19,11 +19,12 @@ Before cutting a stable release tag, confirm the following checks have passed on
 | Tests | CI, stable release validation, package publish | Confirms the solution test suite passes before packaging or publishing. |
 | Package creation | CI, stable release validation, package publish | Confirms every package project under `src`, excluding template-content projects, can be packed. |
 | Package version validation | stable release validation, package publish | Confirms generated package versions and, on tag builds, tag identity align with repository version metadata. |
-| NuGet metadata validation | stable release validation, package publish | Confirms generated `.nupkg` metadata, README files, IDs, descriptions, tags, license metadata, project URL, and repository URL align with the stable package boundary. |
+| NuGet metadata validation | stable release validation, package publish | Confirms generated `.nupkg` metadata, README files, IDs, descriptions, tags, license metadata, project URL, repository URL, repository commit metadata, and stable package boundary wording align before publication. |
 | Template package smoke validation | CI, stable release validation | Confirms the packed `CDCavell.AsiBackbone.Templates` package can be installed, generate supported host styles, restore, and build. |
 | Documentation build | publish docs, stable release validation, package publish | Confirms DocFX can build the documentation included in the release posture. |
 | External consumer smoke tests | external consumer smoke workflow, stable release validation | Confirms clean consumer-style projects can reference and wire the package family. |
 | CodeQL and dependency review | CI | Confirms configured static/security checks run on pull requests where applicable. |
+| Source Link metadata validation | manual post-publish validation | Confirms published NuGet packages include expected repository type, repository URL, and Source Link repository commit metadata after packages are available from NuGet. |
 
 ## Release-blocking workflows
 
@@ -97,10 +98,21 @@ This keeps package publication behind restore, build, test, documentation, packa
 - package tags;
 - MIT license metadata;
 - project URL and repository URL metadata;
+- repository commit metadata when repository metadata is present;
 - README metadata and packaged README presence;
 - package-specific README wording anchors, such as non-durable storage language for `Storage.InMemory`, provider-neutral wording for `OpenTelemetry`, local-development/managed-key boundaries for signing packages, test-harness boundaries for `Testing`, and template-scaffold boundaries for `Templates`.
 
 This check catches release-blocking NuGet metadata mistakes before package publication because NuGet package metadata for a published version cannot be overwritten.
+
+## Source Link metadata validation
+
+After `1.2.1` packages are published and visible on NuGet, maintainers should run:
+
+```powershell
+./scripts/Validate-Source-Link-commit-metadata.ps1 -Version 1.2.1
+```
+
+This post-publish check downloads the published packages and confirms the expected repository type, repository URL, and non-empty repository commit metadata are present.
 
 ## Checks intentionally not owned by the package
 
@@ -130,6 +142,8 @@ Deferred checks should be rare for a stable release.
 
 ## Related documentation
 
+- [1.2.1 Release Readiness Record](release-readiness-121.md)
+- [1.2.1 Release Notes](release-notes-121.md)
 - [1.2.0 Release Readiness Record](release-readiness-120.md)
 - [1.2.0 Release Notes](release-notes-120.md)
 - [Historical 1.1.0 Release Readiness Record](release-readiness-checklist.md)

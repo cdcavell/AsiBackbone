@@ -2,10 +2,10 @@
 
 This article defines the public API compatibility promise for the stable AsiBackbone `1.x` package family and documents how semantic versioning applies after stabilization.
 
-It complements the historical stable API review tracked in [issue #13](https://github.com/cdcavell/AsiBackbone/issues/13). That review established the original `1.0.0` public type names, namespaces, package boundaries, dependency direction, and extension points. The released `1.1.0` package family expanded the stable contract with additive analyzer, OpenTelemetry, and signing-provider package surfaces. `1.2.0` is a compatible minor release that formalizes additive adoption, diagnostics, testing, templates, samples, and documentation-alignment surfaces on the stable `1.x` contract.
+It complements the historical stable API review tracked in [issue #13](https://github.com/cdcavell/AsiBackbone/issues/13). That review established the original `1.0.0` public type names, namespaces, package boundaries, dependency direction, and extension points. The released `1.1.0` package family expanded the stable contract with additive analyzer, OpenTelemetry, and signing-provider package surfaces. `1.2.0` is a compatible minor release that formalizes additive adoption, diagnostics, testing, templates, samples, and documentation-alignment surfaces on the stable `1.x` contract. `1.2.1` is a compatible patch release that preserves the `1.2.0` package/API boundary while hardening release metadata, Source Link repository-commit metadata, validation guidance, workflow hygiene, and documentation wording.
 
 > [!NOTE]
-> `1.1.1` included small additive, opt-in endpoint-governance public surface and an additive template package while preserving source and binary compatibility for existing `1.1.0` consumers. That release is documented as a compatibility exception to the expected SemVer policy below. Future additive public API or package surface should use a minor version bump even when the change is backward-compatible. `1.2.0` resumes that expectation by grouping additive public/package surfaces under a minor release.
+> `1.1.1` included small additive, opt-in endpoint-governance public surface and an additive template package while preserving source and binary compatibility for existing `1.1.0` consumers. That release is documented as a compatibility exception to the expected SemVer policy below. Future additive public API or package surface should use a minor version bump even when the change is backward-compatible. `1.2.0` resumed that expectation by grouping additive public/package surfaces under a minor release. `1.2.1` is a normal patch release on the `1.2.x` line.
 
 ## Compatibility promise for the stable `1.x` line
 
@@ -55,11 +55,11 @@ The released `1.1.0` package family kept the `1.0.0` packages compatible and add
 | `CDCavell.AsiBackbone.Signing.LocalDevelopment` | Stable local-development signing and verification provider for tests, samples, and wiring proof paths only. Not production key custody. |
 | `CDCavell.AsiBackbone.Signing.ManagedKey` | Stable managed-key signing adapter boundary. The host supplies the actual managed-key client and operational controls. |
 
-### Current `1.2.0` stable family
+### Current `1.2.x` stable family
 
-`1.2.0` is the current stable minor release for the compatible `1.x` line. It preserves the `1.0.0` and `1.1.x` contracts while formalizing additive adoption, diagnostics, testing, templates, sample, and documentation-alignment surfaces as the current package-family boundary.
+`1.2.1` is the current stable patch release for the compatible `1.x` line. It preserves the `1.0.0`, `1.1.x`, and `1.2.0` contracts while hardening release metadata, Source Link repository-commit metadata, validation guidance, workflow hygiene, and documentation wording.
 
-| Package | `1.2.0` stable role |
+| Package | `1.2.x` stable role |
 | --- | --- |
 | `CDCavell.AsiBackbone.Core` | Continues the framework-neutral governance primitive surface and durable artifact contracts from the compatible `1.x` line. |
 | `CDCavell.AsiBackbone.DependencyInjection` | Provides the explicit builder facade and host-selected provider registration composition path. |
@@ -121,6 +121,7 @@ Expected stable-line behavior:
 | `1.1.0` | `1.1.0` | `1.0.0.0` | `1.1.0.0` | `1.1.0+...` |
 | `1.1.1` | `1.1.1` | `1.0.0.0` | `1.1.1.0` | `1.1.1+...` |
 | `1.2.0` | `1.2.0` | `1.0.0.0` | `1.2.0.0` | `1.2.0+...` |
+| `1.2.1` | `1.2.1` | `1.0.0.0` | `1.2.1.0` | `1.2.1+...` |
 | `2.0.0` | `2.0.0` | `2.0.0.0` | `2.0.0.0` | `2.0.0+...` |
 
 Before cutting stable releases, release validation should verify that `AssemblyVersion`, `FileVersion`, `InformationalVersion`, package metadata, release notes, and repository tags match this policy.
@@ -135,7 +136,7 @@ Additive artifact fields are normally acceptable in a compatible minor release w
 
 ## Provider and future package guidance
 
-Released provider packages have their own stable contract within the compatible `1.x` line once they are published as stable packages. In `1.2.0`, that includes:
+Released provider packages have their own stable contract within the compatible `1.x` line once they are published as stable packages. In the current `1.2.x` line, that includes:
 
 - `CDCavell.AsiBackbone.OpenTelemetry`;
 - `CDCavell.AsiBackbone.Signing.LocalDevelopment`;
@@ -173,6 +174,7 @@ Before cutting a stable release or stable package-family expansion, the release 
 ## Related documentation
 
 - [Historical Stable API Review](stable-api-review.md)
+- [1.2.1 Release Notes](release-notes-121.md)
 - [1.2.0 Release Notes](release-notes-120.md)
 - [1.1.x Release Notes](release-notes-110.md)
 - [Upgrade Guide: 1.0.0 to 1.1.0](upgrade-100-to-110.md)

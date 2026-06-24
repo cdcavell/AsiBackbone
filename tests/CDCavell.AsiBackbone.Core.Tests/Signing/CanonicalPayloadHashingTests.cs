@@ -1,12 +1,12 @@
 using System.Text.Json;
-using CDCavell.AsiBackbone.Core.Actors;
-using CDCavell.AsiBackbone.Core.Audit;
-using CDCavell.AsiBackbone.Core.Emissions;
-using CDCavell.AsiBackbone.Core.Outbox;
-using CDCavell.AsiBackbone.Core.Signing;
+using AsiBackbone.Core.Actors;
+using AsiBackbone.Core.Audit;
+using AsiBackbone.Core.Emissions;
+using AsiBackbone.Core.Outbox;
+using AsiBackbone.Core.Signing;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.Core.Tests.Signing;
+namespace AsiBackbone.Core.Tests.Signing;
 
 public sealed class CanonicalPayloadHashingTests
 {

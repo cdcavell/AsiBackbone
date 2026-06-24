@@ -1,9 +1,9 @@
-using CDCavell.AsiBackbone.Core.Actors;
-using CDCavell.AsiBackbone.Core.Audit;
-using CDCavell.AsiBackbone.Core.Signing;
+using AsiBackbone.Core.Actors;
+using AsiBackbone.Core.Audit;
+using AsiBackbone.Core.Signing;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.Core.Tests.Signing;
+namespace AsiBackbone.Core.Tests.Signing;
 
 public sealed class SigningAbstractionsTests
 {

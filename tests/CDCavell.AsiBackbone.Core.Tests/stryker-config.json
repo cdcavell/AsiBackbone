@@ -1,7 +1,7 @@
 {
   "stryker-config": {
     "solution": "../../AsiBackbone.slnx",
-    "project": "CDCavell.AsiBackbone.Core.csproj",
+    "project": "AsiBackbone.Core.csproj",
     "target-framework": "net10.0",
     "configuration": "Release",
     "test-runner": "mtp",

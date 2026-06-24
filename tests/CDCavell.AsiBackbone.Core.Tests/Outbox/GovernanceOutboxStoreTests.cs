@@ -1,11 +1,11 @@
-using CDCavell.AsiBackbone.Core.Audit;
-using CDCavell.AsiBackbone.Core.Emissions;
-using CDCavell.AsiBackbone.Core.Outbox;
-using CDCavell.AsiBackbone.Storage.InMemory.Audit;
-using CDCavell.AsiBackbone.Storage.InMemory.Outbox;
+using AsiBackbone.Core.Audit;
+using AsiBackbone.Core.Emissions;
+using AsiBackbone.Core.Outbox;
+using AsiBackbone.Storage.InMemory.Audit;
+using AsiBackbone.Storage.InMemory.Outbox;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.Core.Tests.Outbox;
+namespace AsiBackbone.Core.Tests.Outbox;
 
 /// <summary>
 /// Tests for provider-neutral governance outbox persistence and lifecycle durability.

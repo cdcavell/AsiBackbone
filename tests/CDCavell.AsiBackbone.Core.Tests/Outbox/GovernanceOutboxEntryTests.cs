@@ -1,9 +1,9 @@
-using CDCavell.AsiBackbone.Core.Audit;
-using CDCavell.AsiBackbone.Core.Emissions;
-using CDCavell.AsiBackbone.Core.Outbox;
+using AsiBackbone.Core.Audit;
+using AsiBackbone.Core.Emissions;
+using AsiBackbone.Core.Outbox;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.Core.Tests.Outbox;
+namespace AsiBackbone.Core.Tests.Outbox;
 
 /// <summary>
 /// Focused branch tests for provider-neutral governance outbox entries.

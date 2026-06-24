@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.DependencyInjection.Tests;
+namespace AsiBackbone.DependencyInjection.Tests;
 
 public sealed class AsiBackboneServiceCollectionExtensionsTests
 {

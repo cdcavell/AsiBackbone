@@ -1,7 +1,7 @@
-using CDCavell.AsiBackbone.Core.Results;
+using AsiBackbone.Core.Results;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.Core.Tests.Results;
+namespace AsiBackbone.Core.Tests.Results;
 
 /// <summary>
 /// Unit tests for the <see cref="OperationResult{TValue}"/> class, verifying the behavior of success and failure scenarios, including value storage, reason codes, warnings, and exception handling when accessing values from failed results.

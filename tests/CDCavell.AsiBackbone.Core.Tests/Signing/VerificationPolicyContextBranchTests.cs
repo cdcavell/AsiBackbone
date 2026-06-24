@@ -1,7 +1,7 @@
-using CDCavell.AsiBackbone.Core.Signing;
+using AsiBackbone.Core.Signing;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.Core.Tests.Signing;
+namespace AsiBackbone.Core.Tests.Signing;
 
 public sealed class VerificationPolicyContextBranchTests
 {

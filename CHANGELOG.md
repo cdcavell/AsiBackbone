@@ -68,9 +68,9 @@ This release promotes post-`1.1.x` adoption, diagnostics, testing, templates, sa
 
 ### Added
 
-* Added `CDCavell.AsiBackbone.DependencyInjection` with an explicit `AddAsiBackbone(...)` builder facade for host-selected provider registration.
-* Added `CDCavell.AsiBackbone.Testing` as a test-only package for deterministic endpoint-governance harnesses, policy-result shaping, in-memory inspection, and no-signature signing seams.
-* Added `CDCavell.AsiBackbone.Templates` with `dotnet new asibackbone-webapi` scaffolding for governed ASP.NET Core hosts.
+* Added `AsiBackbone.DependencyInjection` with an explicit `AddAsiBackbone(...)` builder facade for host-selected provider registration.
+* Added `AsiBackbone.Testing` as a test-only package for deterministic endpoint-governance harnesses, policy-result shaping, in-memory inspection, and no-signature signing seams.
+* Added `AsiBackbone.Templates` with `dotnet new asibackbone-webapi` scaffolding for governed ASP.NET Core hosts.
 * Added opt-in ASP.NET Core endpoint-governance development diagnostics gated by explicit configuration and development-environment checks.
 * Added a sample-first .NET Aspire AppHost path without introducing an Aspire runtime package.
 * Added reference-deployment evidence for the Plain ASP.NET Core host sample.
@@ -121,7 +121,7 @@ This release focuses on post-`1.1.0` hardening, documentation clarity, endpoint-
 * Added optional ASP.NET Core endpoint-governance strict mode through `RequireGovernanceMetadata`.
 * Added explicit public/excluded endpoint metadata so hosts can allow known public endpoints when strict endpoint-governance mode is enabled.
 * Added `AllowMissingGovernanceMetadataAttribute` for explicit host-owned endpoint exclusions.
-* Added Core-only branch coverage enforcement with a stricter branch coverage expectation for `CDCavell.AsiBackbone.Core`.
+* Added Core-only branch coverage enforcement with a stricter branch coverage expectation for `AsiBackbone.Core`.
 * Added focused test coverage for endpoint governance route-builder behavior.
 * Added additional branch and behavior tests for capability grants, signing and verification, canonical payloads, governance emission, outbox behavior, DLP/classification policy, audit integrity, and operation/decision results.
 * Added documentation for progressive adoption, API-gating, host-owned execution, DLP/classification scanner seams, safe audit/telemetry data, outbox reliability, outbox concurrency, and terminology mapping.
@@ -171,11 +171,11 @@ This release focuses on post-`1.1.0` hardening, documentation clarity, endpoint-
 
 * Added provider-neutral governance emission contracts and envelope/result/error primitives for downstream observability and governance projection.
 * Added durable governance outbox and audit residue lifecycle surfaces so local accountability records can be preserved before provider emission is attempted.
-* Added `CDCavell.AsiBackbone.OpenTelemetry` as the first concrete governance emission provider package for projecting governance envelopes into `ActivitySource` and `Meter` diagnostics.
-* Added `CDCavell.AsiBackbone.Analyzers` as Roslyn analyzer safety rails for governance persistence and continuation flows.
+* Added `AsiBackbone.OpenTelemetry` as the first concrete governance emission provider package for projecting governance envelopes into `ActivitySource` and `Meter` diagnostics.
+* Added `AsiBackbone.Analyzers` as Roslyn analyzer safety rails for governance persistence and continuation flows.
 * Added signing-ready receipt, canonical hashing/signing, and verification-policy seams while keeping Core provider-neutral.
-* Added `CDCavell.AsiBackbone.Signing.LocalDevelopment` for local-development RSA signing and verification in tests, samples, and wiring proof paths.
-* Added `CDCavell.AsiBackbone.Signing.ManagedKey` as a provider-neutral managed-key signing adapter boundary where the host supplies the actual managed-key client and operational policy.
+* Added `AsiBackbone.Signing.LocalDevelopment` for local-development RSA signing and verification in tests, samples, and wiring proof paths.
+* Added `AsiBackbone.Signing.ManagedKey` as a provider-neutral managed-key signing adapter boundary where the host supplies the actual managed-key client and operational policy.
 * Added ASP.NET Core endpoint governance metadata and hosted outbox drain integration.
 
 ### Changed
@@ -202,7 +202,7 @@ This release focuses on post-`1.1.0` hardening, documentation clarity, endpoint-
 
 ### Added
 
-* Finalized the first stable package-family release boundary for `CDCavell.AsiBackbone.Core`, `CDCavell.AsiBackbone.Storage.InMemory`, `CDCavell.AsiBackbone.EntityFrameworkCore`, and `CDCavell.AsiBackbone.AspNetCore`.
+* Finalized the first stable package-family release boundary for `AsiBackbone.Core`, `AsiBackbone.Storage.InMemory`, `AsiBackbone.EntityFrameworkCore`, and `AsiBackbone.AspNetCore`.
 * Added release-ready metadata alignment across `Directory.Build.props`, `CITATION.cff`, `.zenodo.json`, release notes, and version-consistency validation.
 * Added schema-version stamping for durable or exported governance artifacts that require stable migration anchors.
 * Added stable package integration and external consumer smoke-test coverage to validate consumer-style package usage before publication.
@@ -364,7 +364,7 @@ This release focuses on post-`1.1.0` hardening, documentation clarity, endpoint-
 
 ### Added
 
-* Added the initial `CDCavell.AsiBackbone.AspNetCore` alpha integration package.
+* Added the initial `AsiBackbone.AspNetCore` alpha integration package.
 * Added ASP.NET Core service registration extensions through `AddAsiBackboneAspNetCore(...)`.
 * Added configurable ASP.NET Core integration options with startup validation.
 * Added an HTTP actor context adapter for resolving Core-compatible actor context from `HttpContext.User`.
@@ -417,7 +417,7 @@ This release focuses on post-`1.1.0` hardening, documentation clarity, endpoint-
 ### Fixed
 
 * Updated EF Core documentation samples to show host applications calling the extension from `OnModelCreating`.
-* Aligned EF Core documentation with the implemented `CDCavell.AsiBackbone.EntityFrameworkCore` package name.
+* Aligned EF Core documentation with the implemented `AsiBackbone.EntityFrameworkCore` package name.
 * Normalized EF Core configuration folder and file paths.
 * Updated the root README to describe the current 0.2 persistence package status.
 * Cleared the EF Core change tracker after audit ledger append failures so failed append entities do not remain tracked in the host-owned context.
@@ -458,7 +458,7 @@ This release focuses on post-`1.1.0` hardening, documentation clarity, endpoint-
 
 ### Added
 
-* Introduced the initial `CDCavell.AsiBackbone.Core` alpha package boundary.
+* Introduced the initial `AsiBackbone.Core` alpha package boundary.
 * Added framework-neutral domain primitives for governance-oriented decision flow.
 * Added actor context primitives for describing who or what is requesting an operation.
 * Added entity identity and optimistic-concurrency abstractions.

@@ -1,7 +1,7 @@
 using System.Collections;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.Core.Tests;
+namespace AsiBackbone.Core.Tests;
 
 internal static class ReadOnlyMetadataAssert
 {

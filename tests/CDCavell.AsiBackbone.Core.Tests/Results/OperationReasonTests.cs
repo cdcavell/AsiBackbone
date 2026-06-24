@@ -1,8 +1,8 @@
-using CDCavell.AsiBackbone.Core.Constraints;
-using CDCavell.AsiBackbone.Core.Results;
+using AsiBackbone.Core.Constraints;
+using AsiBackbone.Core.Results;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.Core.Tests.Results;
+namespace AsiBackbone.Core.Tests.Results;
 
 /// <summary>
 /// Unit tests for the OperationReason class, which represents the reason for an operation's success or failure.

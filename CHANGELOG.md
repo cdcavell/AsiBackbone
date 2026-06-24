@@ -4,6 +4,58 @@ All notable changes to this project are documented in this file.
 
 This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/) and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1] - 2026-06-24
+
+### Release summary
+
+`1.2.1` is a compatible patch release for the stable `1.2.x` package family.
+
+This release preserves the `1.2.0` package/API boundary while hardening release metadata, Source Link repository-commit metadata, package-signing wording, workflow hygiene, documentation alignment, and release-validation guidance. No breaking public API changes are intended.
+
+`AssemblyVersion` remains fixed at `1.0.0.0` for the compatible stable `1.x` line. Package `Version`, `FileVersion`, and `InformationalVersion` move to `1.2.1`.
+
+### Added
+
+* Added Source Link metadata support across package projects and samples so generated packages can include repository commit metadata when built with Source Link enabled.
+* Added `scripts/Validate-Source-Link-commit-metadata.ps1` for post-publish validation of NuGet repository metadata and Source Link commit metadata.
+* Added `1.2.1` release notes and a dedicated `1.2.1` release readiness record.
+* Added explicit .NET Foundation Code of Conduct alignment wording.
+
+### Changed
+
+* Promoted central package version metadata from `1.2.0` to `1.2.1` while preserving `AssemblyVersion` as `1.0.0.0` for the compatible `1.x` line.
+* Updated `CITATION.cff` and `.zenodo.json` for the `1.2.1` release.
+* Updated README, documentation home, article index, table of contents, release validation, API compatibility / SemVer guidance, template package documentation, and quality posture for the `1.2.1` package family.
+* Updated package-signing wording to clarify that current NuGet packages are not signed release artifacts from the project maintainer.
+* Updated the Source Link validation script default package version to `1.2.1`.
+* Refreshed GitHub Actions checkout usage to `actions/checkout` `v7.0.0`.
+* Normalized GitHub workflow YAML files to LF line endings to prevent repeated local modification noise after checkout or hard reset.
+
+### Fixed
+
+* Hardened release-validation documentation so generated NuGet metadata and post-publish Source Link metadata checks are called out explicitly.
+* Clarified `1.2.1` as a patch release on the `1.2.0` minor-release boundary rather than a new package/API expansion.
+* Preserved bounded project language around Accountable Systems Infrastructure, host-owned execution, package-signing status, and non-claims.
+
+### Validation
+
+* Release-candidate validation is expected to pass through CI, Stable Release Validation, package metadata validation, template package smoke validation, external consumer smoke tests, stable package integration smoke tests, and DocFX build before tagging.
+* Version-consistency validation should pass for `1.2.1`, including `Directory.Build.props`, `CITATION.cff`, `.zenodo.json`, optional tag `v1.2.1`, and generated package filenames when package artifacts are supplied.
+* After packages are published and visible on NuGet, Source Link repository commit metadata should be validated with:
+
+```powershell
+./scripts/Validate-Source-Link-commit-metadata.ps1 -Version 1.2.1
+```
+
+### Compatibility notes
+
+* Existing stable `1.2.0` consumers should be able to upgrade to `1.2.1` without required source-code changes.
+* `1.2.1` is a patch release focused on release readiness, package metadata, Source Link validation, workflow hygiene, documentation, and implementation hardening.
+* `AssemblyVersion` remains `1.0.0.0` for the compatible stable `1.x` line.
+* `FileVersion` should be updated to `1.2.1.0`.
+* Package `Version` and `InformationalVersion` should be updated to `1.2.1`.
+* Event Hubs, Purview, Azure-specific SDK adapters, robotics, immutable-storage, and additional provider packages remain outside the stable package contract unless separately reviewed and released.
+
 ## [1.2.0] - 2026-06-20
 
 ### Release summary

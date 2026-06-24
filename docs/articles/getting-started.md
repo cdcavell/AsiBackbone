@@ -2,7 +2,7 @@
 
 This guide explains the current direction of the AsiBackbone repository and how to begin working with the project.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a stable `1.1.0` .NET package family for governance-oriented decision flow. The foundation package is `CDCavell.AsiBackbone.Core`, with optional integration packages for in-memory validation, EF Core host-owned persistence, ASP.NET Core host integration, analyzer guidance, OpenTelemetry projection, and signing-provider boundaries.
+In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a stable `1.2.x` .NET package family for governance-oriented decision flow. The foundation package is `CDCavell.AsiBackbone.Core`, with optional integration packages for in-memory validation, EF Core host-owned persistence, ASP.NET Core host integration, analyzer guidance, OpenTelemetry projection, and signing-provider boundaries.
 
 > [!IMPORTANT]
 > This project does not implement artificial superintelligence. It provides Accountable Systems Infrastructure: governance-oriented software building blocks inspired by broader Backbone framework concepts.
@@ -11,13 +11,16 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 
 The repository includes the Core foundation and optional packages for in-memory validation, EF Core host-owned persistence, ASP.NET Core host integration, Roslyn analyzer safety rails, OpenTelemetry governance emission, local-development signing, and managed-key signing adapter wiring.
 
-The stable `1.1.0` package lineup is:
+The stable `1.2.1` package lineup is:
 
 ```text
 CDCavell.AsiBackbone.Core
+CDCavell.AsiBackbone.DependencyInjection
 CDCavell.AsiBackbone.Storage.InMemory
 CDCavell.AsiBackbone.EntityFrameworkCore
 CDCavell.AsiBackbone.AspNetCore
+CDCavell.AsiBackbone.Testing
+CDCavell.AsiBackbone.Templates
 CDCavell.AsiBackbone.Analyzers
 CDCavell.AsiBackbone.OpenTelemetry
 CDCavell.AsiBackbone.Signing.LocalDevelopment
@@ -252,7 +255,7 @@ Examples should focus on safe software scenarios first:
 * Administrative workflow execution
 * Simulated command validation
 
-Robotics and physical execution should remain later-stage examples after the core governance pattern is stable.
+Robotics and physical execution should remain future, sample-only, or separately reviewed provider scenarios unless a later stable release explicitly ships them as part of the package family.
 
 ## Current packages
 
@@ -324,6 +327,24 @@ It is not a production managed-key provider and does not provide protected key c
 
 The host supplies the actual managed-key client, credentials, key operations, monitoring, verification path, and operational policy. The package does not include live Azure Key Vault, Managed HSM, cloud KMS, HSM, or certificate-store implementation by default.
 
+## CDCavell.AsiBackbone.DependencyInjection
+
+`CDCavell.AsiBackbone.DependencyInjection` provides the shared `AddAsiBackbone(...)` builder facade for host-selected provider registration.
+
+It coordinates package registration without making Core own infrastructure, persistence, web hosting, telemetry exporters, signing providers, or execution behavior.
+
+## CDCavell.AsiBackbone.Testing
+
+`CDCavell.AsiBackbone.Testing` provides test-only helpers for deterministic governance and package-wiring validation.
+
+It is intended for tests, smoke checks, and package-consumer validation. It is not runtime enforcement and should not be treated as production governance infrastructure by itself.
+
+## CDCavell.AsiBackbone.Templates
+
+`CDCavell.AsiBackbone.Templates` provides `dotnet new` templates for generating governed ASP.NET Core host scaffolds.
+
+The templates are developer-experience scaffolding. They are not runtime dependencies and do not replace host-owned architecture, security, persistence, deployment, or operational review.
+
 ## Planned package areas
 
 Future package areas may include:
@@ -333,7 +354,7 @@ Future package areas may include:
 * `CDCavell.AsiBackbone.Robotics`
 * `CDCavell.AsiBackbone.ImmutableStorage`
 
-Planned package names are not part of the `1.1.0` stable contract unless a future release explicitly ships them as stable packages.
+Planned package names are not part of the current `1.2.x` stable contract unless a future release explicitly ships them as stable packages.
 
 ## Relationship to NetCoreApplicationTemplate
 

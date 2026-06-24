@@ -1,6 +1,6 @@
 # Progressive Adoption Ladder
 
-This guide shows the smallest useful way to adopt AsiBackbone first, then how to add `1.1.0` capabilities only when a host actually needs them.
+This guide shows the smallest useful way to adopt AsiBackbone first, then how to add current `1.2.x` capabilities only when a host actually needs them.
 
 Issue: #285.
 
@@ -17,7 +17,7 @@ Most new users should start with one of these paths:
 | --- | --- | --- |
 | Understand the absolute Core-only decision shape | This page, [Level 1](#level-1-core-decision-pipeline-only) | `CDCavell.AsiBackbone.Core` |
 | Gate one ASP.NET Core endpoint and inspect audit residue locally | [First 15 Minutes: Standard API Gating](quickstart-api-gating.md) | `Core`, `AspNetCore`, `Storage.InMemory` |
-| Upgrade an existing `1.0.0` consumer without adopting new `1.1.0` features | [Upgrade Guide: 1.0.0 to 1.1.0](upgrade-100-to-110.md) | Existing stable packages only |
+| Upgrade an existing `1.0.0` consumer through the `1.1.x` transition before adopting later `1.2.x` capabilities | [Upgrade Guide: 1.0.0 to 1.1.0](upgrade-100-to-110.md) | Existing stable packages only |
 
 Everything else is an add-on.
 
@@ -29,7 +29,7 @@ Everything else is an add-on.
 | 2 | Acknowledgment / handshake and audit residue | You need a human/system responsibility checkpoint or local decision evidence. | `Core`; optionally `Storage.InMemory` for samples/tests |
 | 3 | Durable audit and outbox persistence | Governance records must survive restarts, provider outages, or retries. | `Core`, `EntityFrameworkCore` or a host-owned store |
 | 4 | Hosted drain worker and provider emission | You want local outbox entries delivered to a provider after local persistence. | `Core`, `AspNetCore`, durable store, one emitter |
-| 5 | OpenTelemetry / Azure Monitor / Purview-style integration | You want dashboards, diagnostics, alerting, or governance enrichment downstream. | `OpenTelemetry` for released provider projection; host OpenTelemetry exporters; Purview remains strategy-only in `1.1.0` |
+| 5 | OpenTelemetry / Azure Monitor / Purview-style integration | You want dashboards, diagnostics, alerting, or governance enrichment downstream. | `OpenTelemetry` for released provider projection; host OpenTelemetry exporters; Purview remains strategy-only in the current `1.2.x` package family |
 | 6 | Signing-ready or managed-key host integration | You need signed or verified governance artifacts and have key-management responsibilities defined. | `Core`, `Signing.LocalDevelopment` for local proof paths, `Signing.ManagedKey` for host-owned managed-key clients |
 
 Cross-cutting add-ons:
@@ -203,7 +203,7 @@ Start with:
 - [Observability and Governance Emission Architecture](observability-and-governance-emission-architecture.md)
 - [Strategy-Only: Purview Governance and Lineage Enrichment](purview-governance-lineage-enrichment-strategy.md)
 
-In `1.1.0`, OpenTelemetry is the concrete released governance emission provider. Azure Monitor is reached through host-configured OpenTelemetry exporters. Purview remains strategy-only unless a future release ships a concrete provider package.
+In the current `1.2.x` package family, OpenTelemetry is the concrete released governance emission provider. Azure Monitor is reached through host-configured OpenTelemetry exporters. Purview remains strategy-only unless a future release ships a concrete provider package.
 
 ## Level 6: signing-ready or managed-key host integration
 
@@ -257,7 +257,7 @@ After that works, choose the next level deliberately.
 
 - [First 15 Minutes: Standard API Gating](quickstart-api-gating.md)
 - [Getting Started](getting-started.md)
-- [Upgrade Guide: 1.0.0 to 1.1.0](upgrade-100-to-110.md)
+- [Historical Upgrade Guide: 1.0.0 to 1.1.0](upgrade-100-to-110.md)
 - [Policy Evaluator Pipeline](policy-evaluator-pipeline.md)
 - [Durable Audit and Outbox Persistence](durable-audit-outbox-persistence.md)
 - [Hosted Governance Outbox Drain](hosted-governance-outbox-drain.md)

@@ -3,7 +3,7 @@
 This document preserves the readiness review for `CDCavell.AsiBackbone.Core` before the `0.1.0-alpha.1` milestone was completed.
 
 > [!NOTE]
-> This page is an archived design and readiness record. It is retained to explain early Core package boundary decisions, not to describe the current stable release posture. Current stable guidance is documented in [1.1.0 Release Notes](release-notes-110.md), [API Compatibility and Semantic Versioning](api-compatibility-and-semver.md), and [Historical Stable API Review](stable-api-review.md).
+> This page is an archived design and readiness record. It is retained to explain early Core package boundary decisions, not to describe the current stable release posture. Current stable package guidance is documented in [1.2.1 Release Notes](release-notes-121.md), [API Compatibility and Semantic Versioning](api-compatibility-and-semver.md), and [Historical Stable API Review](stable-api-review.md).
 
 ## Historical review scope
 
@@ -172,7 +172,9 @@ Historical review status: Pending stable release review at the time this alpha d
 
 For current stable documentation, use:
 
-- [1.1.0 Release Notes](release-notes-110.md)
+- [1.2.1 Release Notes](release-notes-121.md)
+- [1.2.0 Release Notes](release-notes-120.md)
+- [1.1.x Release Notes](release-notes-110.md)
 - [API Compatibility and Semantic Versioning](api-compatibility-and-semver.md)
 - [Historical Stable API Review](stable-api-review.md)
 - [Schema Versioning](schema-versioning.md)

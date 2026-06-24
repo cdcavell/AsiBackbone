@@ -2,7 +2,7 @@
 
 This review records the public API review for the initial stable AsiBackbone package family before the `1.0.0` surface was established. It is retained as a historical API-shape baseline for the compatible `1.x` line.
 
-The current released stable package family is documented in [1.1.0 Release Notes](release-notes-110.md). The expanded `1.1.0` package family added stable analyzer, OpenTelemetry, and signing-provider packages while preserving the original `1.0.0` package compatibility promise. Future stable packages or public API expansions should continue to use release validation, package-boundary review, and follow-up API review notes when needed.
+The current released stable package family is documented in [1.2.1 Release Notes](release-notes-121.md). The current `1.2.1` package family carries forward the stable analyzer, OpenTelemetry, and signing-provider packages reviewed in the `1.1.0` addendum, while preserving the original `1.0.0` package compatibility promise. Future stable packages or public API expansions should continue to use release validation, package-boundary review, and follow-up API review notes when needed.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. This review is limited to implemented .NET package APIs and does not treat AsiBackbone as an artificial superintelligence implementation, AI model host, legal/compliance guarantee, or robot controller.
 
@@ -43,6 +43,14 @@ The `1.1.0` stable package family is an additive compatible expansion over the `
 | `CDCavell.AsiBackbone.Signing.ManagedKey` | Provides a managed-key signing adapter boundary. | Stable adapter boundary. The host supplies the managed-key client, credentials, key operations, monitoring, verification plan, and operational policy. |
 
 The `1.1.0` addendum does not bring future Event Hubs, Purview, Azure-specific SDK adapters, robotics, immutable storage, external anchoring, Azure Key Vault-specific implementation packages, HSM-specific implementation packages, or other future providers into the stable contract. Those must complete their own review before being documented as stable packages.
+
+## `1.2.x` current package-family note
+
+The current `1.2.x` package family carries forward the `1.0.0` stable baseline and the `1.1.0` additive package-family expansion.
+
+Additional current package surfaces such as `CDCavell.AsiBackbone.DependencyInjection`, `CDCavell.AsiBackbone.Testing`, and `CDCavell.AsiBackbone.Templates` should be treated as stable only within the release lines where they are explicitly documented, validated, and released.
+
+This historical API review remains the baseline record for the initial stable API shape and the `1.1.0` addendum, while current package status should be read from the `1.2.1` release documentation.
 
 ## Public naming review
 
@@ -86,7 +94,7 @@ The stale `CDCavell.AsiBackbone.Core.Tokens` reference from the historical revie
 
 ## Dependency direction review
 
-The dependency direction was acceptable for the initial stable package family and remains the rule for `1.1.0` provider additions:
+The dependency direction was acceptable for the initial stable package family and remains the rule for compatible `1.x` package additions:
 
 ```text
 CDCavell.AsiBackbone.Core
@@ -178,7 +186,7 @@ The following were not required before `1.0.0`, but should remain visible for la
 - consider adding upgrade notes if any later provider package introduces stable serialized artifacts;
 - keep release notes and package READMEs aligned when new stable packages are added.
 
-For the post-`1.1.0` line, future Event Hubs, Purview, Azure-specific SDK adapters, robotics, immutable-storage, timestamping, or external-anchoring packages should remain design-only, strategy-only, preview, or sample-only until they complete their own stable package review.
+For future release lines, Event Hubs, Purview, Azure-specific SDK adapters, robotics, immutable-storage, timestamping, or external-anchoring packages should remain design-only, strategy-only, preview, or sample-only until they complete their own stable package review.
 
 ## Release decision
 
@@ -190,9 +198,11 @@ This review does not replace CI, tests, package smoke validation, DocFX validati
 
 ## Related documentation
 
-- [1.1.0 Release Notes](release-notes-110.md)
+- [1.2.1 Release Notes](release-notes-121.md)
+- [1.2.0 Release Notes](release-notes-120.md)
+- [1.1.x Release Notes](release-notes-110.md)
 - [API Compatibility and SemVer](api-compatibility-and-semver.md)
-- [Upgrade Guide: 1.0.0 to 1.1.0](upgrade-100-to-110.md)
+- [Historical Upgrade Guide: 1.0.0 to 1.1.0](upgrade-100-to-110.md)
 - [Release Validation](release-validation.md)
 - [API Baseline and Architecture Boundary Checks](api-baseline-and-boundary-checks.md)
 - [Schema Versioning](schema-versioning.md)

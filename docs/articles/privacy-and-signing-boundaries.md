@@ -1,21 +1,21 @@
-# Privacy and Signing Boundaries
+# Privacy, Metadata, and Signing Boundaries
 
-This article documents the `1.0.0` release boundary for metadata privacy, identifier handling, signing-ready fields, host responsibilities, and later provider work.
+This article documents the current `1.2.x` stable boundary for metadata privacy, identifier handling, signing-ready fields, released signing providers, host responsibilities, and future provider work.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone provides governance-oriented software building blocks. It does not provide legal, compliance, privacy, security, or cryptographic guarantees by itself.
 
 > [!IMPORTANT]
-> The `1.0.0` package family is signing-ready in shape, but it does not implement a signing provider, key-management provider, tamper-evident ledger, privacy classifier, or compliance system.
+> The current `1.2.x` package family includes signing-ready Core metadata, released local-development signing, and a managed-key adapter boundary. These surfaces do not provide production key custody, tamper-evidence, immutable storage, privacy classification, legal non-repudiation, or compliance certification by themselves.
 
-## `1.0.0` boundary summary
+## Current `1.2.x` boundary summary
 
-The initial stable release focuses on explicit governance records and host-owned integration seams.
+The current stable package family focuses on explicit governance records, host-owned integration seams, released local-development signing, managed-key adapter boundaries, provider-neutral emission, and optional provider projection.
 
-| Area | `1.0.0` behavior | Not included in `1.0.0` |
+| Area | Current `1.2.x` behavior | Still not provided by default |
 | --- | --- | --- |
 | Metadata | Host-provided dictionaries and values can flow into contexts, decisions, audit residue, and ledger records. | Automatic classification, redaction, encryption, tokenization, or privacy scanning. |
 | Identifiers | Correlation IDs, trace IDs, event IDs, record IDs, actor IDs, policy versions, and policy hashes are available for linking records. | Automatic pseudonymization, identity-proofing, cross-system identity governance, or secret handling. |
-| Signing-ready fields | Records include fields such as policy version, policy hash, schema version, timestamps, correlation IDs, and record IDs that can support later signing. | Built-in cryptographic signing, signature verification, key rotation, certificate policy, or non-repudiation guarantees. |
+| Signing and verification boundaries | Core records can carry signing-ready metadata and canonical hashing inputs. Released local-development signing and managed-key adapter packages support test/sample signing and host-owned managed-key integration. | Production key custody, automatic key rotation, concrete Azure Key Vault/HSM/KMS implementation, immutable storage, tamper-evidence, legal non-repudiation, or compliance guarantees. |
 | Persistence | EF Core integration supports host-owned persistence through the host application database. | Package-owned database lifecycle, retention policy, encryption-at-rest enforcement, backup policy, or immutable storage. |
 | Audit | Audit residue and ledger records make decision flow easier to inspect. | Tamper-evidence, regulatory audit certification, legal evidence guarantees, or automated compliance approval. |
 
@@ -74,28 +74,15 @@ Host guidance:
 - Treat correlation and trace identifiers as operational data that may appear in logs.
 - Keep tenant, jurisdiction, and resource identifiers no more specific than the decision requires.
 
-## Signing-ready does not mean signed
+## Signing-ready, local-development signing, and managed-key boundaries
 
-The `1.0.0` model includes fields that are useful for future signing and verification workflows. Examples include policy version, policy hash, schema version, event ID, record ID, timestamp, correlation ID, and trace ID.
+The current `1.2.x` package family separates signing-related behavior into explicit boundaries:
 
-Those fields make records easier to bind together later, but they do not create cryptographic protection by themselves.
+- Core records may carry signing-ready metadata and canonical hashing inputs.
+- `CDCavell.AsiBackbone.Signing.LocalDevelopment` provides local/test/sample signing and verification proof paths.
+- `CDCavell.AsiBackbone.Signing.ManagedKey` provides a provider-neutral adapter boundary for host-owned managed-key clients.
 
-Do not describe a `1.0.0` audit record as:
-
-- cryptographically signed;
-- tamper-proof;
-- tamper-evident;
-- immutable;
-- non-repudiable;
-- legally certified;
-- compliance-approved.
-
-Accurate `1.0.0` wording:
-
-- signing-ready fields are present;
-- records are structured for future signing providers;
-- durable records can carry schema and policy version information;
-- hosts may apply their own signing, hashing, immutable storage, or retention controls outside the package.
+These surfaces do not make audit records tamper-evident, immutable, legally non-repudiable, or compliance-certified by default.
 
 ## Host responsibilities
 
@@ -156,20 +143,11 @@ The ASP.NET Core package does not own:
 
 The host must decide which requests are allowed to reach AsiBackbone and which actors may view or act on decisions and audit records.
 
-## Later provider work
+## Released, host-owned, and future provider work
 
-Later `1.1.0` or preview provider packages may add specialized implementations, such as:
+The current `1.2.x` stable package family includes released provider or provider-adjacent surfaces for OpenTelemetry governance emission, local-development signing, and managed-key signing adapter boundaries.
 
-- signing providers;
-- key-management adapters;
-- external immutable ledger adapters;
-- outbox and external emission patterns;
-- cloud observability enrichment;
-- governance catalog or lineage enrichment;
-- privacy review hooks;
-- gateway-specific providers.
-
-Those providers are outside the `1.0.0` stable boundary unless they complete their own stable API review and are explicitly released as stable packages.
+Other provider areas remain host-owned, strategy-only, design-only, sample-only, preview, or future-provider work unless a later stable release explicitly ships them.
 
 Future provider documentation should state whether a provider is:
 
@@ -181,20 +159,26 @@ Future provider documentation should state whether a provider is:
 
 ## Release wording checklist
 
-Use this checklist when preparing `1.0.0` release notes or docs:
+Use this checklist when preparing current stable release notes or documentation:
 
 - State that AsiBackbone provides Accountable Systems Infrastructure, not artificial superintelligence.
 - State that metadata is host-owned.
 - State that hosts must classify, minimize, redact, or omit sensitive metadata before passing it into package APIs.
-- State that signing-ready fields are present, but built-in signing is future provider work.
+- State that signing-ready fields, local-development signing, and managed-key adapter boundaries are available where released, but production key custody, tamper-evidence, immutability, legal non-repudiation, and compliance certification remain host-owned.
 - Avoid claims of tamper-evidence unless signing or immutable storage is actually implemented and documented.
 - Avoid claims of regulatory compliance or legal non-repudiation.
-- Keep provider, cloud, signing, outbox, and gateway behavior separate from the `1.0.0` stable package boundary unless explicitly released as stable.
+- Keep provider, cloud, signing, outbox, and gateway behavior separate from the current stable package boundary unless explicitly released as stable.
 
 ## Related documentation
 
-- [1.0.0 Quickstart](quickstart-100.md)
+- [1.2.1 Release Notes](release-notes-121.md)
+- [Production Wording and Stable Signing Boundaries](production-wording-and-alpha-limitations.md)
+- [Signing-Ready Receipts and Key Handling](signing-ready-receipts-and-key-handling.md)
+- [Signing Provider Package Boundary](signing-provider-package-boundary.md)
+- [Managed-Key Signing Provider](managed-key-signing-provider.md)
+- [Cryptographic Security Posture and Production Guidance](cryptographic-security-posture.md)
 - [API Compatibility and SemVer](api-compatibility-and-semver.md)
 - [Schema Versioning](schema-versioning.md)
 - [EF Core Host Ownership and Migrations](ef-core-host-ownership-and-migrations.md)
 - [ASP.NET Core Integration Boundary](aspnetcore-integration-boundary.md)
+- [Historical 1.0.0 Quickstart](quickstart-100.md)

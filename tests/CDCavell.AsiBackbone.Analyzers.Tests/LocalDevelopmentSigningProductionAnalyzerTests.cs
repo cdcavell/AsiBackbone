@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.Analyzers.Tests;
+namespace AsiBackbone.Analyzers.Tests;
 
 public sealed class LocalDevelopmentSigningProductionAnalyzerTests
 {
@@ -122,7 +122,7 @@ public sealed class LocalDevelopmentSigningProductionAnalyzerTests
 
         return $$"""
             using System;
-            using CDCavell.AsiBackbone.Signing.LocalDevelopment;
+            using AsiBackbone.Signing.LocalDevelopment;
             using Microsoft.Extensions.DependencyInjection;
             using Microsoft.Extensions.Hosting;
 
@@ -131,7 +131,7 @@ public sealed class LocalDevelopmentSigningProductionAnalyzerTests
 
             {{configureCode}}
 
-            namespace CDCavell.AsiBackbone.Signing.LocalDevelopment
+            namespace AsiBackbone.Signing.LocalDevelopment
             {
                 public sealed class LocalDevelopmentSigningService
                 {

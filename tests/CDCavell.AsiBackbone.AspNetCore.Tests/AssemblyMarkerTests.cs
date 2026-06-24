@@ -1,6 +1,6 @@
 using Xunit;
 
-namespace CDCavell.AsiBackbone.AspNetCore.Tests;
+namespace AsiBackbone.AspNetCore.Tests;
 
 public sealed class AssemblyMarkerTests
 {

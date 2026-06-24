@@ -1,14 +1,14 @@
-using CDCavell.AsiBackbone.AspNetCore.Actors;
-using CDCavell.AsiBackbone.AspNetCore.Correlation;
-using CDCavell.AsiBackbone.AspNetCore.DependencyInjection;
-using CDCavell.AsiBackbone.AspNetCore.Handshakes;
-using CDCavell.AsiBackbone.AspNetCore.Results;
+using AsiBackbone.AspNetCore.Actors;
+using AsiBackbone.AspNetCore.Correlation;
+using AsiBackbone.AspNetCore.DependencyInjection;
+using AsiBackbone.AspNetCore.Handshakes;
+using AsiBackbone.AspNetCore.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.AspNetCore.Tests.DependencyInjection;
+namespace AsiBackbone.AspNetCore.Tests.DependencyInjection;
 
 public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
 {

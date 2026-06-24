@@ -1,7 +1,7 @@
-using CDCavell.AsiBackbone.AspNetCore.DependencyInjection;
+using AsiBackbone.AspNetCore.DependencyInjection;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.AspNetCore.Tests.DependencyInjection;
+namespace AsiBackbone.AspNetCore.Tests.DependencyInjection;
 
 public sealed class AsiBackboneAspNetCoreOptionsBranchTests
 {

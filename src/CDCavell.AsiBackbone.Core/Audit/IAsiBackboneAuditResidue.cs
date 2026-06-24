@@ -1,7 +1,7 @@
-using CDCavell.AsiBackbone.Core.Actors;
-using CDCavell.AsiBackbone.Core.Serialization;
+using AsiBackbone.Core.Actors;
+using AsiBackbone.Core.Serialization;
 
-namespace CDCavell.AsiBackbone.Core.Audit;
+namespace AsiBackbone.Core.Audit;
 
 /// <summary>
 /// Defines the framework-neutral audit residue produced by an AsiBackbone operation.

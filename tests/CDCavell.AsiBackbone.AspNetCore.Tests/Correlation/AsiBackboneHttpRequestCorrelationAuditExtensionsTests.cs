@@ -1,11 +1,11 @@
-using CDCavell.AsiBackbone.AspNetCore.Correlation;
-using CDCavell.AsiBackbone.Core.Actors;
-using CDCavell.AsiBackbone.Core.Audit;
-using CDCavell.AsiBackbone.Core.Constraints;
-using CDCavell.AsiBackbone.Core.Decisions;
+using AsiBackbone.AspNetCore.Correlation;
+using AsiBackbone.Core.Actors;
+using AsiBackbone.Core.Audit;
+using AsiBackbone.Core.Constraints;
+using AsiBackbone.Core.Decisions;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.AspNetCore.Tests.Correlation;
+namespace AsiBackbone.AspNetCore.Tests.Correlation;
 
 public sealed class AsiBackboneHttpRequestCorrelationAuditExtensionsTests
 {

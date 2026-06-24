@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.Analyzers.Tests;
+namespace AsiBackbone.Analyzers.Tests;
 
 public sealed class GovernanceArtifactPersistenceAnalyzerTests
 {
@@ -44,7 +44,7 @@ public sealed class GovernanceArtifactPersistenceAnalyzerTests
     public async Task ReturnedGovernanceDecisionDoesNotReport()
     {
         string source = """
-            using CDCavell.AsiBackbone.Core.Decisions;
+            using AsiBackbone.Core.Decisions;
 
             public static class Sample
             {
@@ -54,7 +54,7 @@ public sealed class GovernanceArtifactPersistenceAnalyzerTests
                 }
             }
 
-            namespace CDCavell.AsiBackbone.Core.Decisions
+            namespace AsiBackbone.Core.Decisions
             {
                 public sealed class GovernanceDecision
                 {
@@ -73,7 +73,7 @@ public sealed class GovernanceArtifactPersistenceAnalyzerTests
     {
         string source = """
             using System.Threading.Tasks;
-            using CDCavell.AsiBackbone.Core.Decisions;
+            using AsiBackbone.Core.Decisions;
 
             public static class Sample
             {
@@ -83,7 +83,7 @@ public sealed class GovernanceArtifactPersistenceAnalyzerTests
                 }
             }
 
-            namespace CDCavell.AsiBackbone.Core.Decisions
+            namespace AsiBackbone.Core.Decisions
             {
                 public sealed class GovernanceDecision
                 {
@@ -102,8 +102,8 @@ public sealed class GovernanceArtifactPersistenceAnalyzerTests
     public async Task OperationResultOfGovernanceDecisionReportsASIB001()
     {
         string source = """
-            using CDCavell.AsiBackbone.Core.Decisions;
-            using CDCavell.AsiBackbone.Core.Results;
+            using AsiBackbone.Core.Decisions;
+            using AsiBackbone.Core.Results;
 
             public static class Sample
             {
@@ -113,7 +113,7 @@ public sealed class GovernanceArtifactPersistenceAnalyzerTests
                 }
             }
 
-            namespace CDCavell.AsiBackbone.Core.Decisions
+            namespace AsiBackbone.Core.Decisions
             {
                 public sealed class GovernanceDecision
                 {
@@ -121,7 +121,7 @@ public sealed class GovernanceArtifactPersistenceAnalyzerTests
                 }
             }
 
-            namespace CDCavell.AsiBackbone.Core.Results
+            namespace AsiBackbone.Core.Results
             {
                 public sealed class OperationResult<T>
                 {
@@ -141,7 +141,7 @@ public sealed class GovernanceArtifactPersistenceAnalyzerTests
     {
         string source = """
             using System;
-            using CDCavell.AsiBackbone.Core.Decisions;
+            using AsiBackbone.Core.Decisions;
 
             [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
             internal sealed class AsiBackbonePersistenceHandledAttribute : Attribute;
@@ -155,7 +155,7 @@ public sealed class GovernanceArtifactPersistenceAnalyzerTests
                 }
             }
 
-            namespace CDCavell.AsiBackbone.Core.Decisions
+            namespace AsiBackbone.Core.Decisions
             {
                 public sealed class GovernanceDecision
                 {
@@ -172,7 +172,7 @@ public sealed class GovernanceArtifactPersistenceAnalyzerTests
     private static string SourceWithBody(string body)
     {
         return $$"""
-            using CDCavell.AsiBackbone.Core.Decisions;
+            using AsiBackbone.Core.Decisions;
 
             public static class Sample
             {
@@ -182,7 +182,7 @@ public sealed class GovernanceArtifactPersistenceAnalyzerTests
                 }
             }
 
-            namespace CDCavell.AsiBackbone.Core.Decisions
+            namespace AsiBackbone.Core.Decisions
             {
                 public sealed class GovernanceDecision
                 {

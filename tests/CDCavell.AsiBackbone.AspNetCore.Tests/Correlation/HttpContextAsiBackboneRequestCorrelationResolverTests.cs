@@ -1,12 +1,12 @@
-using CDCavell.AsiBackbone.AspNetCore.Correlation;
-using CDCavell.AsiBackbone.AspNetCore.DependencyInjection;
+using AsiBackbone.AspNetCore.Correlation;
+using AsiBackbone.AspNetCore.DependencyInjection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Patterns;
 using Microsoft.Extensions.Options;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.AspNetCore.Tests.Correlation;
+namespace AsiBackbone.AspNetCore.Tests.Correlation;
 
 public sealed class HttpContextAsiBackboneRequestCorrelationResolverTests
 {

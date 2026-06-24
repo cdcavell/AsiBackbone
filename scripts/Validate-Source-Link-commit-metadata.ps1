@@ -20,17 +20,17 @@ $ErrorActionPreference = 'Stop'
 $expectedRepositoryUrl = 'https://github.com/cdcavell/AsiBackbone'
 
 $packageIds = @(
-    'CDCavell.AsiBackbone.Core',
-    'CDCavell.AsiBackbone.DependencyInjection',
-    'CDCavell.AsiBackbone.Storage.InMemory',
-    'CDCavell.AsiBackbone.EntityFrameworkCore',
-    'CDCavell.AsiBackbone.AspNetCore',
-    'CDCavell.AsiBackbone.Testing',
-    'CDCavell.AsiBackbone.Templates',
-    'CDCavell.AsiBackbone.Analyzers',
-    'CDCavell.AsiBackbone.OpenTelemetry',
-    'CDCavell.AsiBackbone.Signing.LocalDevelopment',
-    'CDCavell.AsiBackbone.Signing.ManagedKey'
+    'AsiBackbone.Core',
+    'AsiBackbone.DependencyInjection',
+    'AsiBackbone.Storage.InMemory',
+    'AsiBackbone.EntityFrameworkCore',
+    'AsiBackbone.AspNetCore',
+    'AsiBackbone.Testing',
+    'AsiBackbone.Templates',
+    'AsiBackbone.Analyzers',
+    'AsiBackbone.OpenTelemetry',
+    'AsiBackbone.Signing.LocalDevelopment',
+    'AsiBackbone.Signing.ManagedKey'
 )
 
 $workRoot = Join-Path $PWD "nuget-sourcelink-check-$Version"

@@ -1,11 +1,11 @@
 using System.Reflection;
-using CDCavell.AsiBackbone.AspNetCore.Endpoints;
+using AsiBackbone.AspNetCore.Endpoints;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Patterns;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.AspNetCore.Tests.Endpoints;
+namespace AsiBackbone.AspNetCore.Tests.Endpoints;
 
 public sealed class AsiBackboneEndpointGovernanceRouteBuilderExtensionsTests
 {

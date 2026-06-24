@@ -35,7 +35,7 @@ to_dotnet_path() {
 
 package_output="$(to_dotnet_path "$(make_absolute_path "$package_output")")"
 
-core_project="$repo_root/src/CDCavell.AsiBackbone.Core/CDCavell.AsiBackbone.Core.csproj"
+core_project="$repo_root/src/AsiBackbone.Core/AsiBackbone.Core.csproj"
 package_version="${SMOKE_PACKAGE_VERSION:-$(dotnet msbuild "$core_project" -getProperty:Version -nologo | tr -d '\r' | awk 'NF { print; exit }')}"
 
 if [ -z "$package_version" ]; then
@@ -92,14 +92,14 @@ if [ -z "$ef_sqlite_version" ] || [ -z "$sqlitepclraw_version" ]; then
   exit 1
 fi
 
-dotnet add "$smoke_project" package CDCavell.AsiBackbone.Core --version "$package_version"
-dotnet add "$smoke_project" package CDCavell.AsiBackbone.AspNetCore --version "$package_version"
-dotnet add "$smoke_project" package CDCavell.AsiBackbone.EntityFrameworkCore --version "$package_version"
-dotnet add "$smoke_project" package CDCavell.AsiBackbone.Storage.InMemory --version "$package_version"
-dotnet add "$smoke_project" package CDCavell.AsiBackbone.Analyzers --version "$package_version"
-dotnet add "$smoke_project" package CDCavell.AsiBackbone.OpenTelemetry --version "$package_version"
-dotnet add "$smoke_project" package CDCavell.AsiBackbone.Signing.LocalDevelopment --version "$package_version"
-dotnet add "$smoke_project" package CDCavell.AsiBackbone.Signing.ManagedKey --version "$package_version"
+dotnet add "$smoke_project" package AsiBackbone.Core --version "$package_version"
+dotnet add "$smoke_project" package AsiBackbone.AspNetCore --version "$package_version"
+dotnet add "$smoke_project" package AsiBackbone.EntityFrameworkCore --version "$package_version"
+dotnet add "$smoke_project" package AsiBackbone.Storage.InMemory --version "$package_version"
+dotnet add "$smoke_project" package AsiBackbone.Analyzers --version "$package_version"
+dotnet add "$smoke_project" package AsiBackbone.OpenTelemetry --version "$package_version"
+dotnet add "$smoke_project" package AsiBackbone.Signing.LocalDevelopment --version "$package_version"
+dotnet add "$smoke_project" package AsiBackbone.Signing.ManagedKey --version "$package_version"
 dotnet add "$smoke_project" package Microsoft.AspNetCore.TestHost
 dotnet add "$smoke_project" package Microsoft.EntityFrameworkCore.Sqlite --version "$ef_sqlite_version"
 dotnet add "$smoke_project" package SQLitePCLRaw.bundle_e_sqlite3 --version "$sqlitepclraw_version"
@@ -108,19 +108,19 @@ popd > /dev/null
 
 cat > "$smoke_project_dir/StablePackageIntegrationSmokeTests.cs" <<'CSHARP'
 using System.Net.Http.Json;
-using CDCavell.AsiBackbone.AspNetCore.Actors;
-using CDCavell.AsiBackbone.AspNetCore.Correlation;
-using CDCavell.AsiBackbone.AspNetCore.DependencyInjection;
-using CDCavell.AsiBackbone.AspNetCore.Handshakes;
-using CDCavell.AsiBackbone.Core.Actors;
-using CDCavell.AsiBackbone.Core.Audit;
-using CDCavell.AsiBackbone.Core.Constraints;
-using CDCavell.AsiBackbone.Core.Decisions;
-using CDCavell.AsiBackbone.Core.Evaluation;
-using CDCavell.AsiBackbone.Core.Results;
-using CDCavell.AsiBackbone.EntityFrameworkCore;
-using CDCavell.AsiBackbone.EntityFrameworkCore.Audit;
-using CDCavell.AsiBackbone.Storage.InMemory.Audit;
+using AsiBackbone.AspNetCore.Actors;
+using AsiBackbone.AspNetCore.Correlation;
+using AsiBackbone.AspNetCore.DependencyInjection;
+using AsiBackbone.AspNetCore.Handshakes;
+using AsiBackbone.Core.Actors;
+using AsiBackbone.Core.Audit;
+using AsiBackbone.Core.Constraints;
+using AsiBackbone.Core.Decisions;
+using AsiBackbone.Core.Evaluation;
+using AsiBackbone.Core.Results;
+using AsiBackbone.EntityFrameworkCore;
+using AsiBackbone.EntityFrameworkCore.Audit;
+using AsiBackbone.Storage.InMemory.Audit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;

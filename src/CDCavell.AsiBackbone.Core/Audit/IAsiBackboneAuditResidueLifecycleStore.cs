@@ -1,4 +1,4 @@
-namespace CDCavell.AsiBackbone.Core.Audit;
+namespace AsiBackbone.Core.Audit;
 
 /// <summary>
 /// Defines a provider-neutral durable store for audit residue lifecycle events.

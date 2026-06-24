@@ -1,4 +1,4 @@
-# CDCavell.AsiBackbone.AspNetCore
+# AsiBackbone.AspNetCore
 
 ASP.NET Core host adapters for Accountable Systems Infrastructure governance primitives.
 

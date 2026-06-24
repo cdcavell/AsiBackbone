@@ -64,9 +64,9 @@ Host applications remain responsible for deciding how AsiBackbone decisions are 
 
 ## Signing and key-handling boundaries
 
-`CDCavell.AsiBackbone.Signing.LocalDevelopment` is for tests, samples, local validation, and wiring proof paths only. It is **not** a production key-custody or production signing control.
+`AsiBackbone.Signing.LocalDevelopment` is for tests, samples, local validation, and wiring proof paths only. It is **not** a production key-custody or production signing control.
 
-`CDCavell.AsiBackbone.Signing.ManagedKey` provides an adapter boundary. The host supplies the actual managed-key client, credentials, key operations, verification path, monitoring, operational policy, and incident response.
+`AsiBackbone.Signing.ManagedKey` provides an adapter boundary. The host supplies the actual managed-key client, credentials, key operations, verification path, monitoring, operational policy, and incident response.
 
 Signing-ready metadata, signed records, verification results, hash chains, and externally anchored evidence are distinct states. Do not assume that a record is tamper-evident, immutable, legally non-repudiable, externally anchored, or compliance-certified unless the host has deployed and verified the full operational trust design that proves that claim.
 

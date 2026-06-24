@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../src/CDCavell.AsiBackbone.Analyzers/CDCavell.AsiBackbone.Analyzers.csproj" />
+    <ProjectReference Include="../../src/AsiBackbone.Analyzers/AsiBackbone.Analyzers.csproj" />
   </ItemGroup>
 
 </Project>

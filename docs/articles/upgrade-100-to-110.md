@@ -17,16 +17,16 @@ Upgrade pressure appears only when a host chooses to adopt new features such as 
 Update existing stable package references from `1.0.0` to `1.1.0` when the packages are published.
 
 ```xml
-<PackageReference Include="CDCavell.AsiBackbone.Core" Version="1.1.0" />
-<PackageReference Include="CDCavell.AsiBackbone.Storage.InMemory" Version="1.1.0" />
-<PackageReference Include="CDCavell.AsiBackbone.EntityFrameworkCore" Version="1.1.0" />
-<PackageReference Include="CDCavell.AsiBackbone.AspNetCore" Version="1.1.0" />
+<PackageReference Include="AsiBackbone.Core" Version="1.1.0" />
+<PackageReference Include="AsiBackbone.Storage.InMemory" Version="1.1.0" />
+<PackageReference Include="AsiBackbone.EntityFrameworkCore" Version="1.1.0" />
+<PackageReference Include="AsiBackbone.AspNetCore" Version="1.1.0" />
 ```
 
 Add the OpenTelemetry provider only when the host intends to emit governance envelopes into the host's OpenTelemetry pipeline.
 
 ```xml
-<PackageReference Include="CDCavell.AsiBackbone.OpenTelemetry" Version="1.1.0" />
+<PackageReference Include="AsiBackbone.OpenTelemetry" Version="1.1.0" />
 ```
 
 Do not add provider packages merely because they are documented as future directions. Event Hubs, Purview, Azure-specific, signing-provider, gateway, robotics, and immutable-storage packages are not part of this stable package family unless separately released.
@@ -96,7 +96,7 @@ Do not treat the package as owning database lifecycle or production migration de
 
 ## In-memory and no-op proof paths
 
-`CDCavell.AsiBackbone.Storage.InMemory` and the no-op governance emitter are useful for:
+`AsiBackbone.Storage.InMemory` and the no-op governance emitter are useful for:
 
 - unit tests;
 - local development;
@@ -112,7 +112,7 @@ Use this wording in production documentation:
 
 ## Adopting the hosted outbox drain
 
-`CDCavell.AsiBackbone.AspNetCore` can host the provider-neutral outbox drain in an ASP.NET Core or generic-host application.
+`AsiBackbone.AspNetCore` can host the provider-neutral outbox drain in an ASP.NET Core or generic-host application.
 
 Typical adoption steps:
 
@@ -133,7 +133,7 @@ Operational guidance:
 
 ## Adopting OpenTelemetry emission
 
-Add `CDCavell.AsiBackbone.OpenTelemetry` when the host wants to project governance envelopes into OpenTelemetry-compatible diagnostics.
+Add `AsiBackbone.OpenTelemetry` when the host wants to project governance envelopes into OpenTelemetry-compatible diagnostics.
 
 The OpenTelemetry provider:
 
@@ -162,7 +162,7 @@ Avoid direct emitter use as the only accountability path in production unless th
 Azure Monitor should be configured through the host's OpenTelemetry pipeline, not inside AsiBackbone Core or the OpenTelemetry provider.
 
 ```text
-CDCavell.AsiBackbone.OpenTelemetry
+AsiBackbone.OpenTelemetry
   -> ActivitySource / Meter
   -> host OpenTelemetry SDK pipeline
   -> host-configured Azure Monitor exporter

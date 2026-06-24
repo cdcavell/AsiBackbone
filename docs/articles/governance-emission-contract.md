@@ -20,7 +20,7 @@ The goal is to define the handoff shape before implementing concrete providers s
 
 ## Core-neutral placement
 
-The contract lives in `CDCavell.AsiBackbone.Core` under the provider-neutral emission language.
+The contract lives in `AsiBackbone.Core` under the provider-neutral emission language.
 
 Core owns:
 

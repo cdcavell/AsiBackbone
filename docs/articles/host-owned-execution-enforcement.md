@@ -33,8 +33,8 @@ That second path is a host implementation defect. AsiBackbone enables governance
 
 | Concern | Owner |
 | --- | --- |
-| Constraint contracts and decision composition | `CDCavell.AsiBackbone.Core` |
-| Endpoint metadata and common HTTP-edge orchestration | `CDCavell.AsiBackbone.AspNetCore` |
+| Constraint contracts and decision composition | `AsiBackbone.Core` |
+| Endpoint metadata and common HTTP-edge orchestration | `AsiBackbone.AspNetCore` |
 | Durable audit persistence, transactions, and outbox storage | Host-owned storage/integration layer |
 | Internal service methods, message consumers, job workers, CLI tools, orchestration handlers, and side-effecting operations | Host application |
 | Compliance interpretation and evidence review | Host governance process |

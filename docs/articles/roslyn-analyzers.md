@@ -1,8 +1,8 @@
 # Roslyn Analyzers
 
-`CDCavell.AsiBackbone.Analyzers` provides compile-time safety rails for host applications that use AsiBackbone governance primitives.
+`AsiBackbone.Analyzers` provides compile-time safety rails for host applications that use AsiBackbone governance primitives.
 
-The analyzer package is intentionally separate from `CDCavell.AsiBackbone.Core`. Core remains framework-neutral and does not depend on Roslyn, ASP.NET Core, EF Core, observability providers, or storage providers.
+The analyzer package is intentionally separate from `AsiBackbone.Core`. Core remains framework-neutral and does not depend on Roslyn, ASP.NET Core, EF Core, observability providers, or storage providers.
 
 ## Intent
 
@@ -77,7 +77,7 @@ Examples of recognized local-development types include:
 
 - `LocalDevelopmentSigningService`
 - `LocalDevelopmentSigningOptions`
-- other public types under `CDCavell.AsiBackbone.Signing.LocalDevelopment`
+- other public types under `AsiBackbone.Signing.LocalDevelopment`
 
 ### Diagnostic examples
 

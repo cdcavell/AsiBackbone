@@ -40,10 +40,10 @@ The `1.0.0` stable package line covers the implemented packages that complete th
 
 | Package | Stable role |
 | --- | --- |
-| `CDCavell.AsiBackbone.Core` | Framework-neutral governance primitives, decisions, constraints, audit contracts, acknowledgment contracts, capability-token abstractions, and operation results. |
-| `CDCavell.AsiBackbone.Storage.InMemory` | Non-durable in-memory audit sink and ledger helpers for tests, samples, and local validation. |
-| `CDCavell.AsiBackbone.EntityFrameworkCore` | EF Core model configuration and audit ledger persistence through a host-owned `DbContext`. |
-| `CDCavell.AsiBackbone.AspNetCore` | Thin ASP.NET Core host adapters for actor context, request correlation, HTTP result mapping, and acknowledgment challenge support. |
+| `AsiBackbone.Core` | Framework-neutral governance primitives, decisions, constraints, audit contracts, acknowledgment contracts, capability-token abstractions, and operation results. |
+| `AsiBackbone.Storage.InMemory` | Non-durable in-memory audit sink and ledger helpers for tests, samples, and local validation. |
+| `AsiBackbone.EntityFrameworkCore` | EF Core model configuration and audit ledger persistence through a host-owned `DbContext`. |
+| `AsiBackbone.AspNetCore` | Thin ASP.NET Core host adapters for actor context, request correlation, HTTP result mapping, and acknowledgment challenge support. |
 
 Future or provider-specific packages are not automatically part of the `1.0.0` stable contract unless they are explicitly released as stable.
 

@@ -40,7 +40,7 @@ flowchart LR
 From the repository root:
 
 ```powershell
-dotnet run --project samples/PlainAspNetCoreHost/CDCavell.AsiBackbone.Samples.PlainAspNetCoreHost.csproj
+dotnet run --project samples/PlainAspNetCoreHost/AsiBackbone.Samples.PlainAspNetCoreHost.csproj
 ```
 
 Then request the sample decision endpoint:

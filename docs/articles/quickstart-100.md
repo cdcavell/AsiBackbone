@@ -9,45 +9,45 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 The initial stable path focuses on public package consumption for the implemented package family:
 
 ```text
-CDCavell.AsiBackbone.Core
-CDCavell.AsiBackbone.Storage.InMemory
-CDCavell.AsiBackbone.EntityFrameworkCore
-CDCavell.AsiBackbone.AspNetCore
+AsiBackbone.Core
+AsiBackbone.Storage.InMemory
+AsiBackbone.EntityFrameworkCore
+AsiBackbone.AspNetCore
 ```
 
-The minimum supported setup is `CDCavell.AsiBackbone.Core`. Add integration packages only when the host application needs them.
+The minimum supported setup is `AsiBackbone.Core`. Add integration packages only when the host application needs them.
 
 | Need | Package |
 | --- | --- |
-| Framework-neutral decisions, constraints, audit residue, handshakes, and capability-token primitives | `CDCavell.AsiBackbone.Core` |
-| Non-durable local validation or sample audit storage | `CDCavell.AsiBackbone.Storage.InMemory` |
-| Host-owned EF Core audit ledger persistence | `CDCavell.AsiBackbone.EntityFrameworkCore` |
-| ASP.NET Core request correlation, actor context, result mapping, and acknowledgment challenge helpers | `CDCavell.AsiBackbone.AspNetCore` |
+| Framework-neutral decisions, constraints, audit residue, handshakes, and capability-token primitives | `AsiBackbone.Core` |
+| Non-durable local validation or sample audit storage | `AsiBackbone.Storage.InMemory` |
+| Host-owned EF Core audit ledger persistence | `AsiBackbone.EntityFrameworkCore` |
+| ASP.NET Core request correlation, actor context, result mapping, and acknowledgment challenge helpers | `AsiBackbone.AspNetCore` |
 
 ## Install the minimum package
 
 For a console app, worker, library, or existing service that only needs framework-neutral governance primitives:
 
 ```bash
-dotnet add package CDCavell.AsiBackbone.Core
+dotnet add package AsiBackbone.Core
 ```
 
 For local validation with non-durable in-memory audit storage:
 
 ```bash
-dotnet add package CDCavell.AsiBackbone.Storage.InMemory
+dotnet add package AsiBackbone.Storage.InMemory
 ```
 
 For ASP.NET Core host integration:
 
 ```bash
-dotnet add package CDCavell.AsiBackbone.AspNetCore
+dotnet add package AsiBackbone.AspNetCore
 ```
 
 For host-owned EF Core persistence:
 
 ```bash
-dotnet add package CDCavell.AsiBackbone.EntityFrameworkCore
+dotnet add package AsiBackbone.EntityFrameworkCore
 ```
 
 ## Basic public API example
@@ -55,11 +55,11 @@ dotnet add package CDCavell.AsiBackbone.EntityFrameworkCore
 The following example uses only public Core APIs. It creates a host-defined constraint, evaluates a request, and produces audit residue from the decision.
 
 ```csharp
-using CDCavell.AsiBackbone.Core.Actors;
-using CDCavell.AsiBackbone.Core.Audit;
-using CDCavell.AsiBackbone.Core.Constraints;
-using CDCavell.AsiBackbone.Core.Decisions;
-using CDCavell.AsiBackbone.Core.Evaluation;
+using AsiBackbone.Core.Actors;
+using AsiBackbone.Core.Audit;
+using AsiBackbone.Core.Constraints;
+using AsiBackbone.Core.Decisions;
+using AsiBackbone.Core.Evaluation;
 
 var evaluator = new DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>(
     [new RegionRequiredConstraint()]);
@@ -115,8 +115,8 @@ This example does not execute the requested operation. It only evaluates the req
 For local validation, tests, or sample hosts, write audit residue to `InMemoryAuditLedger`:
 
 ```csharp
-using CDCavell.AsiBackbone.Core.Audit;
-using CDCavell.AsiBackbone.Storage.InMemory.Audit;
+using AsiBackbone.Core.Audit;
+using AsiBackbone.Storage.InMemory.Audit;
 
 var ledger = new InMemoryAuditLedger();
 IAsiBackboneAuditSink sink = ledger;
@@ -134,7 +134,7 @@ Console.WriteLine(stored.CorrelationId);
 For ASP.NET Core hosts, register the thin host adapter package:
 
 ```csharp
-using CDCavell.AsiBackbone.AspNetCore.DependencyInjection;
+using AsiBackbone.AspNetCore.DependencyInjection;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -150,7 +150,7 @@ The ASP.NET Core package provides integration seams. It does not register authen
 For EF Core persistence, the host application owns its `DbContext`, provider, connection string, migrations, deployment, and schema lifecycle. AsiBackbone contributes model configuration helpers.
 
 ```csharp
-using CDCavell.AsiBackbone.EntityFrameworkCore;
+using AsiBackbone.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 internal sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)

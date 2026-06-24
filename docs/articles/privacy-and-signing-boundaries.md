@@ -79,8 +79,8 @@ Host guidance:
 The current `1.2.x` package family separates signing-related behavior into explicit boundaries:
 
 - Core records may carry signing-ready metadata and canonical hashing inputs.
-- `CDCavell.AsiBackbone.Signing.LocalDevelopment` provides local/test/sample signing and verification proof paths.
-- `CDCavell.AsiBackbone.Signing.ManagedKey` provides a provider-neutral adapter boundary for host-owned managed-key clients.
+- `AsiBackbone.Signing.LocalDevelopment` provides local/test/sample signing and verification proof paths.
+- `AsiBackbone.Signing.ManagedKey` provides a provider-neutral adapter boundary for host-owned managed-key clients.
 
 These surfaces do not make audit records tamper-evident, immutable, legally non-repudiable, or compliance-certified by default.
 
@@ -107,7 +107,7 @@ AsiBackbone should sit inside the host's existing security, privacy, and complia
 
 ## EF Core and persistence boundary
 
-`CDCavell.AsiBackbone.EntityFrameworkCore` provides model configuration and storage helpers. The host application owns the `DbContext`, provider, connection string, database permissions, migrations, schema deployment, backups, retention, and encryption choices.
+`AsiBackbone.EntityFrameworkCore` provides model configuration and storage helpers. The host application owns the `DbContext`, provider, connection string, database permissions, migrations, schema deployment, backups, retention, and encryption choices.
 
 For production persistence, the host should review:
 
@@ -126,7 +126,7 @@ See [EF Core Host Ownership and Migrations](ef-core-host-ownership-and-migration
 
 ## ASP.NET Core boundary
 
-`CDCavell.AsiBackbone.AspNetCore` provides thin host adapters for request correlation, actor context, HTTP result mapping, and acknowledgment challenge helpers.
+`AsiBackbone.AspNetCore` provides thin host adapters for request correlation, actor context, HTTP result mapping, and acknowledgment challenge helpers.
 
 The ASP.NET Core package does not own:
 

@@ -37,32 +37,32 @@ cd AsiBackboneQuickstart
 Install the three packages used by this quickstart:
 
 ```bash
-dotnet add package CDCavell.AsiBackbone.Core
-dotnet add package CDCavell.AsiBackbone.AspNetCore
-dotnet add package CDCavell.AsiBackbone.Storage.InMemory
+dotnet add package AsiBackbone.Core
+dotnet add package AsiBackbone.AspNetCore
+dotnet add package AsiBackbone.Storage.InMemory
 ```
 
 Package roles:
 
 | Package | Why it is used here |
 | --- | --- |
-| `CDCavell.AsiBackbone.Core` | Defines constraints, evaluation context, decisions, and audit residue. |
-| `CDCavell.AsiBackbone.AspNetCore` | Provides ASP.NET Core registration helpers, result mapping, and endpoint metadata helpers. |
-| `CDCavell.AsiBackbone.Storage.InMemory` | Gives the sample a non-durable local audit sink so you can see records immediately. |
+| `AsiBackbone.Core` | Defines constraints, evaluation context, decisions, and audit residue. |
+| `AsiBackbone.AspNetCore` | Provides ASP.NET Core registration helpers, result mapping, and endpoint metadata helpers. |
+| `AsiBackbone.Storage.InMemory` | Gives the sample a non-durable local audit sink so you can see records immediately. |
 
 ## Replace `Program.cs`
 
 Paste the following into `Program.cs`.
 
 ```csharp
-using CDCavell.AsiBackbone.AspNetCore.DependencyInjection;
-using CDCavell.AsiBackbone.AspNetCore.Endpoints;
-using CDCavell.AsiBackbone.Core.Actors;
-using CDCavell.AsiBackbone.Core.Audit;
-using CDCavell.AsiBackbone.Core.Constraints;
-using CDCavell.AsiBackbone.Core.Decisions;
-using CDCavell.AsiBackbone.Core.Evaluation;
-using CDCavell.AsiBackbone.Storage.InMemory.Audit;
+using AsiBackbone.AspNetCore.DependencyInjection;
+using AsiBackbone.AspNetCore.Endpoints;
+using AsiBackbone.Core.Actors;
+using AsiBackbone.Core.Audit;
+using AsiBackbone.Core.Constraints;
+using AsiBackbone.Core.Decisions;
+using AsiBackbone.Core.Evaluation;
+using AsiBackbone.Storage.InMemory.Audit;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -302,7 +302,7 @@ In a production-style host, the usual progression is:
 
 1. Write local durable audit/outbox records first.
 2. Drain those records through a governance emitter.
-3. Use `CDCavell.AsiBackbone.OpenTelemetry` to project governance envelopes into tracing and metrics when an exporter is configured by the host.
+3. Use `AsiBackbone.OpenTelemetry` to project governance envelopes into tracing and metrics when an exporter is configured by the host.
 
 See [OpenTelemetry Governance Emission Provider](opentelemetry-governance-emission-provider.md) after the basic API gate is working.
 

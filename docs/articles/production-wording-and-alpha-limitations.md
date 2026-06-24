@@ -32,9 +32,9 @@ Use these categories when documenting `1.1.0` signing-related behavior.
 
 | Category | Current status | Safe wording |
 | --- | --- | --- |
-| Core signing-ready and verification primitives | Stable in `CDCavell.AsiBackbone.Core`. | Core provides canonical payload hashing, signing-ready metadata, signing request/result contracts, verification request/result contracts, and verification-policy primitives. |
-| Local-development signing provider | Stable package: `CDCavell.AsiBackbone.Signing.LocalDevelopment`. | The local-development signer is for tests, samples, deterministic local validation, and host wiring proof paths. It is not production key custody. |
-| Managed-key signing adapter | Stable package: `CDCavell.AsiBackbone.Signing.ManagedKey`. | The managed-key package provides an adapter boundary. The host supplies the actual managed-key client, credentials, key operations, verification path, monitoring, and operational policy. |
+| Core signing-ready and verification primitives | Stable in `AsiBackbone.Core`. | Core provides canonical payload hashing, signing-ready metadata, signing request/result contracts, verification request/result contracts, and verification-policy primitives. |
+| Local-development signing provider | Stable package: `AsiBackbone.Signing.LocalDevelopment`. | The local-development signer is for tests, samples, deterministic local validation, and host wiring proof paths. It is not production key custody. |
+| Managed-key signing adapter | Stable package: `AsiBackbone.Signing.ManagedKey`. | The managed-key package provides an adapter boundary. The host supplies the actual managed-key client, credentials, key operations, verification path, monitoring, and operational policy. |
 | Concrete cloud/HSM/KMS implementation packages | Future or host-owned unless separately released. | Azure Key Vault, Managed HSM, cloud KMS, certificate-store, HSM-backed, or organization-specific clients remain host-owned implementations or future provider packages. |
 | Production tamper-evidence, immutability, external anchoring, or legal non-repudiation | Not provided by default. | These claims require deployed signing, verification, protected key management, durable append-only or otherwise controlled storage, retention policy, monitoring, incident response, and any chain/anchor design the claim depends on. |
 
@@ -109,9 +109,9 @@ Core remains provider-neutral. Provider packages depend on Core. Core must not d
 
 Appropriate wording:
 
-- `CDCavell.AsiBackbone.Core` defines provider-neutral governance primitives and seams.
-- `CDCavell.AsiBackbone.Signing.LocalDevelopment` is a released local-development provider package for tests, samples, and wiring proof paths.
-- `CDCavell.AsiBackbone.Signing.ManagedKey` is a released adapter boundary for host-owned managed-key clients.
+- `AsiBackbone.Core` defines provider-neutral governance primitives and seams.
+- `AsiBackbone.Signing.LocalDevelopment` is a released local-development provider package for tests, samples, and wiring proof paths.
+- `AsiBackbone.Signing.ManagedKey` is a released adapter boundary for host-owned managed-key clients.
 - Provider packages or host adapters translate Core records into provider-specific systems.
 - Provider packages are optional integration surfaces.
 - Host applications choose whether to install and configure a provider package.

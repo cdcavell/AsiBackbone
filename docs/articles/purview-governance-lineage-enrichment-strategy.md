@@ -9,7 +9,7 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 > [!IMPORTANT]
 > This page does **not** document a released NuGet package. No Purview provider package, Purview SDK adapter, catalog-ingestion implementation, or Azure-specific enrichment package is included in the `1.1.0` stable package family.
 >
-> `CDCavell.AsiBackbone.OpenTelemetry` is the only concrete released governance emission provider package in `1.1.0`. Purview remains a future/strategy-only governance enrichment direction unless a later release separately reviews and ships it.
+> `AsiBackbone.OpenTelemetry` is the only concrete released governance emission provider package in `1.1.0`. Purview remains a future/strategy-only governance enrichment direction unless a later release separately reviews and ships it.
 >
 > See [1.1.0 Release Notes - Accepted deferrals](release-notes-110.md#accepted-deferrals) for the current release boundary.
 
@@ -230,22 +230,22 @@ A future Purview integration package may be useful, but it should remain optiona
 Candidate package name:
 
 ```text
-CDCavell.AsiBackbone.Governance.Purview
+AsiBackbone.Governance.Purview
 ```
 
 Acceptable alternatives:
 
 ```text
-CDCavell.AsiBackbone.Azure.Purview
-CDCavell.AsiBackbone.Purview
-CDCavell.AsiBackbone.Lineage.Purview
+AsiBackbone.Azure.Purview
+AsiBackbone.Purview
+AsiBackbone.Lineage.Purview
 ```
 
 These names are planning candidates only. They are not part of the released `1.1.0` package list.
 
 A future package should depend on:
 
-* `CDCavell.AsiBackbone.Core`;
+* `AsiBackbone.Core`;
 * Purview SDKs/APIs or host abstractions required for catalog and lineage enrichment;
 * Azure Identity support when Managed Identity or token credentials are enabled;
 * `Microsoft.Extensions.Options` and logging abstractions if needed.

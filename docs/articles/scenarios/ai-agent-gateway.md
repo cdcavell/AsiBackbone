@@ -164,12 +164,12 @@ This gateway pattern helps avoid common agent-integration mistakes:
 
 Core classes and interfaces:
 
-- [`IAsiBackbonePolicyEvaluator<TContext>`](../../../src/CDCavell.AsiBackbone.Core/Evaluation/IAsiBackbonePolicyEvaluator.cs)
-- [`AsiBackboneConstraintEvaluationContext`](../../../src/CDCavell.AsiBackbone.Core/Constraints/AsiBackboneConstraintEvaluationContext.cs)
-- [`GovernanceDecision`](../../../src/CDCavell.AsiBackbone.Core/Decisions/GovernanceDecision.cs)
-- [`GovernanceDecisionOutcome`](../../../src/CDCavell.AsiBackbone.Core/Decisions/GovernanceDecisionOutcome.cs)
-- [`AuditResidue`](../../../src/CDCavell.AsiBackbone.Core/Audit/AuditResidue.cs)
-- [`IAsiBackboneAcknowledgmentChallengeService`](../../../src/CDCavell.AsiBackbone.AspNetCore/Handshakes/IAsiBackboneAcknowledgmentChallengeService.cs)
+- [`IAsiBackbonePolicyEvaluator<TContext>`](../../../src/AsiBackbone.Core/Evaluation/IAsiBackbonePolicyEvaluator.cs)
+- [`AsiBackboneConstraintEvaluationContext`](../../../src/AsiBackbone.Core/Constraints/AsiBackboneConstraintEvaluationContext.cs)
+- [`GovernanceDecision`](../../../src/AsiBackbone.Core/Decisions/GovernanceDecision.cs)
+- [`GovernanceDecisionOutcome`](../../../src/AsiBackbone.Core/Decisions/GovernanceDecisionOutcome.cs)
+- [`AuditResidue`](../../../src/AsiBackbone.Core/Audit/AuditResidue.cs)
+- [`IAsiBackboneAcknowledgmentChallengeService`](../../../src/AsiBackbone.AspNetCore/Handshakes/IAsiBackboneAcknowledgmentChallengeService.cs)
 
 Related documentation:
 

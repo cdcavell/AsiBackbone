@@ -37,10 +37,10 @@ Use this mode when validating published or locally packed packages.
 From the NetCoreApplicationTemplate host project, reference the packages needed for the validation path:
 
 ```powershell
-dotnet add package CDCavell.AsiBackbone.Core
-dotnet add package CDCavell.AsiBackbone.AspNetCore
-dotnet add package CDCavell.AsiBackbone.Storage.InMemory
-dotnet add package CDCavell.AsiBackbone.EntityFrameworkCore
+dotnet add package AsiBackbone.Core
+dotnet add package AsiBackbone.AspNetCore
+dotnet add package AsiBackbone.Storage.InMemory
+dotnet add package AsiBackbone.EntityFrameworkCore
 ```
 
 Use package-reference mode to confirm that a consuming application can integrate AsiBackbone the same way an external developer would.
@@ -52,10 +52,10 @@ Use this mode while developing both repositories locally.
 From the NetCoreApplicationTemplate host project, add references to the AsiBackbone source projects:
 
 ```powershell
-dotnet add reference ..\AsiBackbone\src\CDCavell.AsiBackbone.Core\CDCavell.AsiBackbone.Core.csproj
-dotnet add reference ..\AsiBackbone\src\CDCavell.AsiBackbone.AspNetCore\CDCavell.AsiBackbone.AspNetCore.csproj
-dotnet add reference ..\AsiBackbone\src\CDCavell.AsiBackbone.Storage.InMemory\CDCavell.AsiBackbone.Storage.InMemory.csproj
-dotnet add reference ..\AsiBackbone\src\CDCavell.AsiBackbone.EntityFrameworkCore\CDCavell.AsiBackbone.EntityFrameworkCore.csproj
+dotnet add reference ..\AsiBackbone\src\AsiBackbone.Core\AsiBackbone.Core.csproj
+dotnet add reference ..\AsiBackbone\src\AsiBackbone.AspNetCore\AsiBackbone.AspNetCore.csproj
+dotnet add reference ..\AsiBackbone\src\AsiBackbone.Storage.InMemory\AsiBackbone.Storage.InMemory.csproj
+dotnet add reference ..\AsiBackbone\src\AsiBackbone.EntityFrameworkCore\AsiBackbone.EntityFrameworkCore.csproj
 ```
 
 Adjust the relative paths to match your local folder layout. The references should be added only to the NetCoreApplicationTemplate-generated host application or validation branch. Do not add a reference from any AsiBackbone project back to NetCoreApplicationTemplate.
@@ -65,10 +65,10 @@ Adjust the relative paths to match your local folder layout. The references shou
 In the NetCoreApplicationTemplate host startup path, wire AsiBackbone like any other optional module:
 
 ```csharp
-using CDCavell.AsiBackbone.AspNetCore.DependencyInjection;
-using CDCavell.AsiBackbone.Core.Audit;
-using CDCavell.AsiBackbone.EntityFrameworkCore.Audit;
-using CDCavell.AsiBackbone.Storage.InMemory.Audit;
+using AsiBackbone.AspNetCore.DependencyInjection;
+using AsiBackbone.Core.Audit;
+using AsiBackbone.EntityFrameworkCore.Audit;
+using AsiBackbone.Storage.InMemory.Audit;
 using Microsoft.EntityFrameworkCore;
 
 builder.Services.AddAsiBackboneAspNetCore();
@@ -94,7 +94,7 @@ The exact context name will depend on the generated host.
 In the NetCoreApplicationTemplate host `DbContext`, apply the AsiBackbone model configuration contribution:
 
 ```csharp
-using CDCavell.AsiBackbone.EntityFrameworkCore;
+using AsiBackbone.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)

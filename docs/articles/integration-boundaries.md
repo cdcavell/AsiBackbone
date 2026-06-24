@@ -55,7 +55,7 @@ The host integrates AsiBackbone where governance is needed and leaves the rest o
 
 ## Host-owned persistence model
 
-When using `CDCavell.AsiBackbone.EntityFrameworkCore`, the host application remains the persistence owner.
+When using `AsiBackbone.EntityFrameworkCore`, the host application remains the persistence owner.
 
 The host owns:
 

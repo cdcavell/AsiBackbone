@@ -31,14 +31,14 @@ The released `1.1.0` package line covers the package family below.
 
 | Package | Stable role |
 | --- | --- |
-| `CDCavell.AsiBackbone.Core` | Framework-neutral governance primitives, decisions, acknowledgments, capability-token references, audit residue, lifecycle events, provider-neutral emission contracts, durable outbox contracts, DLP/classification failure policy primitives, signing-ready metadata abstractions, canonical hashing/signing seams, and verification-policy primitives. |
-| `CDCavell.AsiBackbone.Storage.InMemory` | Non-durable in-memory audit, lifecycle, and outbox helpers for tests, samples, local validation, and no-op proof paths. |
-| `CDCavell.AsiBackbone.EntityFrameworkCore` | EF Core model configuration and host-owned persistence for audit ledger, audit residue lifecycle, acknowledgment, and durable governance outbox records. |
-| `CDCavell.AsiBackbone.AspNetCore` | ASP.NET Core host integration seams for service registration, request correlation, audit enrichment, HTTP result mapping, acknowledgment challenge helpers, endpoint governance, and hosted outbox drain integration. |
-| `CDCavell.AsiBackbone.Analyzers` | Roslyn analyzer safety rails for governance persistence and continuation flows. Analyzer diagnostics are development/build-time guidance and do not enforce runtime behavior. |
-| `CDCavell.AsiBackbone.OpenTelemetry` | Concrete OpenTelemetry governance emission provider that projects provider-neutral governance envelopes into .NET diagnostics primitives such as `ActivitySource` and `Meter`. |
-| `CDCavell.AsiBackbone.Signing.LocalDevelopment` | Local-development RSA signing and verification provider for tests, samples, and host wiring proof paths. Not production key custody, managed-key signing, immutability, non-repudiation, or tamper-evidence. |
-| `CDCavell.AsiBackbone.Signing.ManagedKey` | Provider-neutral managed-key signing adapter. The host supplies the actual managed-key client, credentials, key operations, verification path, monitoring, and operational policy. |
+| `AsiBackbone.Core` | Framework-neutral governance primitives, decisions, acknowledgments, capability-token references, audit residue, lifecycle events, provider-neutral emission contracts, durable outbox contracts, DLP/classification failure policy primitives, signing-ready metadata abstractions, canonical hashing/signing seams, and verification-policy primitives. |
+| `AsiBackbone.Storage.InMemory` | Non-durable in-memory audit, lifecycle, and outbox helpers for tests, samples, local validation, and no-op proof paths. |
+| `AsiBackbone.EntityFrameworkCore` | EF Core model configuration and host-owned persistence for audit ledger, audit residue lifecycle, acknowledgment, and durable governance outbox records. |
+| `AsiBackbone.AspNetCore` | ASP.NET Core host integration seams for service registration, request correlation, audit enrichment, HTTP result mapping, acknowledgment challenge helpers, endpoint governance, and hosted outbox drain integration. |
+| `AsiBackbone.Analyzers` | Roslyn analyzer safety rails for governance persistence and continuation flows. Analyzer diagnostics are development/build-time guidance and do not enforce runtime behavior. |
+| `AsiBackbone.OpenTelemetry` | Concrete OpenTelemetry governance emission provider that projects provider-neutral governance envelopes into .NET diagnostics primitives such as `ActivitySource` and `Meter`. |
+| `AsiBackbone.Signing.LocalDevelopment` | Local-development RSA signing and verification provider for tests, samples, and host wiring proof paths. Not production key custody, managed-key signing, immutability, non-repudiation, or tamper-evidence. |
+| `AsiBackbone.Signing.ManagedKey` | Provider-neutral managed-key signing adapter. The host supplies the actual managed-key client, credentials, key operations, verification path, monitoring, and operational policy. |
 
 Future Event Hubs, Purview, Azure-specific, Azure Key Vault-specific, HSM-specific, gateway, robotics, or immutable-storage packages are not part of the `1.1.0` stable contract unless separately released as stable packages.
 
@@ -48,7 +48,7 @@ A documentation page can describe a future provider direction without meaning a 
 
 | Area | `1.1.0` status | Documentation meaning |
 | --- | --- | --- |
-| OpenTelemetry governance emission | **Released package**: `CDCavell.AsiBackbone.OpenTelemetry`. | Concrete implemented provider package for projecting governance envelopes into .NET diagnostics. |
+| OpenTelemetry governance emission | **Released package**: `AsiBackbone.OpenTelemetry`. | Concrete implemented provider package for projecting governance envelopes into .NET diagnostics. |
 | Azure Monitor / Log Analytics | **Host-configured exporter guidance.** | Reach Azure Monitor through the host OpenTelemetry SDK/exporter pipeline; no Azure Monitor-specific AsiBackbone package is released. |
 | Event Hubs governance emission | **Design-only future provider strategy.** | The Event Hubs page is planning guidance only; no Event Hubs NuGet package or Azure SDK adapter is released in `1.1.0`. |
 | Purview governance and lineage enrichment | **Strategy-only future enrichment direction.** | The Purview page is planning guidance only; no Purview NuGet package or SDK adapter is released in `1.1.0`. |
@@ -101,13 +101,13 @@ This avoids losing governance records when downstream providers are unavailable,
 
 ### In-memory proof paths
 
-`CDCavell.AsiBackbone.Storage.InMemory` includes non-durable development and test helpers for lifecycle and outbox validation.
+`AsiBackbone.Storage.InMemory` includes non-durable development and test helpers for lifecycle and outbox validation.
 
 The no-op governance emitter and in-memory outbox path are intended for tests, samples, local smoke checks, and proof-of-wiring only. They are not durable production storage, not evidence of provider delivery, and not a substitute for EF Core or another host-owned durable store.
 
 ### EF Core durable adapter
 
-`CDCavell.AsiBackbone.EntityFrameworkCore` adds host-owned durable persistence for governance outbox entries and audit residue lifecycle events.
+`AsiBackbone.EntityFrameworkCore` adds host-owned durable persistence for governance outbox entries and audit residue lifecycle events.
 
 The host application still owns:
 
@@ -125,7 +125,7 @@ The EF Core package contributes model configuration and storage adapters. It doe
 
 ### Hosted governance outbox drain
 
-`CDCavell.AsiBackbone.AspNetCore` adds hosted outbox drain integration for ASP.NET Core and generic-host applications.
+`AsiBackbone.AspNetCore` adds hosted outbox drain integration for ASP.NET Core and generic-host applications.
 
 The hosted worker can drain pending outbox entries through a registered provider-neutral emitter. Hosts configure enablement, batch size, polling interval, failure delay, shutdown behavior, stores, and concrete providers.
 
@@ -133,13 +133,13 @@ Hosts should avoid duplicate workers unless they intentionally design for multi-
 
 ### Endpoint governance
 
-`CDCavell.AsiBackbone.AspNetCore` includes endpoint governance metadata and validation seams so hosts can attach governance intent to endpoints and validate endpoint-level policy metadata explicitly.
+`AsiBackbone.AspNetCore` includes endpoint governance metadata and validation seams so hosts can attach governance intent to endpoints and validate endpoint-level policy metadata explicitly.
 
 Endpoint governance remains a host adapter. It does not replace authentication, authorization, routing, middleware enforcement, UI, persistence, or execution controls.
 
 ### OpenTelemetry provider
 
-`CDCavell.AsiBackbone.OpenTelemetry` is the first concrete governance emission provider package and the only concrete released governance emission provider package in `1.1.0`.
+`AsiBackbone.OpenTelemetry` is the first concrete governance emission provider package and the only concrete released governance emission provider package in `1.1.0`.
 
 It implements `IAsiBackboneGovernanceEmitter` and projects governance envelopes into OpenTelemetry-friendly .NET diagnostics:
 
@@ -155,7 +155,7 @@ The provider does not configure exporters. It does not depend on Azure Monitor, 
 Azure Monitor should be reached through host-owned OpenTelemetry exporter configuration:
 
 ```text
-CDCavell.AsiBackbone.OpenTelemetry
+AsiBackbone.OpenTelemetry
   -> ActivitySource / Meter
   -> host OpenTelemetry SDK pipeline
   -> host-configured Azure Monitor exporter
@@ -175,7 +175,7 @@ Those pages preserve architectural direction and provider-boundary thinking, but
 
 ### Roslyn analyzer safety rails
 
-`CDCavell.AsiBackbone.Analyzers` adds build-time analyzer safety rails for governance persistence and continuation flows.
+`AsiBackbone.Analyzers` adds build-time analyzer safety rails for governance persistence and continuation flows.
 
 Analyzer diagnostics should be treated as development-time feedback. They do not execute governance decisions at runtime, do not prove compliance, and do not replace tests, code review, runtime policy evaluation, or host-owned operational controls.
 
@@ -199,7 +199,7 @@ Accurate wording:
 
 ### Local-development signing provider
 
-`CDCavell.AsiBackbone.Signing.LocalDevelopment` provides a local-development RSA signing and verification provider.
+`AsiBackbone.Signing.LocalDevelopment` provides a local-development RSA signing and verification provider.
 
 It is intended for:
 
@@ -213,7 +213,7 @@ It is not a production managed-key provider and does not provide protected key c
 
 ### Managed-key signing adapter
 
-`CDCavell.AsiBackbone.Signing.ManagedKey` provides a provider-neutral managed-key signing adapter.
+`AsiBackbone.Signing.ManagedKey` provides a provider-neutral managed-key signing adapter.
 
 The package supplies the adapter boundary and registration shape. The host supplies the actual managed-key client. That host-owned client may call Azure Key Vault, Managed HSM, cloud KMS, HSM appliances, or organization-owned signing services, but those concrete integrations are not included by default.
 
@@ -266,12 +266,12 @@ See [Upgrade Guide: 1.0.0 to 1.1.0](upgrade-100-to-110.md) for step-by-step guid
 At a high level:
 
 1. Upgrade existing stable packages from `1.0.0` to `1.1.0`.
-2. Add `CDCavell.AsiBackbone.Analyzers` only when build-time diagnostics are desired.
-3. Add `CDCavell.AsiBackbone.OpenTelemetry` only if provider emission is needed.
+2. Add `AsiBackbone.Analyzers` only when build-time diagnostics are desired.
+3. Add `AsiBackbone.OpenTelemetry` only if provider emission is needed.
 4. Prefer durable EF Core or another durable host-owned outbox store before provider emission.
 5. Use in-memory stores and no-op emitters only for tests, samples, and local validation.
-6. Use `CDCavell.AsiBackbone.Signing.LocalDevelopment` only for local development, tests, samples, or proof paths.
-7. Use `CDCavell.AsiBackbone.Signing.ManagedKey` only when the host supplies a managed-key client, credentials, key identity, failure policy, monitoring, and verification plan.
+6. Use `AsiBackbone.Signing.LocalDevelopment` only for local development, tests, samples, or proof paths.
+7. Use `AsiBackbone.Signing.ManagedKey` only when the host supplies a managed-key client, credentials, key identity, failure policy, monitoring, and verification plan.
 8. Configure Azure Monitor through the host OpenTelemetry pipeline if Azure Monitor is the selected backend.
 9. Treat Event Hubs and Purview pages as future design/strategy guidance only unless a later release publishes concrete provider packages.
 10. Do not claim signing, immutability, non-repudiation, or tamper-evidence unless a concrete signing, verification, storage, retention, and key-management design is actually implemented.

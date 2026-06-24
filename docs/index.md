@@ -71,17 +71,17 @@ These pages are the best first stops for implementation-first adoption. The opti
 Stable `1.2.x` is the current compatible release line. `1.2.1` is the current patch release on the `1.2.0` minor-release boundary and covers these packages:
 
 ```text
-CDCavell.AsiBackbone.Core
-CDCavell.AsiBackbone.DependencyInjection
-CDCavell.AsiBackbone.Storage.InMemory
-CDCavell.AsiBackbone.EntityFrameworkCore
-CDCavell.AsiBackbone.AspNetCore
-CDCavell.AsiBackbone.Testing
-CDCavell.AsiBackbone.Templates
-CDCavell.AsiBackbone.Analyzers
-CDCavell.AsiBackbone.OpenTelemetry
-CDCavell.AsiBackbone.Signing.LocalDevelopment
-CDCavell.AsiBackbone.Signing.ManagedKey
+AsiBackbone.Core
+AsiBackbone.DependencyInjection
+AsiBackbone.Storage.InMemory
+AsiBackbone.EntityFrameworkCore
+AsiBackbone.AspNetCore
+AsiBackbone.Testing
+AsiBackbone.Templates
+AsiBackbone.Analyzers
+AsiBackbone.OpenTelemetry
+AsiBackbone.Signing.LocalDevelopment
+AsiBackbone.Signing.ManagedKey
 ```
 
 Package-specific READMEs and release notes define which surfaces are stable, optional, local-only, or future-facing. A design page being present in the documentation does not mean the corresponding provider package has shipped as stable.

@@ -15,7 +15,7 @@ Most new users should start with one of these paths:
 
 | Goal | First page | Packages |
 | --- | --- | --- |
-| Understand the absolute Core-only decision shape | This page, [Level 1](#level-1-core-decision-pipeline-only) | `CDCavell.AsiBackbone.Core` |
+| Understand the absolute Core-only decision shape | This page, [Level 1](#level-1-core-decision-pipeline-only) | `AsiBackbone.Core` |
 | Gate one ASP.NET Core endpoint and inspect audit residue locally | [First 15 Minutes: Standard API Gating](quickstart-api-gating.md) | `Core`, `AspNetCore`, `Storage.InMemory` |
 | Upgrade an existing `1.0.0` consumer through the `1.1.x` transition before adopting later `1.2.x` capabilities | [Upgrade Guide: 1.0.0 to 1.1.0](upgrade-100-to-110.md) | Existing stable packages only |
 
@@ -25,7 +25,7 @@ Everything else is an add-on.
 
 | Level | Capability | Use when | Typical packages |
 | --- | --- | --- | --- |
-| 1 | Core decision pipeline only | You need to ask whether a proposed action can proceed. | `CDCavell.AsiBackbone.Core` |
+| 1 | Core decision pipeline only | You need to ask whether a proposed action can proceed. | `AsiBackbone.Core` |
 | 2 | Acknowledgment / handshake and audit residue | You need a human/system responsibility checkpoint or local decision evidence. | `Core`; optionally `Storage.InMemory` for samples/tests |
 | 3 | Durable audit and outbox persistence | Governance records must survive restarts, provider outages, or retries. | `Core`, `EntityFrameworkCore` or a host-owned store |
 | 4 | Hosted drain worker and provider emission | You want local outbox entries delivered to a provider after local persistence. | `Core`, `AspNetCore`, durable store, one emitter |
@@ -51,17 +51,17 @@ Install only Core:
 ```bash
 dotnet new console -n AsiBackboneCoreOnly
 cd AsiBackboneCoreOnly
-dotnet add package CDCavell.AsiBackbone.Core
+dotnet add package AsiBackbone.Core
 ```
 
 Minimal Core-only example:
 
 ```csharp
-using CDCavell.AsiBackbone.Core.Actors;
-using CDCavell.AsiBackbone.Core.Audit;
-using CDCavell.AsiBackbone.Core.Constraints;
-using CDCavell.AsiBackbone.Core.Decisions;
-using CDCavell.AsiBackbone.Core.Evaluation;
+using AsiBackbone.Core.Actors;
+using AsiBackbone.Core.Audit;
+using AsiBackbone.Core.Constraints;
+using AsiBackbone.Core.Decisions;
+using AsiBackbone.Core.Evaluation;
 
 IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>[] constraints =
 [
@@ -228,14 +228,14 @@ Signing does not mean production tamper-evidence. Production claims require conc
 
 | Package | Install when | Do not install just because |
 | --- | --- | --- |
-| `CDCavell.AsiBackbone.Core` | You need decisions, constraints, audit residue, capability abstractions, provider-neutral outbox/emission/signing seams, or DLP failure-policy primitives. | You only want to read conceptual docs. |
-| `CDCavell.AsiBackbone.AspNetCore` | You are integrating with ASP.NET Core endpoint metadata, request correlation, result mapping, acknowledgment challenge helpers, endpoint governance, or hosted outbox drain. | You are writing a console, worker, or library-only proof path. |
-| `CDCavell.AsiBackbone.Storage.InMemory` | You need non-durable sample/test/local validation storage. | You need production audit durability. |
-| `CDCavell.AsiBackbone.EntityFrameworkCore` | You want host-owned EF Core persistence for audit/outbox/lifecycle records. | You are not ready to own migrations and database lifecycle. |
-| `CDCavell.AsiBackbone.Analyzers` | You want build-time diagnostics for governance persistence and continuation patterns. | You expect runtime enforcement. |
-| `CDCavell.AsiBackbone.OpenTelemetry` | You want to project governance envelopes into .NET diagnostics and a host-configured OpenTelemetry pipeline. | You expect Azure Monitor or another backend to be configured automatically. |
-| `CDCavell.AsiBackbone.Signing.LocalDevelopment` | You need a local/test/sample signing proof path. | You need production key custody. |
-| `CDCavell.AsiBackbone.Signing.ManagedKey` | You have a host-owned managed-key client and need an adapter boundary. | You expect built-in Azure Key Vault, Managed HSM, cloud KMS, or HSM implementation by default. |
+| `AsiBackbone.Core` | You need decisions, constraints, audit residue, capability abstractions, provider-neutral outbox/emission/signing seams, or DLP failure-policy primitives. | You only want to read conceptual docs. |
+| `AsiBackbone.AspNetCore` | You are integrating with ASP.NET Core endpoint metadata, request correlation, result mapping, acknowledgment challenge helpers, endpoint governance, or hosted outbox drain. | You are writing a console, worker, or library-only proof path. |
+| `AsiBackbone.Storage.InMemory` | You need non-durable sample/test/local validation storage. | You need production audit durability. |
+| `AsiBackbone.EntityFrameworkCore` | You want host-owned EF Core persistence for audit/outbox/lifecycle records. | You are not ready to own migrations and database lifecycle. |
+| `AsiBackbone.Analyzers` | You want build-time diagnostics for governance persistence and continuation patterns. | You expect runtime enforcement. |
+| `AsiBackbone.OpenTelemetry` | You want to project governance envelopes into .NET diagnostics and a host-configured OpenTelemetry pipeline. | You expect Azure Monitor or another backend to be configured automatically. |
+| `AsiBackbone.Signing.LocalDevelopment` | You need a local/test/sample signing proof path. | You need production key custody. |
+| `AsiBackbone.Signing.ManagedKey` | You have a host-owned managed-key client and need an adapter boundary. | You expect built-in Azure Key Vault, Managed HSM, cloud KMS, or HSM implementation by default. |
 
 ## What to avoid on day one
 

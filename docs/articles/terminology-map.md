@@ -162,14 +162,14 @@ Use this when an operation needs more than a simple allow/deny result before an 
 
 | Need | Start with |
 | --- | --- |
-| Framework-neutral policy decisions and audit primitives | `CDCavell.AsiBackbone.Core` |
-| ASP.NET Core request correlation, result mapping, endpoint metadata, or middleware seams | `CDCavell.AsiBackbone.AspNetCore` |
-| Local sample or test audit storage | `CDCavell.AsiBackbone.Storage.InMemory` |
-| Host-owned database persistence with EF Core model helpers | `CDCavell.AsiBackbone.EntityFrameworkCore` |
-| Provider-neutral governance emission projected through .NET diagnostics | `CDCavell.AsiBackbone.OpenTelemetry` |
-| Local development signing proof paths | `CDCavell.AsiBackbone.Signing.LocalDevelopment` |
-| Managed-key signing adapter boundary | `CDCavell.AsiBackbone.Signing.ManagedKey` |
-| Static-analysis guidance during development | `CDCavell.AsiBackbone.Analyzers` |
+| Framework-neutral policy decisions and audit primitives | `AsiBackbone.Core` |
+| ASP.NET Core request correlation, result mapping, endpoint metadata, or middleware seams | `AsiBackbone.AspNetCore` |
+| Local sample or test audit storage | `AsiBackbone.Storage.InMemory` |
+| Host-owned database persistence with EF Core model helpers | `AsiBackbone.EntityFrameworkCore` |
+| Provider-neutral governance emission projected through .NET diagnostics | `AsiBackbone.OpenTelemetry` |
+| Local development signing proof paths | `AsiBackbone.Signing.LocalDevelopment` |
+| Managed-key signing adapter boundary | `AsiBackbone.Signing.ManagedKey` |
+| Static-analysis guidance during development | `AsiBackbone.Analyzers` |
 
 Basic Core or ASP.NET Core adoption does not require EF Core, OpenTelemetry, signing, managed keys, outbox draining, or capability grants. Those are later layers for hosts that need stronger persistence, observability, signing, or execution-boundary behavior.
 

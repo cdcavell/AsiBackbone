@@ -15,9 +15,9 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 
 | Surface | Status | Limit |
 | --- | --- | --- |
-| Core canonical payload and signed-artifact helpers | Stable in `CDCavell.AsiBackbone.Core`. | Produces signing-ready, unsigned, or signed artifact wrappers; does not own key custody or storage controls. |
-| Local-development signing provider | Stable package: `CDCavell.AsiBackbone.Signing.LocalDevelopment`. | Test/sample/local validation only. Not production signing. |
-| Managed-key signing adapter | Stable package: `CDCavell.AsiBackbone.Signing.ManagedKey`. | Host supplies the concrete managed-key client, credentials, verification path, and operational controls. |
+| Core canonical payload and signed-artifact helpers | Stable in `AsiBackbone.Core`. | Produces signing-ready, unsigned, or signed artifact wrappers; does not own key custody or storage controls. |
+| Local-development signing provider | Stable package: `AsiBackbone.Signing.LocalDevelopment`. | Test/sample/local validation only. Not production signing. |
+| Managed-key signing adapter | Stable package: `AsiBackbone.Signing.ManagedKey`. | Host supplies the concrete managed-key client, credentials, verification path, and operational controls. |
 | Future concrete cloud/HSM/KMS packages | Future or host-owned unless separately released. | Not implied by this article. |
 
 ## Selected signable artifacts

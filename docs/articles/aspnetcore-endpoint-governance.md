@@ -1,6 +1,6 @@
 # ASP.NET Core Endpoint Governance
 
-`CDCavell.AsiBackbone.AspNetCore` includes an optional ergonomic endpoint-governance layer for the common ASP.NET Core case where a host wants to protect a Minimal API endpoint or controller action with AsiBackbone metadata.
+`AsiBackbone.AspNetCore` includes an optional ergonomic endpoint-governance layer for the common ASP.NET Core case where a host wants to protect a Minimal API endpoint or controller action with AsiBackbone metadata.
 
 This layer is intentionally a host adapter. It does not replace Core primitives, make persistence durable, create transactions, or certify audit immutability. It reduces endpoint boilerplate while keeping storage, transaction boundaries, capability-grant validation, and outbox behavior under host ownership.
 
@@ -63,7 +63,7 @@ The ergonomic endpoint layer deliberately does not own persistence. Durable audi
 
 | Concern | Owner |
 | --- | --- |
-| Endpoint metadata and middleware orchestration | `CDCavell.AsiBackbone.AspNetCore` |
+| Endpoint metadata and middleware orchestration | `AsiBackbone.AspNetCore` |
 | Policy constraints and decision policy | Host/Core evaluator registration |
 | Capability-grant source, proof validation, and replay handling | Host-owned `IAsiBackboneEndpointCapabilityGrantValidator` |
 | Audit sink, ledger store, outbox store, and transactions | Host-owned storage/integration layer |

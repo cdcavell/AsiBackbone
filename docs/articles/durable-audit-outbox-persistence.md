@@ -38,7 +38,7 @@ Core does not reference Azure Monitor, Event Hubs, Purview, OpenTelemetry, SIEM 
 
 ## In-memory development stores
 
-`CDCavell.AsiBackbone.Storage.InMemory` includes development and test stores:
+`AsiBackbone.Storage.InMemory` includes development and test stores:
 
 | Type | Purpose |
 | --- | --- |

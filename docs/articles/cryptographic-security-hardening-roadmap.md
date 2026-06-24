@@ -11,7 +11,7 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 
 ## Roadmap goals
 
-The cryptographic hardening roadmap turns signing-ready abstractions into progressively stronger implementation surfaces without coupling `CDCavell.AsiBackbone.Core` to one provider or platform.
+The cryptographic hardening roadmap turns signing-ready abstractions into progressively stronger implementation surfaces without coupling `AsiBackbone.Core` to one provider or platform.
 
 Primary goals:
 

@@ -14,7 +14,7 @@ Issue #244 asks whether Aspire should be a package, sample, or both. The current
 - Aspire is primarily a local orchestration and developer-experience layer for distributed applications.
 - The immediate value is showing how the existing governed ASP.NET Core sample can be launched and inspected from one local AppHost.
 
-A future `CDCavell.AsiBackbone.Aspire` package may make sense only if reusable Aspire resource extensions emerge that are valuable outside this repository's samples.
+A future `AsiBackbone.Aspire` package may make sense only if reusable Aspire resource extensions emerge that are valuable outside this repository's samples.
 
 ## Sample location
 
@@ -60,7 +60,7 @@ The AppHost sets a local SQLite connection string for the sample API and starts 
 From the repository root:
 
 ```powershell
-dotnet run --project samples/AsiBackboneAspireAppHost/CDCavell.AsiBackbone.Samples.AspireAppHost.csproj
+dotnet run --project samples/AsiBackboneAspireAppHost/AsiBackbone.Samples.AspireAppHost.csproj
 ```
 
 Then use the Aspire dashboard to open the `asi-backbone-api` resource endpoint.
@@ -96,7 +96,7 @@ Deeper governance-emission visibility through OpenTelemetry remains a future enh
 | --- | --- | --- |
 | API host | Existing Plain ASP.NET Core host sample | Host-owned execution remains inside the API. |
 | Database | Local SQLite connection string passed by the AppHost | Local validation only; production hosts own provider, migrations, backups, and retention. |
-| Signing | `CDCavell.AsiBackbone.Signing.LocalDevelopment` in the API sample | Not production key custody or legal non-repudiation. |
+| Signing | `AsiBackbone.Signing.LocalDevelopment` in the API sample | Not production key custody or legal non-repudiation. |
 | Telemetry/dashboard | Aspire dashboard resource and console visibility | Helpful for local debugging; not compliance evidence. |
 | Governance emission | Future OpenTelemetry sample extension | Optional; local audit/ledger records remain the first evidence boundary. |
 
@@ -104,7 +104,7 @@ Deeper governance-emission visibility through OpenTelemetry remains a future enh
 
 Aspire is valuable for distributed local development, but it should not change the dependency posture of the package family:
 
-- `CDCavell.AsiBackbone.Core` stays dependency-light.
+- `AsiBackbone.Core` stays dependency-light.
 - ASP.NET Core and EF Core remain separate provider/integration packages.
 - Aspire stays in `samples/` and in documentation.
 - Cloud Key Vault, production databases, managed keys, deprecated Aspire workloads, and external telemetry backends are not required for this local path.

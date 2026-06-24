@@ -24,7 +24,7 @@ This keeps the behavior policy-driven and provider-neutral. Purview, custom clas
 
 ## Core-neutral model
 
-The model lives in `CDCavell.AsiBackbone.Core` under provider-neutral classification language.
+The model lives in `AsiBackbone.Core` under provider-neutral classification language.
 
 Core owns:
 

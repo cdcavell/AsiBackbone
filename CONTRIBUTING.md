@@ -8,7 +8,7 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 
 Contributions should preserve the stable package direction:
 
-- keep `CDCavell.AsiBackbone.Core` framework-neutral;
+- keep `AsiBackbone.Core` framework-neutral;
 - keep host ownership explicit;
 - keep package boundaries clear;
 - avoid hidden infrastructure assumptions;

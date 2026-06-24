@@ -1,6 +1,6 @@
 # EF Core Host Ownership and Migration Guidance
 
-`CDCavell.AsiBackbone.EntityFrameworkCore` contributes model configuration and persistence helpers for ASI Backbone accountability records. The host application owns the `DbContext`, database provider, connection string, migrations, schema deployment, and operational database lifecycle.
+`AsiBackbone.EntityFrameworkCore` contributes model configuration and persistence helpers for ASI Backbone accountability records. The host application owns the `DbContext`, database provider, connection string, migrations, schema deployment, and operational database lifecycle.
 
 > [!IMPORTANT]
 > ASI Backbone does not take over the host database. The EF Core package adds ASI Backbone persistence shapes to a host-owned EF Core model; it does not provide a required package-owned `AsiBackboneDbContext`, forced provider, forced connection string, or package-owned migration set.
@@ -33,8 +33,8 @@ This allows ASI Backbone accountability records to participate in the applicatio
 A host application integrates ASI Backbone persistence by applying the EF Core model configuration extension from its own `DbContext`.
 
 ```csharp
-using CDCavell.AsiBackbone.EntityFrameworkCore;
-using CDCavell.AsiBackbone.EntityFrameworkCore.Persistence;
+using AsiBackbone.EntityFrameworkCore;
+using AsiBackbone.EntityFrameworkCore.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 public sealed class ApplicationDbContext : DbContext

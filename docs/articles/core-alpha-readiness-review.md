@@ -1,6 +1,6 @@
 # Historical Core Alpha Readiness Review
 
-This document preserves the readiness review for `CDCavell.AsiBackbone.Core` before the `0.1.0-alpha.1` milestone was completed.
+This document preserves the readiness review for `AsiBackbone.Core` before the `0.1.0-alpha.1` milestone was completed.
 
 > [!NOTE]
 > This page is an archived design and readiness record. It is retained to explain early Core package boundary decisions, not to describe the current stable release posture. Current stable package guidance is documented in [1.2.1 Release Notes](release-notes-121.md), [API Compatibility and Semantic Versioning](api-compatibility-and-semver.md), and [Historical Stable API Review](stable-api-review.md).
@@ -19,7 +19,7 @@ This review confirmed that the Core package was expected to:
 
 ## Historical Core package boundary
 
-At the alpha stage, `CDCavell.AsiBackbone.Core` was a dependency-light foundation package.
+At the alpha stage, `AsiBackbone.Core` was a dependency-light foundation package.
 
 Core was responsible for framework-neutral domain primitives such as:
 
@@ -52,13 +52,13 @@ The stable `1.x` package family now contains additional released packages and pr
 The alpha public API was organized by domain area:
 
 ```text
-CDCavell.AsiBackbone.Core.Actors
-CDCavell.AsiBackbone.Core.Audit
-CDCavell.AsiBackbone.Core.Constraints
-CDCavell.AsiBackbone.Core.Decisions
-CDCavell.AsiBackbone.Core.Entities
-CDCavell.AsiBackbone.Core.Handshakes
-CDCavell.AsiBackbone.Core.Results
+AsiBackbone.Core.Actors
+AsiBackbone.Core.Audit
+AsiBackbone.Core.Constraints
+AsiBackbone.Core.Decisions
+AsiBackbone.Core.Entities
+AsiBackbone.Core.Handshakes
+AsiBackbone.Core.Results
 ```
 
 The domain-based namespace model kept Core readable and avoided a broad catch-all abstractions namespace.

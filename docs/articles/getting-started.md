@@ -2,7 +2,7 @@
 
 This guide explains the current direction of the AsiBackbone repository and how to begin working with the project.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a stable `1.2.x` .NET package family for governance-oriented decision flow. The foundation package is `CDCavell.AsiBackbone.Core`, with optional integration packages for in-memory validation, EF Core host-owned persistence, ASP.NET Core host integration, analyzer guidance, OpenTelemetry projection, and signing-provider boundaries.
+In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a stable `1.2.x` .NET package family for governance-oriented decision flow. The foundation package is `AsiBackbone.Core`, with optional integration packages for in-memory validation, EF Core host-owned persistence, ASP.NET Core host integration, analyzer guidance, OpenTelemetry projection, and signing-provider boundaries.
 
 > [!IMPORTANT]
 > This project does not implement artificial superintelligence. It provides Accountable Systems Infrastructure: governance-oriented software building blocks inspired by broader Backbone framework concepts.
@@ -14,26 +14,26 @@ The repository includes the Core foundation and optional packages for in-memory 
 The stable `1.2.1` package lineup is:
 
 ```text
-CDCavell.AsiBackbone.Core
-CDCavell.AsiBackbone.DependencyInjection
-CDCavell.AsiBackbone.Storage.InMemory
-CDCavell.AsiBackbone.EntityFrameworkCore
-CDCavell.AsiBackbone.AspNetCore
-CDCavell.AsiBackbone.Testing
-CDCavell.AsiBackbone.Templates
-CDCavell.AsiBackbone.Analyzers
-CDCavell.AsiBackbone.OpenTelemetry
-CDCavell.AsiBackbone.Signing.LocalDevelopment
-CDCavell.AsiBackbone.Signing.ManagedKey
+AsiBackbone.Core
+AsiBackbone.DependencyInjection
+AsiBackbone.Storage.InMemory
+AsiBackbone.EntityFrameworkCore
+AsiBackbone.AspNetCore
+AsiBackbone.Testing
+AsiBackbone.Templates
+AsiBackbone.Analyzers
+AsiBackbone.OpenTelemetry
+AsiBackbone.Signing.LocalDevelopment
+AsiBackbone.Signing.ManagedKey
 ```
 
 Planned or later package areas remain separate from the implemented stable lineup:
 
 ```text
-CDCavell.AsiBackbone.EventHubs
-CDCavell.AsiBackbone.Purview
-CDCavell.AsiBackbone.Robotics
-CDCavell.AsiBackbone.ImmutableStorage
+AsiBackbone.EventHubs
+AsiBackbone.Purview
+AsiBackbone.Robotics
+AsiBackbone.ImmutableStorage
 ```
 
 The current implementation direction is:
@@ -231,7 +231,7 @@ A capability token should be:
 
 The durable governance outbox preserves local accountability records before downstream provider delivery is attempted.
 
-Provider emission is optional. Hosts can use provider-neutral emission contracts and adopt a concrete provider such as `CDCavell.AsiBackbone.OpenTelemetry` when governance events should be projected into diagnostics, observability, or governance systems.
+Provider emission is optional. Hosts can use provider-neutral emission contracts and adopt a concrete provider such as `AsiBackbone.OpenTelemetry` when governance events should be projected into diagnostics, observability, or governance systems.
 
 The host remains responsible for deciding whether a downstream system is authoritative, supplemental, or enrichment-only.
 
@@ -239,8 +239,8 @@ The host remains responsible for deciding whether a downstream system is authori
 
 Core keeps signing and verification provider-neutral. The signing packages provide optional provider boundaries:
 
-* `CDCavell.AsiBackbone.Signing.LocalDevelopment` for tests, samples, and local proof paths.
-* `CDCavell.AsiBackbone.Signing.ManagedKey` for host-owned managed-key client integration.
+* `AsiBackbone.Signing.LocalDevelopment` for tests, samples, and local proof paths.
+* `AsiBackbone.Signing.ManagedKey` for host-owned managed-key client integration.
 
 Signing does not equal production tamper-evidence by itself. Hosts own key custody, verification policy, storage controls, retention, monitoring, and operational procedures.
 
@@ -259,9 +259,9 @@ Robotics and physical execution should remain future, sample-only, or separately
 
 ## Current packages
 
-## CDCavell.AsiBackbone.Core
+## AsiBackbone.Core
 
-`CDCavell.AsiBackbone.Core` is the framework-neutral foundation package.
+`AsiBackbone.Core` is the framework-neutral foundation package.
 
 It provides:
 
@@ -287,61 +287,61 @@ It avoids:
 * Cloud-provider SDK assumptions
 * Signing-provider implementation assumptions
 
-## CDCavell.AsiBackbone.Storage.InMemory
+## AsiBackbone.Storage.InMemory
 
-`CDCavell.AsiBackbone.Storage.InMemory` provides non-durable in-memory storage helpers for tests, samples, and local validation hosts.
+`AsiBackbone.Storage.InMemory` provides non-durable in-memory storage helpers for tests, samples, and local validation hosts.
 
 It should not be used as durable production storage.
 
-## CDCavell.AsiBackbone.EntityFrameworkCore
+## AsiBackbone.EntityFrameworkCore
 
-`CDCavell.AsiBackbone.EntityFrameworkCore` provides EF Core model configuration and durable accountability persistence while preserving host ownership of the `DbContext`, provider, connection string, migrations, deployment, and schema lifecycle.
+`AsiBackbone.EntityFrameworkCore` provides EF Core model configuration and durable accountability persistence while preserving host ownership of the `DbContext`, provider, connection string, migrations, deployment, and schema lifecycle.
 
-## CDCavell.AsiBackbone.AspNetCore
+## AsiBackbone.AspNetCore
 
-`CDCavell.AsiBackbone.AspNetCore` provides thin ASP.NET Core host adapters for service registration, request correlation, audit enrichment, HTTP result mapping, acknowledgment challenge helpers, endpoint governance, and hosted outbox drain integration.
+`AsiBackbone.AspNetCore` provides thin ASP.NET Core host adapters for service registration, request correlation, audit enrichment, HTTP result mapping, acknowledgment challenge helpers, endpoint governance, and hosted outbox drain integration.
 
 It does not own authentication, authorization, persistence, route exposure, UI rendering, policy definitions, exporter configuration, key management, or operational execution.
 
-## CDCavell.AsiBackbone.Analyzers
+## AsiBackbone.Analyzers
 
-`CDCavell.AsiBackbone.Analyzers` provides Roslyn analyzer safety rails for governance persistence and continuation flows.
+`AsiBackbone.Analyzers` provides Roslyn analyzer safety rails for governance persistence and continuation flows.
 
 Analyzer guidance is build-time feedback. It is not runtime enforcement and does not prove compliance.
 
-## CDCavell.AsiBackbone.OpenTelemetry
+## AsiBackbone.OpenTelemetry
 
-`CDCavell.AsiBackbone.OpenTelemetry` provides a concrete governance emission provider that projects provider-neutral governance envelopes into .NET diagnostics through `ActivitySource` and `Meter`.
+`AsiBackbone.OpenTelemetry` provides a concrete governance emission provider that projects provider-neutral governance envelopes into .NET diagnostics through `ActivitySource` and `Meter`.
 
 Exporters such as Azure Monitor remain host-configured.
 
-## CDCavell.AsiBackbone.Signing.LocalDevelopment
+## AsiBackbone.Signing.LocalDevelopment
 
-`CDCavell.AsiBackbone.Signing.LocalDevelopment` provides local-development RSA signing and verification for tests, samples, and proof paths.
+`AsiBackbone.Signing.LocalDevelopment` provides local-development RSA signing and verification for tests, samples, and proof paths.
 
 It is not a production managed-key provider and does not provide protected key custody, immutability, legal non-repudiation, compliance certification, or production tamper-evidence.
 
-## CDCavell.AsiBackbone.Signing.ManagedKey
+## AsiBackbone.Signing.ManagedKey
 
-`CDCavell.AsiBackbone.Signing.ManagedKey` provides a provider-neutral managed-key signing adapter boundary.
+`AsiBackbone.Signing.ManagedKey` provides a provider-neutral managed-key signing adapter boundary.
 
 The host supplies the actual managed-key client, credentials, key operations, monitoring, verification path, and operational policy. The package does not include live Azure Key Vault, Managed HSM, cloud KMS, HSM, or certificate-store implementation by default.
 
-## CDCavell.AsiBackbone.DependencyInjection
+## AsiBackbone.DependencyInjection
 
-`CDCavell.AsiBackbone.DependencyInjection` provides the shared `AddAsiBackbone(...)` builder facade for host-selected provider registration.
+`AsiBackbone.DependencyInjection` provides the shared `AddAsiBackbone(...)` builder facade for host-selected provider registration.
 
 It coordinates package registration without making Core own infrastructure, persistence, web hosting, telemetry exporters, signing providers, or execution behavior.
 
-## CDCavell.AsiBackbone.Testing
+## AsiBackbone.Testing
 
-`CDCavell.AsiBackbone.Testing` provides test-only helpers for deterministic governance and package-wiring validation.
+`AsiBackbone.Testing` provides test-only helpers for deterministic governance and package-wiring validation.
 
 It is intended for tests, smoke checks, and package-consumer validation. It is not runtime enforcement and should not be treated as production governance infrastructure by itself.
 
-## CDCavell.AsiBackbone.Templates
+## AsiBackbone.Templates
 
-`CDCavell.AsiBackbone.Templates` provides `dotnet new` templates for generating governed ASP.NET Core host scaffolds.
+`AsiBackbone.Templates` provides `dotnet new` templates for generating governed ASP.NET Core host scaffolds.
 
 The templates are developer-experience scaffolding. They are not runtime dependencies and do not replace host-owned architecture, security, persistence, deployment, or operational review.
 
@@ -349,10 +349,10 @@ The templates are developer-experience scaffolding. They are not runtime depende
 
 Future package areas may include:
 
-* `CDCavell.AsiBackbone.EventHubs`
-* `CDCavell.AsiBackbone.Purview`
-* `CDCavell.AsiBackbone.Robotics`
-* `CDCavell.AsiBackbone.ImmutableStorage`
+* `AsiBackbone.EventHubs`
+* `AsiBackbone.Purview`
+* `AsiBackbone.Robotics`
+* `AsiBackbone.ImmutableStorage`
 
 Planned package names are not part of the current `1.2.x` stable contract unless a future release explicitly ships them as stable packages.
 

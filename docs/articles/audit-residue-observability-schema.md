@@ -2,7 +2,7 @@
 
 This article documents the provider-neutral telemetry, traceability, and operational diagnostics fields added to the audit residue model for the `1.1.0 - Observability, Outbox, and Governance Emission Providers` milestone.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. These fields support observability and governance emission without making `CDCavell.AsiBackbone.Core` depend on OpenTelemetry, Azure Monitor, Event Hubs, Purview, SIEM products, or any provider-specific package.
+In this software project, **ASI** means **Accountable Systems Infrastructure**. These fields support observability and governance emission without making `AsiBackbone.Core` depend on OpenTelemetry, Azure Monitor, Event Hubs, Purview, SIEM products, or any provider-specific package.
 
 ## Design intent
 
@@ -70,7 +70,7 @@ The schema is intentionally usable by multiple provider paths:
 | Event Hubs | Stream minimized governance envelopes after durable local/outbox persistence. |
 | Purview | Enrich catalog, classification, or lineage context without making Purview the raw audit store by default. |
 
-`CDCavell.AsiBackbone.Core` owns the neutral field names and value-shape guidance. Provider-specific transformation, retry behavior, workspace IDs, cloud SDKs, exporters, and provider-specific payloads belong outside Core.
+`AsiBackbone.Core` owns the neutral field names and value-shape guidance. Provider-specific transformation, retry behavior, workspace IDs, cloud SDKs, exporters, and provider-specific payloads belong outside Core.
 
 ## Recommended controlled values
 

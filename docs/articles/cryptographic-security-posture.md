@@ -45,9 +45,9 @@ The host application remains responsible for deciding whether a given workflow r
 
 | Surface | `1.1.0` status | Production boundary |
 | --- | --- | --- |
-| `CDCavell.AsiBackbone.Core` signing primitives | Stable. | Signing-ready metadata, canonical hashing, signing seams, verification seams, and verification-policy primitives. No production key custody. |
-| `CDCavell.AsiBackbone.Signing.LocalDevelopment` | Stable local-development provider. | Tests, samples, local validation, and wiring proof paths only. Not production signing. |
-| `CDCavell.AsiBackbone.Signing.ManagedKey` | Stable managed-key adapter. | Adapter boundary only. Host supplies the actual managed-key client, credentials, verification path, monitoring, and operational policy. |
+| `AsiBackbone.Core` signing primitives | Stable. | Signing-ready metadata, canonical hashing, signing seams, verification seams, and verification-policy primitives. No production key custody. |
+| `AsiBackbone.Signing.LocalDevelopment` | Stable local-development provider. | Tests, samples, local validation, and wiring proof paths only. Not production signing. |
+| `AsiBackbone.Signing.ManagedKey` | Stable managed-key adapter. | Adapter boundary only. Host supplies the actual managed-key client, credentials, verification path, monitoring, and operational policy. |
 | Concrete Azure Key Vault, Managed HSM, cloud KMS, HSM, or certificate-store implementation | Host-owned or future package unless separately released. | Do not imply this ships by default. |
 | Production tamper-evidence, immutability, external anchoring, legal non-repudiation, or compliance certification | Not provided by default. | Requires a deployed end-to-end operational trust design. |
 
@@ -282,7 +282,7 @@ For high-risk workflows, token validation failure should usually deny or escalat
 
 ## Local-development signer limitations
 
-`CDCavell.AsiBackbone.Signing.LocalDevelopment` is a released local-development provider package. It can be useful for samples, smoke tests, and development workflows, but it should be described narrowly.
+`AsiBackbone.Signing.LocalDevelopment` is a released local-development provider package. It can be useful for samples, smoke tests, and development workflows, but it should be described narrowly.
 
 Local-development signers are appropriate for:
 
@@ -311,7 +311,7 @@ Local signer guidance:
 
 ## Managed-key adapter limitations
 
-`CDCavell.AsiBackbone.Signing.ManagedKey` is a released adapter boundary, not a complete key-management implementation.
+`AsiBackbone.Signing.ManagedKey` is a released adapter boundary, not a complete key-management implementation.
 
 Hosts using it in production should:
 

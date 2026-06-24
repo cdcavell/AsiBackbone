@@ -1,6 +1,6 @@
 # EF Core Integration Package Boundary
 
-This article defines the intended boundary for the implemented `CDCavell.AsiBackbone.EntityFrameworkCore` package.
+This article defines the intended boundary for the implemented `AsiBackbone.EntityFrameworkCore` package.
 
 The EF Core integration package provides persistence configuration and storage helpers for AsiBackbone accountability records while preserving host ownership of the application database.
 
@@ -24,7 +24,7 @@ The package contributes EF Core model configuration, persistence-facing entities
 
 ## Package responsibility
 
-`CDCavell.AsiBackbone.EntityFrameworkCore` provides:
+`AsiBackbone.EntityFrameworkCore` provides:
 
 * EF Core entity type configurations for AsiBackbone persistence models
 * `ModelBuilder` extension methods for applying AsiBackbone configurations
@@ -51,7 +51,7 @@ The host application owns the `DbContext`.
 A consuming application should be able to integrate AsiBackbone persistence using a pattern similar to:
 
 ```csharp
-using CDCavell.AsiBackbone.EntityFrameworkCore;
+using AsiBackbone.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 public sealed class ApplicationDbContext : DbContext
@@ -91,7 +91,7 @@ AsiBackbone EF Core package
 The extension method lives in the EF Core integration package under:
 
 ```csharp
-namespace CDCavell.AsiBackbone.EntityFrameworkCore;
+namespace AsiBackbone.EntityFrameworkCore;
 ```
 
 The public contract is intentionally simple: the host calls one extension method from `OnModelCreating`.
@@ -140,15 +140,15 @@ Provider-specific examples may appear later in samples or documentation, but the
 
 ## Relationship to Core
 
-`CDCavell.AsiBackbone.Core` remains free of EF Core references.
+`AsiBackbone.Core` remains free of EF Core references.
 
 Dependency direction is:
 
 ```text
-CDCavell.AsiBackbone.Core
+AsiBackbone.Core
         ▲
         │
-CDCavell.AsiBackbone.EntityFrameworkCore
+AsiBackbone.EntityFrameworkCore
 ```
 
 Core defines the domain contracts and governance primitives. The EF Core package adapts those contracts into persistence behavior.

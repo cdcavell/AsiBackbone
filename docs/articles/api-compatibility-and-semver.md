@@ -32,10 +32,10 @@ The initial stable `1.0.0` package family established the first compatible `1.x`
 
 | Package | Stable role |
 | --- | --- |
-| `CDCavell.AsiBackbone.Core` | Framework-neutral governance primitives, decisions, constraints, actor context, audit residue, acknowledgment, capability-token abstractions, and operation results. |
-| `CDCavell.AsiBackbone.AspNetCore` | ASP.NET Core host adapters for actor context, request correlation, HTTP result mapping, and acknowledgment challenge support. |
-| `CDCavell.AsiBackbone.Storage.InMemory` | Non-durable in-memory storage helpers for tests, samples, and local validation. |
-| `CDCavell.AsiBackbone.EntityFrameworkCore` | EF Core model configuration and host-owned persistence integration. |
+| `AsiBackbone.Core` | Framework-neutral governance primitives, decisions, constraints, actor context, audit residue, acknowledgment, capability-token abstractions, and operation results. |
+| `AsiBackbone.AspNetCore` | ASP.NET Core host adapters for actor context, request correlation, HTTP result mapping, and acknowledgment challenge support. |
+| `AsiBackbone.Storage.InMemory` | Non-durable in-memory storage helpers for tests, samples, and local validation. |
+| `AsiBackbone.EntityFrameworkCore` | EF Core model configuration and host-owned persistence integration. |
 
 ### Expanded `1.1.x` stable family
 
@@ -43,17 +43,17 @@ The released `1.1.0` package family kept the `1.0.0` packages compatible and add
 
 | Package | `1.1.x` stable role |
 | --- | --- |
-| `CDCavell.AsiBackbone.Core` | Adds provider-neutral governance emission contracts, durable outbox contracts, DLP/classification policy primitives, signing-ready metadata abstractions, canonical hashing/signing seams, verification-policy primitives, and lifecycle/audit additions while preserving the compatible `1.x` Core line. |
-| `CDCavell.AsiBackbone.DependencyInjection` | Adds the explicit `AddAsiBackbone(...)` builder facade for coordinating host-selected provider registrations without making Core own infrastructure. |
-| `CDCavell.AsiBackbone.Storage.InMemory` | Adds non-durable lifecycle and outbox proof paths for tests, samples, and local validation. |
-| `CDCavell.AsiBackbone.EntityFrameworkCore` | Adds host-owned durable persistence surfaces for audit residue lifecycle and governance outbox records. |
-| `CDCavell.AsiBackbone.AspNetCore` | Adds endpoint governance and hosted outbox drain integration while keeping host ownership explicit. |
-| `CDCavell.AsiBackbone.Testing` | Adds test-only endpoint-governance harness helpers for deterministic policy decisions and in-memory inspection. |
-| `CDCavell.AsiBackbone.Templates` | Adds `dotnet new` templates for generating governed ASP.NET Core host scaffolds. The package is a developer-experience scaffold, not a runtime dependency. |
-| `CDCavell.AsiBackbone.Analyzers` | Stable build-time analyzer safety rails for governance persistence and continuation-flow patterns. |
-| `CDCavell.AsiBackbone.OpenTelemetry` | Stable concrete governance emission provider that projects provider-neutral envelopes into .NET diagnostics primitives such as `ActivitySource` and `Meter`. |
-| `CDCavell.AsiBackbone.Signing.LocalDevelopment` | Stable local-development signing and verification provider for tests, samples, and wiring proof paths only. Not production key custody. |
-| `CDCavell.AsiBackbone.Signing.ManagedKey` | Stable managed-key signing adapter boundary. The host supplies the actual managed-key client and operational controls. |
+| `AsiBackbone.Core` | Adds provider-neutral governance emission contracts, durable outbox contracts, DLP/classification policy primitives, signing-ready metadata abstractions, canonical hashing/signing seams, verification-policy primitives, and lifecycle/audit additions while preserving the compatible `1.x` Core line. |
+| `AsiBackbone.DependencyInjection` | Adds the explicit `AddAsiBackbone(...)` builder facade for coordinating host-selected provider registrations without making Core own infrastructure. |
+| `AsiBackbone.Storage.InMemory` | Adds non-durable lifecycle and outbox proof paths for tests, samples, and local validation. |
+| `AsiBackbone.EntityFrameworkCore` | Adds host-owned durable persistence surfaces for audit residue lifecycle and governance outbox records. |
+| `AsiBackbone.AspNetCore` | Adds endpoint governance and hosted outbox drain integration while keeping host ownership explicit. |
+| `AsiBackbone.Testing` | Adds test-only endpoint-governance harness helpers for deterministic policy decisions and in-memory inspection. |
+| `AsiBackbone.Templates` | Adds `dotnet new` templates for generating governed ASP.NET Core host scaffolds. The package is a developer-experience scaffold, not a runtime dependency. |
+| `AsiBackbone.Analyzers` | Stable build-time analyzer safety rails for governance persistence and continuation-flow patterns. |
+| `AsiBackbone.OpenTelemetry` | Stable concrete governance emission provider that projects provider-neutral envelopes into .NET diagnostics primitives such as `ActivitySource` and `Meter`. |
+| `AsiBackbone.Signing.LocalDevelopment` | Stable local-development signing and verification provider for tests, samples, and wiring proof paths only. Not production key custody. |
+| `AsiBackbone.Signing.ManagedKey` | Stable managed-key signing adapter boundary. The host supplies the actual managed-key client and operational controls. |
 
 ### Current `1.2.x` stable family
 
@@ -61,17 +61,17 @@ The released `1.1.0` package family kept the `1.0.0` packages compatible and add
 
 | Package | `1.2.x` stable role |
 | --- | --- |
-| `CDCavell.AsiBackbone.Core` | Continues the framework-neutral governance primitive surface and durable artifact contracts from the compatible `1.x` line. |
-| `CDCavell.AsiBackbone.DependencyInjection` | Provides the explicit builder facade and host-selected provider registration composition path. |
-| `CDCavell.AsiBackbone.Storage.InMemory` | Provides non-durable storage helpers for tests, samples, local validation, lifecycle events, and outbox proof paths. |
-| `CDCavell.AsiBackbone.EntityFrameworkCore` | Provides EF Core host-owned persistence helpers for audit, acknowledgment, lifecycle, and outbox records. |
-| `CDCavell.AsiBackbone.AspNetCore` | Provides ASP.NET Core host adapters, endpoint governance, development diagnostics, and hosted outbox drain integration. |
-| `CDCavell.AsiBackbone.Testing` | Provides test-only harness helpers for deterministic governance and package-wiring tests. |
-| `CDCavell.AsiBackbone.Templates` | Provides developer-experience `dotnet new` templates for governed ASP.NET Core host scaffolding. |
-| `CDCavell.AsiBackbone.Analyzers` | Provides build-time analyzer safety rails, including production-signing configuration guidance. |
-| `CDCavell.AsiBackbone.OpenTelemetry` | Provides the released OpenTelemetry governance emission provider. |
-| `CDCavell.AsiBackbone.Signing.LocalDevelopment` | Provides local-development signing and verification for tests, samples, and wiring proof paths only. |
-| `CDCavell.AsiBackbone.Signing.ManagedKey` | Provides the managed-key signing adapter boundary where the host supplies the concrete managed-key client and operational controls. |
+| `AsiBackbone.Core` | Continues the framework-neutral governance primitive surface and durable artifact contracts from the compatible `1.x` line. |
+| `AsiBackbone.DependencyInjection` | Provides the explicit builder facade and host-selected provider registration composition path. |
+| `AsiBackbone.Storage.InMemory` | Provides non-durable storage helpers for tests, samples, local validation, lifecycle events, and outbox proof paths. |
+| `AsiBackbone.EntityFrameworkCore` | Provides EF Core host-owned persistence helpers for audit, acknowledgment, lifecycle, and outbox records. |
+| `AsiBackbone.AspNetCore` | Provides ASP.NET Core host adapters, endpoint governance, development diagnostics, and hosted outbox drain integration. |
+| `AsiBackbone.Testing` | Provides test-only harness helpers for deterministic governance and package-wiring tests. |
+| `AsiBackbone.Templates` | Provides developer-experience `dotnet new` templates for governed ASP.NET Core host scaffolding. |
+| `AsiBackbone.Analyzers` | Provides build-time analyzer safety rails, including production-signing configuration guidance. |
+| `AsiBackbone.OpenTelemetry` | Provides the released OpenTelemetry governance emission provider. |
+| `AsiBackbone.Signing.LocalDevelopment` | Provides local-development signing and verification for tests, samples, and wiring proof paths only. |
+| `AsiBackbone.Signing.ManagedKey` | Provides the managed-key signing adapter boundary where the host supplies the concrete managed-key client and operational controls. |
 
 Stable package status does not imply that every future provider idea is stable. Event Hubs, Purview, Azure-specific SDK adapters, Aspire runtime packages, robotics, immutable storage, and additional provider packages remain outside the stable contract unless separately reviewed and released as stable packages.
 
@@ -138,9 +138,9 @@ Additive artifact fields are normally acceptable in a compatible minor release w
 
 Released provider packages have their own stable contract within the compatible `1.x` line once they are published as stable packages. In the current `1.2.x` line, that includes:
 
-- `CDCavell.AsiBackbone.OpenTelemetry`;
-- `CDCavell.AsiBackbone.Signing.LocalDevelopment`;
-- `CDCavell.AsiBackbone.Signing.ManagedKey`.
+- `AsiBackbone.OpenTelemetry`;
+- `AsiBackbone.Signing.LocalDevelopment`;
+- `AsiBackbone.Signing.ManagedKey`.
 
 The analyzer package is also part of the released stable package family, but analyzer diagnostics are build-time guidance rather than runtime enforcement. The testing package is a test-harness package rather than runtime enforcement. The templates package is a developer-experience package rather than a runtime provider.
 

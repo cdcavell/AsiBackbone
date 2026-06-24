@@ -9,7 +9,7 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 > [!IMPORTANT]
 > This page does **not** document a released NuGet package. No Event Hubs provider package, Azure Event Hubs SDK adapter, Azure-specific emission package, or Event Hubs publishing implementation is included in the `1.1.0` stable package family.
 >
-> `CDCavell.AsiBackbone.OpenTelemetry` is the only concrete released governance emission provider package in `1.1.0`. Event Hubs remains a future/design-only provider direction unless a later release separately reviews and ships it.
+> `AsiBackbone.OpenTelemetry` is the only concrete released governance emission provider package in `1.1.0`. Event Hubs remains a future/design-only provider direction unless a later release separately reviews and ships it.
 >
 > See [1.1.0 Release Notes - Accepted deferrals](release-notes-110.md#accepted-deferrals) for the current release boundary.
 
@@ -20,7 +20,7 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 
 The Event Hubs provider design gives hosts a possible future Azure streaming path for replayable governance event delivery to downstream monitoring, compliance, lineage, SIEM, enrichment, or analytics consumers.
 
-A future provider should adapt provider-neutral governance emission envelopes into Event Hubs messages without making `CDCavell.AsiBackbone.Core` depend on Azure SDKs, Azure resource concepts, Event Hubs namespaces, Purview, SIEM products, or provider-specific retry clients.
+A future provider should adapt provider-neutral governance emission envelopes into Event Hubs messages without making `AsiBackbone.Core` depend on Azure SDKs, Azure resource concepts, Event Hubs namespaces, Purview, SIEM products, or provider-specific retry clients.
 
 ```text
 Audit residue / lifecycle event / gateway result
@@ -38,22 +38,22 @@ The durable local audit and outbox records remain the reliability and accountabi
 Candidate provider package name:
 
 ```text
-CDCavell.AsiBackbone.Streaming.EventHubs
+AsiBackbone.Streaming.EventHubs
 ```
 
 Acceptable alternative package names if the package family later groups Azure integrations differently:
 
 ```text
-CDCavell.AsiBackbone.AzureEventHubs
-CDCavell.AsiBackbone.Azure.EventHubs
-CDCavell.AsiBackbone.Observability.EventHubs
+AsiBackbone.AzureEventHubs
+AsiBackbone.Azure.EventHubs
+AsiBackbone.Observability.EventHubs
 ```
 
 These names are planning candidates only. They are not part of the released `1.1.0` package list.
 
 A future package should depend on:
 
-* `CDCavell.AsiBackbone.Core`;
+* `AsiBackbone.Core`;
 * Event Hubs client abstractions needed to publish to Azure Event Hubs;
 * Azure Identity support when Managed Identity or token credentials are enabled;
 * `Microsoft.Extensions.Options` for provider configuration;
@@ -102,7 +102,7 @@ Recommended envelope-level fields:
 | --- | --- |
 | `EnvelopeId` | Stable envelope identifier for idempotency and diagnostics. |
 | `SchemaVersion` | Stable envelope schema version. |
-| `Source` | Package or host source name, such as `CDCavell.AsiBackbone`. |
+| `Source` | Package or host source name, such as `AsiBackbone`. |
 | `SourceVersion` | AsiBackbone or provider package version when known. |
 | `EventType` | Controlled governance event type. |
 | `EventId` | Stable governance event identifier. |
@@ -122,8 +122,8 @@ Recommended envelope schema identity:
 
 ```text
 SchemaVersion: 1.0
-ContentType: application/vnd.cdcavell.asibackbone.governance-emission+json;v=1
-Source: CDCavell.AsiBackbone
+ContentType: application/vnd.AsiBackbone.governance-emission+json;v=1
+Source: AsiBackbone
 EmitterProvider: azure-event-hubs
 ```
 

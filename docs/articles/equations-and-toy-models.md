@@ -2,9 +2,9 @@
 
 This article explains the conceptual equations and toy models that inspired the AsiBackbone software architecture.
 
-The equations are used here as architectural language. They are not claims that `CDCavell.AsiBackbone.Core` performs literal physical collapse, implements artificial superintelligence, or proves the Eden Hypothesis.
+The equations are used here as architectural language. They are not claims that `AsiBackbone.Core` performs literal physical collapse, implements artificial superintelligence, or proves the Eden Hypothesis.
 
-`CDCavell.AsiBackbone.Core` is best understood as a governance spine: a framework-neutral set of primitives for policy evaluation, constrained outcomes, acknowledgment, audit residue, capability boundaries, and gateway-safe execution.
+`AsiBackbone.Core` is best understood as a governance spine: a framework-neutral set of primitives for policy evaluation, constrained outcomes, acknowledgment, audit residue, capability boundaries, and gateway-safe execution.
 
 > [!IMPORTANT]
 > AsiBackbone uses collapse language conceptually and structurally. In software terms, collapse means that a proposed request is narrowed into a bounded decision outcome through explicit policy structure.
@@ -17,7 +17,7 @@ The key software interpretation is:
 
 That sentence is the bridge between the conceptual notation and the package design.
 
-In `CDCavell.AsiBackbone.Core`, a request enters as open possibility. It may represent a user intent, service request, administrative action, external API call, document approval, simulated command, or gateway-bound operation.
+In `AsiBackbone.Core`, a request enters as open possibility. It may represent a user intent, service request, administrative action, external API call, document approval, simulated command, or gateway-bound operation.
 
 The policy pipeline then narrows that request into one of the supported governance outcomes.
 
@@ -323,7 +323,7 @@ Operation requested
 
 This is the practical software version of constrained execution.
 
-## Why this matters for `CDCavell.AsiBackbone.Core`
+## Why this matters for `AsiBackbone.Core`
 
 The Core package should remain framework-neutral and host-neutral. It should define the primitives that make these flows possible without owning the host application.
 

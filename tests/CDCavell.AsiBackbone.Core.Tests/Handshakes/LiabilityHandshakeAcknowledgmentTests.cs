@@ -1,8 +1,8 @@
-using CDCavell.AsiBackbone.Core.Actors;
-using CDCavell.AsiBackbone.Core.Handshakes;
+using AsiBackbone.Core.Actors;
+using AsiBackbone.Core.Handshakes;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.Core.Tests.Handshakes;
+namespace AsiBackbone.Core.Tests.Handshakes;
 
 /// <summary>
 /// Unit tests for the <see cref="LiabilityHandshakeAcknowledgment"/> class, which represents the acknowledgment response to a liability handshake request.

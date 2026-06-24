@@ -1,9 +1,9 @@
-using CDCavell.AsiBackbone.Core.Integrity;
-using CDCavell.AsiBackbone.Core.Serialization;
-using CDCavell.AsiBackbone.Core.Signing;
+using AsiBackbone.Core.Integrity;
+using AsiBackbone.Core.Serialization;
+using AsiBackbone.Core.Signing;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.Core.Tests.Integrity;
+namespace AsiBackbone.Core.Tests.Integrity;
 
 public sealed class AuditIntegrityVerifierTests
 {

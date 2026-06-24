@@ -1,10 +1,10 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using CDCavell.AsiBackbone.Core.CapabilityTokens;
-using CDCavell.AsiBackbone.Core.Signing;
+using AsiBackbone.Core.CapabilityTokens;
+using AsiBackbone.Core.Signing;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.Core.Tests.CapabilityTokens;
+namespace AsiBackbone.Core.Tests.CapabilityTokens;
 
 public sealed class CapabilityGrantValidatorTests
 {

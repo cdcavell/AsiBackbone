@@ -1,7 +1,7 @@
-using CDCavell.AsiBackbone.Core.CapabilityTokens;
+using AsiBackbone.Core.CapabilityTokens;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.Core.Tests.CapabilityTokens;
+namespace AsiBackbone.Core.Tests.CapabilityTokens;
 
 public sealed class CapabilityTokenGrantBranchTests
 {

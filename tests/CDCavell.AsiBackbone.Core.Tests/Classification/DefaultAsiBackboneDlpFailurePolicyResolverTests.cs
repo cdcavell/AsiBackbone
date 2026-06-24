@@ -1,7 +1,7 @@
-using CDCavell.AsiBackbone.Core.Classification;
+using AsiBackbone.Core.Classification;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.Core.Tests.Classification;
+namespace AsiBackbone.Core.Tests.Classification;
 
 /// <summary>
 /// Unit tests for provider-neutral DLP and classification failure policy resolution.

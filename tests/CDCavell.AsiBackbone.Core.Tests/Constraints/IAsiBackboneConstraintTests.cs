@@ -1,7 +1,7 @@
-using CDCavell.AsiBackbone.Core.Constraints;
+using AsiBackbone.Core.Constraints;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.Core.Tests.Constraints;
+namespace AsiBackbone.Core.Tests.Constraints;
 
 /// <summary>
 /// Tests for <see cref="IAsiBackboneConstraint{TContext}"/> implementations.

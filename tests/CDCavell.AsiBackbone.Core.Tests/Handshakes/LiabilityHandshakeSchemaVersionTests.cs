@@ -1,10 +1,10 @@
 using System.Text.Json;
-using CDCavell.AsiBackbone.Core.Actors;
-using CDCavell.AsiBackbone.Core.Handshakes;
-using CDCavell.AsiBackbone.Core.Serialization;
+using AsiBackbone.Core.Actors;
+using AsiBackbone.Core.Handshakes;
+using AsiBackbone.Core.Serialization;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.Core.Tests.Handshakes;
+namespace AsiBackbone.Core.Tests.Handshakes;
 
 /// <summary>
 /// Unit tests for stable liability handshake schema version serialization.

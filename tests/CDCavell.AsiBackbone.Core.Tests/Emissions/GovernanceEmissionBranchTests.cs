@@ -1,9 +1,9 @@
-using CDCavell.AsiBackbone.Core.Actors;
-using CDCavell.AsiBackbone.Core.Audit;
-using CDCavell.AsiBackbone.Core.Emissions;
+using AsiBackbone.Core.Actors;
+using AsiBackbone.Core.Audit;
+using AsiBackbone.Core.Emissions;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.Core.Tests.Emissions;
+namespace AsiBackbone.Core.Tests.Emissions;
 
 /// <summary>
 /// Focused branch tests for provider-neutral governance emission domain objects.

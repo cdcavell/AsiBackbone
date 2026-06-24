@@ -1,7 +1,7 @@
-using CDCavell.AsiBackbone.Core.Decisions;
+using AsiBackbone.Core.Decisions;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.Core.Tests.Decisions;
+namespace AsiBackbone.Core.Tests.Decisions;
 
 /// <summary>
 /// Unit tests for GovernanceDecision telemetry identifier normalization boundaries.

@@ -1,9 +1,9 @@
-using CDCavell.AsiBackbone.Core.Constraints;
-using CDCavell.AsiBackbone.Core.Decisions;
-using CDCavell.AsiBackbone.Core.Evaluation;
+using AsiBackbone.Core.Constraints;
+using AsiBackbone.Core.Decisions;
+using AsiBackbone.Core.Evaluation;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.Core.Tests.Evaluation;
+namespace AsiBackbone.Core.Tests.Evaluation;
 
 /// <summary>
 /// Branch-focused unit tests for <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}"/>.

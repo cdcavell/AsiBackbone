@@ -1,10 +1,10 @@
-using CDCavell.AsiBackbone.Core.Actors;
-using CDCavell.AsiBackbone.Core.Decisions;
-using CDCavell.AsiBackbone.Core.Handshakes;
-using CDCavell.AsiBackbone.Core.Results;
+using AsiBackbone.Core.Actors;
+using AsiBackbone.Core.Decisions;
+using AsiBackbone.Core.Handshakes;
+using AsiBackbone.Core.Results;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.Core.Tests.Handshakes;
+namespace AsiBackbone.Core.Tests.Handshakes;
 
 /// <summary>
 /// Mutation-focused tests for liability and responsibility handshake behavior.

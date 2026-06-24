@@ -1,11 +1,11 @@
 using System.Text.Json;
-using CDCavell.AsiBackbone.Core.Actors;
-using CDCavell.AsiBackbone.Core.Audit;
-using CDCavell.AsiBackbone.Core.Emissions;
-using CDCavell.AsiBackbone.Core.Serialization;
+using AsiBackbone.Core.Actors;
+using AsiBackbone.Core.Audit;
+using AsiBackbone.Core.Emissions;
+using AsiBackbone.Core.Serialization;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.Core.Tests.Emissions;
+namespace AsiBackbone.Core.Tests.Emissions;
 
 /// <summary>
 /// Unit tests for the provider-neutral governance emission contract.

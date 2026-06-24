@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
-    <Include>[CDCavell.AsiBackbone.Signing.ManagedKey]*</Include>
+    <Include>[AsiBackbone.Signing.ManagedKey]*</Include>
   </PropertyGroup>
 
   <ItemGroup>
@@ -32,7 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\CDCavell.AsiBackbone.Signing.ManagedKey\CDCavell.AsiBackbone.Signing.ManagedKey.csproj" />
+    <ProjectReference Include="..\..\src\AsiBackbone.Signing.ManagedKey\AsiBackbone.Signing.ManagedKey.csproj" />
   </ItemGroup>
 
 </Project>

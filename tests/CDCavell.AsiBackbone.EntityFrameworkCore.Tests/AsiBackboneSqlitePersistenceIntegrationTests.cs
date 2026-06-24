@@ -1,12 +1,12 @@
-using CDCavell.AsiBackbone.Core.Actors;
-using CDCavell.AsiBackbone.Core.Handshakes;
-using CDCavell.AsiBackbone.EntityFrameworkCore.Persistence;
+using AsiBackbone.Core.Actors;
+using AsiBackbone.Core.Handshakes;
+using AsiBackbone.EntityFrameworkCore.Persistence;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.EntityFrameworkCore.Tests;
+namespace AsiBackbone.EntityFrameworkCore.Tests;
 
 /// <summary>
 /// SQLite-backed integration tests for ASI Backbone Entity Framework Core persistence configuration.

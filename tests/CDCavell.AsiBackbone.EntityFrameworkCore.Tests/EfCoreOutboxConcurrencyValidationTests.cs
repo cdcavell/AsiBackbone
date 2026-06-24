@@ -1,15 +1,15 @@
 using System.Globalization;
-using CDCavell.AsiBackbone.Core.Audit;
-using CDCavell.AsiBackbone.Core.Emissions;
-using CDCavell.AsiBackbone.Core.Outbox;
-using CDCavell.AsiBackbone.EntityFrameworkCore.Audit;
-using CDCavell.AsiBackbone.EntityFrameworkCore.Outbox;
-using CDCavell.AsiBackbone.EntityFrameworkCore.Persistence;
+using AsiBackbone.Core.Audit;
+using AsiBackbone.Core.Emissions;
+using AsiBackbone.Core.Outbox;
+using AsiBackbone.EntityFrameworkCore.Audit;
+using AsiBackbone.EntityFrameworkCore.Outbox;
+using AsiBackbone.EntityFrameworkCore.Persistence;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.EntityFrameworkCore.Tests;
+namespace AsiBackbone.EntityFrameworkCore.Tests;
 
 /// <summary>
 /// CI-friendly relational validation for EF Core outbox concurrency and drain-worker contention behavior.

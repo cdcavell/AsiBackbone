@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
-    <Include>[CDCavell.AsiBackbone.EntityFrameworkCore]*</Include>
+    <Include>[AsiBackbone.EntityFrameworkCore]*</Include>
   </PropertyGroup>
 
   <ItemGroup>
@@ -34,7 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\CDCavell.AsiBackbone.EntityFrameworkCore\CDCavell.AsiBackbone.EntityFrameworkCore.csproj" />
+    <ProjectReference Include="..\..\src\AsiBackbone.EntityFrameworkCore\AsiBackbone.EntityFrameworkCore.csproj" />
   </ItemGroup>
 
 </Project>

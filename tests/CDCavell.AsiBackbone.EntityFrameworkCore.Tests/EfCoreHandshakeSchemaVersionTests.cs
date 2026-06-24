@@ -1,11 +1,11 @@
-using CDCavell.AsiBackbone.Core.Actors;
-using CDCavell.AsiBackbone.Core.Handshakes;
-using CDCavell.AsiBackbone.Core.Serialization;
-using CDCavell.AsiBackbone.EntityFrameworkCore.Persistence;
+using AsiBackbone.Core.Actors;
+using AsiBackbone.Core.Handshakes;
+using AsiBackbone.Core.Serialization;
+using AsiBackbone.EntityFrameworkCore.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.EntityFrameworkCore.Tests;
+namespace AsiBackbone.EntityFrameworkCore.Tests;
 
 /// <summary>
 /// Integration tests for handshake schema version persistence.

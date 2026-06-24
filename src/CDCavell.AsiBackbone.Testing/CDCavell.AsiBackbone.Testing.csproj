@@ -4,8 +4,8 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <PackageId>CDCavell.AsiBackbone.Testing</PackageId>
-    <Title>CDCavell AsiBackbone Testing</Title>
+    <PackageId>AsiBackbone.Testing</PackageId>
+    <Title>AsiBackbone Testing</Title>
     <Description>Test harness helpers for Accountable Systems Infrastructure endpoint governance, deterministic policy decisions, and in-memory inspection.</Description>
     <Authors>Christopher D. Cavell</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -27,9 +27,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CDCavell.AsiBackbone.AspNetCore\CDCavell.AsiBackbone.AspNetCore.csproj" />
-    <ProjectReference Include="..\CDCavell.AsiBackbone.Core\CDCavell.AsiBackbone.Core.csproj" />
-    <ProjectReference Include="..\CDCavell.AsiBackbone.Storage.InMemory\CDCavell.AsiBackbone.Storage.InMemory.csproj" />
+    <ProjectReference Include="..\AsiBackbone.AspNetCore\AsiBackbone.AspNetCore.csproj" />
+    <ProjectReference Include="..\AsiBackbone.Core\AsiBackbone.Core.csproj" />
+    <ProjectReference Include="..\AsiBackbone.Storage.InMemory\AsiBackbone.Storage.InMemory.csproj" />
   </ItemGroup>
 
 </Project>

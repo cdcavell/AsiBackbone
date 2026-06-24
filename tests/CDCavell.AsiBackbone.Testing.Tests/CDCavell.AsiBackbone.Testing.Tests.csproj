@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
-    <Include>[CDCavell.AsiBackbone.Testing]*</Include>
+    <Include>[AsiBackbone.Testing]*</Include>
   </PropertyGroup>
 
   <ItemGroup>
@@ -34,8 +34,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\CDCavell.AsiBackbone.AspNetCore\CDCavell.AsiBackbone.AspNetCore.csproj" />
-    <ProjectReference Include="..\..\src\CDCavell.AsiBackbone.Testing\CDCavell.AsiBackbone.Testing.csproj" />
+    <ProjectReference Include="..\..\src\AsiBackbone.AspNetCore\AsiBackbone.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\src\AsiBackbone.Testing\AsiBackbone.Testing.csproj" />
   </ItemGroup>
 
 </Project>

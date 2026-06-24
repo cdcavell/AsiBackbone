@@ -1,14 +1,14 @@
-using CDCavell.AsiBackbone.Core.Actors;
-using CDCavell.AsiBackbone.Core.Handshakes;
-using CDCavell.AsiBackbone.EntityFrameworkCore.Persistence;
+using AsiBackbone.Core.Actors;
+using AsiBackbone.Core.Handshakes;
+using AsiBackbone.EntityFrameworkCore.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.EntityFrameworkCore.Tests;
+namespace AsiBackbone.EntityFrameworkCore.Tests;
 
 /// <summary>
-/// Unit tests for verifying that the entity configurations defined in the CDCavell.AsiBackbone.EntityFrameworkCore assembly
+/// Unit tests for verifying that the entity configurations defined in the AsiBackbone.EntityFrameworkCore assembly
 /// </summary>
 public sealed class AsiBackboneEntityConfigurationsTests
 {

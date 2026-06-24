@@ -1,6 +1,6 @@
-# CDCavell.AsiBackbone.Testing
+# AsiBackbone.Testing
 
-`CDCavell.AsiBackbone.Testing` provides test harness helpers for exercising AsiBackbone-governed endpoints and services without forcing host applications to wire production persistence, signing, outbox, audit, or capability-grant infrastructure in every automated test.
+`AsiBackbone.Testing` provides test harness helpers for exercising AsiBackbone-governed endpoints and services without forcing host applications to wire production persistence, signing, outbox, audit, or capability-grant infrastructure in every automated test.
 
 > [!IMPORTANT]
 > This package is for tests only. It is not a production enforcement provider and should not be used to weaken host-owned governance, persistence, signing, audit, or capability validation in production applications.
@@ -20,8 +20,8 @@ The package does not change production package defaults. ASP.NET Core endpoint g
 ## Basic endpoint test setup
 
 ```csharp
-using CDCavell.AsiBackbone.AspNetCore.DependencyInjection;
-using CDCavell.AsiBackbone.Testing;
+using AsiBackbone.AspNetCore.DependencyInjection;
+using AsiBackbone.Testing;
 
 builder.Services
     .AddAsiBackboneAspNetCore()

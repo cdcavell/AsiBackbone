@@ -1,6 +1,6 @@
 using Xunit;
 
-namespace CDCavell.AsiBackbone.EntityFrameworkCore.Tests;
+namespace AsiBackbone.EntityFrameworkCore.Tests;
 
 public sealed class AssemblyReferenceTests
 {

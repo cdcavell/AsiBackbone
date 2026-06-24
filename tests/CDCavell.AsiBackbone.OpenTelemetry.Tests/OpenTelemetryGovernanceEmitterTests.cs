@@ -1,10 +1,10 @@
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
-using CDCavell.AsiBackbone.Core.Audit;
-using CDCavell.AsiBackbone.Core.Emissions;
+using AsiBackbone.Core.Audit;
+using AsiBackbone.Core.Emissions;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.OpenTelemetry.Tests;
+namespace AsiBackbone.OpenTelemetry.Tests;
 
 /// <summary>
 /// Unit tests for the OpenTelemetry governance emission provider.

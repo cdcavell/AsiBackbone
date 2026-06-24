@@ -1,13 +1,13 @@
-using CDCavell.AsiBackbone.Core.Actors;
-using CDCavell.AsiBackbone.Core.Audit;
-using CDCavell.AsiBackbone.Core.Results;
-using CDCavell.AsiBackbone.EntityFrameworkCore.Audit;
-using CDCavell.AsiBackbone.EntityFrameworkCore.Persistence;
+using AsiBackbone.Core.Actors;
+using AsiBackbone.Core.Audit;
+using AsiBackbone.Core.Results;
+using AsiBackbone.EntityFrameworkCore.Audit;
+using AsiBackbone.EntityFrameworkCore.Persistence;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.EntityFrameworkCore.Tests;
+namespace AsiBackbone.EntityFrameworkCore.Tests;
 
 public sealed class EfCoreAuditLedgerStoreBranchTests
 {

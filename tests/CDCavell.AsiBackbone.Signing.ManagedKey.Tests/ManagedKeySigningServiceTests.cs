@@ -1,9 +1,9 @@
 using System.Text;
-using CDCavell.AsiBackbone.Core.Signing;
+using AsiBackbone.Core.Signing;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.Signing.ManagedKey.Tests;
+namespace AsiBackbone.Signing.ManagedKey.Tests;
 
 public sealed class ManagedKeySigningServiceTests
 {

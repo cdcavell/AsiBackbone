@@ -1,14 +1,14 @@
-using CDCavell.AsiBackbone.AspNetCore.DependencyInjection;
-using CDCavell.AsiBackbone.AspNetCore.Endpoints;
-using CDCavell.AsiBackbone.Core.Constraints;
-using CDCavell.AsiBackbone.Core.Decisions;
-using CDCavell.AsiBackbone.Core.Evaluation;
-using CDCavell.AsiBackbone.Core.Signing;
+using AsiBackbone.AspNetCore.DependencyInjection;
+using AsiBackbone.AspNetCore.Endpoints;
+using AsiBackbone.Core.Constraints;
+using AsiBackbone.Core.Decisions;
+using AsiBackbone.Core.Evaluation;
+using AsiBackbone.Core.Signing;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.Testing.Tests;
+namespace AsiBackbone.Testing.Tests;
 
 public sealed class AsiBackboneTestHarnessTests
 {

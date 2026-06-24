@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../src/CDCavell.AsiBackbone.DependencyInjection/CDCavell.AsiBackbone.DependencyInjection.csproj" />
+    <ProjectReference Include="../../src/AsiBackbone.DependencyInjection/AsiBackbone.DependencyInjection.csproj" />
   </ItemGroup>
 
 </Project>

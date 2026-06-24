@@ -1,59 +1,59 @@
 <Solution>
   <Folder Name="/src/">
-    <Project Path="src/CDCavell.AsiBackbone.Analyzers/CDCavell.AsiBackbone.Analyzers.csproj" />
-    <Project Path="src/CDCavell.AsiBackbone.AspNetCore/CDCavell.AsiBackbone.AspNetCore.csproj">
+    <Project Path="src/CDCavell.AsiBackbone.Analyzers/AsiBackbone.Analyzers.csproj" />
+    <Project Path="src/CDCavell.AsiBackbone.AspNetCore/AsiBackbone.AspNetCore.csproj">
       <Build Solution="Debug|*" Project="false" />
     </Project>
-    <Project Path="src/CDCavell.AsiBackbone.Core/CDCavell.AsiBackbone.Core.csproj">
+    <Project Path="src/CDCavell.AsiBackbone.Core/AsiBackbone.Core.csproj">
       <Build Solution="Debug|*" Project="false" />
     </Project>
-    <Project Path="src/CDCavell.AsiBackbone.DependencyInjection/CDCavell.AsiBackbone.DependencyInjection.csproj" />
-    <Project Path="src/CDCavell.AsiBackbone.EntityFrameworkCore/CDCavell.AsiBackbone.EntityFrameworkCore.csproj">
+    <Project Path="src/CDCavell.AsiBackbone.DependencyInjection/AsiBackbone.DependencyInjection.csproj" />
+    <Project Path="src/CDCavell.AsiBackbone.EntityFrameworkCore/AsiBackbone.EntityFrameworkCore.csproj">
       <Build Solution="Debug|*" Project="false" />
     </Project>
-    <Project Path="src/CDCavell.AsiBackbone.OpenTelemetry/CDCavell.AsiBackbone.OpenTelemetry.csproj">
+    <Project Path="src/CDCavell.AsiBackbone.OpenTelemetry/AsiBackbone.OpenTelemetry.csproj">
       <Build Solution="Debug|*" Project="false" />
     </Project>
-    <Project Path="src/CDCavell.AsiBackbone.Signing.LocalDevelopment/CDCavell.AsiBackbone.Signing.LocalDevelopment.csproj">
+    <Project Path="src/CDCavell.AsiBackbone.Signing.LocalDevelopment/AsiBackbone.Signing.LocalDevelopment.csproj">
       <Build Solution="Debug|*" Project="false" />
     </Project>
-    <Project Path="src/CDCavell.AsiBackbone.Signing.ManagedKey/CDCavell.AsiBackbone.Signing.ManagedKey.csproj" />
-    <Project Path="src/CDCavell.AsiBackbone.Storage.InMemory/CDCavell.AsiBackbone.Storage.InMemory.csproj">
+    <Project Path="src/CDCavell.AsiBackbone.Signing.ManagedKey/AsiBackbone.Signing.ManagedKey.csproj" />
+    <Project Path="src/CDCavell.AsiBackbone.Storage.InMemory/AsiBackbone.Storage.InMemory.csproj">
       <Build Solution="Debug|*" Project="false" />
     </Project>
-    <Project Path="src/CDCavell.AsiBackbone.Templates/CDCavell.AsiBackbone.Templates.csproj">
+    <Project Path="src/CDCavell.AsiBackbone.Templates/AsiBackbone.Templates.csproj">
       <Build Solution="Debug|*" Project="false" />
     </Project>
-    <Project Path="src/CDCavell.AsiBackbone.Testing/CDCavell.AsiBackbone.Testing.csproj">
+    <Project Path="src/CDCavell.AsiBackbone.Testing/AsiBackbone.Testing.csproj">
       <Build Solution="Debug|*" Project="false" />
     </Project>
   </Folder>
   <Folder Name="/samples/">
-    <Project Path="samples/AsiBackboneAspireAppHost/CDCavell.AsiBackbone.Samples.AspireAppHost.csproj" />
-    <Project Path="samples/PlainAspNetCoreHost/CDCavell.AsiBackbone.Samples.PlainAspNetCoreHost.csproj">
+    <Project Path="samples/AsiBackboneAspireAppHost/AsiBackbone.Samples.AspireAppHost.csproj" />
+    <Project Path="samples/PlainAspNetCoreHost/AsiBackbone.Samples.PlainAspNetCoreHost.csproj">
       <Build Solution="Debug|*" Project="false" />
     </Project>
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="tests/CDCavell.AsiBackbone.Analyzers.Tests/CDCavell.AsiBackbone.Analyzers.Tests.csproj" />
-    <Project Path="tests/CDCavell.AsiBackbone.AspNetCore.Tests/CDCavell.AsiBackbone.AspNetCore.Tests.csproj">
+    <Project Path="tests/CDCavell.AsiBackbone.Analyzers.Tests/AsiBackbone.Analyzers.Tests.csproj" />
+    <Project Path="tests/CDCavell.AsiBackbone.AspNetCore.Tests/AsiBackbone.AspNetCore.Tests.csproj">
       <Build Solution="Debug|*" Project="false" />
     </Project>
-    <Project Path="tests/CDCavell.AsiBackbone.Core.Tests/CDCavell.AsiBackbone.Core.Tests.csproj">
+    <Project Path="tests/CDCavell.AsiBackbone.Core.Tests/AsiBackbone.Core.Tests.csproj">
       <Build Solution="Debug|*" Project="false" />
     </Project>
-    <Project Path="tests/CDCavell.AsiBackbone.DependencyInjection.Tests/CDCavell.AsiBackbone.DependencyInjection.Tests.csproj" />
-    <Project Path="tests/CDCavell.AsiBackbone.EntityFrameworkCore.Tests/CDCavell.AsiBackbone.EntityFrameworkCore.Tests.csproj">
+    <Project Path="tests/CDCavell.AsiBackbone.DependencyInjection.Tests/AsiBackbone.DependencyInjection.Tests.csproj" />
+    <Project Path="tests/CDCavell.AsiBackbone.EntityFrameworkCore.Tests/AsiBackbone.EntityFrameworkCore.Tests.csproj">
       <Build Solution="Debug|*" Project="false" />
     </Project>
-    <Project Path="tests/CDCavell.AsiBackbone.OpenTelemetry.Tests/CDCavell.AsiBackbone.OpenTelemetry.Tests.csproj">
+    <Project Path="tests/CDCavell.AsiBackbone.OpenTelemetry.Tests/AsiBackbone.OpenTelemetry.Tests.csproj">
       <Build Solution="Debug|*" Project="false" />
     </Project>
-    <Project Path="tests/CDCavell.AsiBackbone.Signing.LocalDevelopment.Tests/CDCavell.AsiBackbone.Signing.LocalDevelopment.Tests.csproj">
+    <Project Path="tests/CDCavell.AsiBackbone.Signing.LocalDevelopment.Tests/AsiBackbone.Signing.LocalDevelopment.Tests.csproj">
       <Build Solution="Debug|*" Project="false" />
     </Project>
-    <Project Path="tests/CDCavell.AsiBackbone.Signing.ManagedKey.Tests/CDCavell.AsiBackbone.Signing.ManagedKey.Tests.csproj" />
-    <Project Path="tests/CDCavell.AsiBackbone.Testing.Tests/CDCavell.AsiBackbone.Testing.Tests.csproj">
+    <Project Path="tests/CDCavell.AsiBackbone.Signing.ManagedKey.Tests/AsiBackbone.Signing.ManagedKey.Tests.csproj" />
+    <Project Path="tests/CDCavell.AsiBackbone.Testing.Tests/AsiBackbone.Testing.Tests.csproj">
       <Build Solution="Debug|*" Project="false" />
     </Project>
   </Folder>

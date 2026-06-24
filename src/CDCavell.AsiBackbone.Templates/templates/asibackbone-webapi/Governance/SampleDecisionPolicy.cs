@@ -1,6 +1,6 @@
-using CDCavell.AsiBackbone.Core.Constraints;
-using CDCavell.AsiBackbone.Core.Decisions;
-using CDCavell.AsiBackbone.Core.Evaluation;
+using AsiBackbone.Core.Constraints;
+using AsiBackbone.Core.Decisions;
+using AsiBackbone.Core.Evaluation;
 
 namespace Company.AsibackboneTemplate.Governance;
 

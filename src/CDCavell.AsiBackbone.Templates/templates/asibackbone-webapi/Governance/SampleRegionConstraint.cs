@@ -1,4 +1,4 @@
-using CDCavell.AsiBackbone.Core.Constraints;
+using AsiBackbone.Core.Constraints;
 
 namespace Company.AsibackboneTemplate.Governance;
 

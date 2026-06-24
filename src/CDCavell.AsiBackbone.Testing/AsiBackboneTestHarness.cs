@@ -1,19 +1,19 @@
-using CDCavell.AsiBackbone.AspNetCore.Endpoints;
-using CDCavell.AsiBackbone.Core.Audit;
-using CDCavell.AsiBackbone.Core.Constraints;
-using CDCavell.AsiBackbone.Core.Decisions;
-using CDCavell.AsiBackbone.Core.Evaluation;
-using CDCavell.AsiBackbone.Core.Outbox;
-using CDCavell.AsiBackbone.Core.Signing;
-using CDCavell.AsiBackbone.Storage.InMemory.Outbox;
+using AsiBackbone.AspNetCore.Endpoints;
+using AsiBackbone.Core.Audit;
+using AsiBackbone.Core.Constraints;
+using AsiBackbone.Core.Decisions;
+using AsiBackbone.Core.Evaluation;
+using AsiBackbone.Core.Outbox;
+using AsiBackbone.Core.Signing;
+using AsiBackbone.Storage.InMemory.Outbox;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace CDCavell.AsiBackbone.Testing;
+namespace AsiBackbone.Testing;
 
 /// <summary>
-/// Marker type for the CDCavell.AsiBackbone.Testing assembly.
+/// Marker type for the AsiBackbone.Testing assembly.
 /// </summary>
 public sealed class AsiBackboneTestingAssemblyMarker
 {

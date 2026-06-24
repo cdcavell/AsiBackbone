@@ -1,5 +1,5 @@
-using CDCavell.AsiBackbone.AspNetCore.Endpoints;
-using CDCavell.AsiBackbone.Core.Decisions;
+using AsiBackbone.AspNetCore.Endpoints;
+using AsiBackbone.Core.Decisions;
 
 namespace Company.AsibackboneTemplate.Governance;
 

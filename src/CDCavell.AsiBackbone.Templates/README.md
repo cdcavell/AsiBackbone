@@ -1,13 +1,13 @@
-# CDCavell.AsiBackbone.Templates
+# AsiBackbone.Templates
 
-`CDCavell.AsiBackbone.Templates` provides `dotnet new` templates for creating Accountable Systems Infrastructure governed ASP.NET Core hosts.
+`AsiBackbone.Templates` provides `dotnet new` templates for creating Accountable Systems Infrastructure governed ASP.NET Core hosts.
 
 The package is a developer-experience scaffold. It is not a runtime dependency, production host baseline, compliance guarantee, storage provider, signing provider, or execution engine.
 
 ## Install
 
 ```powershell
-dotnet new install CDCavell.AsiBackbone.Templates
+dotnet new install AsiBackbone.Templates
 ```
 
 ## Create a governed Web API

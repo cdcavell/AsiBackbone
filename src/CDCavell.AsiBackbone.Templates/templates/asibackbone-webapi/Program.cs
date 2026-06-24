@@ -1,11 +1,11 @@
-using CDCavell.AsiBackbone.AspNetCore.DependencyInjection;
-using CDCavell.AsiBackbone.AspNetCore.Endpoints;
-using CDCavell.AsiBackbone.Core.Actors;
-using CDCavell.AsiBackbone.Core.Audit;
-using CDCavell.AsiBackbone.Core.Constraints;
-using CDCavell.AsiBackbone.Core.Decisions;
-using CDCavell.AsiBackbone.Core.Evaluation;
-using CDCavell.AsiBackbone.Storage.InMemory.Audit;
+using AsiBackbone.AspNetCore.DependencyInjection;
+using AsiBackbone.AspNetCore.Endpoints;
+using AsiBackbone.Core.Actors;
+using AsiBackbone.Core.Audit;
+using AsiBackbone.Core.Constraints;
+using AsiBackbone.Core.Decisions;
+using AsiBackbone.Core.Evaluation;
+using AsiBackbone.Storage.InMemory.Audit;
 using Company.AsibackboneTemplate.Governance;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);

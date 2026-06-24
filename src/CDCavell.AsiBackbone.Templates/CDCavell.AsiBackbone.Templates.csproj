@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <IsPackable>true</IsPackable>
-    <PackageId>CDCavell.AsiBackbone.Templates</PackageId>
-    <Title>CDCavell.AsiBackbone.Templates</Title>
+    <PackageId>AsiBackbone.Templates</PackageId>
+    <Title>AsiBackbone.Templates</Title>
     <Description>dotnet new templates for Accountable Systems Infrastructure governed ASP.NET Core hosts.</Description>
     <Authors>Christopher D. Cavell</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

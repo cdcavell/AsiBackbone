@@ -1,4 +1,4 @@
-using CDCavell.AsiBackbone.AspNetCore.Endpoints;
+using AsiBackbone.AspNetCore.Endpoints;
 using Company.AsibackboneTemplate.Governance;
 using Microsoft.AspNetCore.Mvc;
 

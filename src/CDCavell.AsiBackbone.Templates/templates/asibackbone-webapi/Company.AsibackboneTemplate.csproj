@@ -12,21 +12,21 @@
 
   <PropertyGroup>
     <AsiBackboneRepositorySourceRoot>../../..</AsiBackboneRepositorySourceRoot>
-    <UseRepositoryAsiBackboneProjects Condition="Exists('$(AsiBackboneRepositorySourceRoot)/CDCavell.AsiBackbone.Core/CDCavell.AsiBackbone.Core.csproj')">true</UseRepositoryAsiBackboneProjects>
+    <UseRepositoryAsiBackboneProjects Condition="Exists('$(AsiBackboneRepositorySourceRoot)/AsiBackbone.Core/AsiBackbone.Core.csproj')">true</UseRepositoryAsiBackboneProjects>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(UseRepositoryAsiBackboneProjects)' == 'true'">
-    <ProjectReference Include="$(AsiBackboneRepositorySourceRoot)/CDCavell.AsiBackbone.AspNetCore/CDCavell.AsiBackbone.AspNetCore.csproj" />
-    <ProjectReference Include="$(AsiBackboneRepositorySourceRoot)/CDCavell.AsiBackbone.Core/CDCavell.AsiBackbone.Core.csproj" />
-    <ProjectReference Include="$(AsiBackboneRepositorySourceRoot)/CDCavell.AsiBackbone.Storage.InMemory/CDCavell.AsiBackbone.Storage.InMemory.csproj" />
-    <ProjectReference Include="$(AsiBackboneRepositorySourceRoot)/CDCavell.AsiBackbone.Analyzers/CDCavell.AsiBackbone.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="all" />
+    <ProjectReference Include="$(AsiBackboneRepositorySourceRoot)/AsiBackbone.AspNetCore/AsiBackbone.AspNetCore.csproj" />
+    <ProjectReference Include="$(AsiBackboneRepositorySourceRoot)/AsiBackbone.Core/AsiBackbone.Core.csproj" />
+    <ProjectReference Include="$(AsiBackboneRepositorySourceRoot)/AsiBackbone.Storage.InMemory/AsiBackbone.Storage.InMemory.csproj" />
+    <ProjectReference Include="$(AsiBackboneRepositorySourceRoot)/AsiBackbone.Analyzers/AsiBackbone.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(UseRepositoryAsiBackboneProjects)' != 'true'">
-    <PackageReference Include="CDCavell.AsiBackbone.AspNetCore" Version="1.2.0" />
-    <PackageReference Include="CDCavell.AsiBackbone.Core" Version="1.2.0" />
-    <PackageReference Include="CDCavell.AsiBackbone.Storage.InMemory" Version="1.2.0" />
-    <PackageReference Include="CDCavell.AsiBackbone.Analyzers" Version="1.2.0" PrivateAssets="all" />
+    <PackageReference Include="AsiBackbone.AspNetCore" Version="1.2.0" />
+    <PackageReference Include="AsiBackbone.Core" Version="1.2.0" />
+    <PackageReference Include="AsiBackbone.Storage.InMemory" Version="1.2.0" />
+    <PackageReference Include="AsiBackbone.Analyzers" Version="1.2.0" PrivateAssets="all" />
   </ItemGroup>
 
 </Project>

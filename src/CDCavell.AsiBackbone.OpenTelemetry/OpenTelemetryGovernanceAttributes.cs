@@ -1,4 +1,4 @@
-namespace CDCavell.AsiBackbone.OpenTelemetry;
+namespace AsiBackbone.OpenTelemetry;
 
 /// <summary>
 /// Provides stable attribute names used by the OpenTelemetry governance emitter.

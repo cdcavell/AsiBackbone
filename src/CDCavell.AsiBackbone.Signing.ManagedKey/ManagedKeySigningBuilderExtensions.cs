@@ -1,6 +1,6 @@
-using CDCavell.AsiBackbone.DependencyInjection;
+using AsiBackbone.DependencyInjection;
 
-namespace CDCavell.AsiBackbone.Signing.ManagedKey;
+namespace AsiBackbone.Signing.ManagedKey;
 
 /// <summary>
 /// Provides explicit builder facade extension methods for managed-key signing.

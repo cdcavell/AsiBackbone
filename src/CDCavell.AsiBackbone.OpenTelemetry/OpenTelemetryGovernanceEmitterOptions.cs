@@ -1,6 +1,6 @@
-using CDCavell.AsiBackbone.Core.Emissions;
+using AsiBackbone.Core.Emissions;
 
-namespace CDCavell.AsiBackbone.OpenTelemetry;
+namespace AsiBackbone.OpenTelemetry;
 
 /// <summary>
 /// Provides host-owned options for the OpenTelemetry governance emitter.

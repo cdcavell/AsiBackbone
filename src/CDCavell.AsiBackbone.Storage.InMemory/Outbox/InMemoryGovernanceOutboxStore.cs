@@ -1,8 +1,8 @@
 using System.Collections.Concurrent;
-using CDCavell.AsiBackbone.Core.Emissions;
-using CDCavell.AsiBackbone.Core.Outbox;
+using AsiBackbone.Core.Emissions;
+using AsiBackbone.Core.Outbox;
 
-namespace CDCavell.AsiBackbone.Storage.InMemory.Outbox;
+namespace AsiBackbone.Storage.InMemory.Outbox;
 
 /// <summary>
 /// In-memory governance outbox store for tests, samples, and development hosts.

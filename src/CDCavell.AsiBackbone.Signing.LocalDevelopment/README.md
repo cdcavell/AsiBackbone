@@ -1,6 +1,6 @@
-# CDCavell.AsiBackbone.Signing.LocalDevelopment
+# AsiBackbone.Signing.LocalDevelopment
 
-`CDCavell.AsiBackbone.Signing.LocalDevelopment` provides a local-development RSA signing and verification provider for exercising AsiBackbone signing abstractions without Azure Key Vault, HSM, cloud KMS, certificate-store, or external infrastructure dependencies.
+`AsiBackbone.Signing.LocalDevelopment` provides a local-development RSA signing and verification provider for exercising AsiBackbone signing abstractions without Azure Key Vault, HSM, cloud KMS, certificate-store, or external infrastructure dependencies.
 
 > **New to AsiBackbone?** Start with the concept, not this package: [Intent to Execution: An Accountability Pattern](https://cdcavell.github.io/AsiBackbone/articles/intent-to-execution-pattern.html) and the [documentation site](https://cdcavell.github.io/AsiBackbone/). This README covers one package in the family.
 
@@ -16,7 +16,7 @@ This package implements:
 
 It signs the `SigningRequest.SigningHash` value using an in-process RSA key generated for the service instance and returns provider-neutral `SigningMetadata`.
 
-Core remains provider-neutral. `CDCavell.AsiBackbone.Core` does not reference this package.
+Core remains provider-neutral. `AsiBackbone.Core` does not reference this package.
 
 ## Metadata returned
 

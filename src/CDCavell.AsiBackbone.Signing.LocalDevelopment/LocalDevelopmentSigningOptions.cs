@@ -1,4 +1,4 @@
-namespace CDCavell.AsiBackbone.Signing.LocalDevelopment;
+namespace AsiBackbone.Signing.LocalDevelopment;
 
 /// <summary>
 /// Configures the local-development signing provider.

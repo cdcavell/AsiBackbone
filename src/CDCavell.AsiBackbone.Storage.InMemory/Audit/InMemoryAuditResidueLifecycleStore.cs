@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
-using CDCavell.AsiBackbone.Core.Audit;
+using AsiBackbone.Core.Audit;
 
-namespace CDCavell.AsiBackbone.Storage.InMemory.Audit;
+namespace AsiBackbone.Storage.InMemory.Audit;
 
 /// <summary>
 /// In-memory audit residue lifecycle store for tests, samples, and development hosts.

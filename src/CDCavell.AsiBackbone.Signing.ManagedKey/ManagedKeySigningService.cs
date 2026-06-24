@@ -1,7 +1,7 @@
 using System.Runtime.ExceptionServices;
-using CDCavell.AsiBackbone.Core.Signing;
+using AsiBackbone.Core.Signing;
 
-namespace CDCavell.AsiBackbone.Signing.ManagedKey;
+namespace AsiBackbone.Signing.ManagedKey;
 
 /// <summary>
 /// Provides managed-key signing for AsiBackbone signing abstractions through a host-owned managed-key client.

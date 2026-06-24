@@ -4,8 +4,8 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <PackageId>CDCavell.AsiBackbone.Signing.ManagedKey</PackageId>
-    <Title>CDCavell AsiBackbone Managed Key Signing</Title>
+    <PackageId>AsiBackbone.Signing.ManagedKey</PackageId>
+    <Title>AsiBackbone Managed Key Signing</Title>
     <Description>Provider-neutral managed-key signing adapter for Accountable Systems Infrastructure governance artifacts without loading raw private keys into Core.</Description>
     <Authors>Christopher D. Cavell</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -24,8 +24,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CDCavell.AsiBackbone.Core\CDCavell.AsiBackbone.Core.csproj" />
-    <ProjectReference Include="..\CDCavell.AsiBackbone.DependencyInjection\CDCavell.AsiBackbone.DependencyInjection.csproj" />
+    <ProjectReference Include="..\AsiBackbone.Core\CDCavell.AsiBackbone.Core.csproj" />
+    <ProjectReference Include="..\AsiBackbone.DependencyInjection\CDCavell.AsiBackbone.DependencyInjection.csproj" />
   </ItemGroup>
 
 </Project>

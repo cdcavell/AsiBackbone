@@ -1,4 +1,4 @@
-namespace CDCavell.AsiBackbone.OpenTelemetry;
+namespace AsiBackbone.OpenTelemetry;
 
 /// <summary>
 /// Provides stable OpenTelemetry source, meter, provider, event, metric, and attribute names for AsiBackbone governance emission.
@@ -8,12 +8,12 @@ public static class OpenTelemetryGovernanceInstrumentation
     /// <summary>
     /// Gets the ActivitySource name used by the OpenTelemetry governance emitter.
     /// </summary>
-    public const string ActivitySourceName = "CDCavell.AsiBackbone.OpenTelemetry";
+    public const string ActivitySourceName = "AsiBackbone.OpenTelemetry";
 
     /// <summary>
     /// Gets the Meter name used by the OpenTelemetry governance emitter.
     /// </summary>
-    public const string MeterName = "CDCavell.AsiBackbone.OpenTelemetry";
+    public const string MeterName = "AsiBackbone.OpenTelemetry";
 
     /// <summary>
     /// Gets the provider name returned in provider-neutral emission results.

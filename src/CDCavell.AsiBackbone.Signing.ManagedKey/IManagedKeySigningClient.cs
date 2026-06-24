@@ -1,4 +1,4 @@
-namespace CDCavell.AsiBackbone.Signing.ManagedKey;
+namespace AsiBackbone.Signing.ManagedKey;
 
 /// <summary>
 /// Defines the host-owned managed-key signing boundary used by the AsiBackbone managed-key signing provider.

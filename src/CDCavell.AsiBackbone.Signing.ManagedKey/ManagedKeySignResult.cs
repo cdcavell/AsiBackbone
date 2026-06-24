@@ -1,6 +1,6 @@
 using System.Collections.ObjectModel;
 
-namespace CDCavell.AsiBackbone.Signing.ManagedKey;
+namespace AsiBackbone.Signing.ManagedKey;
 
 /// <summary>
 /// Represents the result returned by a host-owned managed-key signing client.

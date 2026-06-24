@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
-using CDCavell.AsiBackbone.Core.Emissions;
+using AsiBackbone.Core.Emissions;
 
-namespace CDCavell.AsiBackbone.OpenTelemetry;
+namespace AsiBackbone.OpenTelemetry;
 
 /// <summary>
 /// Emits provider-neutral governance envelopes through OpenTelemetry-friendly .NET diagnostics primitives.

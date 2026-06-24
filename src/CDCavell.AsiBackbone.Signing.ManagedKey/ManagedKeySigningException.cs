@@ -1,4 +1,4 @@
-namespace CDCavell.AsiBackbone.Signing.ManagedKey;
+namespace AsiBackbone.Signing.ManagedKey;
 
 /// <summary>
 /// Represents a provider-neutral managed-key signing failure.

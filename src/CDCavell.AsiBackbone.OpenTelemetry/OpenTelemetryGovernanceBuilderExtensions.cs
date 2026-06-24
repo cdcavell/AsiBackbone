@@ -1,8 +1,8 @@
-using CDCavell.AsiBackbone.Core.Emissions;
-using CDCavell.AsiBackbone.DependencyInjection;
+using AsiBackbone.Core.Emissions;
+using AsiBackbone.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace CDCavell.AsiBackbone.OpenTelemetry;
+namespace AsiBackbone.OpenTelemetry;
 
 /// <summary>
 /// Provides explicit builder facade extension methods for OpenTelemetry governance emission.

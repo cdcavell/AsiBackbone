@@ -1,6 +1,6 @@
 using System.Collections.ObjectModel;
 
-namespace CDCavell.AsiBackbone.Signing.ManagedKey;
+namespace AsiBackbone.Signing.ManagedKey;
 
 /// <summary>
 /// Represents a managed-key client request to sign a precomputed governance artifact hash.

@@ -1,7 +1,7 @@
-using CDCavell.AsiBackbone.Core.Signing;
+using AsiBackbone.Core.Signing;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace CDCavell.AsiBackbone.Signing.ManagedKey;
+namespace AsiBackbone.Signing.ManagedKey;
 
 /// <summary>
 /// Provides dependency injection registration helpers for managed-key signing.

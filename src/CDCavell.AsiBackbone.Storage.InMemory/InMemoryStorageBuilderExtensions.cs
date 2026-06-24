@@ -1,11 +1,11 @@
-using CDCavell.AsiBackbone.Core.Audit;
-using CDCavell.AsiBackbone.Core.Outbox;
-using CDCavell.AsiBackbone.DependencyInjection;
-using CDCavell.AsiBackbone.Storage.InMemory.Audit;
-using CDCavell.AsiBackbone.Storage.InMemory.Outbox;
+using AsiBackbone.Core.Audit;
+using AsiBackbone.Core.Outbox;
+using AsiBackbone.DependencyInjection;
+using AsiBackbone.Storage.InMemory.Audit;
+using AsiBackbone.Storage.InMemory.Outbox;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace CDCavell.AsiBackbone.Storage.InMemory;
+namespace AsiBackbone.Storage.InMemory;
 
 /// <summary>
 /// Provides explicit builder facade extension methods for non-durable in-memory storage.

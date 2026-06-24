@@ -1,4 +1,4 @@
-# CDCavell.AsiBackbone.EntityFrameworkCore
+# AsiBackbone.EntityFrameworkCore
 
 Entity Framework Core model configuration and host-owned persistence helpers for Accountable Systems Infrastructure records.
 
@@ -21,8 +21,8 @@ This package contributes provider-neutral EF Core model configuration, persisten
 ## Minimal host-owned DbContext setup
 
 ```csharp
-using CDCavell.AsiBackbone.EntityFrameworkCore;
-using CDCavell.AsiBackbone.EntityFrameworkCore.Persistence;
+using AsiBackbone.EntityFrameworkCore;
+using AsiBackbone.EntityFrameworkCore.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 public sealed class ApplicationDbContext : DbContext

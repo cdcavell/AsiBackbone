@@ -1,4 +1,4 @@
-# CDCavell.AsiBackbone.Storage.InMemory
+# AsiBackbone.Storage.InMemory
 
 Non-durable in-memory storage helpers for Accountable Systems Infrastructure local validation, samples, and tests.
 
@@ -12,7 +12,7 @@ This package provides non-durable storage implementations that make it easy to e
 ## What this package provides
 
 - In-memory audit ledger behavior for local validation and tests.
-- Storage implementations that depend on `CDCavell.AsiBackbone.Core` only.
+- Storage implementations that depend on `AsiBackbone.Core` only.
 - A simple bridge for samples that need audit records without introducing EF Core or a database.
 
 ## Intended usage
@@ -24,7 +24,7 @@ Use this package when:
 - validating audit residue and audit ledger behavior locally;
 - demonstrating host-neutral ASI Backbone flows before adding durable storage.
 
-For production persistence, use a host-owned durable storage strategy such as `CDCavell.AsiBackbone.EntityFrameworkCore` or a custom implementation of the Core storage contracts.
+For production persistence, use a host-owned durable storage strategy such as `AsiBackbone.EntityFrameworkCore` or a custom implementation of the Core storage contracts.
 
 ## Boundary
 

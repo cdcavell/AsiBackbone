@@ -4,8 +4,8 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <PackageId>CDCavell.AsiBackbone.Storage.InMemory</PackageId>
-    <Title>CDCavell AsiBackbone In-Memory Storage</Title>
+    <PackageId>AsiBackbone.Storage.InMemory</PackageId>
+    <Title>AsiBackbone In-Memory Storage</Title>
     <Description>Non-durable in-memory storage helpers for Accountable Systems Infrastructure local validation, tests, and samples.</Description>
     <Authors>Christopher D. Cavell</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -23,8 +23,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CDCavell.AsiBackbone.Core\CDCavell.AsiBackbone.Core.csproj" />
-    <ProjectReference Include="..\CDCavell.AsiBackbone.DependencyInjection\CDCavell.AsiBackbone.DependencyInjection.csproj" />
+    <ProjectReference Include="..\AsiBackbone.Core\AsiBackbone.Core.csproj" />
+    <ProjectReference Include="..\AsiBackbone.DependencyInjection\AsiBackbone.DependencyInjection.csproj" />
   </ItemGroup>
 
 </Project>

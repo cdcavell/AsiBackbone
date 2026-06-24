@@ -1,8 +1,8 @@
 using System.Security.Cryptography;
 using System.Text;
-using CDCavell.AsiBackbone.Core.Signing;
+using AsiBackbone.Core.Signing;
 
-namespace CDCavell.AsiBackbone.Signing.LocalDevelopment;
+namespace AsiBackbone.Signing.LocalDevelopment;
 
 /// <summary>
 /// Provides local-development RSA signing and verification for AsiBackbone signing abstractions.

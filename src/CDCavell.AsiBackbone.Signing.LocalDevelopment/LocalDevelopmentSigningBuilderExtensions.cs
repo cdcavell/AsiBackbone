@@ -1,8 +1,8 @@
-using CDCavell.AsiBackbone.Core.Signing;
-using CDCavell.AsiBackbone.DependencyInjection;
+using AsiBackbone.Core.Signing;
+using AsiBackbone.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace CDCavell.AsiBackbone.Signing.LocalDevelopment;
+namespace AsiBackbone.Signing.LocalDevelopment;
 
 /// <summary>
 /// Provides explicit builder facade extension methods for local-development signing.

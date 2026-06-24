@@ -1,6 +1,6 @@
-using CDCavell.AsiBackbone.Core.Entities;
+using AsiBackbone.Core.Entities;
 
-namespace CDCavell.AsiBackbone.EntityFrameworkCore.Persistence;
+namespace AsiBackbone.EntityFrameworkCore.Persistence;
 
 /// <summary>
 /// Represents a normalized metadata row associated with an AsiBackbone handshake request.

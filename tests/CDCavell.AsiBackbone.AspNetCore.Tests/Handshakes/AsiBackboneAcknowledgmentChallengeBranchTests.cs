@@ -1,10 +1,10 @@
-using CDCavell.AsiBackbone.AspNetCore.Handshakes;
-using CDCavell.AsiBackbone.Core.Actors;
-using CDCavell.AsiBackbone.Core.Decisions;
+using AsiBackbone.AspNetCore.Handshakes;
+using AsiBackbone.Core.Actors;
+using AsiBackbone.Core.Decisions;
 using Microsoft.Extensions.Options;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.AspNetCore.Tests.Handshakes;
+namespace AsiBackbone.AspNetCore.Tests.Handshakes;
 
 public sealed class AsiBackboneAcknowledgmentChallengeBranchTests
 {

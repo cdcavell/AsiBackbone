@@ -1,7 +1,7 @@
 using System.Reflection;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.Core.Tests;
+namespace AsiBackbone.Core.Tests;
 
 public sealed class AssemblyReferenceTests
 {
@@ -14,6 +14,6 @@ public sealed class AssemblyReferenceTests
         Assembly assembly = AssemblyReference.Assembly;
 
         Assert.Same(typeof(AssemblyReference).Assembly, assembly);
-        Assert.Equal("CDCavell.AsiBackbone.Core", assembly.GetName().Name);
+        Assert.Equal("AsiBackbone.Core", assembly.GetName().Name);
     }
 }

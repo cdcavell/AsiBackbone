@@ -1,10 +1,10 @@
 using System.Text.Json;
-using CDCavell.AsiBackbone.Core.Actors;
-using CDCavell.AsiBackbone.Core.Audit;
-using CDCavell.AsiBackbone.Core.Serialization;
+using AsiBackbone.Core.Actors;
+using AsiBackbone.Core.Audit;
+using AsiBackbone.Core.Serialization;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.Core.Tests.Audit;
+namespace AsiBackbone.Core.Tests.Audit;
 
 /// <summary>
 /// Unit tests for stable audit ledger record schema version serialization.

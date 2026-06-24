@@ -1,7 +1,7 @@
-using CDCavell.AsiBackbone.Core.Actors;
+using AsiBackbone.Core.Actors;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.Core.Tests.Actors;
+namespace AsiBackbone.Core.Tests.Actors;
 
 public sealed class AsiBackboneActorContextTests
 {

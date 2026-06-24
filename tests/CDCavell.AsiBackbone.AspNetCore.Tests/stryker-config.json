@@ -1,12 +1,12 @@
 {
   "stryker-config": {
     "solution": "../../AsiBackbone.slnx",
-    "project": "CDCavell.AsiBackbone.AspNetCore.csproj",
+    "project": "AsiBackbone.AspNetCore.csproj",
     "target-framework": "net10.0",
     "configuration": "Release",
     "test-runner": "mtp",
     "coverage-analysis": "off",
-    "test-case-filter": "FullyQualifiedName~CDCavell.AsiBackbone.AspNetCore.Tests.Handshakes.AsiBackboneAcknowledgmentChallenge",
+    "test-case-filter": "FullyQualifiedName~AsiBackbone.AspNetCore.Tests.Handshakes.AsiBackboneAcknowledgmentChallenge",
     "reporters": [
       "html",
       "cleartext"

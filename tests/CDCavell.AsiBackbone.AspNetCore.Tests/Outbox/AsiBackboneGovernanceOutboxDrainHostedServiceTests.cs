@@ -1,15 +1,15 @@
 using System.Collections.Concurrent;
-using CDCavell.AsiBackbone.AspNetCore.DependencyInjection;
-using CDCavell.AsiBackbone.AspNetCore.Outbox;
-using CDCavell.AsiBackbone.Core.Audit;
-using CDCavell.AsiBackbone.Core.Emissions;
-using CDCavell.AsiBackbone.Core.Outbox;
+using AsiBackbone.AspNetCore.DependencyInjection;
+using AsiBackbone.AspNetCore.Outbox;
+using AsiBackbone.Core.Audit;
+using AsiBackbone.Core.Emissions;
+using AsiBackbone.Core.Outbox;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.AspNetCore.Tests.Outbox;
+namespace AsiBackbone.AspNetCore.Tests.Outbox;
 
 public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceTests
 {

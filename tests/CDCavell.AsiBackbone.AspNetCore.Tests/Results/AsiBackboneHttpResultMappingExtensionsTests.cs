@@ -1,11 +1,11 @@
-using CDCavell.AsiBackbone.AspNetCore.Results;
-using CDCavell.AsiBackbone.Core.Decisions;
-using CDCavell.AsiBackbone.Core.Results;
+using AsiBackbone.AspNetCore.Results;
+using AsiBackbone.Core.Decisions;
+using AsiBackbone.Core.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.AspNetCore.Tests.Results;
+namespace AsiBackbone.AspNetCore.Tests.Results;
 
 public sealed class AsiBackboneHttpResultMappingExtensionsTests
 {

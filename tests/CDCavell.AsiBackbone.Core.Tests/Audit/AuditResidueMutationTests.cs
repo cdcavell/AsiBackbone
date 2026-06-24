@@ -1,10 +1,10 @@
-using CDCavell.AsiBackbone.Core.Actors;
-using CDCavell.AsiBackbone.Core.Audit;
-using CDCavell.AsiBackbone.Core.Constraints;
-using CDCavell.AsiBackbone.Core.Decisions;
+using AsiBackbone.Core.Actors;
+using AsiBackbone.Core.Audit;
+using AsiBackbone.Core.Constraints;
+using AsiBackbone.Core.Decisions;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.Core.Tests.Audit;
+namespace AsiBackbone.Core.Tests.Audit;
 
 /// <summary>
 /// Mutation-focused tests for audit residue behavior.

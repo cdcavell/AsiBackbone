@@ -1,8 +1,8 @@
-using CDCavell.AsiBackbone.AspNetCore.DependencyInjection;
-using CDCavell.AsiBackbone.AspNetCore.Endpoints;
-using CDCavell.AsiBackbone.Core.Constraints;
-using CDCavell.AsiBackbone.Core.Decisions;
-using CDCavell.AsiBackbone.Core.Evaluation;
+using AsiBackbone.AspNetCore.DependencyInjection;
+using AsiBackbone.AspNetCore.Endpoints;
+using AsiBackbone.Core.Constraints;
+using AsiBackbone.Core.Decisions;
+using AsiBackbone.Core.Evaluation;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,7 +10,7 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.AspNetCore.Tests.Endpoints;
+namespace AsiBackbone.AspNetCore.Tests.Endpoints;
 
 public sealed class AsiBackboneEndpointGovernanceTests
 {
@@ -559,7 +559,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
     {
         public string EnvironmentName { get; set; } = environmentName;
 
-        public string ApplicationName { get; set; } = "CDCavell.AsiBackbone.AspNetCore.Tests";
+        public string ApplicationName { get; set; } = "AsiBackbone.AspNetCore.Tests";
 
         public string WebRootPath { get; set; } = string.Empty;
 

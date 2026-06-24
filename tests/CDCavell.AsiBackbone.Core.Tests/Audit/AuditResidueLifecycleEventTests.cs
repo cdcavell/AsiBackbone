@@ -1,8 +1,8 @@
-using CDCavell.AsiBackbone.Core.Actors;
-using CDCavell.AsiBackbone.Core.Audit;
+using AsiBackbone.Core.Actors;
+using AsiBackbone.Core.Audit;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.Core.Tests.Audit;
+namespace AsiBackbone.Core.Tests.Audit;
 
 /// <summary>
 /// Unit tests for audit residue lifecycle stages and events.

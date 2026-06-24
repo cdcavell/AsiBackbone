@@ -1,9 +1,9 @@
-using CDCavell.AsiBackbone.Core.Actors;
-using CDCavell.AsiBackbone.Core.Audit;
-using CDCavell.AsiBackbone.Core.Results;
+using AsiBackbone.Core.Actors;
+using AsiBackbone.Core.Audit;
+using AsiBackbone.Core.Results;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.Core.Tests.Audit;
+namespace AsiBackbone.Core.Tests.Audit;
 
 /// <summary>
 /// Unit tests for <see cref="IAsiBackboneAuditLedgerStore"/>. These tests verify the contract of the interface, but do not test any specific implementation. Each implementation should have its own set of unit tests to verify its behavior and correctness.

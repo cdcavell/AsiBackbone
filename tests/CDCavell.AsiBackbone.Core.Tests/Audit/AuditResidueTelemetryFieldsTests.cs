@@ -1,11 +1,11 @@
 using System.Text.Json;
-using CDCavell.AsiBackbone.Core.Actors;
-using CDCavell.AsiBackbone.Core.Audit;
-using CDCavell.AsiBackbone.Core.Decisions;
-using CDCavell.AsiBackbone.Core.Serialization;
+using AsiBackbone.Core.Actors;
+using AsiBackbone.Core.Audit;
+using AsiBackbone.Core.Decisions;
+using AsiBackbone.Core.Serialization;
 using Xunit;
 
-namespace CDCavell.AsiBackbone.Core.Tests.Audit;
+namespace AsiBackbone.Core.Tests.Audit;
 
 /// <summary>
 /// Unit tests for provider-neutral audit residue telemetry and traceability fields.

@@ -1,6 +1,6 @@
 {
   "title": "ASI Backbone",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "upload_type": "software",
   "description": "AsiBackbone is a .NET package-family project providing framework-neutral governance primitives for consequential software decision flow, including actor context, constraint evaluation, governance decisions, acknowledgment workflows, audit residue, durable outbox persistence, provider-neutral governance emission, OpenTelemetry projection, and signing-provider boundaries.",
   "creators": [

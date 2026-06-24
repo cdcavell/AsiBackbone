@@ -11,7 +11,7 @@ Use the header search box for package names, API concepts, and article titles. S
 
 ## Current stable package posture
 
-Stable `1.2.x` is the current compatible package line. `1.2.0` is a minor release that formalizes additive adoption, diagnostics, testing, templates, sample, and documentation-alignment surfaces on the stable `1.x` contract.
+Stable `1.2.x` is the current compatible package line. `1.2.1` is the current patch release on the `1.2.0` minor-release boundary. `1.2.0` formalized additive adoption, diagnostics, testing, templates, sample, and documentation-alignment surfaces on the stable `1.x` contract; `1.2.1` focuses on release-readiness, Source Link, package metadata, workflow, documentation, and implementation hardening.
 
 Released stable package surfaces include Core, DependencyInjection, Storage.InMemory, EntityFrameworkCore, AspNetCore, Testing, Templates, Analyzers, OpenTelemetry, Signing.LocalDevelopment, and Signing.ManagedKey. OpenTelemetry is the concrete released governance-emission provider. Event Hubs, Purview, Azure-specific SDK adapters, Aspire runtime packages, robotics, immutable-storage, and additional provider packages remain design-only, strategy-only, sample-only, host-owned, or future-provider work unless a later stable release explicitly ships them.
 
@@ -28,6 +28,7 @@ Released stable package surfaces include Core, DependencyInjection, Storage.InMe
 * [AddAsiBackbone Builder Facade](add-asibackbone-builder-facade.md)
 * [dotnet new Templates](templates.md)
 * [Why AsiBackbone?](why-asi-backbone.md)
+* [1.2.1 Release Notes](release-notes-121.md)
 * [1.2.0 Release Notes](release-notes-120.md)
 * [Upgrade Guide: 1.0.0 to 1.1.0](upgrade-100-to-110.md)
 
@@ -77,7 +78,7 @@ These pages remain available for readers who want the broader framing. They are 
 
 ## Durability, observability, signing, diagnostics, and developer experience
 
-These pages cover the `1.x` durability, governance-emission, signing, diagnostics, testing, and template surfaces carried into the current `1.2.0` package family.
+These pages cover the `1.x` durability, governance-emission, signing, diagnostics, testing, and template surfaces carried into the current `1.2.1` package family.
 
 * [Observability and Governance Emission Architecture](observability-and-governance-emission-architecture.md)
 * [Governance Emission Contract](governance-emission-contract.md)
@@ -134,10 +135,12 @@ Scenario pages describe applied patterns. They remain optional and do not imply 
 
 * [Quality Reports](../quality/index.md)
 * [Release Validation](release-validation.md)
+* [1.2.1 Release Readiness Record](release-readiness-121.md)
 * [1.2.0 Release Readiness Record](release-readiness-120.md)
 * [Historical 1.1.0 Release Readiness Record](release-readiness-checklist.md)
 * [API Baseline and Boundary Checks](api-baseline-and-boundary-checks.md)
 * [Developer Checklist](developer-checklist.md)
+* [1.2.1 Release Notes](release-notes-121.md)
 * [1.2.0 Release Notes](release-notes-120.md)
 * [1.1.x Release Notes](release-notes-110.md)
 * [1.0.0 Release Notes](release-notes-100.md)

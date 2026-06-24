@@ -1,8 +1,8 @@
 using System.Collections.ObjectModel;
-using CDCavell.AsiBackbone.Core.Serialization;
-using CDCavell.AsiBackbone.Core.Signing;
+using AsiBackbone.Core.Serialization;
+using AsiBackbone.Core.Signing;
 
-namespace CDCavell.AsiBackbone.Core.Integrity;
+namespace AsiBackbone.Core.Integrity;
 
 /// <summary>
 /// Represents one append-only hash-chain link for a canonical audit or outbox record hash.

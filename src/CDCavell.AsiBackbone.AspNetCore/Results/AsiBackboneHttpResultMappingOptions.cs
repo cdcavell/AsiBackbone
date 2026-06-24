@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Http;
 
-namespace CDCavell.AsiBackbone.AspNetCore.Results;
+namespace AsiBackbone.AspNetCore.Results;
 
 /// <summary>
 /// Provides host-overridable defaults for mapping AsiBackbone Core outcomes into HTTP responses.

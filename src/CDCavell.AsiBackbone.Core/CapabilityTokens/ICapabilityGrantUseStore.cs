@@ -1,4 +1,4 @@
-namespace CDCavell.AsiBackbone.Core.CapabilityTokens;
+namespace AsiBackbone.Core.CapabilityTokens;
 
 /// <summary>
 /// Defines a provider-neutral boundary for checking and consuming bounded-use capability grants.

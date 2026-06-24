@@ -1,7 +1,7 @@
-using CDCavell.AsiBackbone.AspNetCore.Outbox;
-using CDCavell.AsiBackbone.DependencyInjection;
+using AsiBackbone.AspNetCore.Outbox;
+using AsiBackbone.DependencyInjection;
 
-namespace CDCavell.AsiBackbone.AspNetCore.DependencyInjection;
+namespace AsiBackbone.AspNetCore.DependencyInjection;
 
 /// <summary>
 /// Provides explicit builder facade extension methods for ASP.NET Core host integration.

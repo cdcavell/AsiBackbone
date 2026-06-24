@@ -1,10 +1,10 @@
-using CDCavell.AsiBackbone.Core.Outbox;
+using AsiBackbone.Core.Outbox;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace CDCavell.AsiBackbone.AspNetCore.Outbox;
+namespace AsiBackbone.AspNetCore.Outbox;
 
 /// <summary>
 /// Runs the provider-neutral governance outbox drain from an ASP.NET Core or generic-host background worker.

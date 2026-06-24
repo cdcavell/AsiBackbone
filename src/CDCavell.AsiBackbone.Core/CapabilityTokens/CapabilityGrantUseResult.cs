@@ -1,4 +1,4 @@
-namespace CDCavell.AsiBackbone.Core.CapabilityTokens;
+namespace AsiBackbone.Core.CapabilityTokens;
 
 /// <summary>
 /// Represents the outcome returned by a capability grant use-control store.

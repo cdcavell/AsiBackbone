@@ -1,7 +1,7 @@
 using System.Collections.ObjectModel;
-using CDCavell.AsiBackbone.Core.Emissions;
+using AsiBackbone.Core.Emissions;
 
-namespace CDCavell.AsiBackbone.Core.Outbox;
+namespace AsiBackbone.Core.Outbox;
 
 /// <summary>
 /// Represents a provider-neutral durable outbox entry for a governance emission envelope.

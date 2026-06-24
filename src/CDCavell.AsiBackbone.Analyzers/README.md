@@ -1,4 +1,4 @@
-# CDCavell.AsiBackbone.Analyzers
+# AsiBackbone.Analyzers
 
 Roslyn analyzer safety rails for Accountable Systems Infrastructure governance flows.
 

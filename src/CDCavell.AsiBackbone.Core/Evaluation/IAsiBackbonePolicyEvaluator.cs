@@ -1,7 +1,7 @@
-using CDCavell.AsiBackbone.Core.Constraints;
-using CDCavell.AsiBackbone.Core.Decisions;
+using AsiBackbone.Core.Constraints;
+using AsiBackbone.Core.Decisions;
 
-namespace CDCavell.AsiBackbone.Core.Evaluation;
+namespace AsiBackbone.Core.Evaluation;
 
 /// <summary>
 /// Evaluates a framework-neutral context against the active policy structure and composes the result into a governance decision.

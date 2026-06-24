@@ -1,8 +1,8 @@
-using CDCavell.AsiBackbone.EntityFrameworkCore.Persistence;
+using AsiBackbone.EntityFrameworkCore.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace CDCavell.AsiBackbone.EntityFrameworkCore.Configurations;
+namespace AsiBackbone.EntityFrameworkCore.Configurations;
 
 /// <summary>
 /// Configures the Entity Framework Core persistence mapping for

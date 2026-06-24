@@ -1,17 +1,17 @@
-using CDCavell.AsiBackbone.AspNetCore.Actors;
-using CDCavell.AsiBackbone.AspNetCore.Correlation;
-using CDCavell.AsiBackbone.AspNetCore.Handshakes;
-using CDCavell.AsiBackbone.AspNetCore.Results;
-using CDCavell.AsiBackbone.Core.Actors;
-using CDCavell.AsiBackbone.Core.Audit;
-using CDCavell.AsiBackbone.Core.Constraints;
-using CDCavell.AsiBackbone.Core.Decisions;
-using CDCavell.AsiBackbone.Core.Evaluation;
+using AsiBackbone.AspNetCore.Actors;
+using AsiBackbone.AspNetCore.Correlation;
+using AsiBackbone.AspNetCore.Handshakes;
+using AsiBackbone.AspNetCore.Results;
+using AsiBackbone.Core.Actors;
+using AsiBackbone.Core.Audit;
+using AsiBackbone.Core.Constraints;
+using AsiBackbone.Core.Decisions;
+using AsiBackbone.Core.Evaluation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace CDCavell.AsiBackbone.AspNetCore.Endpoints;
+namespace AsiBackbone.AspNetCore.Endpoints;
 
 /// <summary>
 /// Default host-adapter implementation for ergonomic ASP.NET Core endpoint governance.

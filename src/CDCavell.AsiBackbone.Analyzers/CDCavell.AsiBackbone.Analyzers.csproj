@@ -4,8 +4,8 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <PackageId>CDCavell.AsiBackbone.Analyzers</PackageId>
-    <Title>CDCavell AsiBackbone Analyzers</Title>
+    <PackageId>AsiBackbone.Analyzers</PackageId>
+    <Title>AsiBackbone Analyzers</Title>
     <Description>Roslyn analyzer safety rails for Accountable Systems Infrastructure governance persistence and continuation flows.</Description>
     <Authors>Christopher D. Cavell</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

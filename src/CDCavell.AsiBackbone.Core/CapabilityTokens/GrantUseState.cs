@@ -1,4 +1,4 @@
-namespace CDCavell.AsiBackbone.Core.CapabilityTokens;
+namespace AsiBackbone.Core.CapabilityTokens;
 
 public enum GrantUseState
 {

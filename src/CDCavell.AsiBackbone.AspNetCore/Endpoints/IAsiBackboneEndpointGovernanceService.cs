@@ -1,7 +1,7 @@
-using CDCavell.AsiBackbone.Core.Decisions;
+using AsiBackbone.Core.Decisions;
 using Microsoft.AspNetCore.Http;
 
-namespace CDCavell.AsiBackbone.AspNetCore.Endpoints;
+namespace AsiBackbone.AspNetCore.Endpoints;
 
 /// <summary>
 /// Evaluates AsiBackbone governance metadata attached to an ASP.NET Core endpoint before endpoint execution.

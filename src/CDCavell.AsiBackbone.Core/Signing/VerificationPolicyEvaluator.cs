@@ -1,4 +1,4 @@
-namespace CDCavell.AsiBackbone.Core.Signing;
+namespace AsiBackbone.Core.Signing;
 
 /// <summary>
 /// Evaluates provider-neutral signature verification results against host verification policy.

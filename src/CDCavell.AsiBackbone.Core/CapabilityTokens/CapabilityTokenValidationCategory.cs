@@ -1,4 +1,4 @@
-namespace CDCavell.AsiBackbone.Core.CapabilityTokens;
+namespace AsiBackbone.Core.CapabilityTokens;
 
 /// <summary>
 /// Describes the provider-neutral validation category assigned to a capability grant.

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Http;
 
-namespace CDCavell.AsiBackbone.AspNetCore.Endpoints;
+namespace AsiBackbone.AspNetCore.Endpoints;
 
 /// <summary>
 /// Provides options for ergonomic ASP.NET Core endpoint governance integration.

@@ -1,4 +1,4 @@
-namespace CDCavell.AsiBackbone.Core.Audit;
+namespace AsiBackbone.Core.Audit;
 
 /// <summary>
 /// Defines framework-neutral lifecycle stages for audit residue emitted across a governed decision flow.

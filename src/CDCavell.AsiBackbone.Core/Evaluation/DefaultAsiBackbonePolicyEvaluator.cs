@@ -1,8 +1,8 @@
-using CDCavell.AsiBackbone.Core.Constraints;
-using CDCavell.AsiBackbone.Core.Decisions;
-using CDCavell.AsiBackbone.Core.Results;
+using AsiBackbone.Core.Constraints;
+using AsiBackbone.Core.Decisions;
+using AsiBackbone.Core.Results;
 
-namespace CDCavell.AsiBackbone.Core.Evaluation;
+namespace AsiBackbone.Core.Evaluation;
 
 /// <summary>
 /// Default policy evaluator that runs the active constraint structure and composes the result into a governance decision.

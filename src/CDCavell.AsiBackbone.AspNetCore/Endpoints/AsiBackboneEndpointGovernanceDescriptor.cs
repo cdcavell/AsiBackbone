@@ -1,7 +1,7 @@
 using System.Collections.ObjectModel;
 using Microsoft.AspNetCore.Http;
 
-namespace CDCavell.AsiBackbone.AspNetCore.Endpoints;
+namespace AsiBackbone.AspNetCore.Endpoints;
 
 /// <summary>
 /// Represents normalized AsiBackbone governance metadata resolved from an ASP.NET Core endpoint.

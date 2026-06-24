@@ -1,4 +1,4 @@
-namespace CDCavell.AsiBackbone.Core.Signing;
+namespace AsiBackbone.Core.Signing;
 
 /// <summary>
 /// Describes the host-facing action selected by verification policy.

@@ -1,4 +1,4 @@
-namespace CDCavell.AsiBackbone.Core.Signing;
+namespace AsiBackbone.Core.Signing;
 
 /// <summary>
 /// Represents the provider-neutral result of a signature verification operation.

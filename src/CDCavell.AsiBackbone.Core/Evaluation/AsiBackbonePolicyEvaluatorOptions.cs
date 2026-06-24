@@ -1,4 +1,4 @@
-namespace CDCavell.AsiBackbone.Core.Evaluation;
+namespace AsiBackbone.Core.Evaluation;
 
 /// <summary>
 /// Provides host-configurable options for the default AsiBackbone policy evaluator.

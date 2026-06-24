@@ -1,7 +1,7 @@
 using System.Collections.ObjectModel;
-using CDCavell.AsiBackbone.Core.Serialization;
+using AsiBackbone.Core.Serialization;
 
-namespace CDCavell.AsiBackbone.Core.CapabilityTokens;
+namespace AsiBackbone.Core.CapabilityTokens;
 
 /// <summary>
 /// Represents a provider-neutral, short-lived capability grant for follow-on governed execution.

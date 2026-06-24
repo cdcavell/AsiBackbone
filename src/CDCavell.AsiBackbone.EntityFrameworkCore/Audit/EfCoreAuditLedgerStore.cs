@@ -1,12 +1,12 @@
 using System.Collections.ObjectModel;
 using System.Text.Json;
-using CDCavell.AsiBackbone.Core.Actors;
-using CDCavell.AsiBackbone.Core.Audit;
-using CDCavell.AsiBackbone.Core.Results;
-using CDCavell.AsiBackbone.EntityFrameworkCore.Persistence;
+using AsiBackbone.Core.Actors;
+using AsiBackbone.Core.Audit;
+using AsiBackbone.Core.Results;
+using AsiBackbone.EntityFrameworkCore.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-namespace CDCavell.AsiBackbone.EntityFrameworkCore.Audit;
+namespace AsiBackbone.EntityFrameworkCore.Audit;
 
 /// <summary>
 /// Entity Framework Core-backed audit ledger store that persists records through a host-owned <see cref="DbContext" />.

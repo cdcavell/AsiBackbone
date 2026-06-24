@@ -1,4 +1,4 @@
-namespace CDCavell.AsiBackbone.Core.Signing;
+namespace AsiBackbone.Core.Signing;
 
 /// <summary>
 /// Provides provider-neutral helpers for verifying signed governance artifacts and applying verification policy.

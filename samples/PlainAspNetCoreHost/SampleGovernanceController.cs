@@ -1,7 +1,7 @@
-using CDCavell.AsiBackbone.AspNetCore.Endpoints;
+using AsiBackbone.AspNetCore.Endpoints;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CDCavell.AsiBackbone.Samples.PlainAspNetCoreHost;
+namespace AsiBackbone.Samples.PlainAspNetCoreHost;
 
 [ApiController]
 [Route("sample/ergonomic/controller-public")]

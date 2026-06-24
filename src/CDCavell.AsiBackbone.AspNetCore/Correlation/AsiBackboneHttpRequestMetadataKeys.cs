@@ -1,4 +1,4 @@
-namespace CDCavell.AsiBackbone.AspNetCore.Correlation;
+namespace AsiBackbone.AspNetCore.Correlation;
 
 /// <summary>
 /// Defines metadata keys emitted by ASP.NET Core request correlation adapters.

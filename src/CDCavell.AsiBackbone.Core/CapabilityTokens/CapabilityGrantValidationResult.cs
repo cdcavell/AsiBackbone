@@ -1,7 +1,7 @@
 using System.Collections.ObjectModel;
-using CDCavell.AsiBackbone.Core.Signing;
+using AsiBackbone.Core.Signing;
 
-namespace CDCavell.AsiBackbone.Core.CapabilityTokens;
+namespace AsiBackbone.Core.CapabilityTokens;
 
 public sealed class CapabilityGrantValidationResult
 {

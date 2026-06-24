@@ -1,7 +1,7 @@
 using System.Collections.ObjectModel;
-using CDCavell.AsiBackbone.Core.Results;
+using AsiBackbone.Core.Results;
 
-namespace CDCavell.AsiBackbone.Core.Constraints;
+namespace AsiBackbone.Core.Constraints;
 
 /// <summary>
 /// Represents the framework-neutral result of evaluating a constraint.

@@ -1,6 +1,6 @@
-using CDCavell.AsiBackbone.Core.Emissions;
+using AsiBackbone.Core.Emissions;
 
-namespace CDCavell.AsiBackbone.Core.Outbox;
+namespace AsiBackbone.Core.Outbox;
 
 /// <summary>
 /// Defines a provider-neutral durable outbox store for governance emission envelopes.

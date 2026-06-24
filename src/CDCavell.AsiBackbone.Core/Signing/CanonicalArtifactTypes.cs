@@ -1,4 +1,4 @@
-namespace CDCavell.AsiBackbone.Core.Signing;
+namespace AsiBackbone.Core.Signing;
 
 /// <summary>
 /// Provides stable artifact type identifiers for canonical AsiBackbone signing payloads.

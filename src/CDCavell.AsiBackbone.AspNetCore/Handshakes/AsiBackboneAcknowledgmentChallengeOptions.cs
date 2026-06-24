@@ -1,6 +1,6 @@
-using CDCavell.AsiBackbone.Core.Handshakes;
+using AsiBackbone.Core.Handshakes;
 
-namespace CDCavell.AsiBackbone.AspNetCore.Handshakes;
+namespace AsiBackbone.AspNetCore.Handshakes;
 
 /// <summary>
 /// Provides host-overridable defaults for building acknowledgment challenges from Core governance decisions.

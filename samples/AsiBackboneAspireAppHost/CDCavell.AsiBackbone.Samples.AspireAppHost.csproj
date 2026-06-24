@@ -8,7 +8,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
-    <UserSecretsId>cdcavell-asibackbone-samples-aspire-apphost</UserSecretsId>
+    <UserSecretsId>asibackbone-samples-aspire-apphost</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PlainAspNetCoreHost\CDCavell.AsiBackbone.Samples.PlainAspNetCoreHost.csproj" />
+    <ProjectReference Include="..\PlainAspNetCoreHost\AsiBackbone.Samples.PlainAspNetCoreHost.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,7 +1,7 @@
 using System.Collections.ObjectModel;
-using CDCavell.AsiBackbone.Core.Results;
+using AsiBackbone.Core.Results;
 
-namespace CDCavell.AsiBackbone.Core.Decisions;
+namespace AsiBackbone.Core.Decisions;
 
 /// <summary>
 /// Represents a framework-neutral governance decision produced by an AsiBackbone evaluation flow.

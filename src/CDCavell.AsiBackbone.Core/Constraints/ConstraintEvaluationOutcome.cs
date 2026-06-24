@@ -1,4 +1,4 @@
-namespace CDCavell.AsiBackbone.Core.Constraints;
+namespace AsiBackbone.Core.Constraints;
 
 /// <summary>
 /// Represents the outcome produced by evaluating a constraint.

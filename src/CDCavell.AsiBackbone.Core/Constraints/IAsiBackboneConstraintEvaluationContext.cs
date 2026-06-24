@@ -1,4 +1,4 @@
-namespace CDCavell.AsiBackbone.Core.Constraints;
+namespace AsiBackbone.Core.Constraints;
 
 /// <summary>
 /// Represents framework-neutral context data commonly useful during constraint evaluation.

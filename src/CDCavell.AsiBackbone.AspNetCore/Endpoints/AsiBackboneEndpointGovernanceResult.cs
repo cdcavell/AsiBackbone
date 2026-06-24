@@ -1,8 +1,8 @@
-using CDCavell.AsiBackbone.AspNetCore.Handshakes;
-using CDCavell.AsiBackbone.Core.Decisions;
+using AsiBackbone.AspNetCore.Handshakes;
+using AsiBackbone.Core.Decisions;
 using Microsoft.AspNetCore.Http;
 
-namespace CDCavell.AsiBackbone.AspNetCore.Endpoints;
+namespace AsiBackbone.AspNetCore.Endpoints;
 
 /// <summary>
 /// Represents the outcome of ASP.NET Core endpoint governance evaluation before endpoint execution.

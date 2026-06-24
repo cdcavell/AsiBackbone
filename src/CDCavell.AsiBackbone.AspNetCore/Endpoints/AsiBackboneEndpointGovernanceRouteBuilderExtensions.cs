@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 
-namespace CDCavell.AsiBackbone.AspNetCore.Endpoints;
+namespace AsiBackbone.AspNetCore.Endpoints;
 
 /// <summary>
 /// Provides Minimal API / endpoint route-builder helpers for adding AsiBackbone governance metadata.

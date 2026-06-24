@@ -1,9 +1,9 @@
-using CDCavell.AsiBackbone.Core.Audit;
-using CDCavell.AsiBackbone.Core.Emissions;
-using CDCavell.AsiBackbone.Core.Entities;
-using CDCavell.AsiBackbone.Core.Serialization;
+using AsiBackbone.Core.Audit;
+using AsiBackbone.Core.Emissions;
+using AsiBackbone.Core.Entities;
+using AsiBackbone.Core.Serialization;
 
-namespace CDCavell.AsiBackbone.EntityFrameworkCore.Persistence;
+namespace AsiBackbone.EntityFrameworkCore.Persistence;
 
 /// <summary>
 /// Represents the Entity Framework Core persistence shape for a durable governance outbox entry.

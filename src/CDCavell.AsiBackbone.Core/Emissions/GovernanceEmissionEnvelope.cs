@@ -1,8 +1,8 @@
 using System.Collections.ObjectModel;
-using CDCavell.AsiBackbone.Core.Audit;
-using CDCavell.AsiBackbone.Core.Serialization;
+using AsiBackbone.Core.Audit;
+using AsiBackbone.Core.Serialization;
 
-namespace CDCavell.AsiBackbone.Core.Emissions;
+namespace AsiBackbone.Core.Emissions;
 
 /// <summary>
 /// Represents a provider-neutral governance emission envelope that can be handed to outbox storage or downstream providers.

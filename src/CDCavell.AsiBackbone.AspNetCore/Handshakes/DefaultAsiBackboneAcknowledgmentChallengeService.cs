@@ -1,9 +1,9 @@
-using CDCavell.AsiBackbone.Core.Actors;
-using CDCavell.AsiBackbone.Core.Decisions;
-using CDCavell.AsiBackbone.Core.Handshakes;
+using AsiBackbone.Core.Actors;
+using AsiBackbone.Core.Decisions;
+using AsiBackbone.Core.Handshakes;
 using Microsoft.Extensions.Options;
 
-namespace CDCavell.AsiBackbone.AspNetCore.Handshakes;
+namespace AsiBackbone.AspNetCore.Handshakes;
 
 /// <summary>
 /// Provides the default ASP.NET Core-friendly acknowledgment challenge service.

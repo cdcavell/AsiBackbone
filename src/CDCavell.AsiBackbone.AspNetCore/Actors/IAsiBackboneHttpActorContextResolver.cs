@@ -1,6 +1,6 @@
-using CDCavell.AsiBackbone.Core.Actors;
+using AsiBackbone.Core.Actors;
 
-namespace CDCavell.AsiBackbone.AspNetCore.Actors;
+namespace AsiBackbone.AspNetCore.Actors;
 
 /// <summary>
 /// Resolves the current ASP.NET Core request actor into the framework-neutral AsiBackbone actor context model.

@@ -1,7 +1,7 @@
-using CDCavell.AsiBackbone.Core.Actors;
-using CDCavell.AsiBackbone.Core.Decisions;
+using AsiBackbone.Core.Actors;
+using AsiBackbone.Core.Decisions;
 
-namespace CDCavell.AsiBackbone.AspNetCore.Handshakes;
+namespace AsiBackbone.AspNetCore.Handshakes;
 
 /// <summary>
 /// Builds and handles ASP.NET Core-friendly acknowledgment challenges without assuming a specific UI framework.

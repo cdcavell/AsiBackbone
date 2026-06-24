@@ -4,8 +4,8 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <PackageId>CDCavell.AsiBackbone.Core</PackageId>
-    <Title>CDCavell AsiBackbone Core</Title>
+    <PackageId>AsiBackbone.Core</PackageId>
+    <Title>AsiBackbone Core</Title>
     <Description>Framework-neutral Accountable Systems Infrastructure governance primitives for consequential .NET decision flow.</Description>
     <Authors>Christopher D. Cavell</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

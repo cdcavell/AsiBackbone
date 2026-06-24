@@ -3,14 +3,14 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
 
-namespace CDCavell.AsiBackbone.Analyzers;
+namespace AsiBackbone.Analyzers;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class LocalDevelopmentSigningProductionAnalyzer : DiagnosticAnalyzer
 {
     public const string DiagnosticId = "ASIB002";
 
-    private const string LocalDevelopmentNamespace = "CDCavell.AsiBackbone.Signing.LocalDevelopment";
+    private const string LocalDevelopmentNamespace = "AsiBackbone.Signing.LocalDevelopment";
 
     private static readonly DiagnosticDescriptor Rule = new(
         DiagnosticId,

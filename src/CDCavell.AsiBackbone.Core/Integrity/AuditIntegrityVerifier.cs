@@ -1,6 +1,6 @@
-using CDCavell.AsiBackbone.Core.Signing;
+using AsiBackbone.Core.Signing;
 
-namespace CDCavell.AsiBackbone.Core.Integrity;
+namespace AsiBackbone.Core.Integrity;
 
 /// <summary>
 /// Verifies provider-neutral append-only audit integrity chains.

@@ -1,10 +1,10 @@
 using System.Globalization;
-using CDCavell.AsiBackbone.Core.Audit;
-using CDCavell.AsiBackbone.Core.Emissions;
-using CDCavell.AsiBackbone.Core.Outbox;
-using CDCavell.AsiBackbone.Core.Serialization;
+using AsiBackbone.Core.Audit;
+using AsiBackbone.Core.Emissions;
+using AsiBackbone.Core.Outbox;
+using AsiBackbone.Core.Serialization;
 
-namespace CDCavell.AsiBackbone.Core.Signing;
+namespace AsiBackbone.Core.Signing;
 
 /// <summary>
 /// Builds deterministic, provider-neutral signing payloads for AsiBackbone governance artifacts.

@@ -1,14 +1,14 @@
-using CDCavell.AsiBackbone.AspNetCore.Actors;
-using CDCavell.AsiBackbone.AspNetCore.Correlation;
-using CDCavell.AsiBackbone.AspNetCore.Endpoints;
-using CDCavell.AsiBackbone.AspNetCore.Handshakes;
-using CDCavell.AsiBackbone.AspNetCore.Outbox;
-using CDCavell.AsiBackbone.AspNetCore.Results;
-using CDCavell.AsiBackbone.Core.Outbox;
+using AsiBackbone.AspNetCore.Actors;
+using AsiBackbone.AspNetCore.Correlation;
+using AsiBackbone.AspNetCore.Endpoints;
+using AsiBackbone.AspNetCore.Handshakes;
+using AsiBackbone.AspNetCore.Outbox;
+using AsiBackbone.AspNetCore.Results;
+using AsiBackbone.Core.Outbox;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace CDCavell.AsiBackbone.AspNetCore.DependencyInjection;
+namespace AsiBackbone.AspNetCore.DependencyInjection;
 
 /// <summary>
 /// Provides dependency injection registration helpers for ASP.NET Core host integration.

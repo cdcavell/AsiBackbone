@@ -1,9 +1,9 @@
 using System.Collections.ObjectModel;
-using CDCavell.AsiBackbone.Core.Actors;
-using CDCavell.AsiBackbone.Core.Serialization;
-using SigningMetadataValue = CDCavell.AsiBackbone.Core.Signing.SigningMetadata;
+using AsiBackbone.Core.Actors;
+using AsiBackbone.Core.Serialization;
+using SigningMetadataValue = AsiBackbone.Core.Signing.SigningMetadata;
 
-namespace CDCavell.AsiBackbone.Core.Audit;
+namespace AsiBackbone.Core.Audit;
 
 /// <summary>
 /// Represents a persistence-ready audit ledger record captured from AsiBackbone audit residue.

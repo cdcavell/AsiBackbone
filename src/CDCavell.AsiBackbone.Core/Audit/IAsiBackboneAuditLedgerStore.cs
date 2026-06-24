@@ -1,6 +1,6 @@
-using CDCavell.AsiBackbone.Core.Results;
+using AsiBackbone.Core.Results;
 
-namespace CDCavell.AsiBackbone.Core.Audit;
+namespace AsiBackbone.Core.Audit;
 
 /// <summary>
 /// Defines the framework-neutral storage contract for persistent AsiBackbone audit ledger records.

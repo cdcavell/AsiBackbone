@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace CDCavell.AsiBackbone.DependencyInjection;
+namespace AsiBackbone.DependencyInjection;
 
 /// <summary>
 /// Default implementation of the AsiBackbone dependency injection builder facade.

@@ -1,9 +1,9 @@
 using System.Collections.ObjectModel;
 using System.Globalization;
-using CDCavell.AsiBackbone.Core.Decisions;
-using CDCavell.AsiBackbone.Core.Results;
+using AsiBackbone.Core.Decisions;
+using AsiBackbone.Core.Results;
 
-namespace CDCavell.AsiBackbone.Core.Classification;
+namespace AsiBackbone.Core.Classification;
 
 /// <summary>
 /// Represents the resolved provider-neutral policy response to a DLP or classification failure.

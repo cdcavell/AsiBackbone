@@ -1,12 +1,12 @@
-using CDCavell.AsiBackbone.Core.Audit;
-using CDCavell.AsiBackbone.Core.Outbox;
-using CDCavell.AsiBackbone.DependencyInjection;
-using CDCavell.AsiBackbone.EntityFrameworkCore.Audit;
-using CDCavell.AsiBackbone.EntityFrameworkCore.Outbox;
+using AsiBackbone.Core.Audit;
+using AsiBackbone.Core.Outbox;
+using AsiBackbone.DependencyInjection;
+using AsiBackbone.EntityFrameworkCore.Audit;
+using AsiBackbone.EntityFrameworkCore.Outbox;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace CDCavell.AsiBackbone.EntityFrameworkCore;
+namespace AsiBackbone.EntityFrameworkCore;
 
 /// <summary>
 /// Provides explicit builder facade extension methods for EF Core host-owned persistence.

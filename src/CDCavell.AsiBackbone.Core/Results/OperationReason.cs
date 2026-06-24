@@ -1,6 +1,6 @@
 using System.Collections.ObjectModel;
 
-namespace CDCavell.AsiBackbone.Core.Results;
+namespace AsiBackbone.Core.Results;
 
 /// <summary>
 /// Represents a machine-readable reason associated with an operation result.

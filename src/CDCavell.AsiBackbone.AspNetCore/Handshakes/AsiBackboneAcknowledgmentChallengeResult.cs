@@ -1,7 +1,7 @@
-using CDCavell.AsiBackbone.Core.Handshakes;
-using CDCavell.AsiBackbone.Core.Results;
+using AsiBackbone.Core.Handshakes;
+using AsiBackbone.Core.Results;
 
-namespace CDCavell.AsiBackbone.AspNetCore.Handshakes;
+namespace AsiBackbone.AspNetCore.Handshakes;
 
 /// <summary>
 /// Represents the result of handling a host-submitted acknowledgment challenge response.

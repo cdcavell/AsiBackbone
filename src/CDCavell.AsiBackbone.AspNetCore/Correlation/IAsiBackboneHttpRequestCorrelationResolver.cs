@@ -1,4 +1,4 @@
-namespace CDCavell.AsiBackbone.AspNetCore.Correlation;
+namespace AsiBackbone.AspNetCore.Correlation;
 
 /// <summary>
 /// Resolves framework-neutral request correlation data from the current ASP.NET Core HTTP request.

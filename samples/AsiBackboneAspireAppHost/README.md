@@ -31,7 +31,7 @@ The AppHost uses the Aspire SDK and hosting package through NuGet references. It
 From the repository root:
 
 ```powershell
-dotnet run --project samples/AsiBackboneAspireAppHost/CDCavell.AsiBackbone.Samples.AspireAppHost.csproj
+dotnet run --project samples/AsiBackboneAspireAppHost/AsiBackbone.Samples.AspireAppHost.csproj
 ```
 
 The Aspire dashboard should open during local development. Select the `asi-backbone-api` resource and use its endpoint link.
@@ -57,7 +57,7 @@ Future Aspire-oriented work may add deeper OpenTelemetry governance-emission wir
 This sample does not:
 
 - make Aspire a dependency of Core or any stable runtime package,
-- introduce a `CDCavell.AsiBackbone.Aspire` package,
+- introduce a `AsiBackbone.Aspire` package,
 - require cloud Key Vault, managed keys, or production databases,
 - require the deprecated Aspire workload,
 - provide compliance, durability, production signing, or tamper-evidence by itself,

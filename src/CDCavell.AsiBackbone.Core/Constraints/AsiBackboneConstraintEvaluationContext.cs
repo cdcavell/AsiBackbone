@@ -1,6 +1,6 @@
 using System.Collections.ObjectModel;
 
-namespace CDCavell.AsiBackbone.Core.Constraints;
+namespace AsiBackbone.Core.Constraints;
 
 /// <summary>
 /// Default framework-neutral context value used during constraint evaluation.

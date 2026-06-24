@@ -1,4 +1,4 @@
-namespace CDCavell.AsiBackbone.Core.Emissions;
+namespace AsiBackbone.Core.Emissions;
 
 /// <summary>
 /// Defines the provider-neutral contract used to emit governance envelopes from Core artifacts, audit/outbox storage, or host adapters.

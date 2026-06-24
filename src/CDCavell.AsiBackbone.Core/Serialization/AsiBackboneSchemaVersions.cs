@@ -1,4 +1,4 @@
-namespace CDCavell.AsiBackbone.Core.Serialization;
+namespace AsiBackbone.Core.Serialization;
 
 /// <summary>
 /// Defines schema version constants for persisted or exported AsiBackbone governance artifacts.

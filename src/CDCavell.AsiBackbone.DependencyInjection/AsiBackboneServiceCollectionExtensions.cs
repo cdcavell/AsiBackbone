@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace CDCavell.AsiBackbone.DependencyInjection;
+namespace AsiBackbone.DependencyInjection;
 
 /// <summary>
 /// Provides the explicit <c>AddAsiBackbone</c> dependency injection entry point.

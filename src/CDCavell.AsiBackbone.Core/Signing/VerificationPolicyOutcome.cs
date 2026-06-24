@@ -1,6 +1,6 @@
 using System.Collections.ObjectModel;
 
-namespace CDCavell.AsiBackbone.Core.Signing;
+namespace AsiBackbone.Core.Signing;
 
 /// <summary>
 /// Represents the host-facing outcome of signature verification policy evaluation.

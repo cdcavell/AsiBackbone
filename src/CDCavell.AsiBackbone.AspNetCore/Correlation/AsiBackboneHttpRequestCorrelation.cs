@@ -1,7 +1,7 @@
 using System.Collections.ObjectModel;
-using CDCavell.AsiBackbone.Core.Constraints;
+using AsiBackbone.Core.Constraints;
 
-namespace CDCavell.AsiBackbone.AspNetCore.Correlation;
+namespace AsiBackbone.AspNetCore.Correlation;
 
 /// <summary>
 /// Represents framework-neutral request correlation data resolved from the current ASP.NET Core HTTP request.

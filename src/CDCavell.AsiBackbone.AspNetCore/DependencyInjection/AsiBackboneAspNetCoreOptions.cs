@@ -1,4 +1,4 @@
-namespace CDCavell.AsiBackbone.AspNetCore.DependencyInjection;
+namespace AsiBackbone.AspNetCore.DependencyInjection;
 
 /// <summary>
 /// Provides configuration options for ASP.NET Core host integration.

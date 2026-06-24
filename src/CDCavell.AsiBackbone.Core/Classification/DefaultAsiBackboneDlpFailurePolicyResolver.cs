@@ -1,4 +1,4 @@
-namespace CDCavell.AsiBackbone.Core.Classification;
+namespace AsiBackbone.Core.Classification;
 
 /// <summary>
 /// Default provider-neutral resolver for DLP or classification failure behavior.

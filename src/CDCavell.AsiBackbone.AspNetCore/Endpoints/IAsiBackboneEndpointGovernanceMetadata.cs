@@ -1,4 +1,4 @@
-namespace CDCavell.AsiBackbone.AspNetCore.Endpoints;
+namespace AsiBackbone.AspNetCore.Endpoints;
 
 /// <summary>
 /// Marker interface for ASP.NET Core endpoint metadata that participates in AsiBackbone endpoint governance.

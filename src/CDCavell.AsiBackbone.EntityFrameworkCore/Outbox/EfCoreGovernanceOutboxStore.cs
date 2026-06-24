@@ -1,12 +1,12 @@
 using System.Collections.ObjectModel;
 using System.Text.Json;
-using CDCavell.AsiBackbone.Core.Emissions;
-using CDCavell.AsiBackbone.Core.Entities;
-using CDCavell.AsiBackbone.Core.Outbox;
-using CDCavell.AsiBackbone.EntityFrameworkCore.Persistence;
+using AsiBackbone.Core.Emissions;
+using AsiBackbone.Core.Entities;
+using AsiBackbone.Core.Outbox;
+using AsiBackbone.EntityFrameworkCore.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-namespace CDCavell.AsiBackbone.EntityFrameworkCore.Outbox;
+namespace AsiBackbone.EntityFrameworkCore.Outbox;
 
 /// <summary>
 /// Entity Framework Core-backed governance outbox store that persists provider-neutral emission envelopes through a host-owned <see cref="DbContext" />.

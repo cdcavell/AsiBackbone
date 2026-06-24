@@ -1,8 +1,8 @@
-using CDCavell.AsiBackbone.Core.Audit;
-using CDCavell.AsiBackbone.Core.Emissions;
-using CDCavell.AsiBackbone.Core.Outbox;
+using AsiBackbone.Core.Audit;
+using AsiBackbone.Core.Emissions;
+using AsiBackbone.Core.Outbox;
 
-namespace CDCavell.AsiBackbone.Core.Signing;
+namespace AsiBackbone.Core.Signing;
 
 /// <summary>
 /// Provides provider-neutral helper methods for preparing and signing AsiBackbone governance artifacts.

@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
 
-namespace CDCavell.AsiBackbone.Analyzers;
+namespace AsiBackbone.Analyzers;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class GovernanceArtifactPersistenceAnalyzer : DiagnosticAnalyzer
@@ -21,16 +21,16 @@ public sealed class GovernanceArtifactPersistenceAnalyzer : DiagnosticAnalyzer
 
     private static readonly ImmutableHashSet<string> GovernanceArtifactTypeNames = ImmutableHashSet.Create(
         StringComparer.Ordinal,
-        "CDCavell.AsiBackbone.Core.Audit.AuditLedgerRecord",
-        "CDCavell.AsiBackbone.Core.Audit.AuditResidue",
-        "CDCavell.AsiBackbone.Core.CapabilityTokens.CapabilityGrantUseResult",
-        "CDCavell.AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationResult",
-        "CDCavell.AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant",
-        "CDCavell.AsiBackbone.Core.Decisions.GovernanceDecision",
-        "CDCavell.AsiBackbone.Core.Emissions.GovernanceEmissionEnvelope",
-        "CDCavell.AsiBackbone.Core.Emissions.GovernanceEmissionResult",
-        "CDCavell.AsiBackbone.Core.Handshakes.LiabilityHandshakeAcknowledgment",
-        "CDCavell.AsiBackbone.Core.Outbox.GovernanceOutboxEntry");
+        "AsiBackbone.Core.Audit.AuditLedgerRecord",
+        "AsiBackbone.Core.Audit.AuditResidue",
+        "AsiBackbone.Core.CapabilityTokens.CapabilityGrantUseResult",
+        "AsiBackbone.Core.CapabilityTokens.CapabilityGrantValidationResult",
+        "AsiBackbone.Core.CapabilityTokens.CapabilityTokenGrant",
+        "AsiBackbone.Core.Decisions.GovernanceDecision",
+        "AsiBackbone.Core.Emissions.GovernanceEmissionEnvelope",
+        "AsiBackbone.Core.Emissions.GovernanceEmissionResult",
+        "AsiBackbone.Core.Handshakes.LiabilityHandshakeAcknowledgment",
+        "AsiBackbone.Core.Outbox.GovernanceOutboxEntry");
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
@@ -145,7 +145,7 @@ public sealed class GovernanceArtifactPersistenceAnalyzer : DiagnosticAnalyzer
 
         return namespaceName == "System.Threading.Tasks" && (namedType.Name == "Task" || namedType.Name == "ValueTask")
             ? namedType.TypeArguments[0]
-            : namespaceName == "CDCavell.AsiBackbone.Core.Results" && namedType.Name == "OperationResult"
+            : namespaceName == "AsiBackbone.Core.Results" && namedType.Name == "OperationResult"
             ? namedType.TypeArguments[0]
             : type;
     }

@@ -1,9 +1,9 @@
-using CDCavell.AsiBackbone.Core.Decisions;
-using CDCavell.AsiBackbone.Core.Results;
+using AsiBackbone.Core.Decisions;
+using AsiBackbone.Core.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CDCavell.AsiBackbone.AspNetCore.Results;
+namespace AsiBackbone.AspNetCore.Results;
 
 /// <summary>
 /// Provides helpers for translating AsiBackbone Core decisions and operation results into ASP.NET Core HTTP results.

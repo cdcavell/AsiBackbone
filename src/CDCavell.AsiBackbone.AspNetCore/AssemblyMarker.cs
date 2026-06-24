@@ -1,4 +1,4 @@
-namespace CDCavell.AsiBackbone.AspNetCore;
+namespace AsiBackbone.AspNetCore;
 
 /// <summary>
 /// Provides an assembly marker for this package.

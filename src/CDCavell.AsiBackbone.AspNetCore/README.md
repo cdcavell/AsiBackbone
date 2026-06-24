@@ -2,7 +2,7 @@
 
 ASP.NET Core host adapters for Accountable Systems Infrastructure governance primitives.
 
-This package acts as a thin web-host adapter around `CDCavell.AsiBackbone.Core`.
+This package acts as a thin web-host adapter around `AsiBackbone.Core`.
 
 > **New to AsiBackbone?** Start with the concept, not this package: [Intent to Execution: An Accountability Pattern](https://cdcavell.github.io/AsiBackbone/articles/intent-to-execution-pattern.html) and the [documentation site](https://cdcavell.github.io/AsiBackbone/). This README covers one package in the family.
 
@@ -14,7 +14,7 @@ This package acts as a thin web-host adapter around `CDCavell.AsiBackbone.Core`.
 Register the ASP.NET Core integration package from a plain ASP.NET Core host through `IServiceCollection`.
 
 ```csharp
-using CDCavell.AsiBackbone.AspNetCore.DependencyInjection;
+using AsiBackbone.AspNetCore.DependencyInjection;
 
 builder.Services.AddAsiBackboneAspNetCore();
 ```
@@ -39,7 +39,7 @@ The base registration is intentionally narrow. It does not register persistence,
 `UseAsiBackboneEndpointGovernance()` evaluates AsiBackbone endpoint metadata before endpoint execution.
 
 ```csharp
-using CDCavell.AsiBackbone.AspNetCore.Endpoints;
+using AsiBackbone.AspNetCore.Endpoints;
 
 app.UseAsiBackboneEndpointGovernance();
 
@@ -70,10 +70,10 @@ The metadata layer is optional and ergonomic. It does not replace full manual wi
 `AddAsiBackboneGovernanceOutboxDrainWorker` registers a host-owned background worker that runs the provider-neutral Core `AsiBackboneGovernanceOutboxDrain` through dependency injection.
 
 ```csharp
-using CDCavell.AsiBackbone.AspNetCore.DependencyInjection;
-using CDCavell.AsiBackbone.Core.Emissions;
-using CDCavell.AsiBackbone.Core.Outbox;
-using CDCavell.AsiBackbone.Storage.InMemory.Outbox;
+using AsiBackbone.AspNetCore.DependencyInjection;
+using AsiBackbone.Core.Emissions;
+using AsiBackbone.Core.Outbox;
+using AsiBackbone.Storage.InMemory.Outbox;
 
 builder.Services.AddSingleton<IAsiBackboneGovernanceOutboxStore, InMemoryGovernanceOutboxStore>();
 builder.Services.AddSingleton<IAsiBackboneGovernanceEmitter>(NoOpGovernanceEmitter.Instance);
@@ -102,8 +102,8 @@ The default resolver:
 Example usage:
 
 ```csharp
-using CDCavell.AsiBackbone.AspNetCore.Correlation;
-using CDCavell.AsiBackbone.Core.Audit;
+using AsiBackbone.AspNetCore.Correlation;
+using AsiBackbone.Core.Audit;
 
 AsiBackboneHttpRequestCorrelation correlation = correlationResolver.ResolveRequestCorrelation();
 
@@ -120,8 +120,8 @@ Use `AsiBackboneHttpRequestCorrelation.ToEvaluationContext(...)` when a web host
 `AsiBackboneHttpResultMappingExtensions` maps Core `GovernanceDecision` and `OperationResult` instances into ASP.NET Core `IResult` responses through explicit helpers.
 
 ```csharp
-using CDCavell.AsiBackbone.AspNetCore.Results;
-using CDCavell.AsiBackbone.Core.Decisions;
+using AsiBackbone.AspNetCore.Results;
+using AsiBackbone.Core.Decisions;
 
 GovernanceDecision decision = GovernanceDecision.Deny(
     "policy.denied",
@@ -154,7 +154,7 @@ Reason codes and correlation identifiers are preserved by default when available
 Hosts can opt into broader detail only when appropriate:
 
 ```csharp
-using CDCavell.AsiBackbone.AspNetCore.Results;
+using AsiBackbone.AspNetCore.Results;
 
 AsiBackboneHttpResultMappingOptions mappingOptions = new()
 {
@@ -173,8 +173,8 @@ Status-code policy remains host-overridable through `AsiBackboneHttpResultMappin
 `IAsiBackboneAcknowledgmentChallengeService` provides a host-friendly bridge for Core `AcknowledgmentRequired` decisions. It builds an `AsiBackboneAcknowledgmentChallenge` that MVC, Razor Pages, Minimal APIs, a SPA, or another UI layer can render without the package taking a dependency on that stack.
 
 ```csharp
-using CDCavell.AsiBackbone.AspNetCore.Handshakes;
-using CDCavell.AsiBackbone.Core.Decisions;
+using AsiBackbone.AspNetCore.Handshakes;
+using AsiBackbone.Core.Decisions;
 
 GovernanceDecision decision = GovernanceDecision.RequireAcknowledgment(
     "risk.high",

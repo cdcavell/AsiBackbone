@@ -1,10 +1,10 @@
-using CDCavell.AsiBackbone.Core.Decisions;
+using AsiBackbone.Core.Decisions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace CDCavell.AsiBackbone.AspNetCore.Endpoints;
+namespace AsiBackbone.AspNetCore.Endpoints;
 
 internal static class AsiBackboneEndpointGovernanceDevelopmentDiagnostics
 {

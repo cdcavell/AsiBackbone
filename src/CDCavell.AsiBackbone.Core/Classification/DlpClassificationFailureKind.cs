@@ -1,4 +1,4 @@
-namespace CDCavell.AsiBackbone.Core.Classification;
+namespace AsiBackbone.Core.Classification;
 
 /// <summary>
 /// Represents provider-neutral DLP, classification, or governance-screening failure conditions.

@@ -1,4 +1,4 @@
-namespace CDCavell.AsiBackbone.Core.Emissions;
+namespace AsiBackbone.Core.Emissions;
 
 /// <summary>
 /// Provider-neutral no-op governance emitter for tests, samples, local validation, and outbox proof-of-composition flows.

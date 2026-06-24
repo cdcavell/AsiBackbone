@@ -1,4 +1,4 @@
-namespace CDCavell.AsiBackbone.AspNetCore.Endpoints;
+namespace AsiBackbone.AspNetCore.Endpoints;
 
 /// <summary>
 /// Allows a selected ASP.NET Core endpoint to pass through endpoint governance middleware

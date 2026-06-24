@@ -1,6 +1,6 @@
 using System.Collections.ObjectModel;
 
-namespace CDCavell.AsiBackbone.Core.Emissions;
+namespace AsiBackbone.Core.Emissions;
 
 /// <summary>
 /// Represents the provider-neutral result of a governance emission attempt.

@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace CDCavell.AsiBackbone.EntityFrameworkCore;
+namespace AsiBackbone.EntityFrameworkCore;
 
 /// <summary>
 /// Provides Entity Framework Core model configuration hooks for ASI Backbone persistence integration.

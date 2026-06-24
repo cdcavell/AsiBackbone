@@ -1,4 +1,4 @@
-namespace CDCavell.AsiBackbone.Core.Integrity;
+namespace AsiBackbone.Core.Integrity;
 
 /// <summary>
 /// Describes provider-neutral audit integrity verification categories.

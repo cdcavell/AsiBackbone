@@ -1,4 +1,4 @@
-namespace CDCavell.AsiBackbone.AspNetCore.Endpoints;
+namespace AsiBackbone.AspNetCore.Endpoints;
 
 /// <summary>
 /// Marks an ASP.NET Core endpoint as requiring host-defined AsiBackbone governance policy evaluation.

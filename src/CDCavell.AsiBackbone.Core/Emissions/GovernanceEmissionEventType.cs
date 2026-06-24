@@ -1,4 +1,4 @@
-namespace CDCavell.AsiBackbone.Core.Emissions;
+namespace AsiBackbone.Core.Emissions;
 
 /// <summary>
 /// Defines provider-neutral governance event categories that can be emitted through an AsiBackbone emission contract.

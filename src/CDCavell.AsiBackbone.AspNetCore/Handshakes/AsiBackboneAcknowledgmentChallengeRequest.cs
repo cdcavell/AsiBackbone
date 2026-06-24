@@ -1,4 +1,4 @@
-namespace CDCavell.AsiBackbone.AspNetCore.Handshakes;
+namespace AsiBackbone.AspNetCore.Handshakes;
 
 /// <summary>
 /// Represents a host-submitted acknowledgment challenge response payload.

@@ -1,9 +1,9 @@
 using System.Collections.ObjectModel;
-using CDCavell.AsiBackbone.Core.Actors;
-using CDCavell.AsiBackbone.Core.Decisions;
-using CDCavell.AsiBackbone.Core.Serialization;
+using AsiBackbone.Core.Actors;
+using AsiBackbone.Core.Decisions;
+using AsiBackbone.Core.Serialization;
 
-namespace CDCavell.AsiBackbone.Core.Handshakes;
+namespace AsiBackbone.Core.Handshakes;
 
 /// <summary>
 /// Represents a framework-neutral liability or responsibility handshake request before consequential execution.

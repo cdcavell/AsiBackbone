@@ -1,6 +1,6 @@
 using System.Security.Cryptography;
 
-namespace CDCavell.AsiBackbone.Core.Signing;
+namespace AsiBackbone.Core.Signing;
 
 /// <summary>
 /// Represents provider-neutral hash metadata for a canonical AsiBackbone payload.

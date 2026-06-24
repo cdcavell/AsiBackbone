@@ -4,8 +4,8 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <PackageId>CDCavell.AsiBackbone.EntityFrameworkCore</PackageId>
-    <Title>CDCavell AsiBackbone Entity Framework Core</Title>
+    <PackageId>AsiBackbone.EntityFrameworkCore</PackageId>
+    <Title>AsiBackbone Entity Framework Core</Title>
     <Description>Entity Framework Core model configuration and host-owned persistence helpers for Accountable Systems Infrastructure audit and acknowledgment records.</Description>
     <Authors>Christopher D. Cavell</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -25,8 +25,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CDCavell.AsiBackbone.Core\CDCavell.AsiBackbone.Core.csproj" />
-    <ProjectReference Include="..\CDCavell.AsiBackbone.DependencyInjection\CDCavell.AsiBackbone.DependencyInjection.csproj" />
+    <ProjectReference Include="..\AsiBackbone.Core\AsiBackbone.Core.csproj" />
+    <ProjectReference Include="..\AsiBackbone.DependencyInjection\AsiBackbone.DependencyInjection.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,10 +1,10 @@
 using System.Collections.ObjectModel;
 using System.Text.Json;
-using CDCavell.AsiBackbone.Core.Audit;
-using CDCavell.AsiBackbone.EntityFrameworkCore.Persistence;
+using AsiBackbone.Core.Audit;
+using AsiBackbone.EntityFrameworkCore.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-namespace CDCavell.AsiBackbone.EntityFrameworkCore.Audit;
+namespace AsiBackbone.EntityFrameworkCore.Audit;
 
 /// <summary>
 /// Entity Framework Core-backed audit residue lifecycle store that persists records through a host-owned <see cref="DbContext" />.

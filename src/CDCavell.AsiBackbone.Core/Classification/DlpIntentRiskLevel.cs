@@ -1,4 +1,4 @@
-namespace CDCavell.AsiBackbone.Core.Classification;
+namespace AsiBackbone.Core.Classification;
 
 /// <summary>
 /// Represents the host-assigned risk level for an intent that depends on DLP or classification screening.

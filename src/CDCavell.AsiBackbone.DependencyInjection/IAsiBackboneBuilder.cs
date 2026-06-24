@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace CDCavell.AsiBackbone.DependencyInjection;
+namespace AsiBackbone.DependencyInjection;
 
 /// <summary>
 /// Coordinates explicitly selected AsiBackbone provider registrations for a host service collection.

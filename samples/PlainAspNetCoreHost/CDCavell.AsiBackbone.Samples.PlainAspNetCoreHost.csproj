@@ -14,11 +14,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\CDCavell.AsiBackbone.AspNetCore\CDCavell.AsiBackbone.AspNetCore.csproj" />
-    <ProjectReference Include="..\..\src\CDCavell.AsiBackbone.Core\CDCavell.AsiBackbone.Core.csproj" />
-    <ProjectReference Include="..\..\src\CDCavell.AsiBackbone.EntityFrameworkCore\CDCavell.AsiBackbone.EntityFrameworkCore.csproj" />
-    <ProjectReference Include="..\..\src\CDCavell.AsiBackbone.Signing.LocalDevelopment\CDCavell.AsiBackbone.Signing.LocalDevelopment.csproj" />
-    <ProjectReference Include="..\..\src\CDCavell.AsiBackbone.Storage.InMemory\CDCavell.AsiBackbone.Storage.InMemory.csproj" />
+    <ProjectReference Include="..\..\src\AsiBackbone.AspNetCore\AsiBackbone.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\src\AsiBackbone.Core\AsiBackbone.Core.csproj" />
+    <ProjectReference Include="..\..\src\AsiBackbone.EntityFrameworkCore\AsiBackbone.EntityFrameworkCore.csproj" />
+    <ProjectReference Include="..\..\src\AsiBackbone.Signing.LocalDevelopment\AsiBackbone.Signing.LocalDevelopment.csproj" />
+    <ProjectReference Include="..\..\src\AsiBackbone.Storage.InMemory\AsiBackbone.Storage.InMemory.csproj" />
   </ItemGroup>
 
 </Project>

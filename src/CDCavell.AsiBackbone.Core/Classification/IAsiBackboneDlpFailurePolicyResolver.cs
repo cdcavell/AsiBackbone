@@ -1,4 +1,4 @@
-namespace CDCavell.AsiBackbone.Core.Classification;
+namespace AsiBackbone.Core.Classification;
 
 /// <summary>
 /// Resolves provider-neutral DLP or classification failure behavior for a governed intent.

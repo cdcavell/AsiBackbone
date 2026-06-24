@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 
-namespace CDCavell.AsiBackbone.AspNetCore.Endpoints;
+namespace AsiBackbone.AspNetCore.Endpoints;
 
 /// <summary>
 /// Provides ASP.NET Core application builder extensions for AsiBackbone endpoint governance.

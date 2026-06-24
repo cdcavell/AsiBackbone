@@ -1,7 +1,7 @@
 using System.Security.Claims;
-using CDCavell.AsiBackbone.Core.Actors;
+using AsiBackbone.Core.Actors;
 
-namespace CDCavell.AsiBackbone.AspNetCore.Actors;
+namespace AsiBackbone.AspNetCore.Actors;
 
 /// <summary>
 /// Configures how ASP.NET Core claims are mapped into framework-neutral actor contexts.

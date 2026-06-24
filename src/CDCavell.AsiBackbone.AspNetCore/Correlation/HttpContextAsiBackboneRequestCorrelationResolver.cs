@@ -1,11 +1,11 @@
 using System.Diagnostics;
-using CDCavell.AsiBackbone.AspNetCore.DependencyInjection;
+using AsiBackbone.AspNetCore.DependencyInjection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 
-namespace CDCavell.AsiBackbone.AspNetCore.Correlation;
+namespace AsiBackbone.AspNetCore.Correlation;
 
 /// <summary>
 /// Resolves safe request correlation data from the current ASP.NET Core HTTP context.

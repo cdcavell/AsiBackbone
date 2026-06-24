@@ -1,6 +1,6 @@
-using CDCavell.AsiBackbone.Core.Handshakes;
+using AsiBackbone.Core.Handshakes;
 
-namespace CDCavell.AsiBackbone.AspNetCore.Handshakes;
+namespace AsiBackbone.AspNetCore.Handshakes;
 
 /// <summary>
 /// Represents an ASP.NET Core-friendly acknowledgment challenge that a host can render using any UI or transport.

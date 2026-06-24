@@ -1,4 +1,4 @@
-namespace CDCavell.AsiBackbone.Core.Actors;
+namespace AsiBackbone.Core.Actors;
 
 /// <summary>
 /// Identifies the general kind of actor participating in an AsiBackbone operation.

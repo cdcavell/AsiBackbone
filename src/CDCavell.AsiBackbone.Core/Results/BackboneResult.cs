@@ -1,4 +1,4 @@
-namespace CDCavell.AsiBackbone.Core.Results;
+namespace AsiBackbone.Core.Results;
 
 /// <summary>
 /// Represents the outcome of an ASI Backbone operation.

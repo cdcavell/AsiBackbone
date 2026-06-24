@@ -1,7 +1,7 @@
-using CDCavell.AsiBackbone.Core.Audit;
-using CDCavell.AsiBackbone.Core.Entities;
+using AsiBackbone.Core.Audit;
+using AsiBackbone.Core.Entities;
 
-namespace CDCavell.AsiBackbone.EntityFrameworkCore.Persistence;
+namespace AsiBackbone.EntityFrameworkCore.Persistence;
 
 /// <summary>
 /// Represents the Entity Framework Core persistence shape for an audit residue lifecycle event.

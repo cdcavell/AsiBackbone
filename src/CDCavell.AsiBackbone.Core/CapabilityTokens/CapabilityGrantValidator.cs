@@ -1,6 +1,6 @@
-using CDCavell.AsiBackbone.Core.Signing;
+using AsiBackbone.Core.Signing;
 
-namespace CDCavell.AsiBackbone.Core.CapabilityTokens;
+namespace AsiBackbone.Core.CapabilityTokens;
 
 public static class CapabilityGrantValidator
 {

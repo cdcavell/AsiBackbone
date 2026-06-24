@@ -1,4 +1,4 @@
-namespace CDCavell.AsiBackbone.AspNetCore.Outbox;
+namespace AsiBackbone.AspNetCore.Outbox;
 
 /// <summary>
 /// Provides host-owned scheduling options for the governance outbox drain worker.

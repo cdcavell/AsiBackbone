@@ -1,4 +1,4 @@
-namespace CDCavell.AsiBackbone.Core.Emissions;
+namespace AsiBackbone.Core.Emissions;
 
 /// <summary>
 /// Represents provider-neutral error information for a governance emission attempt.

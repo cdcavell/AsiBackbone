@@ -1,6 +1,6 @@
-using CDCavell.AsiBackbone.Core.Emissions;
+using AsiBackbone.Core.Emissions;
 
-namespace CDCavell.AsiBackbone.Core.Outbox;
+namespace AsiBackbone.Core.Outbox;
 
 /// <summary>
 /// Drains provider-neutral governance outbox entries through a configured governance emitter.

@@ -1,6 +1,6 @@
 using System.Collections.ObjectModel;
 
-namespace CDCavell.AsiBackbone.Core.Integrity;
+namespace AsiBackbone.Core.Integrity;
 
 /// <summary>
 /// Represents the outcome of provider-neutral audit integrity verification.

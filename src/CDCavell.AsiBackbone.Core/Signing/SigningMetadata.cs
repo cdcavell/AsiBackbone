@@ -1,6 +1,6 @@
 using System.Collections.ObjectModel;
 
-namespace CDCavell.AsiBackbone.Core.Signing;
+namespace AsiBackbone.Core.Signing;
 
 /// <summary>
 /// Represents provider-neutral signing metadata that can be carried by audit receipts, emission records, or provider adapters without requiring a concrete signing implementation.

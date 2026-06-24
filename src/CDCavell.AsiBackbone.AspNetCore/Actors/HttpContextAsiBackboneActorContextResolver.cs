@@ -1,9 +1,9 @@
 using System.Security.Claims;
-using CDCavell.AsiBackbone.Core.Actors;
+using AsiBackbone.Core.Actors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
-namespace CDCavell.AsiBackbone.AspNetCore.Actors;
+namespace AsiBackbone.AspNetCore.Actors;
 
 /// <summary>
 /// Maps the current ASP.NET Core HTTP context into a framework-neutral AsiBackbone actor context.

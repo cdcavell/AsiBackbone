@@ -1,4 +1,4 @@
-# CDCavell.AsiBackbone.DependencyInjection
+# AsiBackbone.DependencyInjection
 
 Explicit `AddAsiBackbone(...)` builder facade for coordinating host-selected AsiBackbone provider registrations.
 
@@ -7,7 +7,7 @@ Explicit `AddAsiBackbone(...)` builder facade for coordinating host-selected Asi
 
 ## Why this package exists
 
-`CDCavell.AsiBackbone.Core` remains framework-neutral. Provider packages own their own `Use*` extension methods so ASP.NET Core, EF Core, OpenTelemetry, signing, and storage dependencies remain optional.
+`AsiBackbone.Core` remains framework-neutral. Provider packages own their own `Use*` extension methods so ASP.NET Core, EF Core, OpenTelemetry, signing, and storage dependencies remain optional.
 
 This package contains only the shared builder abstraction and the single discoverable service-collection entry point:
 

@@ -1,8 +1,8 @@
-using CDCavell.AsiBackbone.Core.Actors;
-using CDCavell.AsiBackbone.Core.Entities;
-using CDCavell.AsiBackbone.Core.Serialization;
+using AsiBackbone.Core.Actors;
+using AsiBackbone.Core.Entities;
+using AsiBackbone.Core.Serialization;
 
-namespace CDCavell.AsiBackbone.EntityFrameworkCore.Persistence;
+namespace AsiBackbone.EntityFrameworkCore.Persistence;
 
 /// <summary>
 /// Represents the Entity Framework Core persistence shape for an AsiBackbone handshake acknowledgment.

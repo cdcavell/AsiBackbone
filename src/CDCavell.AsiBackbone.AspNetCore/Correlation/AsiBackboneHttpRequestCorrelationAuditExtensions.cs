@@ -1,8 +1,8 @@
-using CDCavell.AsiBackbone.Core.Actors;
-using CDCavell.AsiBackbone.Core.Audit;
-using CDCavell.AsiBackbone.Core.Decisions;
+using AsiBackbone.Core.Actors;
+using AsiBackbone.Core.Audit;
+using AsiBackbone.Core.Decisions;
 
-namespace CDCavell.AsiBackbone.AspNetCore.Correlation;
+namespace AsiBackbone.AspNetCore.Correlation;
 
 /// <summary>
 /// Provides helpers for applying ASP.NET Core request correlation data to framework-neutral audit residue.

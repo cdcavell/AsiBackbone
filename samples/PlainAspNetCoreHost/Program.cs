@@ -12,6 +12,7 @@ using CDCavell.AsiBackbone.Signing.LocalDevelopment;
 using CDCavell.AsiBackbone.Storage.InMemory.Audit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -191,6 +192,10 @@ app.MapGet("/sample/ledger/{correlationId}", async (
 });
 
 app.MapControllers();
+
+// At startup, after building configuration:
+IOptions<AsiBackboneEndpointGovernanceOptions> endpointOptions = builder.Services.BuildServiceProvider().GetRequiredService<IOptions<AsiBackboneEndpointGovernanceOptions>>();
+endpointOptions.Value.Validate(); // run once at startup and remove per-request Validate() calls
 
 app.Run();
 

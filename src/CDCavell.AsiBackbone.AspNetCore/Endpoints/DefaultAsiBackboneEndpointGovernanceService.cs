@@ -77,7 +77,7 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
         if (descriptor.PolicyTypes.Count > 0)
         {
             IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>? evaluator =
-                serviceProvider.GetService<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>>();
+                httpContext.RequestServices.GetService<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>>();
 
             if (evaluator is null)
             {
@@ -100,8 +100,7 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
 
         if (decision.CanProceed && descriptor.CapabilityScopes.Count > 0)
         {
-            IAsiBackboneEndpointCapabilityGrantValidator? capabilityValidator =
-                serviceProvider.GetService<IAsiBackboneEndpointCapabilityGrantValidator>();
+            IAsiBackboneEndpointCapabilityGrantValidator? capabilityValidator = httpContext.RequestServices.GetService<IAsiBackboneEndpointCapabilityGrantValidator>();
 
             if (capabilityValidator is null)
             {

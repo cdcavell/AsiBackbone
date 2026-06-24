@@ -12,7 +12,10 @@ namespace CDCavell.AsiBackbone.AspNetCore.Endpoints;
 /// <param name="next">The next request delegate.</param>
 public sealed class AsiBackboneEndpointGovernanceMiddleware(RequestDelegate next)
 {
-    private static readonly IResult DefaultForbiddenResult = Microsoft.AspNetCore.Http.Results.StatusCode(StatusCodes.Status403Forbidden);
+    // Example: use a precomputed static result for the most common forbidden response
+    private static readonly IResult LightweightForbiddenResult =
+        Microsoft.AspNetCore.Http.Results.StatusCode(StatusCodes.Status403Forbidden);
+    // Use this for default cases instead of constructing new ProblemDetails every time.
 
     private readonly RequestDelegate next = next ?? throw new ArgumentNullException(nameof(next));
 
@@ -98,7 +101,7 @@ public sealed class AsiBackboneEndpointGovernanceMiddleware(RequestDelegate next
                 detail: "Endpoint governance blocked this request before the selected endpoint executed.",
                 statusCode: StatusCodes.Status403Forbidden)
             : options.DefaultForbiddenResultFactory is null
-            ? DefaultForbiddenResult
+            ? LightweightForbiddenResult
             : options.DefaultForbiddenResultFactory(httpContext)
                 ?? throw new InvalidOperationException($"{nameof(AsiBackboneEndpointGovernanceOptions.DefaultForbiddenResultFactory)} must return a non-null result.");
     }

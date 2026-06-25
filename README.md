@@ -122,7 +122,7 @@ For production-style hosts, add durable audit/outbox persistence, signing or ver
 
 ## Package family
 
-Stable `1.2.x` package family. `1.2.1` is the current patch release on the `1.2.0` minor-release boundary; the `1.2.x` line formalizes the compatible `1.x` governance-spine surface with builder-facade, analyzer, OpenTelemetry, signing-provider, testing-harness, template package, endpoint diagnostics, sample, Source Link metadata, and documentation-alignment surfaces.
+Stable `2.0.x` package family. `2.0.0` begins the current major release line after the public package and namespace identity moved from `CDCavell.AsiBackbone.*` to `AsiBackbone.*`. The package family carries forward the governance-spine surface with builder-facade, analyzer, OpenTelemetry, signing-provider, testing-harness, template package, endpoint diagnostics, sample, Source Link metadata, and documentation-alignment surfaces.
 
 | Package | Role |
 | --- | --- |
@@ -167,9 +167,9 @@ The full, categorized documentation set lives at the [documentation site](https:
 
 ## Current status
 
-Stable `1.2.x` is the current released line for the compatible `1.x` API, with `1.2.1` as the current patch release on the `1.2.0` minor-release boundary. The repository includes the Core foundation, builder-facade registration surface, in-memory validation storage, EF Core host-owned persistence, ASP.NET Core integration, test harness helpers, dotnet new templates, analyzers, the OpenTelemetry provider, local-development signing, the managed-key signing adapter boundary, samples, release validation, Source Link metadata validation, and host-validation documentation.
+Stable `2.0.x` is the current released line, with `2.0.0` as the current major release. This release establishes the simplified `AsiBackbone.*` package and namespace identity while carrying forward the Core foundation, builder-facade registration surface, in-memory validation storage, EF Core host-owned persistence, ASP.NET Core integration, test harness helpers, dotnet new templates, analyzers, the OpenTelemetry provider, local-development signing, the managed-key signing adapter boundary, samples, release validation, Source Link metadata validation, and host-validation documentation.
 
-The stable API contract is documented in [API Compatibility and SemVer](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/api-compatibility-and-semver.md); the original `1.0.0` baseline, `1.1.0` addendum, `1.2.0` minor release boundary, and `1.2.1` patch release boundary are recorded in the [Historical Stable API Review](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/stable-api-review.md), [1.1.x Release Notes](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/release-notes-110.md), [1.2.0 Release Notes](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/release-notes-120.md), and [1.2.1 Release Notes](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/release-notes-121.md).
+The stable API contract is documented in [API Compatibility and SemVer](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/api-compatibility-and-semver.md); the original `1.0.0` baseline, `1.1.0` addendum, `1.2.0` minor release boundary, `1.2.1` patch release boundary, and `2.0.0` package/namespace migration boundary are recorded in the [Historical Stable API Review](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/stable-api-review.md), [1.1.x Release Notes](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/release-notes-110.md), [1.2.0 Release Notes](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/release-notes-120.md), [1.2.1 Release Notes](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/release-notes-121.md), and [2.0.0 Release Notes](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/release-notes-200.md).
 
 ## Security and vulnerability reporting
 

@@ -23,6 +23,8 @@
       href: templates.md
     - name: Why AsiBackbone?
       href: why-asi-backbone.md
+    - name: 2.0.0 Release Notes
+      href: release-notes-200.md
     - name: 1.2.1 Release Notes
       href: release-notes-121.md
     - name: 1.2.0 Release Notes
@@ -146,6 +148,8 @@
       href: ../quality/index.md
     - name: Release Validation
       href: release-validation.md
+    - name: 2.0.0 Release Readiness Record
+      href: release-readiness-200.md
     - name: 1.2.1 Release Readiness Record
       href: release-readiness-121.md
     - name: 1.2.0 Release Readiness Record
@@ -154,6 +158,8 @@
       href: api-baseline-and-boundary-checks.md
     - name: Developer Checklist
       href: developer-checklist.md
+    - name: 2.0.0 Release Notes
+      href: release-notes-200.md
     - name: 1.2.1 Release Notes
       href: release-notes-121.md
     - name: 1.2.0 Release Notes

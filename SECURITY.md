@@ -8,15 +8,16 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 
 ## Supported versions
 
-Security review and vulnerability handling focus on the current stable `1.x` release line.
+Security review and vulnerability handling focus on the current stable `2.x` release line.
 
 | Version line | Support posture |
 | --- | --- |
-| `1.x` | Supported stable line. Please prefer the latest available `1.x` patch when validating or reporting a concern. |
+| `2.x` | Supported stable line. Please prefer the latest available `2.x` patch when validating or reporting a concern. |
+| `1.x` | Previous stable line. Supported only for migration-sensitive reports that also affect or inform the current `2.x` package family. |
 | `0.x`, alpha, beta, preview, or historical package lines | Not supported except when a maintainer explicitly asks for comparison or reproduction details. |
 | Unreleased `main` branch changes | Reviewed on a best-effort basis before release, but not treated as a supported production release line. |
 
-A report that affects supported `1.x` packages may still result in documentation, sample, analyzer, package, or release-process changes depending on where the actual risk lives.
+A report that affects supported `2.x` packages may still result in documentation, sample, analyzer, package, or release-process changes depending on where the actual risk lives.
 
 ## How to report a vulnerability or sensitive concern
 
@@ -102,7 +103,7 @@ Examples that are generally out of scope:
 
 - requests for legal, compliance, or certification guarantees;
 - vulnerabilities caused solely by a consuming host application's custom execution logic, deployment configuration, key management, database security, cloud policy, or network controls;
-- reports against unsupported historical package lines unless the same behavior affects the supported stable `1.x` line;
+- reports against unsupported historical package lines unless the same behavior affects the supported stable `2.x` line;
 - claims that AsiBackbone should prevent all misuse of AI, agents, robotics, or host-side tools without a specific package-level or documentation-level vulnerability.
 
 ## Safe public language

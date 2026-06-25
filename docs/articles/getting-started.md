@@ -2,7 +2,7 @@
 
 This guide explains the current direction of the AsiBackbone repository and how to begin working with the project.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a stable `1.2.x` .NET package family for governance-oriented decision flow. The foundation package is `AsiBackbone.Core`, with optional integration packages for in-memory validation, EF Core host-owned persistence, ASP.NET Core host integration, analyzer guidance, OpenTelemetry projection, and signing-provider boundaries.
+In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a stable `2.0.x` .NET package family for governance-oriented decision flow. The foundation package is `AsiBackbone.Core`, with optional integration packages for in-memory validation, EF Core host-owned persistence, ASP.NET Core host integration, analyzer guidance, OpenTelemetry projection, and signing-provider boundaries.
 
 > [!IMPORTANT]
 > This project does not implement artificial superintelligence. It provides Accountable Systems Infrastructure: governance-oriented software building blocks inspired by broader Backbone framework concepts.
@@ -11,7 +11,7 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 
 The repository includes the Core foundation and optional packages for in-memory validation, EF Core host-owned persistence, ASP.NET Core host integration, Roslyn analyzer safety rails, OpenTelemetry governance emission, local-development signing, and managed-key signing adapter wiring.
 
-The stable `1.2.1` package lineup is:
+The stable `2.0.0` package lineup is:
 
 ```text
 AsiBackbone.Core
@@ -198,164 +198,3 @@ An acknowledgment workflow may include:
 ## Audit receipt
 
 An audit receipt records what happened.
-
-A useful audit receipt should include:
-
-* Decision ID
-* Correlation ID
-* Actor or system identity
-* Requested action
-* Decision outcome
-* Reason codes
-* Policy version
-* Policy hash
-* Timestamp
-* Optional signature metadata
-
-Audit receipts should make decision flow explainable after the fact.
-
-## Capability token
-
-A capability token represents short-lived, scoped permission to perform an operation.
-
-A capability token should be:
-
-* Time-bound
-* Purpose-bound
-* Scope-bound
-* Revocable where possible
-* Signed or verifiable where appropriate
-* Traceable through audit records
-
-## Durable outbox and provider emission
-
-The durable governance outbox preserves local accountability records before downstream provider delivery is attempted.
-
-Provider emission is optional. Hosts can use provider-neutral emission contracts and adopt a concrete provider such as `AsiBackbone.OpenTelemetry` when governance events should be projected into diagnostics, observability, or governance systems.
-
-The host remains responsible for deciding whether a downstream system is authoritative, supplemental, or enrichment-only.
-
-## Signing and verification boundary
-
-Core keeps signing and verification provider-neutral. The signing packages provide optional provider boundaries:
-
-* `AsiBackbone.Signing.LocalDevelopment` for tests, samples, and local proof paths.
-* `AsiBackbone.Signing.ManagedKey` for host-owned managed-key client integration.
-
-Signing does not equal production tamper-evidence by itself. Hosts own key custody, verification policy, storage controls, retention, monitoring, and operational procedures.
-
-## Gateway pattern
-
-A gateway pattern applies policy and capability checks before a request reaches an external or consequential system.
-
-Examples should focus on safe software scenarios first:
-
-* Document approval
-* External API execution
-* Administrative workflow execution
-* Simulated command validation
-
-Robotics and physical execution should remain future, sample-only, or separately reviewed provider scenarios unless a later stable release explicitly ships them as part of the package family.
-
-## Current packages
-
-## AsiBackbone.Core
-
-`AsiBackbone.Core` is the framework-neutral foundation package.
-
-It provides:
-
-* Framework-neutral abstractions
-* Decision/result primitives
-* Policy evaluation contracts
-* Acknowledgment contracts
-* Audit contracts
-* Capability-token contracts
-* Durable outbox contracts
-* Provider-neutral governance emission contracts
-* Signing-ready and verification-policy seams
-
-It avoids:
-
-* ASP.NET Core dependencies
-* Entity Framework Core dependencies
-* Web middleware
-* Endpoint mapping
-* Host startup logic
-* Database-provider assumptions
-* Direct dependency on NetCoreApplicationTemplate
-* Cloud-provider SDK assumptions
-* Signing-provider implementation assumptions
-
-## AsiBackbone.Storage.InMemory
-
-`AsiBackbone.Storage.InMemory` provides non-durable in-memory storage helpers for tests, samples, and local validation hosts.
-
-It should not be used as durable production storage.
-
-## AsiBackbone.EntityFrameworkCore
-
-`AsiBackbone.EntityFrameworkCore` provides EF Core model configuration and durable accountability persistence while preserving host ownership of the `DbContext`, provider, connection string, migrations, deployment, and schema lifecycle.
-
-## AsiBackbone.AspNetCore
-
-`AsiBackbone.AspNetCore` provides thin ASP.NET Core host adapters for service registration, request correlation, audit enrichment, HTTP result mapping, acknowledgment challenge helpers, endpoint governance, and hosted outbox drain integration.
-
-It does not own authentication, authorization, persistence, route exposure, UI rendering, policy definitions, exporter configuration, key management, or operational execution.
-
-## AsiBackbone.Analyzers
-
-`AsiBackbone.Analyzers` provides Roslyn analyzer safety rails for governance persistence and continuation flows.
-
-Analyzer guidance is build-time feedback. It is not runtime enforcement and does not prove compliance.
-
-## AsiBackbone.OpenTelemetry
-
-`AsiBackbone.OpenTelemetry` provides a concrete governance emission provider that projects provider-neutral governance envelopes into .NET diagnostics through `ActivitySource` and `Meter`.
-
-Exporters such as Azure Monitor remain host-configured.
-
-## AsiBackbone.Signing.LocalDevelopment
-
-`AsiBackbone.Signing.LocalDevelopment` provides local-development RSA signing and verification for tests, samples, and proof paths.
-
-It is not a production managed-key provider and does not provide protected key custody, immutability, legal non-repudiation, compliance certification, or production tamper-evidence.
-
-## AsiBackbone.Signing.ManagedKey
-
-`AsiBackbone.Signing.ManagedKey` provides a provider-neutral managed-key signing adapter boundary.
-
-The host supplies the actual managed-key client, credentials, key operations, monitoring, verification path, and operational policy. The package does not include live Azure Key Vault, Managed HSM, cloud KMS, HSM, or certificate-store implementation by default.
-
-## AsiBackbone.DependencyInjection
-
-`AsiBackbone.DependencyInjection` provides the shared `AddAsiBackbone(...)` builder facade for host-selected provider registration.
-
-It coordinates package registration without making Core own infrastructure, persistence, web hosting, telemetry exporters, signing providers, or execution behavior.
-
-## AsiBackbone.Testing
-
-`AsiBackbone.Testing` provides test-only helpers for deterministic governance and package-wiring validation.
-
-It is intended for tests, smoke checks, and package-consumer validation. It is not runtime enforcement and should not be treated as production governance infrastructure by itself.
-
-## AsiBackbone.Templates
-
-`AsiBackbone.Templates` provides `dotnet new` templates for generating governed ASP.NET Core host scaffolds.
-
-The templates are developer-experience scaffolding. They are not runtime dependencies and do not replace host-owned architecture, security, persistence, deployment, or operational review.
-
-## Planned package areas
-
-Future package areas may include:
-
-* `AsiBackbone.EventHubs`
-* `AsiBackbone.Purview`
-* `AsiBackbone.Robotics`
-* `AsiBackbone.ImmutableStorage`
-
-Planned package names are not part of the current `1.2.x` stable contract unless a future release explicitly ships them as stable packages.
-
-## Relationship to NetCoreApplicationTemplate
-
-NetCoreApplicationTemplate may be used as a preferred host baseline during development and validation, but AsiBackbone should not require it.

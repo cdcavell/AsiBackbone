@@ -1,13 +1,13 @@
 {
   "$schema": "http://json.schemastore.org/template",
-  "author": "CDCavell",
+  "author": "Christopher D. Cavell",
   "classifications": [
     "Web",
     "Web API",
     "Governance",
     "AsiBackbone"
   ],
-  "identity": "CDCavell.AsiBackbone.Templates.WebApi",
+  "identity": "AsiBackbone.Templates.WebApi",
   "name": "AsiBackbone governed ASP.NET Core Web API",
   "shortName": "asibackbone-webapi",
   "sourceName": "Company.AsibackboneTemplate",

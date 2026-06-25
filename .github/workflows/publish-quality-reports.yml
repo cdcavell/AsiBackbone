@@ -18,7 +18,7 @@ concurrency:
 env:
   CONFIGURATION: Release
   SOLUTION_FILE: './AsiBackbone.slnx'
-  CORE_TEST_PROJECT: './tests/CDCavell.AsiBackbone.Core.Tests/CDCavell.AsiBackbone.Core.Tests.csproj'
+  CORE_TEST_PROJECT: './tests/AsiBackbone.Core.Tests/AsiBackbone.Core.Tests.csproj'
   CORE_COVERAGE_OUTPUT: '${{ github.workspace }}/artifacts/core-coverage'
   CORE_BRANCH_COVERAGE_THRESHOLD: 90
 
@@ -71,7 +71,7 @@ jobs:
             /p:CollectCoverage=true `
             /p:CoverletOutputFormat=cobertura `
             /p:CoverletOutput="${{ env.CORE_COVERAGE_OUTPUT }}/" `
-            /p:Include="[CDCavell.AsiBackbone.Core]*" `
+            /p:Include="[AsiBackbone.Core]*" `
             /p:Exclude="[*.Tests]*" `
             /p:Threshold="${{ env.CORE_BRANCH_COVERAGE_THRESHOLD }}" `
             /p:ThresholdType=branch `
@@ -103,18 +103,18 @@ jobs:
             -reports:"${{ env.CORE_COVERAGE_OUTPUT }}/coverage.cobertura.xml" `
             -targetdir:"./artifacts/core-branch-coverage-report" `
             -reporttypes:"Html;MarkdownSummaryGithub;Cobertura" `
-            -assemblyfilters:"+CDCavell.AsiBackbone.Core;-*.Tests" `
+            -assemblyfilters:"+AsiBackbone.Core;-*.Tests" `
             -filefilters:"-**/bin/**;-**/obj/**;-**/*.g.cs"
 
       - name: Generate Core mutation report
         shell: pwsh
-        working-directory: tests/CDCavell.AsiBackbone.Core.Tests
+        working-directory: tests/AsiBackbone.Core.Tests
         run: |
           dotnet tool run dotnet-stryker -- --config-file stryker-config.json --output "../../artifacts/mutation-report/core"
 
       - name: Generate ASP.NET Core mutation report
         shell: pwsh
-        working-directory: tests/CDCavell.AsiBackbone.AspNetCore.Tests
+        working-directory: tests/AsiBackbone.AspNetCore.Tests
         run: |
           dotnet tool run dotnet-stryker -- --config-file stryker-config.json --output "../../artifacts/mutation-report/aspnetcore"
 

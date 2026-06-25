@@ -10,7 +10,7 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 
 The OpenTelemetry provider gives hosts a vendor-neutral path for projecting AsiBackbone governance events into the host application's configured observability pipeline.
 
-The provider should adapt provider-neutral governance emission envelopes into OpenTelemetry-compatible telemetry without making `CDCavell.AsiBackbone.Core` depend on OpenTelemetry packages, exporters, cloud SDKs, or backend-specific concepts.
+The provider should adapt provider-neutral governance emission envelopes into OpenTelemetry-compatible telemetry without making `AsiBackbone.Core` depend on OpenTelemetry packages, exporters, cloud SDKs, or backend-specific concepts.
 
 ```text
 Audit residue / lifecycle event / gateway result
@@ -29,19 +29,19 @@ OpenTelemetry is the projection path. The durable local audit and outbox records
 Planned provider package name:
 
 ```text
-CDCavell.AsiBackbone.OpenTelemetry
+AsiBackbone.OpenTelemetry
 ```
 
 Alternative package names that remain acceptable if the package family later groups observability integrations:
 
 ```text
-CDCavell.AsiBackbone.Observability.OpenTelemetry
-CDCavell.AsiBackbone.Telemetry.OpenTelemetry
+AsiBackbone.Observability.OpenTelemetry
+AsiBackbone.Telemetry.OpenTelemetry
 ```
 
 The package should depend on:
 
-* `CDCavell.AsiBackbone.Core`
+* `AsiBackbone.Core`
 * OpenTelemetry abstractions needed for activities, metrics, and provider-neutral instrumentation
 * `Microsoft.Extensions.Logging.Abstractions` or logging abstractions if required for host logging seams
 * `Microsoft.Extensions.Options` only if provider options are needed
@@ -92,9 +92,9 @@ The provider should expose three OpenTelemetry-friendly seams.
 Suggested names:
 
 ```text
-ActivitySource: CDCavell.AsiBackbone.OpenTelemetry
-Meter:          CDCavell.AsiBackbone.OpenTelemetry
-Logger source:  CDCavell.AsiBackbone.OpenTelemetry
+ActivitySource: AsiBackbone.OpenTelemetry
+Meter:          AsiBackbone.OpenTelemetry
+Logger source:  AsiBackbone.OpenTelemetry
 ```
 
 The provider should also expose constants for source names and stable attribute names so hosts and tests can assert mappings without copying strings.
@@ -252,7 +252,7 @@ Azure Monitor can receive the provider's events when the host configures an Azur
 Conceptual host flow:
 
 ```text
-CDCavell.AsiBackbone.OpenTelemetry
+AsiBackbone.OpenTelemetry
   -> OpenTelemetry SDK pipeline configured by the host
   -> Azure Monitor exporter configured by the host
   -> Azure Monitor / Application Insights / Log Analytics backend

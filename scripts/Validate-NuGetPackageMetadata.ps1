@@ -133,67 +133,67 @@ else {
 
 $expectedPackages = @(
     [pscustomobject]@{
-        Id = 'CDCavell.AsiBackbone.Core'
+        Id = 'AsiBackbone.Core'
         Description = 'Framework-neutral Accountable Systems Infrastructure governance primitives for consequential .NET decision flow.'
         Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'decision-flow', 'constraint-evaluation', 'audit', 'acknowledgment', 'capability-token')
         ReadmeMustContain = @('Accountable Systems Infrastructure', $expectedStablePackageFamily)
     },
     [pscustomobject]@{
-        Id = 'CDCavell.AsiBackbone.DependencyInjection'
+        Id = 'AsiBackbone.DependencyInjection'
         Description = 'Explicit AddAsiBackbone builder facade for coordinating host-selected AsiBackbone provider registrations.'
         Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'dependency-injection', 'builder', 'configuration', 'provider-coordination')
         ReadmeMustContain = @('Explicit `AddAsiBackbone(...)` builder facade', 'does not register persistence')
     },
     [pscustomobject]@{
-        Id = 'CDCavell.AsiBackbone.Analyzers'
+        Id = 'AsiBackbone.Analyzers'
         Description = 'Roslyn analyzer safety rails for Accountable Systems Infrastructure governance persistence and continuation flows.'
         Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'roslyn', 'analyzer', 'safety-rails', 'audit', 'outbox')
         ReadmeMustContain = @('Roslyn analyzer safety rails', 'ASIB001')
     },
     [pscustomobject]@{
-        Id = 'CDCavell.AsiBackbone.AspNetCore'
+        Id = 'AsiBackbone.AspNetCore'
         Description = 'ASP.NET Core host adapters for Accountable Systems Infrastructure actor context, request correlation, HTTP result mapping, and acknowledgment challenge flows.'
         Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'aspnetcore', 'web', 'host-integration', 'http', 'acknowledgment')
         ReadmeMustContain = @('host adapters only', 'do not enforce decisions automatically')
     },
     [pscustomobject]@{
-        Id = 'CDCavell.AsiBackbone.Storage.InMemory'
+        Id = 'AsiBackbone.Storage.InMemory'
         Description = 'Non-durable in-memory storage helpers for Accountable Systems Infrastructure local validation, tests, and samples.'
         Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'in-memory', 'non-durable', 'storage', 'local-validation', 'testing')
         ReadmeMustContain = @('not durable storage', 'local validation')
     },
     [pscustomobject]@{
-        Id = 'CDCavell.AsiBackbone.Testing'
+        Id = 'AsiBackbone.Testing'
         Description = 'Test harness helpers for Accountable Systems Infrastructure endpoint governance, deterministic policy decisions, and in-memory inspection.'
         Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'testing', 'test-harness', 'aspnetcore', 'policy-evaluation', 'audit')
         ReadmeMustContain = @('test harness helpers', 'not a production enforcement provider')
     },
     [pscustomobject]@{
-        Id = 'CDCavell.AsiBackbone.Templates'
+        Id = 'AsiBackbone.Templates'
         Description = 'dotnet new templates for Accountable Systems Infrastructure governed ASP.NET Core hosts.'
         Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'templates', 'dotnet-new', 'aspnetcore', 'webapi', 'endpoint-governance')
         ReadmeMustContain = @('dotnet new asibackbone-webapi', 'not a runtime dependency')
     },
     [pscustomobject]@{
-        Id = 'CDCavell.AsiBackbone.EntityFrameworkCore'
+        Id = 'AsiBackbone.EntityFrameworkCore'
         Description = 'Entity Framework Core model configuration and host-owned persistence helpers for Accountable Systems Infrastructure audit and acknowledgment records.'
         Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'entity-framework-core', 'efcore', 'host-owned-persistence', 'audit-ledger')
         ReadmeMustContain = @('host-owned', 'does not provide or require a package-owned')
     },
     [pscustomobject]@{
-        Id = 'CDCavell.AsiBackbone.OpenTelemetry'
+        Id = 'AsiBackbone.OpenTelemetry'
         Description = 'OpenTelemetry-friendly Accountable Systems Infrastructure governance emission provider for AsiBackbone decision-flow telemetry.'
         Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'opentelemetry', 'observability', 'audit', 'outbox')
         ReadmeMustContain = @('provider-neutral', 'OpenTelemetry')
     },
     [pscustomobject]@{
-        Id = 'CDCavell.AsiBackbone.Signing.LocalDevelopment'
+        Id = 'AsiBackbone.Signing.LocalDevelopment'
         Description = 'Local-development RSA signing and verification provider for exercising AsiBackbone signing abstractions without cloud key-management dependencies.'
         Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'signing', 'local-development', 'testing', 'audit')
         ReadmeMustContain = @('local development, samples, and tests', 'not a production managed-key provider')
     },
     [pscustomobject]@{
-        Id = 'CDCavell.AsiBackbone.Signing.ManagedKey'
+        Id = 'AsiBackbone.Signing.ManagedKey'
         Description = 'Provider-neutral managed-key signing adapter for Accountable Systems Infrastructure governance artifacts without loading raw private keys into Core.'
         Tags = @('accountable-systems-infrastructure', 'asi-backbone', 'dotnet', 'governance', 'signing', 'managed-key', 'key-management', 'audit')
         ReadmeMustContain = @('Provider-neutral managed-key signing adapter', 'raw key material must not be returned')

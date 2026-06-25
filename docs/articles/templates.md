@@ -1,6 +1,6 @@
 # dotnet new Templates
 
-`CDCavell.AsiBackbone.Templates` removes blank-page adoption friction by generating a runnable ASP.NET Core host with AsiBackbone governance wiring already in place.
+`AsiBackbone.Templates` removes blank-page adoption friction by generating a runnable ASP.NET Core host with AsiBackbone governance wiring already in place.
 
 > [!IMPORTANT]
 > The generated project is a local scaffold. It is not a production persistence design, production signing provider, compliance guarantee, or replacement for host-owned authentication, authorization, security review, deployment, monitoring, or execution controls.
@@ -8,13 +8,13 @@
 ## Install
 
 ```powershell
-dotnet new install CDCavell.AsiBackbone.Templates
+dotnet new install AsiBackbone.Templates
 ```
 
 For local repository validation, install the generated `.nupkg` from the package artifact directory instead:
 
 ```powershell
-dotnet new install ./artifacts/packages/CDCavell.AsiBackbone.Templates.1.2.1.nupkg
+dotnet new install ./artifacts/packages/AsiBackbone.Templates.1.2.1.nupkg
 ```
 
 ## Create a governed Web API
@@ -52,7 +52,7 @@ The generated project includes:
 - a Minimal API endpoint using fluent endpoint-governance metadata;
 - a controller action using `[RequireGovernancePolicy]`, `[RequireCapabilityGrant]`, and `[EmitGovernanceAudit]`;
 - non-durable `InMemoryAuditLedger` storage for local inspection;
-- `CDCavell.AsiBackbone.Analyzers` as a development-time analyzer reference;
+- `AsiBackbone.Analyzers` as a development-time analyzer reference;
 - a generated README with next steps and production-boundary notes.
 
 ## Useful generated endpoints
@@ -81,7 +81,7 @@ The template intentionally favors safe local defaults:
 
 ## CI validation
 
-The repository validates the template package by packing local packages, installing the generated `CDCavell.AsiBackbone.Templates` package, generating both supported host styles, restoring against the local package output plus NuGet, and building each generated project.
+The repository validates the template package by packing local packages, installing the generated `AsiBackbone.Templates` package, generating both supported host styles, restoring against the local package output plus NuGet, and building each generated project.
 
 This proves the template can be installed and used from a clean directory without making Core depend on template infrastructure or NetCoreApplicationTemplate.
 

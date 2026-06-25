@@ -7,9 +7,9 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 > [!IMPORTANT]
 > Provider-specific integrations depend on Core. Core must never depend on provider-specific integrations.
 >
-> `CDCavell.AsiBackbone.Core` remains framework-neutral and vendor-neutral. Observability platforms, streaming systems, governance catalogs, signing systems, storage providers, and cloud-specific enrichment belong in optional packages or host applications.
+> `AsiBackbone.Core` remains framework-neutral and vendor-neutral. Observability platforms, streaming systems, governance catalogs, signing systems, storage providers, and cloud-specific enrichment belong in optional packages or host applications.
 >
-> `CDCavell.AsiBackbone.OpenTelemetry` is the only concrete released governance emission provider package in `1.1.0`. Event Hubs, Purview, Azure Monitor-specific SDK adapters, immutable-storage providers, and additional Azure-specific packages remain design-only or host-owned guidance unless a future release separately reviews and ships them. See [1.1.0 Release Notes - Accepted deferrals](release-notes-110.md#accepted-deferrals).
+> `AsiBackbone.OpenTelemetry` is the only concrete released governance emission provider package in `1.1.0`. Event Hubs, Purview, Azure Monitor-specific SDK adapters, immutable-storage providers, and additional Azure-specific packages remain design-only or host-owned guidance unless a future release separately reviews and ships them. See [1.1.0 Release Notes - Accepted deferrals](release-notes-110.md#accepted-deferrals).
 
 ## Purpose
 
@@ -33,7 +33,7 @@ This sequence keeps the source-of-truth governance record local and durable befo
 
 | Provider path | `1.1.0` status | Appropriate responsibility | Not appropriate responsibility |
 | --- | --- | --- | --- |
-| OpenTelemetry | **Released package**: `CDCavell.AsiBackbone.OpenTelemetry`. | Convert neutral governance emission envelopes into .NET diagnostics through `ActivitySource`, activity events, tags, and `Meter` metrics. | Configure exporters, redefine Core decision semantics, or require Core to reference OpenTelemetry packages. |
+| OpenTelemetry | **Released package**: `AsiBackbone.OpenTelemetry`. | Convert neutral governance emission envelopes into .NET diagnostics through `ActivitySource`, activity events, tags, and `Meter` metrics. | Configure exporters, redefine Core decision semantics, or require Core to reference OpenTelemetry packages. |
 | Azure Monitor / Log Analytics | **Host-configured exporter guidance** through OpenTelemetry. No Azure Monitor-specific AsiBackbone package is released. | Receive telemetry through the host's OpenTelemetry exporter pipeline. | Become the only audit store or force Azure SDK dependencies into Core. |
 | Event Hubs | **Design-only future provider strategy.** No Event Hubs package is released in `1.1.0`. | Future optional streaming adapter for minimized governance events after durable outbox persistence. | Replace local durability or imply a current Event Hubs NuGet package exists. |
 | Purview | **Strategy-only future enrichment direction.** No Purview package is released in `1.1.0`. | Future optional governance/catalog/lineage enrichment for selected, summarized, classified events. | Store raw audit records by default, become the primary audit ledger, or imply a current Purview NuGet package exists. |
@@ -48,7 +48,7 @@ Host application
   |
   | builds actor context, policy context, metadata, and host policy inputs
   v
-CDCavell.AsiBackbone.Core
+AsiBackbone.Core
   |
   | evaluates policy and returns governance decision
   | creates acknowledgment challenge when required
@@ -63,7 +63,7 @@ Durable local store / outbox
   v
 Released provider packages or host adapters
   |
-  | OpenTelemetry projection through CDCavell.AsiBackbone.OpenTelemetry
+  | OpenTelemetry projection through AsiBackbone.OpenTelemetry
   | host-configured Azure Monitor / Log Analytics exporter
   |\  v
 Design-only / future provider strategy
@@ -122,13 +122,13 @@ Audit residue / lifecycle event
 
 ## OpenTelemetry as the released governance emission provider
 
-`CDCavell.AsiBackbone.OpenTelemetry` is the concrete released governance emission provider package for `1.1.0`.
+`AsiBackbone.OpenTelemetry` is the concrete released governance emission provider package for `1.1.0`.
 
 Preferred placement:
 
 ```text
 Core neutral governance emission envelope
-  -> CDCavell.AsiBackbone.OpenTelemetry
+  -> AsiBackbone.OpenTelemetry
   -> ActivitySource / Meter
   -> host OpenTelemetry SDK pipeline
   -> selected exporter/backend
@@ -145,7 +145,7 @@ Azure Monitor and Log Analytics are backend targets reached through the host-own
 Accurate `1.1.0` wording:
 
 ```text
-CDCavell.AsiBackbone.OpenTelemetry
+AsiBackbone.OpenTelemetry
   -> ActivitySource / Meter
   -> host OpenTelemetry SDK pipeline
   -> host-configured Azure Monitor exporter
@@ -236,17 +236,17 @@ Accurate wording:
 
 | Boundary | Current status | Role |
 | --- | --- | --- |
-| `CDCavell.AsiBackbone.Core` | Released | Neutral governance primitives, decision contracts, acknowledgment, capability, audit residue, emission contracts, outbox contracts, signing-ready seams, and verification policy. |
-| `CDCavell.AsiBackbone.Storage.InMemory` | Released | Development, test, sample, and local-validation storage. |
-| `CDCavell.AsiBackbone.EntityFrameworkCore` | Released | Host-owned EF Core persistence and durable local storage support. |
-| `CDCavell.AsiBackbone.AspNetCore` | Released | ASP.NET Core host integration and hosted outbox drain support. |
-| `CDCavell.AsiBackbone.Analyzers` | Released | Build-time governance safety rails. |
-| `CDCavell.AsiBackbone.OpenTelemetry` | Released | Concrete OpenTelemetry governance emission provider. |
-| `CDCavell.AsiBackbone.Signing.LocalDevelopment` | Released | Local-development signing and verification proof path. |
-| `CDCavell.AsiBackbone.Signing.ManagedKey` | Released | Managed-key signing adapter boundary with host-owned managed-key client. |
-| `CDCavell.AsiBackbone.Streaming.EventHubs` | Design-only candidate | Future Event Hubs streaming adapter package. |
-| `CDCavell.AsiBackbone.Governance.Purview` | Strategy-only candidate | Future Purview catalog, classification, and lineage enrichment adapter package. |
-| `CDCavell.AsiBackbone.Observability.AzureMonitor` | Future/host-owned guidance | Azure Monitor should currently be reached through host OpenTelemetry exporter configuration. |
+| `AsiBackbone.Core` | Released | Neutral governance primitives, decision contracts, acknowledgment, capability, audit residue, emission contracts, outbox contracts, signing-ready seams, and verification policy. |
+| `AsiBackbone.Storage.InMemory` | Released | Development, test, sample, and local-validation storage. |
+| `AsiBackbone.EntityFrameworkCore` | Released | Host-owned EF Core persistence and durable local storage support. |
+| `AsiBackbone.AspNetCore` | Released | ASP.NET Core host integration and hosted outbox drain support. |
+| `AsiBackbone.Analyzers` | Released | Build-time governance safety rails. |
+| `AsiBackbone.OpenTelemetry` | Released | Concrete OpenTelemetry governance emission provider. |
+| `AsiBackbone.Signing.LocalDevelopment` | Released | Local-development signing and verification proof path. |
+| `AsiBackbone.Signing.ManagedKey` | Released | Managed-key signing adapter boundary with host-owned managed-key client. |
+| `AsiBackbone.Streaming.EventHubs` | Design-only candidate | Future Event Hubs streaming adapter package. |
+| `AsiBackbone.Governance.Purview` | Strategy-only candidate | Future Purview catalog, classification, and lineage enrichment adapter package. |
+| `AsiBackbone.Observability.AzureMonitor` | Future/host-owned guidance | Azure Monitor should currently be reached through host OpenTelemetry exporter configuration. |
 
 Future package names may change. The architectural rule should not change: provider packages depend on Core; Core never depends on provider packages.
 

@@ -29,10 +29,10 @@ HTTP request
 
 The sample references the current package projects directly:
 
-- `CDCavell.AsiBackbone.Core`
-- `CDCavell.AsiBackbone.AspNetCore`
-- `CDCavell.AsiBackbone.Storage.InMemory`
-- `CDCavell.AsiBackbone.EntityFrameworkCore`
+- `AsiBackbone.Core`
+- `AsiBackbone.AspNetCore`
+- `AsiBackbone.Storage.InMemory`
+- `AsiBackbone.EntityFrameworkCore`
 
 This keeps the sample close to source during development while preserving the same boundary expected from package consumers.
 
@@ -53,7 +53,7 @@ That is the important boundary: AsiBackbone contributes persistence shape; the h
 From the repository root:
 
 ```powershell
-dotnet run --project samples/PlainAspNetCoreHost/CDCavell.AsiBackbone.Samples.PlainAspNetCoreHost.csproj
+dotnet run --project samples/PlainAspNetCoreHost/AsiBackbone.Samples.PlainAspNetCoreHost.csproj
 ```
 
 Open the sample decision endpoint:

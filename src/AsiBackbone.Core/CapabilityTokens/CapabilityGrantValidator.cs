@@ -1,0 +1,188 @@
+using AsiBackbone.Core.Signing;
+
+namespace AsiBackbone.Core.CapabilityTokens;
+
+public static class CapabilityGrantValidator
+{
+    public static async ValueTask<CapabilityGrantValidationResult> ValidateAsync(
+        SignedGovernanceArtifact<CapabilityTokenGrant> signedGrant,
+        CapabilityGrantValidationOptions? options = null,
+        IAsiBackboneSignatureVerificationService? verificationService = null,
+        ICapabilityGrantUseStore? useStore = null,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(signedGrant);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        CapabilityGrantValidationOptions effectiveOptions = options ?? CapabilityGrantValidationOptions.Create();
+        CapabilityTokenGrant grant = signedGrant.Artifact;
+        DateTimeOffset validationUtc = (effectiveOptions.ValidationUtc ?? DateTimeOffset.UtcNow).ToUniversalTime();
+
+        if (effectiveOptions.RequireProof)
+        {
+            CapabilityGrantValidationResult? proofResult = await ValidateProofAsync(
+                signedGrant,
+                grant,
+                verificationService,
+                cancellationToken).ConfigureAwait(false);
+
+            if (proofResult is not null)
+            {
+                return proofResult;
+            }
+        }
+
+        CapabilityGrantValidationResult? metadataResult = ValidateMetadata(grant, effectiveOptions, validationUtc);
+
+        if (metadataResult is not null)
+        {
+            return metadataResult;
+        }
+
+        if (effectiveOptions.RequireUseCheck)
+        {
+            CapabilityGrantValidationResult? useResult = await ValidateUseAsync(
+                grant,
+                effectiveOptions,
+                useStore,
+                validationUtc,
+                cancellationToken).ConfigureAwait(false);
+
+            if (useResult is not null)
+            {
+                return useResult;
+            }
+        }
+
+        return CapabilityGrantValidationResult.Valid(grant);
+    }
+
+    private static async ValueTask<CapabilityGrantValidationResult?> ValidateProofAsync(
+        SignedGovernanceArtifact<CapabilityTokenGrant> signedGrant,
+        CapabilityTokenGrant grant,
+        IAsiBackboneSignatureVerificationService? verificationService,
+        CancellationToken cancellationToken)
+    {
+        if (verificationService is null)
+        {
+            return CapabilityGrantValidationResult.Failed(
+                grant,
+                CapabilityTokenValidationCategory.MissingProof,
+                VerificationPolicyAction.Deny,
+                "capability.proof-verifier-missing",
+                "A proof verifier is required for this validation context.");
+        }
+
+        VerificationPolicyOutcome verificationOutcome = await GovernanceArtifactVerifier.VerifyAsync(
+            signedGrant,
+            verificationService,
+            cancellationToken: cancellationToken).ConfigureAwait(false);
+
+        return verificationOutcome.ShouldAllow
+            ? null
+            : CapabilityGrantValidationResult.Failed(
+            grant,
+            MapVerificationCategory(verificationOutcome.Category),
+            MapVerificationAction(verificationOutcome.Action),
+            verificationOutcome.FailureCode ?? "capability.proof-invalid",
+            verificationOutcome.FailureMessage);
+    }
+
+    private static CapabilityGrantValidationResult? ValidateMetadata(
+        CapabilityTokenGrant grant,
+        CapabilityGrantValidationOptions options,
+        DateTimeOffset validationUtc)
+    {
+        return options.Issuer is not null && !string.Equals(options.Issuer, grant.Issuer, StringComparison.Ordinal)
+            ? CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.WrongIssuer, VerificationPolicyAction.Deny, "capability.issuer-mismatch")
+            : options.Audience is not null && !string.Equals(options.Audience, grant.Audience, StringComparison.Ordinal)
+            ? CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.WrongAudience, VerificationPolicyAction.Deny, "capability.audience-mismatch")
+            : grant.NotBeforeUtc.HasValue && validationUtc < grant.NotBeforeUtc.Value
+            ? CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.NotYetValid, VerificationPolicyAction.Defer, "capability.not-yet-valid")
+            : validationUtc >= grant.ExpiresUtc
+            ? CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.Expired, VerificationPolicyAction.Deny, "capability.expired")
+            : options.Scopes.Count > 0 && !ContainsRequiredScopes(grant.Scopes, options.Scopes)
+            ? CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.WrongScope, VerificationPolicyAction.Deny, "capability.scope-missing")
+            : (options.PolicyVersion is not null && !string.Equals(options.PolicyVersion, grant.PolicyVersion, StringComparison.Ordinal))
+            || (options.PolicyHash is not null && !string.Equals(options.PolicyHash, grant.PolicyHash, StringComparison.Ordinal))
+            ? CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.PolicyMismatch, VerificationPolicyAction.Deny, "capability.policy-mismatch")
+            : options.RequireAcknowledgmentReference && !grant.HasAcknowledgmentReference
+            ? CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.MissingAcknowledgmentReference, VerificationPolicyAction.RequireAcknowledgment, "capability.acknowledgment-missing")
+            : options.AcknowledgmentId is not null && !string.Equals(options.AcknowledgmentId, grant.AcknowledgmentId, StringComparison.Ordinal)
+            ? CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.AcknowledgmentMismatch, VerificationPolicyAction.Deny, "capability.acknowledgment-mismatch")
+            : options.HandshakeId is not null && !string.Equals(options.HandshakeId, grant.HandshakeId, StringComparison.Ordinal)
+            ? CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.HandshakeMismatch, VerificationPolicyAction.Deny, "capability.handshake-mismatch")
+            : options.GatewayBinding is not null && !string.Equals(options.GatewayBinding, grant.GatewayBinding, StringComparison.Ordinal)
+            ? CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.GatewayMismatch, VerificationPolicyAction.Deny, "capability.gateway-mismatch")
+            : options.ResourceBinding is not null && !string.Equals(options.ResourceBinding, grant.ResourceBinding, StringComparison.Ordinal)
+            ? CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.ResourceMismatch, VerificationPolicyAction.Deny, "capability.resource-mismatch")
+            : null;
+    }
+
+    private static async ValueTask<CapabilityGrantValidationResult?> ValidateUseAsync(
+        CapabilityTokenGrant grant,
+        CapabilityGrantValidationOptions options,
+        ICapabilityGrantUseStore? useStore,
+        DateTimeOffset validationUtc,
+        CancellationToken cancellationToken)
+    {
+        if (useStore is null)
+        {
+            return CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.ReplayStoreUnavailable, VerificationPolicyAction.Defer, "capability.use-store-missing");
+        }
+
+        CapabilityGrantUseResult result = await useStore
+            .TryConsumeAsync(grant, options.MaxUseCount, validationUtc, cancellationToken)
+            .ConfigureAwait(false);
+
+        return result.State switch
+        {
+            GrantUseState.Accepted => null,
+            GrantUseState.UseLimitExceeded => CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.ReuseLimitExceeded, VerificationPolicyAction.Deny, result.FailureCode ?? "capability.use-limit-exceeded", result.FailureMessage),
+            GrantUseState.Stopped => CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.Revoked, VerificationPolicyAction.Deny, result.FailureCode ?? "capability.grant-stopped", result.FailureMessage),
+            GrantUseState.Cancelled => CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.Cancelled, VerificationPolicyAction.Deny, result.FailureCode ?? "capability.grant-cancelled", result.FailureMessage),
+            GrantUseState.Unavailable => CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.ReplayStoreUnavailable, VerificationPolicyAction.Defer, result.FailureCode ?? "capability.use-store-unavailable", result.FailureMessage),
+            _ => CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.Failed, VerificationPolicyAction.Escalate, "capability.validation-failed")
+        };
+    }
+
+    private static bool ContainsRequiredScopes(IReadOnlyList<string> actualScopes, IReadOnlyList<string> requiredScopes)
+    {
+        HashSet<string> actualScopeSet = new(actualScopes, StringComparer.Ordinal);
+
+        foreach (string requiredScope in requiredScopes)
+        {
+            if (!actualScopeSet.Contains(requiredScope))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static CapabilityTokenValidationCategory MapVerificationCategory(SignatureVerificationCategory category)
+    {
+        return category switch
+        {
+            SignatureVerificationCategory.MissingSignature => CapabilityTokenValidationCategory.MissingProof,
+            SignatureVerificationCategory.Valid => CapabilityTokenValidationCategory.Valid,
+            SignatureVerificationCategory.InvalidSignature => CapabilityTokenValidationCategory.InvalidProof,
+            SignatureVerificationCategory.HashMismatch => CapabilityTokenValidationCategory.InvalidProof,
+            SignatureVerificationCategory.RevokedKey => CapabilityTokenValidationCategory.Revoked,
+            SignatureVerificationCategory.ProviderUnavailable => CapabilityTokenValidationCategory.Failed,
+            SignatureVerificationCategory.UnknownKeyVersion => CapabilityTokenValidationCategory.Failed,
+            SignatureVerificationCategory.CanonicalizationMismatch => CapabilityTokenValidationCategory.Failed,
+            SignatureVerificationCategory.UnsupportedAlgorithm => CapabilityTokenValidationCategory.InvalidProof,
+            SignatureVerificationCategory.Failed => CapabilityTokenValidationCategory.Failed,
+            _ => CapabilityTokenValidationCategory.Failed
+        };
+    }
+
+    private static VerificationPolicyAction MapVerificationAction(VerificationPolicyAction action)
+    {
+        return action is VerificationPolicyAction.Allow
+            ? VerificationPolicyAction.Allow
+            : action;
+    }
+}

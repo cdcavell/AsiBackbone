@@ -1,6 +1,6 @@
 # Core Policy Evaluator Pipeline
 
-This article documents the host-neutral policy evaluation loop for `CDCavell.AsiBackbone.Core`.
+This article documents the host-neutral policy evaluation loop for `AsiBackbone.Core`.
 
 The Core evaluator proves the governance spine without requiring ASP.NET Core, Entity Framework Core, a database, a web host, robotics integration, or an AI model runtime.
 
@@ -19,10 +19,10 @@ The current alpha ownership model is:
 
 | Area | Responsibility |
 | --- | --- |
-| `CDCavell.AsiBackbone.Core` | Policy evaluator contracts, the default evaluator, decision composition, constraint contracts, decisions, audit residue, and audit sink contracts. |
-| `CDCavell.AsiBackbone.Storage.InMemory` | In-process audit ledger support for tests, samples, and local validation hosts. |
-| `CDCavell.AsiBackbone.AspNetCore` | Thin HTTP host adapters for service registration, current actor resolution, request correlation, audit enrichment, HTTP result mapping, and acknowledgment challenge helpers. |
-| `CDCavell.AsiBackbone.EntityFrameworkCore` | EF Core model configuration and durable accountability persistence while preserving host-owned `DbContext`, provider, migrations, and database lifecycle. |
+| `AsiBackbone.Core` | Policy evaluator contracts, the default evaluator, decision composition, constraint contracts, decisions, audit residue, and audit sink contracts. |
+| `AsiBackbone.Storage.InMemory` | In-process audit ledger support for tests, samples, and local validation hosts. |
+| `AsiBackbone.AspNetCore` | Thin HTTP host adapters for service registration, current actor resolution, request correlation, audit enrichment, HTTP result mapping, and acknowledgment challenge helpers. |
+| `AsiBackbone.EntityFrameworkCore` | EF Core model configuration and durable accountability persistence while preserving host-owned `DbContext`, provider, migrations, and database lifecycle. |
 
 A future package split may move shared contracts into a dedicated abstractions package. For this alpha slice, the contracts remain in Core so the evaluator can be proven without widening the release branch into a larger package restructuring.
 

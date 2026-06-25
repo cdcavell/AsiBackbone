@@ -10,17 +10,17 @@ The `1.2.0` release covers the implemented packages below.
 
 | Package | Stable role | Release boundary |
 | --- | --- | --- |
-| `CDCavell.AsiBackbone.Core` | Framework-neutral governance primitives, decisions, constraints, acknowledgments, audit residue, lifecycle events, durable outbox contracts, provider-neutral emission contracts, DLP/classification failure policy primitives, signing-ready metadata, canonical hashing/signing seams, and verification-policy primitives. | Core remains independent of ASP.NET Core, EF Core, cloud-provider SDKs, OpenTelemetry SDKs, robotics, AI model, and host-template dependencies. |
-| `CDCavell.AsiBackbone.DependencyInjection` | Explicit `AddAsiBackbone(...)` builder facade for coordinating host-selected provider registrations. | Does not register hidden defaults or make Core own infrastructure. |
-| `CDCavell.AsiBackbone.Storage.InMemory` | Non-durable in-memory storage helpers for tests, samples, local validation, lifecycle events, and outbox proof paths. | Not durable storage, not production audit storage, and not a compliance archive. |
-| `CDCavell.AsiBackbone.EntityFrameworkCore` | EF Core model configuration and host-owned persistence helpers. | Host owns `DbContext`, provider, migrations, deployment, schema lifecycle, retention, access controls, backup, and recovery. |
-| `CDCavell.AsiBackbone.AspNetCore` | ASP.NET Core host adapters for actor context, request correlation, HTTP result mapping, acknowledgment challenge flows, endpoint governance, development diagnostics, and hosted outbox drain integration. | Does not own host authentication, authorization, routing, policy enforcement, persistence, UI, exporter configuration, key management, or execution behavior. |
-| `CDCavell.AsiBackbone.Testing` | Test-only harness helpers for deterministic endpoint governance and package wiring. | Test and validation surface only; not runtime enforcement or production control. |
-| `CDCavell.AsiBackbone.Templates` | `dotnet new` templates for governed ASP.NET Core host scaffolding. | Developer-experience scaffold only; not a runtime dependency. |
-| `CDCavell.AsiBackbone.Analyzers` | Roslyn analyzer safety rails for governance persistence, continuation flows, and production-signing configuration mistakes. | Build-time guidance only; not runtime enforcement, compliance proof, or security control by itself. |
-| `CDCavell.AsiBackbone.OpenTelemetry` | OpenTelemetry-friendly governance emission provider for projecting provider-neutral envelopes into .NET diagnostics. | Does not configure exporters and does not depend on Azure Monitor, Event Hubs, Purview, SIEM, AI, robotics, or cloud-provider SDK packages. |
-| `CDCavell.AsiBackbone.Signing.LocalDevelopment` | Local-development RSA signing and verification for tests, samples, and wiring proof paths. | Not production key custody, managed-key signing, immutability, non-repudiation, or tamper-evidence. |
-| `CDCavell.AsiBackbone.Signing.ManagedKey` | Provider-neutral managed-key signing adapter. | Host supplies the actual managed-key client, credentials, key operations, verification path, monitoring, and operational policy. |
+| `AsiBackbone.Core` | Framework-neutral governance primitives, decisions, constraints, acknowledgments, audit residue, lifecycle events, durable outbox contracts, provider-neutral emission contracts, DLP/classification failure policy primitives, signing-ready metadata, canonical hashing/signing seams, and verification-policy primitives. | Core remains independent of ASP.NET Core, EF Core, cloud-provider SDKs, OpenTelemetry SDKs, robotics, AI model, and host-template dependencies. |
+| `AsiBackbone.DependencyInjection` | Explicit `AddAsiBackbone(...)` builder facade for coordinating host-selected provider registrations. | Does not register hidden defaults or make Core own infrastructure. |
+| `AsiBackbone.Storage.InMemory` | Non-durable in-memory storage helpers for tests, samples, local validation, lifecycle events, and outbox proof paths. | Not durable storage, not production audit storage, and not a compliance archive. |
+| `AsiBackbone.EntityFrameworkCore` | EF Core model configuration and host-owned persistence helpers. | Host owns `DbContext`, provider, migrations, deployment, schema lifecycle, retention, access controls, backup, and recovery. |
+| `AsiBackbone.AspNetCore` | ASP.NET Core host adapters for actor context, request correlation, HTTP result mapping, acknowledgment challenge flows, endpoint governance, development diagnostics, and hosted outbox drain integration. | Does not own host authentication, authorization, routing, policy enforcement, persistence, UI, exporter configuration, key management, or execution behavior. |
+| `AsiBackbone.Testing` | Test-only harness helpers for deterministic endpoint governance and package wiring. | Test and validation surface only; not runtime enforcement or production control. |
+| `AsiBackbone.Templates` | `dotnet new` templates for governed ASP.NET Core host scaffolding. | Developer-experience scaffold only; not a runtime dependency. |
+| `AsiBackbone.Analyzers` | Roslyn analyzer safety rails for governance persistence, continuation flows, and production-signing configuration mistakes. | Build-time guidance only; not runtime enforcement, compliance proof, or security control by itself. |
+| `AsiBackbone.OpenTelemetry` | OpenTelemetry-friendly governance emission provider for projecting provider-neutral envelopes into .NET diagnostics. | Does not configure exporters and does not depend on Azure Monitor, Event Hubs, Purview, SIEM, AI, robotics, or cloud-provider SDK packages. |
+| `AsiBackbone.Signing.LocalDevelopment` | Local-development RSA signing and verification for tests, samples, and wiring proof paths. | Not production key custody, managed-key signing, immutability, non-repudiation, or tamper-evidence. |
+| `AsiBackbone.Signing.ManagedKey` | Provider-neutral managed-key signing adapter. | Host supplies the actual managed-key client, credentials, key operations, verification path, monitoring, and operational policy. |
 
 Future Event Hubs, Purview, Azure-specific SDK adapters, robotics/physical execution, immutable storage, external anchoring, or additional provider packages remain outside the `1.2.0` stable contract unless separately reviewed and released as stable.
 
@@ -102,17 +102,17 @@ A release candidate should inspect actual packed `.nupkg` files, not only projec
 Expected `1.2.0` package artifacts:
 
 ```text
-CDCavell.AsiBackbone.Core.1.2.0.nupkg
-CDCavell.AsiBackbone.DependencyInjection.1.2.0.nupkg
-CDCavell.AsiBackbone.Storage.InMemory.1.2.0.nupkg
-CDCavell.AsiBackbone.EntityFrameworkCore.1.2.0.nupkg
-CDCavell.AsiBackbone.AspNetCore.1.2.0.nupkg
-CDCavell.AsiBackbone.Testing.1.2.0.nupkg
-CDCavell.AsiBackbone.Templates.1.2.0.nupkg
-CDCavell.AsiBackbone.Analyzers.1.2.0.nupkg
-CDCavell.AsiBackbone.OpenTelemetry.1.2.0.nupkg
-CDCavell.AsiBackbone.Signing.LocalDevelopment.1.2.0.nupkg
-CDCavell.AsiBackbone.Signing.ManagedKey.1.2.0.nupkg
+AsiBackbone.Core.1.2.0.nupkg
+AsiBackbone.DependencyInjection.1.2.0.nupkg
+AsiBackbone.Storage.InMemory.1.2.0.nupkg
+AsiBackbone.EntityFrameworkCore.1.2.0.nupkg
+AsiBackbone.AspNetCore.1.2.0.nupkg
+AsiBackbone.Testing.1.2.0.nupkg
+AsiBackbone.Templates.1.2.0.nupkg
+AsiBackbone.Analyzers.1.2.0.nupkg
+AsiBackbone.OpenTelemetry.1.2.0.nupkg
+AsiBackbone.Signing.LocalDevelopment.1.2.0.nupkg
+AsiBackbone.Signing.ManagedKey.1.2.0.nupkg
 ```
 
 ## Documentation checklist

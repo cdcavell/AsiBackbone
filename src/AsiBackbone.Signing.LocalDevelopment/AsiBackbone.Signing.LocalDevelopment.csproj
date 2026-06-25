@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PackageId>AsiBackbone.Signing.LocalDevelopment</PackageId>
+    <Title>AsiBackbone Local Development Signing</Title>
+    <Description>Local-development RSA signing and verification provider for exercising AsiBackbone signing abstractions without cloud key-management dependencies.</Description>
+    <Authors>Christopher D. Cavell</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>accountable-systems-infrastructure;asi-backbone;dotnet;governance;signing;local-development;testing;audit</PackageTags>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AsiBackbone.Core\AsiBackbone.Core.csproj" />
+    <ProjectReference Include="..\AsiBackbone.DependencyInjection\AsiBackbone.DependencyInjection.csproj" />
+  </ItemGroup>
+
+</Project>

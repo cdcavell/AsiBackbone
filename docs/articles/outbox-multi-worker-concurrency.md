@@ -17,7 +17,7 @@ A future release may add an explicit claim/lease abstraction, but that should be
 Issue #311 adds a CI-friendly EF Core validation path for concurrent outbox/lifecycle writes, retryable drain failures, and drain-worker contention:
 
 ```text
-tests/CDCavell.AsiBackbone.EntityFrameworkCore.Tests/EfCoreOutboxConcurrencyValidationTests.cs
+tests/AsiBackbone.EntityFrameworkCore.Tests/EfCoreOutboxConcurrencyValidationTests.cs
 ```
 
 The validation deliberately confirms both sides of the current reliability story:

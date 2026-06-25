@@ -22,10 +22,10 @@ The initial stable package family reviewed here is:
 
 | Package | Reviewed role | Boundary decision |
 | --- | --- | --- |
-| `CDCavell.AsiBackbone.Core` | Framework-neutral governance primitives, actor context, constraints, decision results, audit contracts, acknowledgment primitives, capability-token abstractions, and operation results. | Stable candidate. Should remain independent of ASP.NET Core, EF Core, cloud, robotics, AI model, and host-template dependencies. |
-| `CDCavell.AsiBackbone.Storage.InMemory` | Non-durable in-memory storage helpers for tests, samples, and local validation. | Stable candidate with a clear non-durable boundary. Should not be described as production storage. |
-| `CDCavell.AsiBackbone.EntityFrameworkCore` | EF Core model configuration and host-owned persistence integration. | Stable candidate as host-owned EF Core integration. Should not own migrations, database lifecycle, provider selection, or retention policy. |
-| `CDCavell.AsiBackbone.AspNetCore` | Thin ASP.NET Core host adapters for actor context, request correlation, result mapping, and acknowledgment challenge support. | Stable candidate as host integration. Should not become the owner of host authentication, authorization, routing, policy evaluation, persistence, UI, or execution behavior. |
+| `AsiBackbone.Core` | Framework-neutral governance primitives, actor context, constraints, decision results, audit contracts, acknowledgment primitives, capability-token abstractions, and operation results. | Stable candidate. Should remain independent of ASP.NET Core, EF Core, cloud, robotics, AI model, and host-template dependencies. |
+| `AsiBackbone.Storage.InMemory` | Non-durable in-memory storage helpers for tests, samples, and local validation. | Stable candidate with a clear non-durable boundary. Should not be described as production storage. |
+| `AsiBackbone.EntityFrameworkCore` | EF Core model configuration and host-owned persistence integration. | Stable candidate as host-owned EF Core integration. Should not own migrations, database lifecycle, provider selection, or retention policy. |
+| `AsiBackbone.AspNetCore` | Thin ASP.NET Core host adapters for actor context, request correlation, result mapping, and acknowledgment challenge support. | Stable candidate as host integration. Should not become the owner of host authentication, authorization, routing, policy evaluation, persistence, UI, or execution behavior. |
 
 ## `1.1.0` stable API review addendum
 
@@ -33,14 +33,14 @@ The `1.1.0` stable package family is an additive compatible expansion over the `
 
 | Package | `1.1.0` stable role | Boundary decision |
 | --- | --- | --- |
-| `CDCavell.AsiBackbone.Core` | Adds provider-neutral governance emission contracts, durable outbox contracts, DLP/classification policy primitives, signing-ready metadata abstractions, canonical hashing/signing seams, verification-policy primitives, lifecycle events, and expanded audit/outbox vocabulary. | Stable additive Core expansion. Core must remain framework-neutral and provider-neutral. |
-| `CDCavell.AsiBackbone.Storage.InMemory` | Adds non-durable lifecycle and outbox proof paths for tests, samples, local validation, and no-op proof flows. | Stable non-durable helper boundary. Not production storage. |
-| `CDCavell.AsiBackbone.EntityFrameworkCore` | Adds host-owned persistence integration for audit residue lifecycle and governance outbox records. | Stable EF Core integration boundary. Host still owns `DbContext`, provider, migrations, connection string, deployment, and retention. |
-| `CDCavell.AsiBackbone.AspNetCore` | Adds endpoint governance and hosted outbox drain integration. | Stable ASP.NET Core host adapter boundary. Does not replace authentication, authorization, routing, persistence, UI, or execution controls. |
-| `CDCavell.AsiBackbone.Analyzers` | Provides Roslyn analyzer safety rails for governance persistence and continuation flows. | Stable build-time guidance. Analyzer diagnostics are not runtime enforcement. |
-| `CDCavell.AsiBackbone.OpenTelemetry` | Provides the concrete OpenTelemetry governance emission provider package. | Stable provider package. Projects provider-neutral governance envelopes into .NET diagnostics while exporter configuration remains host-owned. |
-| `CDCavell.AsiBackbone.Signing.LocalDevelopment` | Provides local-development signing and verification for tests, samples, and wiring proof paths. | Stable local-only provider. Not production key custody, managed-key signing, immutability, non-repudiation, or tamper-evidence. |
-| `CDCavell.AsiBackbone.Signing.ManagedKey` | Provides a managed-key signing adapter boundary. | Stable adapter boundary. The host supplies the managed-key client, credentials, key operations, monitoring, verification plan, and operational policy. |
+| `AsiBackbone.Core` | Adds provider-neutral governance emission contracts, durable outbox contracts, DLP/classification policy primitives, signing-ready metadata abstractions, canonical hashing/signing seams, verification-policy primitives, lifecycle events, and expanded audit/outbox vocabulary. | Stable additive Core expansion. Core must remain framework-neutral and provider-neutral. |
+| `AsiBackbone.Storage.InMemory` | Adds non-durable lifecycle and outbox proof paths for tests, samples, local validation, and no-op proof flows. | Stable non-durable helper boundary. Not production storage. |
+| `AsiBackbone.EntityFrameworkCore` | Adds host-owned persistence integration for audit residue lifecycle and governance outbox records. | Stable EF Core integration boundary. Host still owns `DbContext`, provider, migrations, connection string, deployment, and retention. |
+| `AsiBackbone.AspNetCore` | Adds endpoint governance and hosted outbox drain integration. | Stable ASP.NET Core host adapter boundary. Does not replace authentication, authorization, routing, persistence, UI, or execution controls. |
+| `AsiBackbone.Analyzers` | Provides Roslyn analyzer safety rails for governance persistence and continuation flows. | Stable build-time guidance. Analyzer diagnostics are not runtime enforcement. |
+| `AsiBackbone.OpenTelemetry` | Provides the concrete OpenTelemetry governance emission provider package. | Stable provider package. Projects provider-neutral governance envelopes into .NET diagnostics while exporter configuration remains host-owned. |
+| `AsiBackbone.Signing.LocalDevelopment` | Provides local-development signing and verification for tests, samples, and wiring proof paths. | Stable local-only provider. Not production key custody, managed-key signing, immutability, non-repudiation, or tamper-evidence. |
+| `AsiBackbone.Signing.ManagedKey` | Provides a managed-key signing adapter boundary. | Stable adapter boundary. The host supplies the managed-key client, credentials, key operations, monitoring, verification plan, and operational policy. |
 
 The `1.1.0` addendum does not bring future Event Hubs, Purview, Azure-specific SDK adapters, robotics, immutable storage, external anchoring, Azure Key Vault-specific implementation packages, HSM-specific implementation packages, or other future providers into the stable contract. Those must complete their own review before being documented as stable packages.
 
@@ -48,7 +48,7 @@ The `1.1.0` addendum does not bring future Event Hubs, Purview, Azure-specific S
 
 The current `1.2.x` package family carries forward the `1.0.0` stable baseline and the `1.1.0` additive package-family expansion.
 
-Additional current package surfaces such as `CDCavell.AsiBackbone.DependencyInjection`, `CDCavell.AsiBackbone.Testing`, and `CDCavell.AsiBackbone.Templates` should be treated as stable only within the release lines where they are explicitly documented, validated, and released.
+Additional current package surfaces such as `AsiBackbone.DependencyInjection`, `AsiBackbone.Testing`, and `AsiBackbone.Templates` should be treated as stable only within the release lines where they are explicitly documented, validated, and released.
 
 This historical API review remains the baseline record for the initial stable API shape and the `1.1.0` addendum, while current package status should be read from the `1.2.1` release documentation.
 
@@ -56,10 +56,10 @@ This historical API review remains the baseline record for the initial stable AP
 
 The reviewed public naming pattern was acceptable for `1.0.0` and remains acceptable for the compatible `1.x` line:
 
-- package names consistently use `CDCavell.AsiBackbone.*`;
+- package names consistently use `AsiBackbone.*`;
 - namespaces mirror package boundaries;
 - public host integration types use the `AsiBackbone` prefix where they are package-specific;
-- Core domain types such as `GovernanceDecision`, `OperationResult`, `AuditResidue`, and `AuditLedgerRecord` are acceptable without repeating the prefix because they are already under the `CDCavell.AsiBackbone.Core` namespace;
+- Core domain types such as `GovernanceDecision`, `OperationResult`, `AuditResidue`, and `AuditLedgerRecord` are acceptable without repeating the prefix because they are already under the `AsiBackbone.Core` namespace;
 - ASP.NET Core, EF Core, OpenTelemetry, analyzer, and signing-provider types carry package-specific names where ambiguity is likely;
 - extension method names are readable and host-oriented, such as `AddAsiBackboneAspNetCore`, `AddAsiBackboneOpenTelemetryGovernanceEmission`, and `ApplyAsiBackboneConfigurations`.
 
@@ -71,40 +71,40 @@ The namespace layout was acceptable for `1.0.0` and is corrected here for the cu
 
 | Namespace area | Review result |
 | --- | --- |
-| `CDCavell.AsiBackbone.Core.Actors` | Clear home for framework-neutral actor context abstractions and defaults. |
-| `CDCavell.AsiBackbone.Core.Constraints` | Clear home for policy constraint abstractions and evaluation results. |
-| `CDCavell.AsiBackbone.Core.Decisions` | Clear home for composed governance decisions and outcomes. |
-| `CDCavell.AsiBackbone.Core.Evaluation` | Clear home for evaluator and decision policy contracts. |
-| `CDCavell.AsiBackbone.Core.Audit` | Clear home for audit residue, ledger records, lifecycle events, and ledger store contracts. |
-| `CDCavell.AsiBackbone.Core.Handshakes` | Clear home for acknowledgment and responsibility-handshake primitives. |
-| `CDCavell.AsiBackbone.Core.CapabilityTokens` | Clear home for capability token abstractions. |
-| `CDCavell.AsiBackbone.Core.Emissions` | Clear home for provider-neutral governance emission contracts and envelopes. |
-| `CDCavell.AsiBackbone.Core.Outbox` | Clear home for provider-neutral durable outbox contracts and records. |
-| `CDCavell.AsiBackbone.Core.Classification` | Clear home for DLP/classification policy primitives. |
-| `CDCavell.AsiBackbone.Core.Signing` | Clear home for signing-ready metadata, canonical hashing/signing seams, and verification policy primitives. |
-| `CDCavell.AsiBackbone.Storage.InMemory` | Clear storage-provider package boundary for non-durable local validation. |
-| `CDCavell.AsiBackbone.EntityFrameworkCore` | Clear EF Core integration boundary. |
-| `CDCavell.AsiBackbone.AspNetCore` | Clear ASP.NET Core host adapter boundary. |
-| `CDCavell.AsiBackbone.Analyzers` | Clear analyzer package boundary for build-time diagnostics. |
-| `CDCavell.AsiBackbone.OpenTelemetry` | Clear OpenTelemetry provider package boundary. |
-| `CDCavell.AsiBackbone.Signing.LocalDevelopment` | Clear local-development signing provider boundary. |
-| `CDCavell.AsiBackbone.Signing.ManagedKey` | Clear managed-key signing adapter boundary. |
+| `AsiBackbone.Core.Actors` | Clear home for framework-neutral actor context abstractions and defaults. |
+| `AsiBackbone.Core.Constraints` | Clear home for policy constraint abstractions and evaluation results. |
+| `AsiBackbone.Core.Decisions` | Clear home for composed governance decisions and outcomes. |
+| `AsiBackbone.Core.Evaluation` | Clear home for evaluator and decision policy contracts. |
+| `AsiBackbone.Core.Audit` | Clear home for audit residue, ledger records, lifecycle events, and ledger store contracts. |
+| `AsiBackbone.Core.Handshakes` | Clear home for acknowledgment and responsibility-handshake primitives. |
+| `AsiBackbone.Core.CapabilityTokens` | Clear home for capability token abstractions. |
+| `AsiBackbone.Core.Emissions` | Clear home for provider-neutral governance emission contracts and envelopes. |
+| `AsiBackbone.Core.Outbox` | Clear home for provider-neutral durable outbox contracts and records. |
+| `AsiBackbone.Core.Classification` | Clear home for DLP/classification policy primitives. |
+| `AsiBackbone.Core.Signing` | Clear home for signing-ready metadata, canonical hashing/signing seams, and verification policy primitives. |
+| `AsiBackbone.Storage.InMemory` | Clear storage-provider package boundary for non-durable local validation. |
+| `AsiBackbone.EntityFrameworkCore` | Clear EF Core integration boundary. |
+| `AsiBackbone.AspNetCore` | Clear ASP.NET Core host adapter boundary. |
+| `AsiBackbone.Analyzers` | Clear analyzer package boundary for build-time diagnostics. |
+| `AsiBackbone.OpenTelemetry` | Clear OpenTelemetry provider package boundary. |
+| `AsiBackbone.Signing.LocalDevelopment` | Clear local-development signing provider boundary. |
+| `AsiBackbone.Signing.ManagedKey` | Clear managed-key signing adapter boundary. |
 
-The stale `CDCavell.AsiBackbone.Core.Tokens` reference from the historical review is corrected to `CDCavell.AsiBackbone.Core.CapabilityTokens`.
+The stale `AsiBackbone.Core.Tokens` reference from the historical review is corrected to `AsiBackbone.Core.CapabilityTokens`.
 
 ## Dependency direction review
 
 The dependency direction was acceptable for the initial stable package family and remains the rule for compatible `1.x` package additions:
 
 ```text
-CDCavell.AsiBackbone.Core
-  <- CDCavell.AsiBackbone.Storage.InMemory
-  <- CDCavell.AsiBackbone.EntityFrameworkCore
-  <- CDCavell.AsiBackbone.AspNetCore
-  <- CDCavell.AsiBackbone.Analyzers
-  <- CDCavell.AsiBackbone.OpenTelemetry
-  <- CDCavell.AsiBackbone.Signing.LocalDevelopment
-  <- CDCavell.AsiBackbone.Signing.ManagedKey
+AsiBackbone.Core
+  <- AsiBackbone.Storage.InMemory
+  <- AsiBackbone.EntityFrameworkCore
+  <- AsiBackbone.AspNetCore
+  <- AsiBackbone.Analyzers
+  <- AsiBackbone.OpenTelemetry
+  <- AsiBackbone.Signing.LocalDevelopment
+  <- AsiBackbone.Signing.ManagedKey
 ```
 
 Review notes:

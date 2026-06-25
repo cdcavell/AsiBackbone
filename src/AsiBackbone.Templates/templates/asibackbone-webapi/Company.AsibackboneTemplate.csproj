@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+    <IsPackable>false</IsPackable>
+    <PackageId>Company.AsibackboneTemplate</PackageId>
+    <UserSecretsId>Company.AsibackboneTemplate-local-dev</UserSecretsId>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <AsiBackboneRepositorySourceRoot>../../..</AsiBackboneRepositorySourceRoot>
+    <UseRepositoryAsiBackboneProjects Condition="Exists('$(AsiBackboneRepositorySourceRoot)/AsiBackbone.Core/AsiBackbone.Core.csproj')">true</UseRepositoryAsiBackboneProjects>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(UseRepositoryAsiBackboneProjects)' == 'true'">
+    <ProjectReference Include="$(AsiBackboneRepositorySourceRoot)/AsiBackbone.AspNetCore/AsiBackbone.AspNetCore.csproj" />
+    <ProjectReference Include="$(AsiBackboneRepositorySourceRoot)/AsiBackbone.Core/AsiBackbone.Core.csproj" />
+    <ProjectReference Include="$(AsiBackboneRepositorySourceRoot)/AsiBackbone.Storage.InMemory/AsiBackbone.Storage.InMemory.csproj" />
+    <ProjectReference Include="$(AsiBackboneRepositorySourceRoot)/AsiBackbone.Analyzers/AsiBackbone.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(UseRepositoryAsiBackboneProjects)' != 'true'">
+    <PackageReference Include="AsiBackbone.AspNetCore" Version="1.2.0" />
+    <PackageReference Include="AsiBackbone.Core" Version="1.2.0" />
+    <PackageReference Include="AsiBackbone.Storage.InMemory" Version="1.2.0" />
+    <PackageReference Include="AsiBackbone.Analyzers" Version="1.2.0" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>

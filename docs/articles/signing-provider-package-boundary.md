@@ -11,7 +11,7 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 
 ## Purpose
 
-Core exposes provider-neutral signing and verification seams while concrete key-management integrations live outside `CDCavell.AsiBackbone.Core`.
+Core exposes provider-neutral signing and verification seams while concrete key-management integrations live outside `AsiBackbone.Core`.
 
 The signing-provider boundary exists so hosts can choose a local-development signer, managed-key adapter, future HSM-backed provider, or organization-owned signing implementation without forcing every AsiBackbone consumer to take dependencies on Azure, cloud KMS SDKs, certificate stores, hardware security modules, local key files, or blockchain services.
 
@@ -21,9 +21,9 @@ The signing-provider boundary exists so hosts can choose a local-development sig
 
 | Package | Purpose | Production posture |
 | --- | --- | --- |
-| `CDCavell.AsiBackbone.Core` | Provider-neutral signing-ready metadata, canonical payload/hash contracts, signing request/result contracts, verification request/result contracts, and verification-policy primitives. | Stable primitives only. Core does not own production key custody, concrete provider clients, immutable storage, or compliance guarantees. |
-| `CDCavell.AsiBackbone.Signing.LocalDevelopment` | Local-development RSA signing and verification for tests, samples, deterministic local validation, and wiring proof paths. | Not production. No protected key custody. Not appropriate for production tamper-evidence. |
-| `CDCavell.AsiBackbone.Signing.ManagedKey` | Provider-neutral managed-key signing adapter that delegates actual signing to a host-owned managed-key client. | Production-capable only when the host supplies a secure managed-key client, credentials, policies, monitoring, and verification path. |
+| `AsiBackbone.Core` | Provider-neutral signing-ready metadata, canonical payload/hash contracts, signing request/result contracts, verification request/result contracts, and verification-policy primitives. | Stable primitives only. Core does not own production key custody, concrete provider clients, immutable storage, or compliance guarantees. |
+| `AsiBackbone.Signing.LocalDevelopment` | Local-development RSA signing and verification for tests, samples, deterministic local validation, and wiring proof paths. | Not production. No protected key custody. Not appropriate for production tamper-evidence. |
+| `AsiBackbone.Signing.ManagedKey` | Provider-neutral managed-key signing adapter that delegates actual signing to a host-owned managed-key client. | Production-capable only when the host supplies a secure managed-key client, credentials, policies, monitoring, and verification path. |
 
 Future provider areas may include Azure Key Vault, Managed HSM, cloud KMS, HSM-backed, certificate-store, or organization-owned signing implementation packages. Those should remain outside Core and should be reviewed as separate package boundaries before being documented as stable.
 
@@ -64,20 +64,20 @@ A concrete verifier should:
 The dependency graph must stay one-way:
 
 ```text
-CDCavell.AsiBackbone.Core
+AsiBackbone.Core
         ^
         |
-CDCavell.AsiBackbone.Signing.LocalDevelopment
+AsiBackbone.Signing.LocalDevelopment
         ^
         |
 Host application, sample, or test
 ```
 
 ```text
-CDCavell.AsiBackbone.Core
+AsiBackbone.Core
         ^
         |
-CDCavell.AsiBackbone.Signing.ManagedKey
+AsiBackbone.Signing.ManagedKey
         ^
         |
 Host-owned managed-key client
@@ -103,7 +103,7 @@ Hashing and signing should remain separate steps. A hashed record is not signed.
 
 ## Local-development signer boundary
 
-`CDCavell.AsiBackbone.Signing.LocalDevelopment` is a released stable package for:
+`AsiBackbone.Signing.LocalDevelopment` is a released stable package for:
 
 - proving DI registration and host wiring;
 - exercising signing metadata flow in samples;
@@ -120,7 +120,7 @@ It must remain clearly marked:
 
 ## Managed-key provider boundary
 
-`CDCavell.AsiBackbone.Signing.ManagedKey` is a released stable adapter boundary. It does not include Azure Key Vault, Managed HSM, cloud KMS, certificate store, or HSM behavior by default.
+`AsiBackbone.Signing.ManagedKey` is a released stable adapter boundary. It does not include Azure Key Vault, Managed HSM, cloud KMS, certificate store, or HSM behavior by default.
 
 A production managed-key host should:
 

@@ -39,7 +39,7 @@ Tracked Core coverage-hardening work includes:
 
 The repository-wide coverage report is generated from the full test suite using Coverlet and ReportGenerator. It is published with the documentation site when the documentation workflow runs successfully.
 
-The Core branch coverage report is generated separately from `CDCavell.AsiBackbone.Core.Tests`, filtered to `CDCavell.AsiBackbone.Core`, and enforced as a 90% branch coverage gate. The repository-wide 75% line coverage gate remains in place; the stricter Core gate does not apply to every adapter, storage provider, telemetry provider, or sample package.
+The Core branch coverage report is generated separately from `AsiBackbone.Core.Tests`, filtered to `AsiBackbone.Core`, and enforced as a 90% branch coverage gate. The repository-wide 75% line coverage gate remains in place; the stricter Core gate does not apply to every adapter, storage provider, telemetry provider, or sample package.
 
 ### Mutation Analysis
 
@@ -62,7 +62,7 @@ The external consumer smoke test packs the repository projects into local NuGet 
 
 - [EF Core Outbox Concurrency Validation](ef-core-outbox-concurrency-validation.md)
 
-The EF Core outbox concurrency validation tests run inside `CDCavell.AsiBackbone.EntityFrameworkCore.Tests`. They use SQLite shared in-memory relational persistence to exercise concurrent outbox/lifecycle writes, retryable drain failures, and multi-worker drain contention. The validation intentionally preserves the current boundary: the provider-neutral drain is not an exactly-once delivery system and does not claim or lease work before provider emission.
+The EF Core outbox concurrency validation tests run inside `AsiBackbone.EntityFrameworkCore.Tests`. They use SQLite shared in-memory relational persistence to exercise concurrent outbox/lifecycle writes, retryable drain failures, and multi-worker drain contention. The validation intentionally preserves the current boundary: the provider-neutral drain is not an exactly-once delivery system and does not claim or lease work before provider emission.
 
 > [!NOTE]
 > If a report link is unavailable, the related workflow may not have generated that report yet. Generate the reports locally or rerun the **Publish Quality Reports** workflow after the report-producing steps are configured.
@@ -91,12 +91,12 @@ dotnet reportgenerator \
 Run the Core branch coverage gate and generate the Core-only report:
 
 ```bash
-dotnet test ./tests/CDCavell.AsiBackbone.Core.Tests/CDCavell.AsiBackbone.Core.Tests.csproj \
+dotnet test ./tests/AsiBackbone.Core.Tests/AsiBackbone.Core.Tests.csproj \
   --configuration Release \
   /p:CollectCoverage=true \
   /p:CoverletOutputFormat=cobertura \
   /p:CoverletOutput="./artifacts/core-coverage/" \
-  /p:Include="[CDCavell.AsiBackbone.Core]*" \
+  /p:Include="[AsiBackbone.Core]*" \
   /p:Exclude="[*.Tests]*" \
   /p:Threshold=90 \
   /p:ThresholdType=branch \
@@ -106,14 +106,14 @@ dotnet reportgenerator \
   -reports:"./artifacts/core-coverage/coverage.cobertura.xml" \
   -targetdir:"./artifacts/core-branch-coverage-report" \
   -reporttypes:"Html;MarkdownSummaryGithub;Cobertura" \
-  -assemblyfilters:"+CDCavell.AsiBackbone.Core;-*.Tests" \
+  -assemblyfilters:"+AsiBackbone.Core;-*.Tests" \
   -filefilters:"-**/bin/**;-**/obj/**;-**/*.g.cs"
 ```
 
 Run the initial Core mutation analysis from the Core test-project folder:
 
 ```bash
-cd ./tests/CDCavell.AsiBackbone.Core.Tests
+cd ./tests/AsiBackbone.Core.Tests
 dotnet tool run dotnet-stryker -- --config-file stryker-config.json
 ```
 
@@ -132,7 +132,7 @@ bash ./eng/smoke-tests/external-consumer-smoke.sh
 Run the EF Core outbox concurrency validation from the repository root:
 
 ```bash
-dotnet test ./tests/CDCavell.AsiBackbone.EntityFrameworkCore.Tests/CDCavell.AsiBackbone.EntityFrameworkCore.Tests.csproj --configuration Release --filter FullyQualifiedName~EfCoreOutboxConcurrencyValidationTests
+dotnet test ./tests/AsiBackbone.EntityFrameworkCore.Tests/AsiBackbone.EntityFrameworkCore.Tests.csproj --configuration Release --filter FullyQualifiedName~EfCoreOutboxConcurrencyValidationTests
 ```
 
 ## Interpreting mutation results

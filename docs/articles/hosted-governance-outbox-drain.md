@@ -2,7 +2,7 @@
 
 Issue #198 adds host integration for running the provider-neutral governance outbox drain from ASP.NET Core or generic-host applications.
 
-Core remains free of hosting, scheduling, ASP.NET Core, EF Core, OpenTelemetry, Azure, or provider-specific dependencies. The hosted worker lives in `CDCavell.AsiBackbone.AspNetCore` and resolves the Core drain through dependency injection.
+Core remains free of hosting, scheduling, ASP.NET Core, EF Core, OpenTelemetry, Azure, or provider-specific dependencies. The hosted worker lives in `AsiBackbone.AspNetCore` and resolves the Core drain through dependency injection.
 
 ## What the worker does
 

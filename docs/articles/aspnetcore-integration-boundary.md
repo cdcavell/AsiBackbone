@@ -1,12 +1,12 @@
 # ASP.NET Core Integration Boundary
 
-This design note defines the implemented boundary for the `CDCavell.AsiBackbone.AspNetCore` package.
+This design note defines the implemented boundary for the `AsiBackbone.AspNetCore` package.
 
 The package makes AsiBackbone easier to wire into ASP.NET Core hosts without moving host ownership, persistence ownership, or domain policy ownership out of the consuming application.
 
 ## Purpose
 
-`CDCavell.AsiBackbone.AspNetCore` acts as a thin host-integration layer around the framework-neutral Core primitives.
+`AsiBackbone.AspNetCore` acts as a thin host-integration layer around the framework-neutral Core primitives.
 
 It helps an ASP.NET Core application:
 
@@ -24,8 +24,8 @@ The package does not become the policy engine, persistence layer, application te
 The implemented dependency direction is:
 
 ```text
-CDCavell.AsiBackbone.AspNetCore
-  -> CDCavell.AsiBackbone.Core
+AsiBackbone.AspNetCore
+  -> AsiBackbone.Core
   -> Microsoft.AspNetCore.* abstractions needed for HTTP host integration
 ```
 
@@ -40,11 +40,11 @@ It avoids direct dependencies on:
 - robotics or physical execution packages;
 - AI model hosting, training, inference, or orchestration libraries.
 
-EF Core-backed storage remains in `CDCavell.AsiBackbone.EntityFrameworkCore`. In-memory helpers remain in `CDCavell.AsiBackbone.Storage.InMemory`. Signing and verification remain a later signing package area.
+EF Core-backed storage remains in `AsiBackbone.EntityFrameworkCore`. In-memory helpers remain in `AsiBackbone.Storage.InMemory`. Signing and verification remain a later signing package area.
 
 ## What Belongs in ASP.NET Core
 
-`CDCavell.AsiBackbone.AspNetCore` includes:
+`AsiBackbone.AspNetCore` includes:
 
 - service registration extensions such as `AddAsiBackboneAspNetCore(...)`;
 - options objects for HTTP integration behavior;
@@ -58,7 +58,7 @@ The package remains a web boundary adapter. It translates ASP.NET Core request i
 
 ## What Does Not Belong in ASP.NET Core
 
-`CDCavell.AsiBackbone.AspNetCore` avoids:
+`AsiBackbone.AspNetCore` avoids:
 
 - defining the Core decision model;
 - implementing durable audit storage;
@@ -81,7 +81,7 @@ The host must remain responsible for its authentication scheme, authorization po
 The primary integration surface is explicit dependency injection extension methods.
 
 ```csharp
-using CDCavell.AsiBackbone.AspNetCore.DependencyInjection;
+using AsiBackbone.AspNetCore.DependencyInjection;
 
 builder.Services.AddAsiBackboneAspNetCore();
 ```
@@ -123,8 +123,8 @@ The default resolver:
 Example usage:
 
 ```csharp
-using CDCavell.AsiBackbone.AspNetCore.Correlation;
-using CDCavell.AsiBackbone.Core.Audit;
+using AsiBackbone.AspNetCore.Correlation;
+using AsiBackbone.Core.Audit;
 
 AsiBackboneHttpRequestCorrelation correlation = correlationResolver.ResolveRequestCorrelation();
 
@@ -141,8 +141,8 @@ Use `AsiBackboneHttpRequestCorrelation.ToEvaluationContext(...)` when a web host
 `AsiBackboneHttpResultMappingExtensions` maps Core `GovernanceDecision` and `OperationResult` instances into ASP.NET Core `IResult` responses through explicit helpers.
 
 ```csharp
-using CDCavell.AsiBackbone.AspNetCore.Results;
-using CDCavell.AsiBackbone.Core.Decisions;
+using AsiBackbone.AspNetCore.Results;
+using AsiBackbone.Core.Decisions;
 
 GovernanceDecision decision = GovernanceDecision.Deny(
     "policy.denied",
@@ -175,7 +175,7 @@ Reason codes and correlation identifiers are preserved by default when available
 Hosts can opt into broader detail only when appropriate:
 
 ```csharp
-using CDCavell.AsiBackbone.AspNetCore.Results;
+using AsiBackbone.AspNetCore.Results;
 
 AsiBackboneHttpResultMappingOptions mappingOptions = new()
 {
@@ -194,8 +194,8 @@ Status-code policy remains host-overridable through `AsiBackboneHttpResultMappin
 `IAsiBackboneAcknowledgmentChallengeService` provides a host-friendly bridge for Core `AcknowledgmentRequired` decisions. It builds an `AsiBackboneAcknowledgmentChallenge` that MVC, Razor Pages, Minimal APIs, a SPA, or another UI layer can render without the package taking a dependency on that stack.
 
 ```csharp
-using CDCavell.AsiBackbone.AspNetCore.Handshakes;
-using CDCavell.AsiBackbone.Core.Decisions;
+using AsiBackbone.AspNetCore.Handshakes;
+using AsiBackbone.Core.Decisions;
 
 GovernanceDecision decision = GovernanceDecision.RequireAcknowledgment(
     "risk.high",
@@ -285,7 +285,7 @@ This package currently provides thin HTTP adapters. Later issues may add additio
 
 ## Boundary Summary
 
-`CDCavell.AsiBackbone.AspNetCore` is the web host adapter for AsiBackbone.
+`AsiBackbone.AspNetCore` is the web host adapter for AsiBackbone.
 
 It belongs at the edge between ASP.NET Core requests and Core governance primitives. It can prepare request context, resolve safe correlation metadata, enrich audit residue, map decision outcomes into HTTP-friendly responses, and support acknowledgment challenges.
 

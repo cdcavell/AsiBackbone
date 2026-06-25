@@ -1,6 +1,6 @@
 # Historical Alpha Package Boundary
 
-This article is a historical stable-era reference for the original intended `0.1.0-alpha.1` boundary for `CDCavell.AsiBackbone.Core`.
+This article is a historical stable-era reference for the original intended `0.1.0-alpha.1` boundary for `AsiBackbone.Core`.
 
 > [!NOTE]
 > This page is preserved for project history and early package-boundary rationale. It describes the alpha planning posture before the stable `1.x` package family. Current stable package guidance is documented in [1.2.1 Release Notes](release-notes-121.md), [API Compatibility and Semantic Versioning](api-compatibility-and-semver.md), and [Historical Stable API Review](stable-api-review.md).
@@ -35,7 +35,7 @@ These boundaries later informed the stable `1.x` package-family direction. Curre
 
 ## Initial package responsibility
 
-At the alpha planning stage, `CDCavell.AsiBackbone.Core` was responsible for defining the first set of shared abstractions and primitives around:
+At the alpha planning stage, `AsiBackbone.Core` was responsible for defining the first set of shared abstractions and primitives around:
 
 * governance spine
 * intent/request evaluation

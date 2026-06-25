@@ -1,6 +1,6 @@
 # Core Branch Coverage Quality Gate
 
-`CDCavell.AsiBackbone.Core` is the framework-neutral governance engine for the package family. A missed branch in Core policy evaluation, decision composition, capability validation, signing verification, acknowledgment, or audit flow can represent a higher regression risk than a missed adapter or sample branch.
+`AsiBackbone.Core` is the framework-neutral governance engine for the package family. A missed branch in Core policy evaluation, decision composition, capability validation, signing verification, acknowledgment, or audit flow can represent a higher regression risk than a missed adapter or sample branch.
 
 For that reason, Core has a stricter branch-coverage expectation than the repository-wide baseline.
 
@@ -9,7 +9,7 @@ For that reason, Core has a stricter branch-coverage expectation than the reposi
 | Gate | Scope | Coverage type | Threshold | Purpose |
 | --- | --- | --- | --- | --- |
 | Repository-wide coverage gate | Full solution | Line coverage | 75% minimum | Keeps the overall package family from losing broad test coverage across Core, adapters, storage, telemetry, samples, and integration-oriented code. |
-| Core branch coverage gate | `CDCavell.AsiBackbone.Core` through `CDCavell.AsiBackbone.Core.Tests` | Branch coverage | 90% minimum | Protects the framework-neutral governance path where missed branches carry the highest policy, acknowledgment, audit, signing, and capability-token regression risk. |
+| Core branch coverage gate | `AsiBackbone.Core` through `AsiBackbone.Core.Tests` | Branch coverage | 90% minimum | Protects the framework-neutral governance path where missed branches carry the highest policy, acknowledgment, audit, signing, and capability-token regression risk. |
 
 The Core branch coverage gate does not replace the repository-wide line coverage gate. Both gates should remain active in CI.
 
@@ -29,7 +29,7 @@ The **Publish Quality Reports** workflow publishes separate report surfaces:
 - `coverage/` for the repository-wide coverage report.
 - `coverage/core/` for the Core-only branch coverage report.
 
-The Core report is generated from the Core test project with the production assembly filtered to `CDCavell.AsiBackbone.Core`.
+The Core report is generated from the Core test project with the production assembly filtered to `AsiBackbone.Core`.
 
 ## Test expectations
 

@@ -33,10 +33,10 @@ if [ ! -d "$package_output" ]; then
   exit 1
 fi
 
-template_package="$(find "$package_output" -maxdepth 1 -name 'CDCavell.AsiBackbone.Templates.*.nupkg' -type f | sort | tail -n 1)"
+template_package="$(find "$package_output" -maxdepth 1 -name 'AsiBackbone.Templates.*.nupkg' -type f | sort | tail -n 1)"
 
 if [ -z "$template_package" ]; then
-  echo "CDCavell.AsiBackbone.Templates package was not found in $package_output."
+  echo "AsiBackbone.Templates package was not found in $package_output."
   exit 1
 fi
 

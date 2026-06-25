@@ -20,7 +20,7 @@ Before cutting a stable release tag, confirm the following checks have passed on
 | Package creation | CI, stable release validation, package publish | Confirms every package project under `src`, excluding template-content projects, can be packed. |
 | Package version validation | stable release validation, package publish | Confirms generated package versions and, on tag builds, tag identity align with repository version metadata. |
 | NuGet metadata validation | stable release validation, package publish | Confirms generated `.nupkg` metadata, README files, IDs, descriptions, tags, license metadata, project URL, repository URL, repository commit metadata, and stable package boundary wording align before publication. |
-| Template package smoke validation | CI, stable release validation | Confirms the packed `CDCavell.AsiBackbone.Templates` package can be installed, generate supported host styles, restore, and build. |
+| Template package smoke validation | CI, stable release validation | Confirms the packed `AsiBackbone.Templates` package can be installed, generate supported host styles, restore, and build. |
 | Documentation build | publish docs, stable release validation, package publish | Confirms DocFX can build the documentation included in the release posture. |
 | External consumer smoke tests | external consumer smoke workflow, stable release validation | Confirms clean consumer-style projects can reference and wire the package family. |
 | CodeQL and dependency review | CI | Confirms configured static/security checks run on pull requests where applicable. |

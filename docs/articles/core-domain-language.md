@@ -1,8 +1,8 @@
 # Core Domain Language
 
-This article defines the domain language for `CDCavell.AsiBackbone.Core` and the host-neutral package boundary that the rest of the AsiBackbone package family builds on.
+This article defines the domain language for `AsiBackbone.Core` and the host-neutral package boundary that the rest of the AsiBackbone package family builds on.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. `CDCavell.AsiBackbone.Core` is the framework-neutral foundation for the AsiBackbone package family. Its purpose is to define shared primitives for governing consequential software actions through explicit policy, constraint, acknowledgment, audit, and capability boundaries.
+In this software project, **ASI** means **Accountable Systems Infrastructure**. `AsiBackbone.Core` is the framework-neutral foundation for the AsiBackbone package family. Its purpose is to define shared primitives for governing consequential software actions through explicit policy, constraint, acknowledgment, audit, and capability boundaries.
 
 > [!IMPORTANT]
 > AsiBackbone is governance infrastructure around intelligent or decision-producing systems. It is not a completed artificial superintelligence implementation, not an AI model package, and not proof of artificial superintelligence.
@@ -224,7 +224,7 @@ The Core boundary establishes language and primitives, not a full integration st
 
 ### In scope for Core
 
-`CDCavell.AsiBackbone.Core` includes framework-neutral governance primitives such as:
+`AsiBackbone.Core` includes framework-neutral governance primitives such as:
 
 * framework-neutral domain abstractions
 * actor context primitives
@@ -244,7 +244,7 @@ The Core boundary establishes language and primitives, not a full integration st
 
 ### Out of scope for Core
 
-`CDCavell.AsiBackbone.Core` should not include:
+`AsiBackbone.Core` should not include:
 
 * Entity Framework Core dependencies
 * ASP.NET Core dependencies

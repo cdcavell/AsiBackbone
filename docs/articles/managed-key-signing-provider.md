@@ -2,7 +2,7 @@
 
 Issue: #210, updated for #253.
 
-This article documents the released `CDCavell.AsiBackbone.Signing.ManagedKey` provider package.
+This article documents the released `AsiBackbone.Signing.ManagedKey` provider package.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone provides provider-neutral signing, verification, and audit metadata seams. It does not provide immutable storage, external anchoring, blockchain, legal evidence guarantees, compliance certification, or tamper-evidence by itself.
 
@@ -11,15 +11,15 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 
 ## Purpose
 
-`CDCavell.AsiBackbone.Signing.ManagedKey` lets a host application wire AsiBackbone signing to a managed-key system without forcing `CDCavell.AsiBackbone.Core` to reference cloud SDKs or handle private key material.
+`AsiBackbone.Signing.ManagedKey` lets a host application wire AsiBackbone signing to a managed-key system without forcing `AsiBackbone.Core` to reference cloud SDKs or handle private key material.
 
 The dependency direction remains:
 
 ```text
-CDCavell.AsiBackbone.Core
+AsiBackbone.Core
         ^
         |
-CDCavell.AsiBackbone.Signing.ManagedKey
+AsiBackbone.Signing.ManagedKey
         ^
         |
 Host application managed-key client

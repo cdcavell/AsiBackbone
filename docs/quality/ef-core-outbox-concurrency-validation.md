@@ -11,7 +11,7 @@ The goal is evidence, not a production throughput guarantee. These tests run aga
 The validation lives in:
 
 ```text
-tests/CDCavell.AsiBackbone.EntityFrameworkCore.Tests/EfCoreOutboxConcurrencyValidationTests.cs
+tests/AsiBackbone.EntityFrameworkCore.Tests/EfCoreOutboxConcurrencyValidationTests.cs
 ```
 
 The test class covers three focused scenarios:
@@ -27,13 +27,13 @@ The test class covers three focused scenarios:
 Run the EF Core test project from the repository root:
 
 ```bash
-dotnet test ./tests/CDCavell.AsiBackbone.EntityFrameworkCore.Tests/CDCavell.AsiBackbone.EntityFrameworkCore.Tests.csproj --configuration Release
+dotnet test ./tests/AsiBackbone.EntityFrameworkCore.Tests/AsiBackbone.EntityFrameworkCore.Tests.csproj --configuration Release
 ```
 
 To run only the concurrency validation tests:
 
 ```bash
-dotnet test ./tests/CDCavell.AsiBackbone.EntityFrameworkCore.Tests/CDCavell.AsiBackbone.EntityFrameworkCore.Tests.csproj --configuration Release --filter FullyQualifiedName~EfCoreOutboxConcurrencyValidationTests
+dotnet test ./tests/AsiBackbone.EntityFrameworkCore.Tests/AsiBackbone.EntityFrameworkCore.Tests.csproj --configuration Release --filter FullyQualifiedName~EfCoreOutboxConcurrencyValidationTests
 ```
 
 ## Expected interpretation

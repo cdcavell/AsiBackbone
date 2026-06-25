@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PackageId>AsiBackbone.OpenTelemetry</PackageId>
+    <Title>AsiBackbone OpenTelemetry</Title>
+    <Description>OpenTelemetry-friendly Accountable Systems Infrastructure governance emission provider for AsiBackbone decision-flow telemetry.</Description>
+    <Authors>Christopher D. Cavell</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>accountable-systems-infrastructure;asi-backbone;dotnet;governance;opentelemetry;observability;audit;outbox</PackageTags>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AsiBackbone.Core\AsiBackbone.Core.csproj" />
+    <ProjectReference Include="..\AsiBackbone.DependencyInjection\AsiBackbone.DependencyInjection.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -88,7 +88,7 @@ Remaining follow-up work should be driven by the next Stryker.NET report and by 
 Run the Core mutation report from the Core test-project folder:
 
 ```bash
-cd ./tests/CDCavell.AsiBackbone.Core.Tests
+cd ./tests/AsiBackbone.Core.Tests
 dotnet tool run dotnet-stryker -- --config-file stryker-config.json
 ```
 

@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "CDCavell.AsiBackbone.Samples.PlainAspNetCoreHost": {
+    "AsiBackbone.Samples.PlainAspNetCoreHost": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,

@@ -60,12 +60,12 @@ A minimal adopter should be able to answer these engineering questions without k
 
 | Layer | Add when | Main package or article |
 | --- | --- | --- |
-| Decision primitives | You need framework-neutral decisions and constraints. | `CDCavell.AsiBackbone.Core` |
-| ASP.NET Core host integration | You want request correlation, endpoint metadata, result mapping, or middleware. | `CDCavell.AsiBackbone.AspNetCore` |
-| Local sample/test records | You want visible decision records without durable storage. | `CDCavell.AsiBackbone.Storage.InMemory` |
-| Durable host persistence | Records must survive restart or support review. | `CDCavell.AsiBackbone.EntityFrameworkCore` |
-| Test harness | Endpoint tests need deterministic policy results without production persistence/signing setup. | `CDCavell.AsiBackbone.Testing` |
-| Telemetry projection | Local audit/outbox records should be projected into diagnostics. | `CDCavell.AsiBackbone.OpenTelemetry` |
+| Decision primitives | You need framework-neutral decisions and constraints. | `AsiBackbone.Core` |
+| ASP.NET Core host integration | You want request correlation, endpoint metadata, result mapping, or middleware. | `AsiBackbone.AspNetCore` |
+| Local sample/test records | You want visible decision records without durable storage. | `AsiBackbone.Storage.InMemory` |
+| Durable host persistence | Records must survive restart or support review. | `AsiBackbone.EntityFrameworkCore` |
+| Test harness | Endpoint tests need deterministic policy results without production persistence/signing setup. | `AsiBackbone.Testing` |
+| Telemetry projection | Local audit/outbox records should be projected into diagnostics. | `AsiBackbone.OpenTelemetry` |
 | Signing boundary | A host needs signing-ready or provider-signed governance artifacts. | Signing provider docs |
 
 ## Optional conceptual background

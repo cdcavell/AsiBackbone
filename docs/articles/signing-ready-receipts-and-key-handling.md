@@ -7,7 +7,7 @@ Issues: #147, #219, #253.
 In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a governance spine for consequential software decision flow. It is not a signing product, key-management system, immutable ledger, legal certification system, or compliance guarantee by itself.
 
 > [!IMPORTANT]
-> `CDCavell.AsiBackbone.Core` includes stable signing-ready metadata, canonical payload hashing, signing seams, and verification-policy primitives in `1.1.0`. Those Core primitives make artifacts ready for provider signing and later verification workflows; they do not create production tamper-evidence by themselves. Production tamper evidence requires a concrete signing provider, protected key management, verification policy, durable storage guarantees, retention policy, monitoring, and operational procedures supplied by the host or provider environment.
+> `AsiBackbone.Core` includes stable signing-ready metadata, canonical payload hashing, signing seams, and verification-policy primitives in `1.1.0`. Those Core primitives make artifacts ready for provider signing and later verification workflows; they do not create production tamper-evidence by themselves. Production tamper evidence requires a concrete signing provider, protected key management, verification policy, durable storage guarantees, retention policy, monitoring, and operational procedures supplied by the host or provider environment.
 
 For released provider boundaries, see [Signing Provider Package Boundary](signing-provider-package-boundary.md), [Managed-Key Signing Provider](managed-key-signing-provider.md), and [Signed Audit and Outbox Records](signed-audit-and-outbox-records.md). For production posture, setup guidance, verification-failure behavior, audit-chain wording, capability-token validation, and security non-goals, see [Cryptographic Security Posture and Production Guidance](cryptographic-security-posture.md).
 
@@ -21,9 +21,9 @@ The signing-ready model gives host applications and provider packages a neutral 
 
 | Boundary | `1.1.0` status | Wording limit |
 | --- | --- | --- |
-| Core signing-ready primitives | Stable in `CDCavell.AsiBackbone.Core`. | Current behavior. Do not describe it as future-only. |
-| Local-development signer | Stable package: `CDCavell.AsiBackbone.Signing.LocalDevelopment`. | Local/test/sample/wiring proof path only, not production key custody. |
-| Managed-key signing adapter | Stable package: `CDCavell.AsiBackbone.Signing.ManagedKey`. | Adapter boundary only. The host supplies the actual managed-key client and operational policy. |
+| Core signing-ready primitives | Stable in `AsiBackbone.Core`. | Current behavior. Do not describe it as future-only. |
+| Local-development signer | Stable package: `AsiBackbone.Signing.LocalDevelopment`. | Local/test/sample/wiring proof path only, not production key custody. |
+| Managed-key signing adapter | Stable package: `AsiBackbone.Signing.ManagedKey`. | Adapter boundary only. The host supplies the actual managed-key client and operational policy. |
 | Concrete Azure Key Vault, Managed HSM, cloud KMS, HSM, or certificate-store clients | Host-owned or future provider-specific work unless separately released. | Do not imply these concrete integrations ship by default. |
 | Tamper-evidence, immutability, external anchoring, legal non-repudiation, or compliance certification | Not provided by default. | Requires deployed signing, verification, protected key management, durable storage controls, retention, monitoring, and operational process. |
 

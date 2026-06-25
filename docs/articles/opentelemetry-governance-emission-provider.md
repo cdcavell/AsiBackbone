@@ -1,12 +1,12 @@
 # OpenTelemetry Governance Emission Provider
 
-Issue #197 adds the first concrete governance emission provider package: `CDCavell.AsiBackbone.OpenTelemetry`.
+Issue #197 adds the first concrete governance emission provider package: `AsiBackbone.OpenTelemetry`.
 
-The provider keeps the Core package provider-neutral. `CDCavell.AsiBackbone.Core` continues to own the governance envelope, result, error, and outbox-drain contracts, while the OpenTelemetry package adapts those contracts into .NET diagnostics primitives that OpenTelemetry SDKs and exporters can observe.
+The provider keeps the Core package provider-neutral. `AsiBackbone.Core` continues to own the governance envelope, result, error, and outbox-drain contracts, while the OpenTelemetry package adapts those contracts into .NET diagnostics primitives that OpenTelemetry SDKs and exporters can observe.
 
 ## Package role
 
-`CDCavell.AsiBackbone.OpenTelemetry` implements `IAsiBackboneGovernanceEmitter` through `OpenTelemetryGovernanceEmitter`.
+`AsiBackbone.OpenTelemetry` implements `IAsiBackboneGovernanceEmitter` through `OpenTelemetryGovernanceEmitter`.
 
 The provider emits:
 
@@ -30,7 +30,7 @@ OpenTelemetryGovernanceInstrumentation.ProviderName
 Current source and meter name:
 
 ```text
-CDCavell.AsiBackbone.OpenTelemetry
+AsiBackbone.OpenTelemetry
 ```
 
 Provider result name:
@@ -99,7 +99,7 @@ The outbox store may be in-memory for local validation or EF Core for durable ho
 Azure Monitor should receive governance emission telemetry through normal host-owned OpenTelemetry exporter wiring:
 
 ```text
-CDCavell.AsiBackbone.OpenTelemetry
+AsiBackbone.OpenTelemetry
   -> ActivitySource / Meter
   -> host OpenTelemetry SDK pipeline
   -> host-configured Azure Monitor exporter

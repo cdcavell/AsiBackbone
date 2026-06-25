@@ -1,6 +1,6 @@
 # Testing Harness
 
-`CDCavell.AsiBackbone.Testing` is a test-only package for host applications that need to test AsiBackbone-governed endpoints without wiring production persistence, signing, audit, outbox, or capability-grant infrastructure in every test fixture.
+`AsiBackbone.Testing` is a test-only package for host applications that need to test AsiBackbone-governed endpoints without wiring production persistence, signing, audit, outbox, or capability-grant infrastructure in every test fixture.
 
 > [!IMPORTANT]
 > The testing package is not a production enforcement provider. It exists for automated tests, local developer validation, and sample hosts only. Production hosts should register real policy evaluators, capability validators, audit sinks, durable outbox stores, signing providers, and storage providers.
@@ -21,8 +21,8 @@ Without the harness, the ASP.NET Core package intentionally fails closed when an
 ## Basic service registration
 
 ```csharp
-using CDCavell.AsiBackbone.AspNetCore.DependencyInjection;
-using CDCavell.AsiBackbone.Testing;
+using AsiBackbone.AspNetCore.DependencyInjection;
+using AsiBackbone.Testing;
 
 builder.Services
     .AddAsiBackboneAspNetCore()
@@ -103,4 +103,4 @@ The sink is in-memory and process-local. It is designed for test assertions, not
 
 ## Boundary notes
 
-The testing package does not change `CDCavell.AsiBackbone.AspNetCore` production behavior. Endpoints without AsiBackbone governance metadata remain opt-in/pass-through by default unless the host enables strict metadata enforcement with `RequireGovernanceMetadata`. Endpoints that do declare governance metadata still fail closed when required host-owned services are missing. The harness only supplies explicit deterministic test registrations when a test chooses to use them, and it does not make `CDCavell.AsiBackbone.Core` depend on ASP.NET Core, EF Core, or testing packages.
+The testing package does not change `AsiBackbone.AspNetCore` production behavior. Endpoints without AsiBackbone governance metadata remain opt-in/pass-through by default unless the host enables strict metadata enforcement with `RequireGovernanceMetadata`. Endpoints that do declare governance metadata still fail closed when required host-owned services are missing. The harness only supplies explicit deterministic test registrations when a test chooses to use them, and it does not make `AsiBackbone.Core` depend on ASP.NET Core, EF Core, or testing packages.

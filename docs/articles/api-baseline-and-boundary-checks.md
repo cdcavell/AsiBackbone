@@ -21,17 +21,17 @@ The Core test suite includes package-boundary checks that inspect stable package
 
 The checks verify that:
 
-- `CDCavell.AsiBackbone.Core` has no `ProjectReference` entries;
-- `CDCavell.AsiBackbone.Core` does not reference integration/provider package families such as ASP.NET Core, EF Core, cloud-provider packages, robotics packages, or AI model packages;
-- `CDCavell.AsiBackbone.Storage.InMemory`, `CDCavell.AsiBackbone.EntityFrameworkCore`, and `CDCavell.AsiBackbone.AspNetCore` reference Core through the expected dependency direction instead of referencing each other through integration layers.
+- `AsiBackbone.Core` has no `ProjectReference` entries;
+- `AsiBackbone.Core` does not reference integration/provider package families such as ASP.NET Core, EF Core, cloud-provider packages, robotics packages, or AI model packages;
+- `AsiBackbone.Storage.InMemory`, `AsiBackbone.EntityFrameworkCore`, and `AsiBackbone.AspNetCore` reference Core through the expected dependency direction instead of referencing each other through integration layers.
 
 This keeps the stable package dependency direction aligned with the documented shape:
 
 ```text
-CDCavell.AsiBackbone.Core
-  <- CDCavell.AsiBackbone.Storage.InMemory
-  <- CDCavell.AsiBackbone.EntityFrameworkCore
-  <- CDCavell.AsiBackbone.AspNetCore
+AsiBackbone.Core
+  <- AsiBackbone.Storage.InMemory
+  <- AsiBackbone.EntityFrameworkCore
+  <- AsiBackbone.AspNetCore
 ```
 
 ## Explicitly deferred API drift detection

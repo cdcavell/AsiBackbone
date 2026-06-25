@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PackageId>AsiBackbone.Storage.InMemory</PackageId>
+    <Title>AsiBackbone In-Memory Storage</Title>
+    <Description>Non-durable in-memory storage helpers for Accountable Systems Infrastructure local validation, tests, and samples.</Description>
+    <Authors>Christopher D. Cavell</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>accountable-systems-infrastructure;asi-backbone;dotnet;governance;in-memory;non-durable;storage;local-validation;testing</PackageTags>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AsiBackbone.Core\AsiBackbone.Core.csproj" />
+    <ProjectReference Include="..\AsiBackbone.DependencyInjection\AsiBackbone.DependencyInjection.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -99,7 +99,7 @@ builder.Services.AddSingleton<IAsiBackboneEndpointCapabilityGrantValidator, MyCa
 
 The endpoint requested `.EmitGovernanceAudit()` or `[EmitGovernanceAudit]`, but no `IAsiBackboneAuditSink` is registered.
 
-Register a host-owned audit sink. For local-only validation, `CDCavell.AsiBackbone.Storage.InMemory` can provide non-durable inspection. Production hosts should use durable host-owned persistence when records must survive restart.
+Register a host-owned audit sink. For local-only validation, `AsiBackbone.Storage.InMemory` can provide non-durable inspection. Production hosts should use durable host-owned persistence when records must survive restart.
 
 ### Bodyless `403 Forbidden`
 

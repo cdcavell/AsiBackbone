@@ -45,11 +45,11 @@ A clean allowed scanner result does not need to call the failure-policy resolver
 
 ## Minimal fake scanner sample
 
-This sample uses a simple regex-style scanner with no Azure dependency, no external service, and no package beyond `CDCavell.AsiBackbone.Core`.
+This sample uses a simple regex-style scanner with no Azure dependency, no external service, and no package beyond `AsiBackbone.Core`.
 
 ```csharp
-using CDCavell.AsiBackbone.Core.Classification;
-using CDCavell.AsiBackbone.Core.Decisions;
+using AsiBackbone.Core.Classification;
+using AsiBackbone.Core.Decisions;
 
 public enum FakeScannerOutcome
 {

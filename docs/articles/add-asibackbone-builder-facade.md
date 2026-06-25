@@ -1,6 +1,6 @@
 # AddAsiBackbone Builder Facade
 
-`CDCavell.AsiBackbone.DependencyInjection` provides a single discoverable dependency injection entry point for coordinating host-selected provider registrations:
+`AsiBackbone.DependencyInjection` provides a single discoverable dependency injection entry point for coordinating host-selected provider registrations:
 
 ```csharp
 builder.Services.AddAsiBackbone(backbone =>
@@ -24,20 +24,20 @@ The facade is intentionally a coordination surface, not a bootstrapper. It does 
 
 ## Package home decision
 
-The builder facade lives in `CDCavell.AsiBackbone.DependencyInjection` rather than Core or ASP.NET Core.
+The builder facade lives in `AsiBackbone.DependencyInjection` rather than Core or ASP.NET Core.
 
-This keeps `CDCavell.AsiBackbone.Core` framework-neutral and avoids forcing ASP.NET Core, EF Core, OpenTelemetry, signing, storage, cloud, or hosting dependencies into the core governance primitives. It also avoids making ASP.NET Core the owner of a builder shape that is useful for worker services, console hosts, gateways, and other non-web applications.
+This keeps `AsiBackbone.Core` framework-neutral and avoids forcing ASP.NET Core, EF Core, OpenTelemetry, signing, storage, cloud, or hosting dependencies into the core governance primitives. It also avoids making ASP.NET Core the owner of a builder shape that is useful for worker services, console hosts, gateways, and other non-web applications.
 
 Provider packages own their own builder extension methods:
 
 | Provider package | Example builder calls |
 | --- | --- |
-| `CDCavell.AsiBackbone.AspNetCore` | `UseAspNetCoreEndpointGovernance()`, `UseGovernanceOutboxDrain()` |
-| `CDCavell.AsiBackbone.EntityFrameworkCore` | `UseEfCoreAuditLedger<TDbContext>()`, `UseEfCoreAuditLifecycle<TDbContext>()`, `UseEfCoreGovernanceOutbox<TDbContext>()` |
-| `CDCavell.AsiBackbone.Storage.InMemory` | `UseInMemoryAuditLedger()`, `UseInMemoryAuditLifecycle()`, `UseInMemoryGovernanceOutbox()` |
-| `CDCavell.AsiBackbone.Signing.LocalDevelopment` | `UseLocalDevelopmentSigning()` |
-| `CDCavell.AsiBackbone.Signing.ManagedKey` | `UseManagedKeySigning(...)` |
-| `CDCavell.AsiBackbone.OpenTelemetry` | `UseOpenTelemetryEmission()` |
+| `AsiBackbone.AspNetCore` | `UseAspNetCoreEndpointGovernance()`, `UseGovernanceOutboxDrain()` |
+| `AsiBackbone.EntityFrameworkCore` | `UseEfCoreAuditLedger<TDbContext>()`, `UseEfCoreAuditLifecycle<TDbContext>()`, `UseEfCoreGovernanceOutbox<TDbContext>()` |
+| `AsiBackbone.Storage.InMemory` | `UseInMemoryAuditLedger()`, `UseInMemoryAuditLifecycle()`, `UseInMemoryGovernanceOutbox()` |
+| `AsiBackbone.Signing.LocalDevelopment` | `UseLocalDevelopmentSigning()` |
+| `AsiBackbone.Signing.ManagedKey` | `UseManagedKeySigning(...)` |
+| `AsiBackbone.OpenTelemetry` | `UseOpenTelemetryEmission()` |
 
 A host only sees the provider calls for packages it references.
 

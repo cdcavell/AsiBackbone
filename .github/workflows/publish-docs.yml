@@ -78,7 +78,7 @@ jobs:
             -reports:"./artifacts/test-results/**/coverage.cobertura.xml" `
             -targetdir:"./artifacts/core-branch-coverage-report" `
             -reporttypes:"Html;MarkdownSummaryGithub;Cobertura" `
-            -assemblyfilters:"+CDCavell.AsiBackbone.Core;-*.Tests" `
+            -assemblyfilters:"+AsiBackbone.Core;-*.Tests" `
             -filefilters:"-**/bin/**;-**/obj/**;-**/*.g.cs"
 
       - name: Preserve deployed mutation reports

@@ -1,6 +1,6 @@
 # Plain ASP.NET Core Host Sample
 
-This sample is the canonical in-repository validation host for `CDCavell.AsiBackbone`.
+This sample is the canonical in-repository validation host for `AsiBackbone`.
 It proves that AsiBackbone can be wired into a plain ASP.NET Core application without requiring `NetCoreApplicationTemplate` or any other host template.
 
 ## What this sample demonstrates
@@ -27,7 +27,7 @@ It proves that AsiBackbone can be wired into a plain ASP.NET Core application wi
 From the repository root:
 
 ```powershell
-dotnet run --project samples/PlainAspNetCoreHost/CDCavell.AsiBackbone.Samples.PlainAspNetCoreHost.csproj
+dotnet run --project samples/PlainAspNetCoreHost/AsiBackbone.Samples.PlainAspNetCoreHost.csproj
 ```
 
 Then open:

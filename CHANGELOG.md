@@ -4,6 +4,50 @@ All notable changes to this project are documented in this file.
 
 This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/) and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2026-06-24
+
+### Breaking Changes
+
+* Renamed NuGet package IDs from `CDCavell.AsiBackbone.*` to `AsiBackbone.*`.
+* Renamed public namespaces from `CDCavell.AsiBackbone.*` to `AsiBackbone.*`.
+* Consumers must update package references and `using` statements when migrating from the 1.x package line.
+
+### Changed
+
+* Updated project/package identity to align the public NuGet package names with the simplified `AsiBackbone.*` namespace.
+* Updated source namespaces, project references, and documentation references to use the new `AsiBackbone.*` naming convention.
+* Prepared the package family for the new 2.x release line.
+
+### Migration Notes
+
+Replace package references such as:
+
+```xml
+<PackageReference Include="CDCavell.AsiBackbone.Core" Version="1.x.x" />
+```
+
+with:
+
+```xml
+<PackageReference Include="AsiBackbone.Core" Version="2.0.0" />
+```
+
+Replace namespace imports such as:
+
+```csharp
+using CDCavell.AsiBackbone.Core;
+```
+
+with:
+
+```csharp
+using AsiBackbone.Core;
+```
+
+### Notes
+
+The previous `CDCavell.AsiBackbone.*` packages should be treated as the 1.x package line. The `AsiBackbone.*` packages begin the 2.x package line and represent the preferred package identity going forward.
+
 ## [1.2.1] - 2026-06-24
 
 ### Release summary

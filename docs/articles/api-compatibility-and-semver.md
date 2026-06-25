@@ -1,15 +1,15 @@
 # API Compatibility and Semantic Versioning
 
-This article defines the public API compatibility promise for the stable AsiBackbone `1.x` package family and documents how semantic versioning applies after stabilization.
+This article defines the public API compatibility promise for the stable AsiBackbone package family and documents how semantic versioning applies after stabilization.
 
-It complements the historical stable API review tracked in [issue #13](https://github.com/cdcavell/AsiBackbone/issues/13). That review established the original `1.0.0` public type names, namespaces, package boundaries, dependency direction, and extension points. The released `1.1.0` package family expanded the stable contract with additive analyzer, OpenTelemetry, and signing-provider package surfaces. `1.2.0` is a compatible minor release that formalizes additive adoption, diagnostics, testing, templates, samples, and documentation-alignment surfaces on the stable `1.x` contract. `1.2.1` is a compatible patch release that preserves the `1.2.0` package/API boundary while hardening release metadata, Source Link repository-commit metadata, validation guidance, workflow hygiene, and documentation wording.
+It complements the historical stable API review tracked in [issue #13](https://github.com/cdcavell/AsiBackbone/issues/13). That review established the original `1.0.0` public type names, namespaces, package boundaries, dependency direction, and extension points. The released `1.1.0` package family expanded the stable contract with additive analyzer, OpenTelemetry, and signing-provider package surfaces. `1.2.0` formalized additive adoption, diagnostics, testing, templates, samples, and documentation-alignment surfaces on the stable `1.x` contract. `1.2.1` preserved the `1.2.0` package/API boundary while hardening release metadata, Source Link repository-commit metadata, validation guidance, workflow hygiene, and documentation wording. `2.0.0` starts the current `2.x` line because the public package IDs and namespaces moved from `CDCavell.AsiBackbone.*` to `AsiBackbone.*`.
 
 > [!NOTE]
-> `1.1.1` included small additive, opt-in endpoint-governance public surface and an additive template package while preserving source and binary compatibility for existing `1.1.0` consumers. That release is documented as a compatibility exception to the expected SemVer policy below. Future additive public API or package surface should use a minor version bump even when the change is backward-compatible. `1.2.0` resumed that expectation by grouping additive public/package surfaces under a minor release. `1.2.1` is a normal patch release on the `1.2.x` line.
+> `1.1.1` included small additive, opt-in endpoint-governance public surface and an additive template package while preserving source and binary compatibility for existing `1.1.0` consumers. That release is documented as a compatibility exception to the expected SemVer policy below. Future additive public API or package surface should use a minor version bump even when the change is backward-compatible.
 
-## Compatibility promise for the stable `1.x` line
+## Compatibility promise for the stable `2.x` line
 
-Starting with `1.0.0`, packages identified as stable are expected to preserve their documented public API surface for consumers within the same major version.
+Starting with `2.0.0`, packages identified as stable are expected to preserve their documented public API surface for consumers within the same major version.
 
 The compatibility promise applies to:
 
@@ -55,9 +55,9 @@ The released `1.1.0` package family kept the `1.0.0` packages compatible and add
 | `AsiBackbone.Signing.LocalDevelopment` | Stable local-development signing and verification provider for tests, samples, and wiring proof paths only. Not production key custody. |
 | `AsiBackbone.Signing.ManagedKey` | Stable managed-key signing adapter boundary. The host supplies the actual managed-key client and operational controls. |
 
-### Current `1.2.x` stable family
+### Final `1.2.x` stable family before the rename
 
-`1.2.1` is the current stable patch release for the compatible `1.x` line. It preserves the `1.0.0`, `1.1.x`, and `1.2.0` contracts while hardening release metadata, Source Link repository-commit metadata, validation guidance, workflow hygiene, and documentation wording.
+`1.2.1` was the final stable patch release for the compatible `1.x` line. It preserved the `1.0.0`, `1.1.x`, and `1.2.0` contracts while hardening release metadata, Source Link repository-commit metadata, validation guidance, workflow hygiene, and documentation wording.
 
 | Package | `1.2.x` stable role |
 | --- | --- |
@@ -72,6 +72,24 @@ The released `1.1.0` package family kept the `1.0.0` packages compatible and add
 | `AsiBackbone.OpenTelemetry` | Provides the released OpenTelemetry governance emission provider. |
 | `AsiBackbone.Signing.LocalDevelopment` | Provides local-development signing and verification for tests, samples, and wiring proof paths only. |
 | `AsiBackbone.Signing.ManagedKey` | Provides the managed-key signing adapter boundary where the host supplies the concrete managed-key client and operational controls. |
+
+### Current `2.0.x` stable family
+
+`2.0.0` is the current stable major release. It begins the simplified `AsiBackbone.*` package and namespace line after the public rename from `CDCavell.AsiBackbone.*`. The underlying governance-spine package roles carry forward from `1.2.1`, but consumers migrating from the old package IDs or namespaces must update package references and `using` statements.
+
+| Package | `2.0.x` stable role |
+| --- | --- |
+| `AsiBackbone.Core` | Framework-neutral governance primitives and durable artifact contracts for the current `2.x` line. |
+| `AsiBackbone.DependencyInjection` | Explicit builder facade and host-selected provider registration composition path. |
+| `AsiBackbone.Storage.InMemory` | Non-durable storage helpers for tests, samples, local validation, lifecycle events, and outbox proof paths. |
+| `AsiBackbone.EntityFrameworkCore` | EF Core host-owned persistence helpers for audit, acknowledgment, lifecycle, and outbox records. |
+| `AsiBackbone.AspNetCore` | ASP.NET Core host adapters, endpoint governance, development diagnostics, and hosted outbox drain integration. |
+| `AsiBackbone.Testing` | Test-only harness helpers for deterministic governance and package-wiring tests. |
+| `AsiBackbone.Templates` | Developer-experience `dotnet new` templates for governed ASP.NET Core host scaffolding. |
+| `AsiBackbone.Analyzers` | Build-time analyzer safety rails, including production-signing configuration guidance. |
+| `AsiBackbone.OpenTelemetry` | Released OpenTelemetry governance emission provider. |
+| `AsiBackbone.Signing.LocalDevelopment` | Local-development signing and verification for tests, samples, and wiring proof paths only. |
+| `AsiBackbone.Signing.ManagedKey` | Managed-key signing adapter boundary where the host supplies the concrete managed-key client and operational controls. |
 
 Stable package status does not imply that every future provider idea is stable. Event Hubs, Purview, Azure-specific SDK adapters, Aspire runtime packages, robotics, immutable storage, and additional provider packages remain outside the stable contract unless separately reviewed and released as stable packages.
 
@@ -108,9 +126,9 @@ Before `1.0.0`, alpha or preview packages may still make breaking changes as the
 
 ## Assembly version policy
 
-For the stable `1.x` package line, AsiBackbone keeps `AssemblyVersion` fixed at `1.0.0.0` for compatible minor and patch releases. NuGet package `Version`, `FileVersion`, and `InformationalVersion` continue to move with each package release.
+For the stable `2.x` package line, AsiBackbone keeps `AssemblyVersion` fixed at `2.0.0.0` for compatible minor and patch releases. NuGet package `Version`, `FileVersion`, and `InformationalVersion` continue to move with each package release.
 
-This separates the package release identity from the binary assembly identity. Package versions communicate the SemVer release to NuGet consumers. `FileVersion` and `InformationalVersion` communicate the concrete build/product version. `AssemblyVersion` is reserved for the compatible major line and should change only when the project intentionally creates a new binary identity, such as a future `2.0.0` release or another intentional binary-compatibility break.
+This separates the package release identity from the binary assembly identity. Package versions communicate the SemVer release to NuGet consumers. `FileVersion` and `InformationalVersion` communicate the concrete build/product version. `AssemblyVersion` is reserved for the compatible major line and should change only when the project intentionally creates a new binary identity.
 
 Expected stable-line behavior:
 
@@ -123,6 +141,7 @@ Expected stable-line behavior:
 | `1.2.0` | `1.2.0` | `1.0.0.0` | `1.2.0.0` | `1.2.0+...` |
 | `1.2.1` | `1.2.1` | `1.0.0.0` | `1.2.1.0` | `1.2.1+...` |
 | `2.0.0` | `2.0.0` | `2.0.0.0` | `2.0.0.0` | `2.0.0+...` |
+| `2.0.1` | `2.0.1` | `2.0.0.0` | `2.0.1.0` | `2.0.1+...` |
 
 Before cutting stable releases, release validation should verify that `AssemblyVersion`, `FileVersion`, `InformationalVersion`, package metadata, release notes, and repository tags match this policy.
 
@@ -136,7 +155,7 @@ Additive artifact fields are normally acceptable in a compatible minor release w
 
 ## Provider and future package guidance
 
-Released provider packages have their own stable contract within the compatible `1.x` line once they are published as stable packages. In the current `1.2.x` line, that includes:
+Released provider packages have their own stable contract within the compatible `2.x` line once they are published as stable packages. In the current `2.0.x` line, that includes:
 
 - `AsiBackbone.OpenTelemetry`;
 - `AsiBackbone.Signing.LocalDevelopment`;
@@ -173,7 +192,7 @@ Before cutting a stable release or stable package-family expansion, the release 
 
 ## Related documentation
 
-- [Historical Stable API Review](stable-api-review.md)
+- [2.0.0 Release Notes](release-notes-200.md)
 - [1.2.1 Release Notes](release-notes-121.md)
 - [1.2.0 Release Notes](release-notes-120.md)
 - [1.1.x Release Notes](release-notes-110.md)

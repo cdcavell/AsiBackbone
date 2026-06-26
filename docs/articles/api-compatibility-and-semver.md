@@ -2,7 +2,7 @@
 
 This article defines the public API compatibility promise for the stable AsiBackbone package family and documents how semantic versioning applies after stabilization.
 
-It complements the historical stable API review tracked in [issue #13](https://github.com/cdcavell/AsiBackbone/issues/13). That review established the original `1.0.0` public type names, namespaces, package boundaries, dependency direction, and extension points. The released `1.1.0` package family expanded the stable contract with additive analyzer, OpenTelemetry, and signing-provider package surfaces. `1.2.0` formalized additive adoption, diagnostics, testing, templates, samples, and documentation-alignment surfaces on the stable `1.x` contract. `1.2.1` preserved the `1.2.0` package/API boundary while hardening release metadata, Source Link repository-commit metadata, validation guidance, workflow hygiene, and documentation wording. `2.0.0` starts the current `2.x` line because the public package IDs and namespaces moved from `CDCavell.AsiBackbone.*` to `AsiBackbone.*`.
+It complements the historical stable API review tracked in [issue #13](https://github.com/cdcavell/AsiBackbone/issues/13). That review established the original `1.0.0` public type names, namespaces, package boundaries, dependency direction, and extension points. The released `1.1.0` package family expanded the stable contract with additive analyzer, OpenTelemetry, and signing-provider package surfaces. `1.2.0` formalized additive adoption, diagnostics, testing, templates, samples, and documentation-alignment surfaces on the stable `1.x` contract. `1.2.1` preserved the `1.2.0` package/API boundary while hardening release metadata, Source Link repository-commit metadata, validation guidance, workflow hygiene, and documentation wording. `2.0.0` started the current `2.x` line because the public package IDs and namespaces moved from `CDCavell.AsiBackbone.*` to `AsiBackbone.*`. `2.0.1` preserves the `2.0.0` public package and namespace boundary while hardening release metadata, documentation currency, package SBOM/provenance artifacts, and repository/package branding.
 
 > [!NOTE]
 > `1.1.1` included small additive, opt-in endpoint-governance public surface and an additive template package while preserving source and binary compatibility for existing `1.1.0` consumers. That release is documented as a compatibility exception to the expected SemVer policy below. Future additive public API or package surface should use a minor version bump even when the change is backward-compatible.
@@ -75,7 +75,7 @@ The released `1.1.0` package family kept the `1.0.0` packages compatible and add
 
 ### Current `2.0.x` stable family
 
-`2.0.0` is the current stable major release. It begins the simplified `AsiBackbone.*` package and namespace line after the public rename from `CDCavell.AsiBackbone.*`. The underlying governance-spine package roles carry forward from `1.2.1`, but consumers migrating from the old package IDs or namespaces must update package references and `using` statements.
+`2.0.1` is the current stable patch release. It preserves the `2.0.0` public package and namespace boundary after the public rename from `CDCavell.AsiBackbone.*` to `AsiBackbone.*`. The underlying governance-spine package roles carry forward from `1.2.1`, and consumers already on `2.0.0` should not need source-code changes to move to `2.0.1`.
 
 | Package | `2.0.x` stable role |
 | --- | --- |
@@ -89,7 +89,7 @@ The released `1.1.0` package family kept the `1.0.0` packages compatible and add
 | `AsiBackbone.Analyzers` | Build-time analyzer safety rails, including production-signing configuration guidance. |
 | `AsiBackbone.OpenTelemetry` | Released OpenTelemetry governance emission provider. |
 | `AsiBackbone.Signing.LocalDevelopment` | Local-development signing and verification for tests, samples, and wiring proof paths only. |
-| `AsiBackbone.Signing.ManagedKey` | Managed-key signing adapter boundary where the host supplies the concrete managed-key client and operational controls. |
+| `AsiBackbone.Signing.ManagedKey` | Managed-key signing adapter boundary where the host supplies the actual managed-key client and operational controls. |
 
 Stable package status does not imply that every future provider idea is stable. Event Hubs, Purview, Azure-specific SDK adapters, Aspire runtime packages, robotics, immutable storage, and additional provider packages remain outside the stable contract unless separately reviewed and released as stable packages.
 
@@ -172,8 +172,8 @@ Examples of packages or integrations outside the current stable contract include
 - Azure Monitor-specific SDK adapters, beyond host-configured OpenTelemetry exporter guidance;
 - Azure Key Vault, Managed HSM, cloud KMS, HSM, or certificate-store implementations beyond the managed-key adapter boundary;
 - robotics or physical execution packages;
-- immutable-storage, timestamping, or external anchoring providers;
-- specialized persistence providers beyond the documented host-owned EF Core path.
+- immutable storage, ledger, or external anchoring packages;
+- any package that would make AsiBackbone a compliance product, model host, execution engine, or production signing appliance by default.
 
 Documentation should state whether each package is stable, preview, experimental, design-only, strategy-only, sample-only, or host-owned integration guidance.
 
@@ -192,6 +192,7 @@ Before cutting a stable release or stable package-family expansion, the release 
 
 ## Related documentation
 
+- [2.0.1 Release Notes](release-notes-201.md)
 - [2.0.0 Release Notes](release-notes-200.md)
 - [1.2.1 Release Notes](release-notes-121.md)
 - [1.2.0 Release Notes](release-notes-120.md)

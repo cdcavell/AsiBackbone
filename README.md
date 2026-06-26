@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/images/asibackbone-icon-256.png" alt="AsiBackbone governance spine icon" width="160" height="160" />
+</p>
+
 # AsiBackbone
 
 [![CI](https://github.com/cdcavell/AsiBackbone/actions/workflows/ci.yml/badge.svg)](https://github.com/cdcavell/AsiBackbone/actions/workflows/ci.yml)

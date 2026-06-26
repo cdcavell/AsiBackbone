@@ -1,10 +1,10 @@
 # Stable Release Validation
 
-This article documents the reusable release-blocking validation path for stable release lines. The current released stable package family is `2.0.x`, with `2.0.0` as the current major release boundary for the simplified `AsiBackbone.*` package and namespace identity; future `2.x` maintenance releases should continue to use the same validation posture unless a later release note supersedes it.
+This article documents the reusable release-blocking validation path for stable release lines. The current released stable package family is `2.0.x`, with `2.0.1` as the current compatible patch release and `2.0.0` as the major release boundary for the simplified `AsiBackbone.*` package and namespace identity; future `2.x` maintenance releases should continue to use the same validation posture unless a later release note supersedes it.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. Release validation should confirm that the package family remains practical governance infrastructure and that implementation claims stay within the documented software boundary.
 
-The [2.0.0 Release Readiness Record](release-readiness-200.md) is the current release-candidate control sheet for the `2.0.0` release. The [1.2.1 Release Readiness Record](release-readiness-121.md), [1.2.0 Release Readiness Record](release-readiness-120.md), and [Historical 1.1.0 Release Readiness Record](release-readiness-checklist.md) are retained for traceability and checklist-shape history.
+The [2.0.1 Release Readiness Record](release-readiness-201.md) is the current release-candidate control sheet for the `2.0.1` release. The [2.0.0 Release Readiness Record](release-readiness-200.md), [1.2.1 Release Readiness Record](release-readiness-121.md), [1.2.0 Release Readiness Record](release-readiness-120.md), and [Historical 1.1.0 Release Readiness Record](release-readiness-checklist.md) are retained for traceability and checklist-shape history.
 
 ## Required checks before tagging a stable release
 
@@ -118,10 +118,10 @@ See [Supply-Chain Provenance and Package SBOMs](supply-chain-provenance.md) for 
 
 ## Source Link metadata validation
 
-After `2.0.0` packages are published and visible on NuGet, maintainers should run:
+After `2.0.1` packages are published and visible on NuGet, maintainers should run:
 
 ```powershell
-./scripts/Validate-Source-Link-commit-metadata.ps1 -Version 2.0.0
+./scripts/Validate-Source-Link-commit-metadata.ps1 -Version 2.0.1
 ```
 
 This post-publish check downloads the published packages and confirms the expected repository type, repository URL, and non-empty repository commit metadata are present.
@@ -155,6 +155,8 @@ Deferred checks should be rare for a stable release.
 ## Related documentation
 
 - [Supply-Chain Provenance and Package SBOMs](supply-chain-provenance.md)
+- [2.0.1 Release Readiness Record](release-readiness-201.md)
+- [2.0.1 Release Notes](release-notes-201.md)
 - [2.0.0 Release Readiness Record](release-readiness-200.md)
 - [2.0.0 Release Notes](release-notes-200.md)
 - [1.2.1 Release Readiness Record](release-readiness-121.md)

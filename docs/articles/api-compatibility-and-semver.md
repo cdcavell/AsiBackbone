@@ -2,7 +2,7 @@
 
 This article defines the public API compatibility promise for the stable AsiBackbone package family and documents how semantic versioning applies after stabilization.
 
-It complements the historical stable API review tracked in [issue #13](https://github.com/cdcavell/AsiBackbone/issues/13). That review established the original `1.0.0` public type names, namespaces, package boundaries, dependency direction, and extension points. The released `1.1.0` package family expanded the stable contract with additive analyzer, OpenTelemetry, and signing-provider package surfaces. `1.2.0` formalized additive adoption, diagnostics, testing, templates, samples, and documentation-alignment surfaces on the stable `1.x` contract. `1.2.1` preserved the `1.2.0` package/API boundary while hardening release metadata, Source Link repository-commit metadata, validation guidance, workflow hygiene, and documentation wording. `2.0.0` started the current `2.x` line because the public package IDs and namespaces moved from `CDCavell.AsiBackbone.*` to `AsiBackbone.*`. `2.0.1` preserves the `2.0.0` public package and namespace boundary while hardening release metadata, documentation currency, package SBOM/provenance artifacts, and repository/package branding.
+It complements the historical stable API review tracked in [issue #13](https://github.com/cdcavell/AsiBackbone/issues/13). That review established the original `1.0.0` public type names, namespaces, package boundaries, dependency direction, and extension points. The released `1.1.0` package family expanded the stable contract with additive analyzer, OpenTelemetry, and signing-provider package surfaces. `1.2.0` formalized additive adoption, diagnostics, testing, templates, samples, and documentation-alignment surfaces on the stable `1.x` contract. `1.2.1` preserved the `1.2.0` package/API boundary while hardening release metadata, Source Link repository-commit metadata, validation guidance, workflow hygiene, and documentation wording. `2.0.0` started the current `2.x` line because the public package IDs and namespaces moved from `CDCavell.AsiBackbone.*` to `AsiBackbone.*`. `2.0.1` preserved the `2.0.0` public package and namespace boundary while hardening release metadata, documentation currency, package SBOM/provenance artifacts, and repository/package branding. `2.0.2` preserves that same public package and namespace boundary while correcting package icon presentation metadata/assets.
 
 > [!NOTE]
 > `1.1.1` included small additive, opt-in endpoint-governance public surface and an additive template package while preserving source and binary compatibility for existing `1.1.0` consumers. That release is documented as a compatibility exception to the expected SemVer policy below. Future additive public API or package surface should use a minor version bump even when the change is backward-compatible.
@@ -75,7 +75,7 @@ The released `1.1.0` package family kept the `1.0.0` packages compatible and add
 
 ### Current `2.0.x` stable family
 
-`2.0.1` is the current stable patch release. It preserves the `2.0.0` public package and namespace boundary after the public rename from `CDCavell.AsiBackbone.*` to `AsiBackbone.*`. The underlying governance-spine package roles carry forward from `1.2.1`, and consumers already on `2.0.0` should not need source-code changes to move to `2.0.1`.
+`2.0.2` is the current stable patch release. It preserves the `2.0.0` public package and namespace boundary after the public rename from `CDCavell.AsiBackbone.*` to `AsiBackbone.*` while correcting package icon presentation metadata/assets. The underlying governance-spine package roles carry forward from `1.2.1`, and consumers already on `2.0.0` or `2.0.1` should not need source-code changes to move to `2.0.2`.
 
 | Package | `2.0.x` stable role |
 | --- | --- |
@@ -142,6 +142,7 @@ Expected stable-line behavior:
 | `1.2.1` | `1.2.1` | `1.0.0.0` | `1.2.1.0` | `1.2.1+...` |
 | `2.0.0` | `2.0.0` | `2.0.0.0` | `2.0.0.0` | `2.0.0+...` |
 | `2.0.1` | `2.0.1` | `2.0.0.0` | `2.0.1.0` | `2.0.1+...` |
+| `2.0.2` | `2.0.2` | `2.0.0.0` | `2.0.2.0` | `2.0.2+...` |
 
 Before cutting stable releases, release validation should verify that `AssemblyVersion`, `FileVersion`, `InformationalVersion`, package metadata, release notes, and repository tags match this policy.
 
@@ -192,6 +193,7 @@ Before cutting a stable release or stable package-family expansion, the release 
 
 ## Related documentation
 
+- [2.0.2 Release Notes](release-notes-202.md)
 - [2.0.1 Release Notes](release-notes-201.md)
 - [2.0.0 Release Notes](release-notes-200.md)
 - [1.2.1 Release Notes](release-notes-121.md)

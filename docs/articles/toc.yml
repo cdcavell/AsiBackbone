@@ -148,6 +148,8 @@
       href: ../quality/index.md
     - name: Release Validation
       href: release-validation.md
+    - name: Post-2.0.0 Documentation Currency Review
+      href: post-200-documentation-currency-review.md
     - name: 2.0.0 Release Readiness Record
       href: release-readiness-200.md
     - name: 1.2.1 Release Readiness Record

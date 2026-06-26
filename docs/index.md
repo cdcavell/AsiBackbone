@@ -51,8 +51,11 @@ These pages are the best first stops for implementation-first adoption. The opti
 * [Progressive Adoption Ladder](articles/progressive-adoption.md)  
   The smallest Core-only path first, followed by optional outbox, telemetry, DLP/classification, signing, and analyzer add-ons.
 
-* [2.0.1 Release Notes](articles/release-notes-201.md)  
+* [2.0.2 Release Notes](articles/release-notes-202.md)  
   Current patch release for the stable `2.0.x` package family.
+
+* [2.0.1 Release Notes](articles/release-notes-201.md)  
+  Previous patch release for the stable `2.0.x` package family.
 
 * [2.0.0 Release Notes](articles/release-notes-200.md)  
   Major release boundary for the simplified `AsiBackbone.*` package and namespace identity.
@@ -74,7 +77,7 @@ These pages are the best first stops for implementation-first adoption. The opti
 
 ## Current stable package family
 
-Stable `2.0.x` is the current release line. `2.0.1` is the current compatible patch release. It preserves the `2.0.0` public package and namespace boundary while adding post-`2.0.0` documentation alignment, package SBOM/provenance hardening, refreshed repository/package icon metadata, and release metadata updates. `2.0.0` established the simplified `AsiBackbone.*` package and namespace identity and covers these packages:
+Stable `2.0.x` is the current release line. `2.0.2` is the current compatible patch release. It preserves the `2.0.0` public package and namespace boundary while correcting the package icon presentation issue discovered after `2.0.1` and aligning release metadata/documentation for the corrected package release. `2.0.0` established the simplified `AsiBackbone.*` package and namespace identity and covers these packages:
 
 ```text
 AsiBackbone.Core
@@ -214,6 +217,7 @@ These pages support maintainers and release validation.
 
 * [Quality Reports](quality/)
 * [Release Validation](articles/release-validation.md)
+* [2.0.2 Release Readiness Record](articles/release-readiness-202.md)
 * [2.0.1 Release Readiness Record](articles/release-readiness-201.md)
 * [2.0.0 Release Readiness Record](articles/release-readiness-200.md)
 * [1.2.1 Release Readiness Record](articles/release-readiness-121.md)

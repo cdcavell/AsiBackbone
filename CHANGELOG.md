@@ -4,6 +4,98 @@ All notable changes to this project are documented in this file.
 
 This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/) and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.2] - 2026-06-26
+
+### Release summary
+
+`2.0.2` is a compatible patch release for the stable `2.0.x` package family.
+
+This release corrects the package-facing icon presentation issue discovered after `2.0.1`. The previous package icon asset could render incompletely in package-list and package-detail contexts. `2.0.2` preserves the `2.0.0` public package and namespace boundary while aligning release metadata and documentation for the corrected package presentation release.
+
+### Fixed
+
+* Corrected the package icon asset used for NuGet and repository/package presentation.
+* Rebuilt `PACKAGE-ICON.png` from the source SVG so the icon renders as a complete image rather than an incomplete or partially rendered PNG.
+* Preserved bounded project language around Accountable Systems Infrastructure, host-owned execution, package-signing status, and non-claims.
+
+### Changed
+
+* Promoted central package version metadata from `2.0.1` to `2.0.2` while preserving `AssemblyVersion` as `2.0.0.0` for the compatible `2.x` line.
+* Updated `FileVersion` to `2.0.2.0`.
+* Updated `CITATION.cff` and `.zenodo.json` for the `2.0.2` release.
+* Updated README, documentation home, article index, table of contents, release validation, API compatibility / SemVer guidance, release notes, release readiness guidance, and Source Link validation defaults for the `2.0.2` package family.
+
+### Validation
+
+* Release-candidate validation is expected to pass through CI, Stable Release Validation, package metadata validation, template package smoke validation, external consumer smoke tests, stable package integration smoke tests, DocFX build, package SBOM generation, and artifact provenance handling before tagging.
+* Version-consistency validation should pass for `2.0.2`, including `Directory.Build.props`, `CITATION.cff`, `.zenodo.json`, optional tag `v2.0.2`, and generated package filenames when package artifacts are supplied.
+* Package icon validation should confirm that `PACKAGE-ICON.png` is included in generated `.nupkg` artifacts and renders correctly in package-list and package-detail contexts.
+* After packages are published and visible on NuGet, Source Link repository commit metadata should be validated with:
+
+```powershell
+./scripts/Validate-Source-Link-commit-metadata.ps1 -Version 2.0.2
+```
+
+### Compatibility notes
+
+* Existing stable `2.0.0` and `2.0.1` consumers should be able to upgrade to `2.0.2` without required source-code changes.
+* `2.0.2` is a patch release focused on package/repository icon presentation metadata, release metadata, documentation alignment, and validation guidance.
+* `AssemblyVersion` remains `2.0.0.0` for the compatible stable `2.x` line.
+* `FileVersion` should be updated to `2.0.2.0`.
+* Package `Version` and `InformationalVersion` should be updated to `2.0.2`.
+* Event Hubs, Purview, Azure-specific SDK adapters, Aspire runtime packages, robotics, immutable-storage, and additional provider packages remain outside the stable package contract unless separately reviewed and released.
+
+## [2.0.1] - 2026-06-26
+
+### Release summary
+
+`2.0.1` is a compatible patch release for the stable `2.0.x` package family.
+
+This release preserves the `2.0.0` public package and namespace boundary while tightening post-`2.0.0` documentation alignment, release-path SBOM/provenance handling, repository/package icon metadata, and release-facing version metadata. No runtime behavior changes or breaking public API changes are intended.
+
+`AssemblyVersion` remains fixed at `2.0.0.0` for the compatible stable `2.x` line. Package `Version`, `FileVersion`, and `InformationalVersion` move to `2.0.1`.
+
+### Added
+
+* Added package-level SBOM generation for produced `.nupkg` artifacts, including SPDX JSON output and an SBOM manifest.
+* Added package and SBOM artifact provenance attestation steps where GitHub artifact attestations are available for the workflow event.
+* Added refreshed text-free repository/package icon assets for README, DocFX, favicon, and NuGet package metadata.
+* Added `2.0.1` release notes and a dedicated `2.0.1` release readiness record.
+
+### Changed
+
+* Promoted central package version metadata from `2.0.0` to `2.0.1` while preserving `AssemblyVersion` as `2.0.0.0` for the compatible `2.x` line.
+* Updated `FileVersion` to `2.0.1.0`.
+* Updated `CITATION.cff` and `.zenodo.json` for the `2.0.1` release.
+* Updated README, documentation home, article index, table of contents, release validation, API compatibility / SemVer guidance, Source Link validation defaults, and release-readiness guidance for the `2.0.1` package family.
+* Updated stable release workflows and release validation guidance to include package SBOM generation and package/SBOM provenance artifact handling.
+* Refreshed post-`2.0.0` documentation currency while keeping host-owned production boundaries explicit.
+
+### Fixed
+
+* Corrected stale post-`2.0.0` references in current documentation navigation and release-validation guidance.
+* Replaced the previous repository/package branding assets with a small-size-friendly governance spine icon for README, documentation, favicon, and package metadata contexts.
+* Preserved bounded project language around Accountable Systems Infrastructure, host-owned execution, package-signing status, and non-claims.
+
+### Validation
+
+* Release-candidate validation is expected to pass through CI, Stable Release Validation, package metadata validation, template package smoke validation, external consumer smoke tests, stable package integration smoke tests, DocFX build, package SBOM generation, and artifact provenance handling before tagging.
+* Version-consistency validation should pass for `2.0.1`, including `Directory.Build.props`, `CITATION.cff`, `.zenodo.json`, optional tag `v2.0.1`, and generated package filenames when package artifacts are supplied.
+* After packages are published and visible on NuGet, Source Link repository commit metadata should be validated with:
+
+```powershell
+./scripts/Validate-Source-Link-commit-metadata.ps1 -Version 2.0.1
+```
+
+### Compatibility notes
+
+* Existing stable `2.0.0` consumers should be able to upgrade to `2.0.1` without required source-code changes.
+* `2.0.1` is a patch release focused on release readiness, documentation alignment, package SBOM/provenance hardening, repository/package branding, and metadata updates.
+* `AssemblyVersion` remains `2.0.0.0` for the compatible stable `2.x` line.
+* `FileVersion` should be updated to `2.0.1.0`.
+* Package `Version` and `InformationalVersion` should be updated to `2.0.1`.
+* Event Hubs, Purview, Azure-specific SDK adapters, Aspire runtime packages, robotics, immutable-storage, and additional provider packages remain outside the stable package contract unless separately reviewed and released.
+
 ## [2.0.0] - 2026-06-24
 
 ### Breaking Changes
@@ -488,7 +580,7 @@ This release focuses on post-`1.1.0` hardening, documentation clarity, endpoint-
 
 ### Fixed
 
-* Aligned policy evaluator tests with the intended constraint-versus-decision-policy boundary.
+* Aligned policy evaluator tests with the intended constraint-versus-decision policy boundary.
 * Preserved elevated-risk warnings as constraint-layer results instead of replacing them in the decision policy layer.
 * Updated test expectations to match current `AsiBackbone` assembly casing.
 * Added explicit switch handling for low-risk and elevated-risk document policy scenarios.

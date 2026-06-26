@@ -54,10 +54,9 @@ The documentation should continue to treat Event Hubs, Purview, Azure-specific S
 ## Updates made during this pass
 
 - Added this review record so the post-`2.0.0` documentation verification is visible in the documentation set.
-- Linked the review record from the documentation home, article index, and article table of contents.
+- Linked the review record from the article table of contents.
 - Updated template local-package installation guidance from the previous `1.2.1` artifact example to the current `2.0.0` package artifact example.
 - Updated the historical `1.0.0` quickstart's current-family pointer so readers are directed to `2.0.0` release notes and current quickstart material.
-- Updated production wording language that still referred to `1.1.0` as the current signing-related package surface, clarifying that those signing surfaces are carried forward in the stable `2.0.x` family.
 
 ## Follow-up expectations
 

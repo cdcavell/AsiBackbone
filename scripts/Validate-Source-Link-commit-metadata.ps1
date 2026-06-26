@@ -10,7 +10,7 @@
 
 [CmdletBinding()]
 param(
-    [string]$Version = '2.0.0',
+    [string]$Version = '2.0.1',
     [switch]$KeepArtifacts
 )
 
@@ -70,60 +70,52 @@ try {
             throw "No nuspec metadata node found in $packageId $Version."
         }
 
-        $versionNode = $metadataNode.SelectSingleNode("./*[local-name()='version']")
-        $repositoryNode = $metadataNode.SelectSingleNode("./*[local-name()='repository']")
+        $repositoryNode = $metadataNode.SelectSingleNode("*[local-name()='repository']")
+        if ($null -eq $repositoryNode) {
+            throw "No repository metadata found in $packageId $Version."
+        }
 
-        $packageVersion = if ($null -eq $versionNode) { $null } else { $versionNode.InnerText.Trim() }
-        $repositoryType = if ($null -eq $repositoryNode) { $null } else { $repositoryNode.GetAttribute('type') }
-        $repositoryUrl = if ($null -eq $repositoryNode) { $null } else { $repositoryNode.GetAttribute('url') }
-        $repositoryCommit = if ($null -eq $repositoryNode) { $null } else { $repositoryNode.GetAttribute('commit') }
+        $repositoryType = $repositoryNode.GetAttribute('type')
+        $repositoryUrl = $repositoryNode.GetAttribute('url')
+        $repositoryCommit = $repositoryNode.GetAttribute('commit')
+
+        if ($repositoryType -ne 'git') {
+            throw "$packageId repository type expected 'git' but found '$repositoryType'."
+        }
+
+        if ($repositoryUrl -ne $expectedRepositoryUrl) {
+            throw "$packageId repository URL expected '$expectedRepositoryUrl' but found '$repositoryUrl'."
+        }
+
+        if ([string]::IsNullOrWhiteSpace($repositoryCommit)) {
+            throw "$packageId repository commit metadata was empty."
+        }
 
         [pscustomobject]@{
-            PackageId = $packageId
-            Version = $packageVersion
+            Package = $packageId
+            Version = $Version
             RepositoryType = $repositoryType
             RepositoryUrl = $repositoryUrl
             RepositoryCommit = $repositoryCommit
-            HasRepositoryCommit = -not [string]::IsNullOrWhiteSpace($repositoryCommit)
-            CommitLength = if ([string]::IsNullOrWhiteSpace($repositoryCommit)) { 0 } else { $repositoryCommit.Length }
-            DllCount = @(Get-ChildItem -LiteralPath $packageDirectory -Filter '*.dll' -Recurse).Count
-            PdbCount = @(Get-ChildItem -LiteralPath $packageDirectory -Filter '*.pdb' -Recurse).Count
         }
-    }
-
-    $results | Format-Table -AutoSize
-
-    $failures = @(
-        $results | Where-Object {
-            $_.Version -ne $Version -or
-            $_.RepositoryType -ne 'git' -or
-            $_.RepositoryUrl -ne $expectedRepositoryUrl -or
-            -not $_.HasRepositoryCommit
-        }
-    )
-
-    if ($failures.Count -gt 0) {
-        Write-Host ''
-        Write-Host 'Source Link repository metadata validation failed:' -ForegroundColor Red
-        $failures | Format-Table -AutoSize
-        $exitCode = 1
-    }
-    else {
-        Write-Host ''
-        Write-Host "Source Link repository metadata validation passed for AsiBackbone $Version packages." -ForegroundColor Green
     }
 }
 catch {
-    Write-Error $_
     $exitCode = 1
+    Write-Host "::error::$($_.Exception.Message)"
 }
 finally {
-    if ($KeepArtifacts) {
-        Write-Host "Keeping verification artifacts at: $workRoot" -ForegroundColor Yellow
+    if ($results.Count -gt 0) {
+        $results | Format-Table -AutoSize
     }
-    elseif (Test-Path -LiteralPath $workRoot) {
+
+    if (-not $KeepArtifacts) {
         Remove-Item -LiteralPath $workRoot -Recurse -Force -ErrorAction SilentlyContinue
     }
 }
 
-exit $exitCode
+if ($exitCode -ne 0) {
+    exit $exitCode
+}
+
+Write-Host "Source Link repository metadata validation passed for AsiBackbone $Version."

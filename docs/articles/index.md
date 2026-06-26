@@ -11,7 +11,7 @@ Use the header search box for package names, API concepts, and article titles. S
 
 ## Current stable package posture
 
-Stable `2.0.x` is the current package line. `2.0.0` establishes the simplified `AsiBackbone.*` package and namespace identity after the public rename from `CDCavell.AsiBackbone.*`. It carries forward the governance-spine surfaces from the stable `1.x` line while intentionally marking the rename as a major-version migration boundary.
+Stable `2.0.x` is the current package line. `2.0.1` is the current compatible patch release. It preserves the `2.0.0` public package and namespace boundary while adding post-`2.0.0` documentation alignment, package SBOM/provenance hardening, refreshed repository/package icon metadata, and release metadata updates. `2.0.0` established the simplified `AsiBackbone.*` package and namespace identity after the public rename from `CDCavell.AsiBackbone.*`.
 
 Released stable package surfaces include Core, DependencyInjection, Storage.InMemory, EntityFrameworkCore, AspNetCore, Testing, Templates, Analyzers, OpenTelemetry, Signing.LocalDevelopment, and Signing.ManagedKey. OpenTelemetry is the concrete released governance-emission provider. Event Hubs, Purview, Azure-specific SDK adapters, Aspire runtime packages, robotics, immutable-storage, and additional provider packages remain design-only, strategy-only, sample-only, host-owned, or future-provider work unless a later stable release explicitly ships them.
 
@@ -28,6 +28,7 @@ Released stable package surfaces include Core, DependencyInjection, Storage.InMe
 * [AddAsiBackbone Builder Facade](add-asibackbone-builder-facade.md)
 * [dotnet new Templates](templates.md)
 * [Why AsiBackbone?](why-asi-backbone.md)
+* [2.0.1 Release Notes](release-notes-201.md)
 * [2.0.0 Release Notes](release-notes-200.md)
 * [1.2.1 Release Notes](release-notes-121.md)
 * [1.2.0 Release Notes](release-notes-120.md)
@@ -138,12 +139,14 @@ Scenario pages describe applied patterns. They remain optional and do not imply 
 * [Quality Reports](../quality/index.md)
 * [Release Validation](release-validation.md)
 * [Supply-Chain Provenance and Package SBOMs](supply-chain-provenance.md)
+* [2.0.1 Release Readiness Record](release-readiness-201.md)
 * [2.0.0 Release Readiness Record](release-readiness-200.md)
 * [1.2.1 Release Readiness Record](release-readiness-121.md)
 * [1.2.0 Release Readiness Record](release-readiness-120.md)
 * [Historical 1.1.0 Release Readiness Record](release-readiness-checklist.md)
 * [API Baseline and Boundary Checks](api-baseline-and-boundary-checks.md)
 * [Developer Checklist](developer-checklist.md)
+* [2.0.1 Release Notes](release-notes-201.md)
 * [2.0.0 Release Notes](release-notes-200.md)
 * [1.2.1 Release Notes](release-notes-121.md)
 * [1.2.0 Release Notes](release-notes-120.md)

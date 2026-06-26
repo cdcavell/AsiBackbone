@@ -1,8 +1,8 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it using the metadata below."
 title: "ASI Backbone"
-version: "2.0.0"
-date-released: "2026-06-24"
+version: "2.0.1"
+date-released: "2026-06-26"
 repository-code: "https://github.com/cdcavell/AsiBackbone"
 url: "https://cdcavell.github.io/AsiBackbone/"
 type: software
@@ -15,7 +15,7 @@ authors:
   - family-names: "Cavell"
     given-names: "Christopher D."
     orcid: "https://orcid.org/0009-0002-2113-0245"
-abstract: "AsiBackbone is a .NET package-family project providing framework-neutral governance primitives for consequential software decision flow, including actor context, constraint evaluation, governance decisions, acknowledgment workflows, audit residue, durable outbox persistence, provider-neutral governance emission, OpenTelemetry projection, and signing-provider boundaries. Version 2.0.0 begins the simplified AsiBackbone.* package and namespace line."
+abstract: "AsiBackbone is a .NET package-family project providing framework-neutral governance primitives for consequential software decision flow, including actor context, constraint evaluation, governance decisions, acknowledgment workflows, audit residue, durable outbox persistence, provider-neutral governance emission, OpenTelemetry projection, and signing-provider boundaries. Version 2.0.1 is a compatible patch release on the simplified AsiBackbone.* package and namespace line."
 keywords:
   - asi-backbone
   - dotnet

@@ -1,44 +1,43 @@
 # Production Wording and Stable Signing Boundaries
 
-This article defines the documentation wording boundary for current AsiBackbone capabilities, stable `1.1.0` signing-related package surfaces, durable local/outbox behavior, optional provider integrations, historical alpha limitations, and future production-grade tamper-evidence.
+This article defines documentation wording boundaries for the current stable `2.0.x` AsiBackbone package family. It keeps current behavior, host responsibilities, released signing surfaces, provider boundaries, and future-provider strategy clearly separated.
 
-Issue: #148, updated for #253 and #306.
+Issue: #148, updated for #253, #306, and #347.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a governance spine for consequential software decision flow. It is not an artificial superintelligence implementation, AI model host, robot controller, signing appliance, key-management system, compliance product, immutable ledger, cloud governance platform, or legal guarantee by itself.
+In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a governance spine for consequential software decision flow. It is not an AI model host, autonomous execution engine, key-management product, compliance certification product, immutable audit store, cloud governance platform, or operational guarantee by itself.
 
 > [!IMPORTANT]
-> Documentation should describe only implemented and released behavior as current behavior. `1.1.0` includes stable Core signing-ready and verification primitives, a stable local-development signing provider, and a stable managed-key adapter boundary. Those released surfaces must still be described with their limits: local-development signing is not production key custody, the managed-key package is an adapter rather than a concrete Azure Key Vault/HSM/KMS implementation, and signing alone does not provide tamper-evidence, immutability, legal non-repudiation, or compliance certification.
+> Documentation should describe only implemented and released behavior as current behavior. The stable `2.0.x` family carries forward Core signing-ready and verification primitives, the local-development signing provider, and the managed-key adapter boundary. These surfaces still have important limits: local-development signing is for tests and samples, the managed-key package is an adapter boundary, and signing alone does not create production-grade audit guarantees without host-owned storage, key management, verification, monitoring, and retention controls.
 
-For vulnerability reporting and sensitive security concerns, use the repository [Security Policy and Vulnerability Disclosure](https://github.com/cdcavell/AsiBackbone/blob/main/SECURITY.md). This article defines production wording boundaries; it is not a private vulnerability reporting channel and does not certify compliance, legal protection, or production tamper-evidence.
+For sensitive security concerns, use the repository [Security Policy and Vulnerability Disclosure](https://github.com/cdcavell/AsiBackbone/blob/main/SECURITY.md). This article is a public wording guide, not a private reporting channel or certification statement.
 
 ## Current-stage wording rules
 
 | Topic | Preferred wording | Avoid wording |
 | --- | --- | --- |
 | Project identity | `Accountable Systems Infrastructure`, governance spine, decision governance infrastructure | artificial superintelligence implementation, AI model, ASI engine |
-| Current audit records | audit residue, audit ledger record, durable local/outbox record when configured | immutable ledger, tamper-proof record, legal evidence guarantee |
-| Stable Core signing primitives | signing-ready metadata, canonical payload hashing, provider-neutral signing and verification seams, verification-policy primitives | future-only signing model, cryptographically signed by default, automatic verification |
-| Local-development signing provider | released local-development signer for tests, samples, local validation, and wiring proof paths | production signer, production key custody, compliance-grade signer |
-| Managed-key adapter boundary | released managed-key signing adapter boundary with host-owned managed-key client and operational policy | built-in Azure Key Vault support, built-in HSM/KMS implementation, automatic production trust |
-| Tamper-evidence | signing-ready, signed, verified, chained, or externally anchored only when the deployed pieces exist and are described narrowly | tamper-evident, tamper-proof, immutable, or non-repudiable by default |
-| Provider integrations | optional provider package, host adapter, downstream emission or enrichment | required platform, Core dependency, authoritative audit store by default |
+| Current audit records | audit residue, audit ledger record, durable local/outbox record when configured | immutable audit store or production-grade evidence by default |
+| Stable Core signing primitives | signing-ready metadata, canonical payload hashing, provider-neutral signing and verification seams, verification-policy primitives | cryptographically signed by default or automatically verified by default |
+| Local-development signing provider | released local-development signer for tests, samples, local validation, and wiring proof paths | production signer or production key custody |
+| Managed-key adapter boundary | released managed-key signing adapter boundary with host-owned managed-key client and operational policy | built-in cloud key service or automatic production trust |
+| Provider integrations | optional provider package, host adapter, downstream emission or enrichment | required platform, Core dependency, or authoritative audit store by default |
 | Cloud observability | operational search, alerting, dashboards, and diagnostics after local persistence | substitute for durable local accountability |
-| Purview | strategy-only governance, catalog, classification, and lineage enrichment unless later released | raw audit ledger by default, released Purview package in `1.1.0` |
-| Robotics or gateway work | future or sample gateway pattern unless released | direct ASI-to-robot control implementation |
+| Purview | strategy-only governance, catalog, classification, and lineage enrichment unless later released | released Purview package in the current stable package family |
+| Gateway or robotics work | future, sample, or host-owned gateway pattern unless released | direct physical-control implementation in the current package family |
 
 ## Released signing categories
 
-Use these categories when documenting `1.1.0` signing-related behavior.
+Use these categories when documenting current `2.0.x` signing-related behavior.
 
 | Category | Current status | Safe wording |
 | --- | --- | --- |
 | Core signing-ready and verification primitives | Stable in `AsiBackbone.Core`. | Core provides canonical payload hashing, signing-ready metadata, signing request/result contracts, verification request/result contracts, and verification-policy primitives. |
 | Local-development signing provider | Stable package: `AsiBackbone.Signing.LocalDevelopment`. | The local-development signer is for tests, samples, deterministic local validation, and host wiring proof paths. It is not production key custody. |
 | Managed-key signing adapter | Stable package: `AsiBackbone.Signing.ManagedKey`. | The managed-key package provides an adapter boundary. The host supplies the actual managed-key client, credentials, key operations, verification path, monitoring, and operational policy. |
-| Concrete cloud/HSM/KMS implementation packages | Future or host-owned unless separately released. | Azure Key Vault, Managed HSM, cloud KMS, certificate-store, HSM-backed, or organization-specific clients remain host-owned implementations or future provider packages. |
-| Production tamper-evidence, immutability, external anchoring, or legal non-repudiation | Not provided by default. | These claims require deployed signing, verification, protected key management, durable append-only or otherwise controlled storage, retention policy, monitoring, incident response, and any chain/anchor design the claim depends on. |
+| Concrete cloud/HSM/KMS implementation packages | Future or host-owned unless separately released. | Cloud key services, certificate stores, and organization-specific clients remain host-owned implementations or future provider packages. |
+| Production-grade audit integrity claims | Not provided by default. | Stronger claims require deployed signing, verification, protected key management, durable storage, retention policy, monitoring, incident response, and any external chain or anchor design the host depends on. |
 
-Do not imply that signing and verification are purely future work. Do not imply that the released signing surfaces provide production tamper-evidence by themselves.
+Do not imply that signing and verification are purely future work. Do not imply that the released signing surfaces provide production-grade audit integrity by themselves.
 
 ## Required qualifiers for future or provider work
 
@@ -58,26 +57,6 @@ Use explicit qualifiers when behavior is not part of the currently released stab
 - `after signing, verification, key-management, and storage guarantees are implemented`.
 
 Avoid wording that implies future provider work is required for Core consumers.
-
-## Tamper-evidence wording boundary
-
-A record may be described as **signing-ready** when it carries stable identifiers, policy version, policy hash, schema version, timestamps, deterministic canonical payload/hash metadata, or signing metadata fields that can support signing.
-
-A record may be described as **signed** only when a concrete signer has produced a signature over a deterministic payload or hash and the signature metadata is stored with the record or attached signed-artifact projection.
-
-A record may be described as **verified** only when a verification service checks the signature against the expected payload or hash, algorithm, key identity, key version, and verification policy.
-
-A record should not be described as **tamper-evident** unless documentation also identifies:
-
-- deterministic payload hashing or canonicalization;
-- signing provider and key protection model;
-- verification behavior;
-- key rotation and retired-key verification policy;
-- durable storage expectations;
-- chain, anchoring, continuity, object-lock, or append-only behavior if deletion, reordering, or external proof is claimed;
-- host operational controls.
-
-When those pieces are not implemented, use **signing-ready**, **signed**, **verified**, **hash-linked**, or **tamper-evident-ready** only when that narrower phrase is accurate.
 
 ## Durable local accountability
 
@@ -121,23 +100,23 @@ Avoid wording that implies:
 - Core requires a cloud provider;
 - Core requires a certificate, managed key, HSM, or KMS;
 - the local-development signer is production-safe;
-- the managed-key adapter includes a live Azure Key Vault, Managed HSM, cloud KMS, certificate-store, or HSM implementation by default;
+- the managed-key adapter includes a live cloud key implementation by default;
 - OpenTelemetry, Azure Monitor, Event Hubs, Purview, or SIEM replaces local accountability;
 - provider-specific packages define Core semantics.
 
-## Alpha, preview, and sample language
+## Preview, design, and sample language
 
-Use alpha, preview, design-only, strategy-only, or sample wording for APIs, provider pages, or packages that are not part of the stable package family.
+Use preview, design-only, strategy-only, or sample wording for APIs, provider pages, or packages that are not part of the stable package family.
 
-Do not imply that an alpha, preview, strategy-only, design-only, or sample package:
+Do not imply that a preview, strategy-only, design-only, or sample package:
 
 - is production-hardened;
 - is covered by the same compatibility promise as stable packages;
-- provides legal, compliance, cryptographic, or operational guarantees;
+- provides compliance or operational guarantees;
 - is required to use Core;
-- makes AsiBackbone a completed ASI implementation.
+- changes the project boundary from governance infrastructure into an intelligence engine.
 
-Stable documentation may discuss alpha history, but should keep historical alpha limitations separate from current stable behavior and future provider planning.
+Stable documentation may discuss earlier release history, but should keep historical limitations separate from current stable behavior and future provider planning.
 
 ## Release and PR checklist
 
@@ -147,11 +126,11 @@ Before merging documentation for provider or security work, confirm:
 - stable Core signing-ready and verification primitives are not described as future-only;
 - the local-development signing provider remains clearly non-production;
 - the managed-key signing provider remains clearly an adapter boundary with host-owned client implementation;
-- tamper-evidence claims are tied to implemented and deployed features;
+- stronger audit-integrity claims are tied to implemented and deployed features;
 - provider dependencies remain outside Core;
 - durable local/outbox persistence remains the reliability baseline before provider emission;
 - host responsibilities for security, privacy, retention, key management, verification, monitoring, and compliance are explicit;
-- no wording claims AsiBackbone implements artificial superintelligence, controls robots, or replaces governance, legal, security, or operational review.
+- no wording claims AsiBackbone is an intelligence engine, controls physical systems, or replaces governance, security, or operational review.
 
 ## Related documentation
 

@@ -96,6 +96,34 @@ function Get-XmlElementValue {
     return $node.InnerText.Trim()
 }
 
+function Get-XmlAttributeValue {
+    param(
+        [Parameter(Mandatory = $false)]
+        [System.Xml.XmlNode]$Node,
+
+        [Parameter(Mandatory = $true)]
+        [string]$Name
+    )
+
+    if ($null -eq $Node -or $null -eq $Node.Attributes) {
+        return $null
+    }
+
+    $attribute = $Node.Attributes.GetNamedItem($Name)
+
+    if ($null -eq $attribute) {
+        return $null
+    }
+
+    $value = [string]$attribute.Value
+
+    if ([string]::IsNullOrWhiteSpace($value)) {
+        return $null
+    }
+
+    return $value.Trim()
+}
+
 function Get-NuGetDependencies {
     param(
         [Parameter(Mandatory = $true)]
@@ -106,16 +134,16 @@ function Get-NuGetDependencies {
     $dependencies = New-Object System.Collections.Generic.List[object]
 
     foreach ($dependencyNode in $dependencyNodes) {
-        $id = $dependencyNode.Attributes['id']?.Value
+        $id = Get-XmlAttributeValue -Node $dependencyNode -Name 'id'
 
         if ([string]::IsNullOrWhiteSpace($id)) {
             continue
         }
 
-        $version = $dependencyNode.Attributes['version']?.Value
-        $targetFramework = $dependencyNode.ParentNode.Attributes['targetFramework']?.Value
+        $version = Get-XmlAttributeValue -Node $dependencyNode -Name 'version'
+        $targetFramework = Get-XmlAttributeValue -Node $dependencyNode.ParentNode -Name 'targetFramework'
 
-        $dependencies.Add([ordered]@{
+        $dependencies.Add([pscustomobject]@{
             Id = $id
             Version = $version
             TargetFramework = $targetFramework
@@ -268,8 +296,8 @@ foreach ($packageFile in $packageFiles) {
                 'Organization: cdcavell/AsiBackbone'
             )
         }
-        packages = @($spdxPackages)
-        relationships = @($relationships)
+        packages = @($spdxPackages.ToArray())
+        relationships = @($relationships.ToArray())
     }
 
     $sbomFileName = '{0}.{1}.spdx.json' -f (ConvertTo-SpdxIdPart -Value $packageId), (ConvertTo-SpdxIdPart -Value $packageVersion)
@@ -293,7 +321,7 @@ $manifest = [ordered]@{
     createdUtc = $createdUtc
     sbomFormat = 'SPDX-2.3 JSON'
     packageDirectory = $resolvedPackageDirectory
-    packages = @($manifestEntries)
+    packages = @($manifestEntries.ToArray())
 }
 
 $manifestPath = Join-Path -Path $resolvedOutputDirectory -ChildPath 'sbom-manifest.json'

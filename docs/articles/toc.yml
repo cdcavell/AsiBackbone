@@ -114,6 +114,8 @@
       href: project-boundaries.md
     - name: Production Wording and Stable Signing Boundaries
       href: production-wording-and-alpha-limitations.md
+    - name: Supply-Chain Provenance and Package SBOMs
+      href: supply-chain-provenance.md
     - name: Signing-Ready Receipts and Key Handling
       href: signing-ready-receipts-and-key-handling.md
     - name: Signed Audit and Outbox Records
@@ -148,6 +150,8 @@
       href: ../quality/index.md
     - name: Release Validation
       href: release-validation.md
+    - name: Supply-Chain Provenance and Package SBOMs
+      href: supply-chain-provenance.md
     - name: Post-2.0.0 Documentation Currency Review
       href: post-200-documentation-currency-review.md
     - name: 2.0.0 Release Readiness Record

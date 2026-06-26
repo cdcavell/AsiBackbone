@@ -15,6 +15,8 @@ on:
 
 permissions:
   contents: read
+  id-token: write
+  attestations: write
 
 concurrency:
   group: stable-release-validation-${{ github.ref }}
@@ -26,6 +28,7 @@ env:
   SOLUTION_PATH: AsiBackbone.slnx
   CONFIGURATION: Release
   PACKAGE_OUTPUT: artifacts/release-validation-packages
+  SBOM_OUTPUT: artifacts/release-validation-sbom
 
 jobs:
   stable-release-validation:
@@ -120,6 +123,10 @@ jobs:
         shell: pwsh
         run: ./scripts/Validate-NuGetPackageMetadata.ps1 -PackageDirectory "$env:PACKAGE_OUTPUT"
 
+      - name: Generate package SBOMs
+        shell: pwsh
+        run: ./scripts/New-NuGetPackageSbom.ps1 -PackageDirectory "$env:PACKAGE_OUTPUT" -OutputDirectory "$env:SBOM_OUTPUT"
+
       - name: Validate dotnet new templates
         shell: bash
         run: bash ./eng/smoke-tests/template-package-smoke.sh "$PACKAGE_OUTPUT"
@@ -132,9 +139,28 @@ jobs:
         shell: bash
         run: bash ./eng/smoke-tests/stable-package-integration-smoke.sh
 
+      - name: Attest package provenance
+        if: github.event_name != 'pull_request'
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: ${{ env.PACKAGE_OUTPUT }}/*.nupkg
+
+      - name: Attest package SBOM provenance
+        if: github.event_name != 'pull_request'
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: ${{ env.SBOM_OUTPUT }}/*.json
+
       - name: Upload package artifacts
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: asi-backbone-release-validation-packages
           path: ${{ env.PACKAGE_OUTPUT }}/*.nupkg
+          if-no-files-found: error
+
+      - name: Upload package SBOM artifacts
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: asi-backbone-release-validation-package-sboms
+          path: ${{ env.SBOM_OUTPUT }}/*.json
           if-no-files-found: error

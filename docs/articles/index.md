@@ -105,6 +105,7 @@ These pages describe signing, verification, capability, and cryptographic-harden
 
 * [Project Boundaries and Non-Claims](project-boundaries.md)
 * [Production Wording and Stable Signing Boundaries](production-wording-and-alpha-limitations.md)
+* [Supply-Chain Provenance and Package SBOMs](supply-chain-provenance.md)
 * [Signing-Ready Receipts and Key Handling](signing-ready-receipts-and-key-handling.md)
 * [Signed Audit and Outbox Records](signed-audit-and-outbox-records.md)
 * [Verification Policy and Result Handling](verification-policy-and-result-handling.md)
@@ -136,6 +137,7 @@ Scenario pages describe applied patterns. They remain optional and do not imply 
 
 * [Quality Reports](../quality/index.md)
 * [Release Validation](release-validation.md)
+* [Supply-Chain Provenance and Package SBOMs](supply-chain-provenance.md)
 * [2.0.0 Release Readiness Record](release-readiness-200.md)
 * [1.2.1 Release Readiness Record](release-readiness-121.md)
 * [1.2.0 Release Readiness Record](release-readiness-120.md)

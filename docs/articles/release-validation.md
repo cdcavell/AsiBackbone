@@ -20,6 +20,8 @@ Before cutting a stable release tag, confirm the following checks have passed on
 | Package creation | CI, stable release validation, package publish | Confirms every package project under `src`, excluding template-content projects, can be packed. |
 | Package version validation | stable release validation, package publish | Confirms generated package versions and, on tag builds, tag identity align with repository version metadata. |
 | NuGet metadata validation | stable release validation, package publish | Confirms generated `.nupkg` metadata, README files, IDs, descriptions, tags, license metadata, project URL, repository URL, repository commit metadata, and stable package boundary wording align before publication. |
+| Package SBOM generation | CI, stable release validation, package publish | Generates SPDX JSON SBOM files and an SBOM manifest for generated `.nupkg` artifacts. |
+| Package provenance attestation | CI on non-PR events, stable release validation on non-PR events, package publish | Attests generated package and SBOM artifacts where GitHub artifact attestations are available for the workflow event. |
 | Template package smoke validation | CI, stable release validation | Confirms the packed `AsiBackbone.Templates` package can be installed, generate supported host styles, restore, and build. |
 | Documentation build | publish docs, stable release validation, package publish | Confirms DocFX can build the documentation included in the release posture. |
 | External consumer smoke tests | external consumer smoke workflow, stable release validation | Confirms clean consumer-style projects can reference and wire the package family. |
@@ -30,11 +32,11 @@ Before cutting a stable release tag, confirm the following checks have passed on
 
 The following workflows form the reusable gate for stable release candidates:
 
-- `CI` validates dependency review for pull requests, solution restore/build/test, formatting, package creation, template package smoke validation, coverage output, and CodeQL analysis.
+- `CI` validates dependency review for pull requests, solution restore/build/test, formatting, package creation, package SBOM generation, template package smoke validation, coverage output, and CodeQL analysis. On non-pull-request events it also attests generated package and SBOM artifacts where supported.
 - `External Consumer Smoke Test` validates package-consumer wiring through the external consumer and stable package integration smoke scripts.
 - `Publish Documentation` validates the DocFX build used for the documentation site.
-- `Stable Release Validation` provides a single release-candidate gate for version metadata, restore, build, formatting, tests, DocFX, package creation, generated package version validation, generated NuGet metadata validation, template package smoke validation, and smoke checks.
-- `Publish AsiBackbone Packages` repeats release-critical validation before package publish. The publish job depends on the validation-and-pack job, so a failed validation step blocks package publication.
+- `Stable Release Validation` provides a single release-candidate gate for version metadata, restore, build, formatting, tests, DocFX, package creation, generated package version validation, generated NuGet metadata validation, SBOM generation, package/SBOM provenance attestation on non-PR events, template package smoke validation, and smoke checks.
+- `Publish AsiBackbone Packages` repeats release-critical validation before package publish. The publish job depends on the validation-and-pack job, so a failed validation, SBOM, or attestation step blocks package publication.
 
 ## Tagging rule
 
@@ -64,10 +66,12 @@ The workflow validates:
 9. Package creation for package projects under `src`, excluding template-content projects under `*/templates/*`.
 10. Generated package version metadata, including tag matching on tag builds.
 11. Generated NuGet package metadata.
-12. Template package installation, generation, restore, and build smoke validation.
-13. External consumer smoke test.
-14. Stable package integration smoke test.
-15. Package artifact upload.
+12. Package SBOM generation.
+13. Template package installation, generation, restore, and build smoke validation.
+14. External consumer smoke test.
+15. Stable package integration smoke test.
+16. Package and SBOM provenance attestation on non-pull-request events where supported.
+17. Package and SBOM artifact upload.
 
 ## Package publish validation
 
@@ -83,10 +87,12 @@ The package publish workflow performs release-critical validation before publish
 8. Pack every package project under `src`, excluding template-content projects under `*/templates/*`.
 9. Validate generated package versions.
 10. Validate generated NuGet metadata.
-11. Upload package artifacts.
-12. Publish only after the validation-and-pack job succeeds.
+11. Generate package SBOMs.
+12. Attest package and SBOM provenance.
+13. Upload package and SBOM artifacts.
+14. Publish only after the validation-and-pack job succeeds.
 
-This keeps package publication behind restore, build, test, documentation, package creation, version checks, and generated package metadata checks.
+This keeps package publication behind restore, build, test, documentation, package creation, version checks, generated package metadata checks, SBOM generation, and release-artifact provenance.
 
 ## NuGet metadata validation
 
@@ -103,6 +109,12 @@ This keeps package publication behind restore, build, test, documentation, packa
 - package-specific README wording anchors, such as non-durable storage language for `Storage.InMemory`, provider-neutral wording for `OpenTelemetry`, local-development/managed-key boundaries for signing packages, test-harness boundaries for `Testing`, and template-scaffold boundaries for `Templates`.
 
 This check catches release-blocking NuGet metadata mistakes before package publication because NuGet package metadata for a published version cannot be overwritten.
+
+## Package SBOM and provenance artifacts
+
+`New-NuGetPackageSbom.ps1` inspects generated `.nupkg` files and emits SPDX 2.3 JSON files plus `sbom-manifest.json`. The SBOM artifacts are uploaded with the workflow run and are attested alongside package artifacts where GitHub artifact attestations are available.
+
+See [Supply-Chain Provenance and Package SBOMs](supply-chain-provenance.md) for artifact names, consumer guidance, and the current NuGet package signing posture.
 
 ## Source Link metadata validation
 
@@ -142,6 +154,7 @@ Deferred checks should be rare for a stable release.
 
 ## Related documentation
 
+- [Supply-Chain Provenance and Package SBOMs](supply-chain-provenance.md)
 - [2.0.0 Release Readiness Record](release-readiness-200.md)
 - [2.0.0 Release Notes](release-notes-200.md)
 - [1.2.1 Release Readiness Record](release-readiness-121.md)

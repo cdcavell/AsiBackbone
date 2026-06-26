@@ -23,6 +23,8 @@
       href: templates.md
     - name: Why AsiBackbone?
       href: why-asi-backbone.md
+    - name: 2.0.1 Release Notes
+      href: release-notes-201.md
     - name: 2.0.0 Release Notes
       href: release-notes-200.md
     - name: 1.2.1 Release Notes
@@ -154,6 +156,8 @@
       href: supply-chain-provenance.md
     - name: Post-2.0.0 Documentation Currency Review
       href: post-200-documentation-currency-review.md
+    - name: 2.0.1 Release Readiness Record
+      href: release-readiness-201.md
     - name: 2.0.0 Release Readiness Record
       href: release-readiness-200.md
     - name: 1.2.1 Release Readiness Record
@@ -164,6 +168,8 @@
       href: api-baseline-and-boundary-checks.md
     - name: Developer Checklist
       href: developer-checklist.md
+    - name: 2.0.1 Release Notes
+      href: release-notes-201.md
     - name: 2.0.0 Release Notes
       href: release-notes-200.md
     - name: 1.2.1 Release Notes

@@ -33,6 +33,19 @@ public static class AsiBackboneEndpointGovernanceRouteBuilderExtensions
     }
 
     /// <summary>
+    /// Adds endpoint-scoped metadata requesting latency-optimized fast-abort policy evaluation after the first denied constraint result.
+    /// </summary>
+    /// <typeparam name="TBuilder">The endpoint convention builder type.</typeparam>
+    /// <param name="builder">The endpoint convention builder.</param>
+    /// <param name="enabled">Whether first-denial short-circuit metadata is enabled for the endpoint.</param>
+    /// <returns>The same builder so calls can be chained.</returns>
+    public static TBuilder ShortCircuitOnFirstDenial<TBuilder>(this TBuilder builder, bool enabled = true)
+        where TBuilder : IEndpointConventionBuilder
+    {
+        return AddEndpointMetadata(builder, new ShortCircuitOnFirstDenialAttribute(enabled));
+    }
+
+    /// <summary>
     /// Adds liability-handshake metadata to an endpoint.
     /// </summary>
     /// <typeparam name="TBuilder">The endpoint convention builder type.</typeparam>

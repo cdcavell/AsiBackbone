@@ -32,6 +32,8 @@
       {
         "files": [
           "images/**",
+          "public/**",
+          "styles/**",
           "examples/**"
         ]
       }

@@ -147,6 +147,143 @@ public sealed class GovernanceOutboxStoreTests
     }
 
     /// <summary>
+    /// Verifies that concurrent retryable failure updates on the same in-memory entry do not collapse into accidental last-write-wins state.
+    /// </summary>
+    [Fact]
+    public async Task ConcurrentMarkFailedAsyncUpdatesSameEntryWithoutLosingRetryCount()
+    {
+        var outboxStore = new InMemoryGovernanceOutboxStore();
+        GovernanceOutboxEntry entry = await outboxStore.EnqueueAsync(
+            CreateEnvelope("event-1", "correlation-1"),
+            TestContext.Current.CancellationToken);
+        var error = GovernanceEmissionError.Create(
+            "provider.timeout",
+            "Provider timed out.",
+            isRetryable: true,
+            providerName: "test-provider");
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
+        var startSignal = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        const int attemptCount = 4;
+
+        Task<GovernanceOutboxEntry>[] updateTasks = [.. Enumerable.Range(0, attemptCount).Select(_ =>
+            Task.Run(async () =>
+            {
+                await startSignal.Task.WaitAsync(cancellationToken);
+
+                return await outboxStore.MarkFailedAsync(
+                    entry.OutboxEntryId,
+                    error,
+                    DateTimeOffset.UtcNow.AddMinutes(1),
+                    cancellationToken);
+            }, cancellationToken))];
+
+        startSignal.SetResult();
+        _ = await Task.WhenAll(updateTasks);
+
+        GovernanceOutboxEntry? storedEntry = await outboxStore.FindByOutboxEntryIdAsync(
+            entry.OutboxEntryId,
+            cancellationToken);
+
+        Assert.NotNull(storedEntry);
+        Assert.Equal(attemptCount, storedEntry.RetryCount);
+        Assert.Equal(GovernanceEmissionStatus.RetryableFailure, storedEntry.Status);
+        Assert.Equal("provider.timeout", storedEntry.LastError?.Code);
+    }
+
+    /// <summary>
+    /// Verifies that a delivered same-entry transition remains terminal when it races with a retryable failure transition.
+    /// </summary>
+    [Fact]
+    public async Task ConcurrentDeliveredAndFailedTransitionsKeepDeliveredTerminalState()
+    {
+        var outboxStore = new InMemoryGovernanceOutboxStore();
+        GovernanceOutboxEntry entry = await outboxStore.EnqueueAsync(
+            CreateEnvelope("event-1", "correlation-1"),
+            TestContext.Current.CancellationToken);
+        var error = GovernanceEmissionError.Create(
+            "provider.timeout",
+            "Provider timed out.",
+            isRetryable: true,
+            providerName: "test-provider");
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
+        var startSignal = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        Task<GovernanceOutboxEntry> deliveredTask = Task.Run(async () =>
+        {
+            await startSignal.Task.WaitAsync(cancellationToken);
+
+            return await outboxStore.MarkDeliveredAsync(
+                entry.OutboxEntryId,
+                GovernanceEmissionResult.Delivered(
+                    providerName: "test-provider",
+                    providerRecordId: "record-1"),
+                cancellationToken);
+        }, cancellationToken);
+
+        Task<GovernanceOutboxEntry> failedTask = Task.Run(async () =>
+        {
+            await startSignal.Task.WaitAsync(cancellationToken);
+
+            return await outboxStore.MarkFailedAsync(
+                entry.OutboxEntryId,
+                error,
+                DateTimeOffset.UtcNow.AddMinutes(1),
+                cancellationToken);
+        }, cancellationToken);
+
+        startSignal.SetResult();
+        _ = await Task.WhenAll(deliveredTask, failedTask);
+
+        GovernanceOutboxEntry? storedEntry = await outboxStore.FindByOutboxEntryIdAsync(
+            entry.OutboxEntryId,
+            cancellationToken);
+
+        Assert.NotNull(storedEntry);
+        Assert.True(storedEntry.IsDelivered);
+        Assert.Equal(GovernanceEmissionStatus.Delivered, storedEntry.Status);
+        Assert.Equal("record-1", storedEntry.ProviderRecordId);
+    }
+
+    /// <summary>
+    /// Verifies that a stale deferred save cannot overwrite a terminal delivered state in the in-memory store.
+    /// </summary>
+    [Fact]
+    public async Task SaveAsyncDoesNotOverwriteTerminalDeliveredEntryWithDeferredSnapshot()
+    {
+        var outboxStore = new InMemoryGovernanceOutboxStore();
+        GovernanceOutboxEntry entry = await outboxStore.EnqueueAsync(
+            CreateEnvelope("event-1", "correlation-1"),
+            TestContext.Current.CancellationToken);
+        var error = GovernanceEmissionError.Create(
+            "provider.deferred",
+            "Provider asked the host to retry later.",
+            isRetryable: true,
+            providerName: "test-provider");
+        GovernanceOutboxEntry deferredSnapshot = entry.MarkDeferred(
+            error,
+            DateTimeOffset.UtcNow.AddMinutes(1));
+
+        GovernanceOutboxEntry deliveredEntry = await outboxStore.MarkDeliveredAsync(
+            entry.OutboxEntryId,
+            GovernanceEmissionResult.Delivered(
+                providerName: "test-provider",
+                providerRecordId: "record-1"),
+            TestContext.Current.CancellationToken);
+        GovernanceOutboxEntry savedEntry = await outboxStore.SaveAsync(
+            deferredSnapshot,
+            TestContext.Current.CancellationToken);
+        GovernanceOutboxEntry? storedEntry = await outboxStore.FindByOutboxEntryIdAsync(
+            entry.OutboxEntryId,
+            TestContext.Current.CancellationToken);
+
+        Assert.True(deliveredEntry.IsDelivered);
+        Assert.True(savedEntry.IsDelivered);
+        Assert.NotNull(storedEntry);
+        Assert.True(storedEntry.IsDelivered);
+        Assert.Equal("record-1", storedEntry.ProviderRecordId);
+    }
+
+    /// <summary>
     /// Verifies that entries can transition to a terminal dead-letter state.
     /// </summary>
     [Fact]

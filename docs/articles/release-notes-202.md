@@ -53,9 +53,7 @@ AsiBackbone.Signing.ManagedKey
 
 ## Release boundary
 
-AsiBackbone remains **Accountable Systems Infrastructure** for governed .NET decision flow.
-
-This release does not change AsiBackbone into an intelligence engine, compliance product, robot controller, signing appliance, immutable ledger, or operational enforcement system. Hosts remain responsible for authentication, authorization, execution, persistence, key management, privacy review, operational monitoring, and legal/compliance interpretation.
+`2.0.2` does not change the project boundary. AsiBackbone remains Accountable Systems Infrastructure for governed .NET decision flow: a governance spine, not an intelligence engine. See [Project Boundaries and Non-Claims](project-boundaries.md) for the full scope statement.
 
 ## Validation
 

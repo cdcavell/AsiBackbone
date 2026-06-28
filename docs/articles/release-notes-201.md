@@ -74,4 +74,4 @@ After packages are published and visible on NuGet, validate Source Link reposito
 
 ## Release boundary
 
-`2.0.1` does not expand the stable public API surface. It does not change AsiBackbone into an intelligence engine, compliance product, robot controller, signing appliance, or operational enforcement system. Hosts still own authentication, authorization, execution, persistence, key management, privacy review, operational monitoring, and legal/compliance interpretation.
+`2.0.1` does not expand the stable public API surface or change the project boundary. AsiBackbone remains a governance spine, not an intelligence engine. See [Project Boundaries and Non-Claims](project-boundaries.md) for the full scope statement.

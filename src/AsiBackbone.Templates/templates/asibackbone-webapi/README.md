@@ -52,7 +52,7 @@ This generated app uses safe local-development defaults. Before production use, 
 
 ## Boundaries
 
-This scaffold is a runnable adoption starting point. It is not a compliance guarantee, not a production persistence design, not a production signing provider, and not an execution authority. The host application still owns execution behavior and operational controls.
+This scaffold is a runnable adoption starting point. It keeps execution behavior and operational controls with the host application. For the full AsiBackbone scope statement, see [Project Boundaries and Non-Claims](https://cdcavell.github.io/AsiBackbone/articles/project-boundaries.html).
 
 ## Documentation
 

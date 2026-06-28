@@ -40,6 +40,7 @@ The release process now includes explicit [Release Cadence and Readiness](releas
 ## Core engineering concepts and domain language
 
 * [Policy Evaluator Pipeline](policy-evaluator-pipeline.md)
+* [Custom Decision Policy Examples](custom-decision-policy-examples.md)
 * [Host-Owned Execution Enforcement](host-owned-execution-enforcement.md)
 * [ASP.NET Core Endpoint Governance](aspnetcore-endpoint-governance.md)
 * [Endpoint Governance Development Diagnostics](endpoint-governance-development-diagnostics.md)

@@ -22,7 +22,7 @@ This release preserves the simplified `AsiBackbone.*` package IDs and public nam
 * Promotes central package version metadata from `2.0.2` to `2.1.0` while preserving `AssemblyVersion` as `2.0.0.0` for the compatible stable `2.x` line.
 * Updates `FileVersion` to `2.1.0.0`.
 * Updates `CITATION.cff` and `.zenodo.json` for the `2.1.0` release.
-* Updates README, documentation home, article index, DocFX article navigation, release validation guidance, API compatibility / SemVer guidance, changelog, and Source Link validation defaults for the `2.1.0` package family.
+* Updates README, documentation home, article index, DocFX article navigation, release validation guidance, API compatibility / SemVer guidance, release notes, release readiness, and Source Link validation defaults for the `2.1.0` package family.
 * Replaces stale alpha-era wording in current policy-evaluator documentation with stable package-family wording.
 
 ## Fixed

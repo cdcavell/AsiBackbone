@@ -14,6 +14,7 @@ public sealed class AsiBackboneEndpointGovernanceDescriptor
     private AsiBackboneEndpointGovernanceDescriptor(
         string operationName,
         IReadOnlyList<Type> policyTypes,
+        bool? shortCircuitOnFirstDenial,
         bool requiresLiabilityHandshake,
         IReadOnlyList<string> capabilityScopes,
         bool emitGovernanceAudit)
@@ -22,6 +23,7 @@ public sealed class AsiBackboneEndpointGovernanceDescriptor
 
         OperationName = operationName.Trim();
         PolicyTypes = policyTypes;
+        ShortCircuitOnFirstDenial = shortCircuitOnFirstDenial;
         RequiresLiabilityHandshake = requiresLiabilityHandshake;
         CapabilityScopes = capabilityScopes;
         EmitGovernanceAudit = emitGovernanceAudit;
@@ -36,6 +38,11 @@ public sealed class AsiBackboneEndpointGovernanceDescriptor
     /// Gets the policy marker or resolver types attached to the endpoint.
     /// </summary>
     public IReadOnlyList<Type> PolicyTypes { get; }
+
+    /// <summary>
+    /// Gets an endpoint-scoped first-denial short-circuit preference, when endpoint metadata supplied one.
+    /// </summary>
+    public bool? ShortCircuitOnFirstDenial { get; }
 
     /// <summary>
     /// Gets a value indicating whether liability-handshake support is requested.
@@ -56,6 +63,7 @@ public sealed class AsiBackboneEndpointGovernanceDescriptor
     /// Gets a value indicating whether the endpoint contains any AsiBackbone governance metadata.
     /// </summary>
     public bool HasGovernanceMetadata => PolicyTypes.Count > 0
+        || ShortCircuitOnFirstDenial.HasValue
         || RequiresLiabilityHandshake
         || CapabilityScopes.Count > 0
         || EmitGovernanceAudit;
@@ -85,6 +93,11 @@ public sealed class AsiBackboneEndpointGovernanceDescriptor
             .Select(static scope => scope.Trim())
             .Distinct(StringComparer.Ordinal)];
 
+        bool? shortCircuitOnFirstDenial = endpoint.Metadata
+            .GetOrderedMetadata<IAsiBackboneEndpointPolicyEvaluationOptionsMetadata>()
+            .Select(static metadata => metadata.ShortCircuitOnFirstDenial)
+            .LastOrDefault();
+
         bool requiresLiabilityHandshake = endpoint.Metadata
             .GetOrderedMetadata<IAsiBackboneEndpointLiabilityHandshakeMetadata>()
             .Any(static metadata => metadata.RequiresLiabilityHandshake);
@@ -96,6 +109,7 @@ public sealed class AsiBackboneEndpointGovernanceDescriptor
         return new AsiBackboneEndpointGovernanceDescriptor(
             ResolveOperationName(endpoint),
             policyTypes.Length == 0 ? EmptyPolicyTypes : Array.AsReadOnly(policyTypes),
+            shortCircuitOnFirstDenial,
             requiresLiabilityHandshake,
             capabilityScopes.Length == 0 ? EmptyScopes : Array.AsReadOnly(capabilityScopes),
             emitGovernanceAudit);
@@ -111,6 +125,7 @@ public sealed class AsiBackboneEndpointGovernanceDescriptor
         return new AsiBackboneEndpointGovernanceDescriptor(
             operationName,
             EmptyPolicyTypes,
+            shortCircuitOnFirstDenial: null,
             requiresLiabilityHandshake: false,
             EmptyScopes,
             emitGovernanceAudit: false);
@@ -132,6 +147,11 @@ public sealed class AsiBackboneEndpointGovernanceDescriptor
         if (PolicyTypes.Count > 0)
         {
             metadata["endpoint.policy_types"] = string.Join(",", PolicyTypes.Select(static policyType => policyType.FullName ?? policyType.Name));
+        }
+
+        if (ShortCircuitOnFirstDenial.HasValue)
+        {
+            metadata["endpoint.short_circuit_on_first_denial"] = ShortCircuitOnFirstDenial.Value ? "true" : "false";
         }
 
         if (CapabilityScopes.Count > 0)

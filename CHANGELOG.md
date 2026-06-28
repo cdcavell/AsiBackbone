@@ -4,6 +4,58 @@ All notable changes to this project are documented in this file.
 
 This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/) and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2026-06-28
+
+### Release summary
+
+`2.1.0` is a compatible minor release for the stable `2.x` package family.
+
+This release preserves the `2.0.0` public package and namespace boundary while adding backward-compatible policy-pipeline ergonomics, audit-residue construction helpers, benchmark guidance, custom decision-policy examples, documentation alignment, and in-memory outbox hardening.
+
+### Added
+
+* Added `AsiBackbonePolicyEvaluatorOptions.ShortCircuitOnFirstDenial`, defaulting to `false`, so existing full constraint aggregation remains the default audit-friendly behavior.
+* Added ASP.NET Core endpoint metadata support for the optional first-denial fast-abort preference through attribute, route-builder extension, endpoint descriptor, and descriptor metadata surfaces.
+* Added `AuditResidueBuilder` as a fluent construction path for complex audit residue values while preserving existing immutable `AuditResidue.Create`, `FromDecision`, and `FromConstraint` factories.
+* Added an isolated benchmark console project for core policy-pipeline measurement under `benchmarks/AsiBackbone.Benchmarks`.
+* Added benchmark scenarios for policy evaluation, policy composition, and audit residue creation.
+* Added custom decision-policy examples covering strict deny-wins composition, warning preservation, regional/local overlays, acknowledgment-required outcomes, gateway readiness checks, and latency-sensitive orchestration.
+* Added release notes and a release readiness record for the `2.1.0` release.
+
+### Changed
+
+* Promoted central package version metadata from `2.0.2` to `2.1.0` while preserving `AssemblyVersion` as `2.0.0.0` for the compatible stable `2.x` line.
+* Updated `FileVersion` to `2.1.0.0`.
+* Updated `CITATION.cff` and `.zenodo.json` for the `2.1.0` release.
+* Updated README, documentation home, article index, DocFX article navigation, release validation, API compatibility / SemVer guidance, release notes, release readiness guidance, and Source Link validation defaults for the `2.1.0` package family.
+* Replaced stale alpha-era wording in current policy-evaluator documentation with stable package-family wording.
+
+### Fixed
+
+* Hardened in-memory governance outbox transition behavior so same-entry state transitions remain terminal and compare-and-swap style updates do not accidentally overwrite delivered or dead-lettered records.
+* Consolidated repeated project-boundary disclaimers around the canonical Project Boundaries and Non-Claims guidance.
+* Clarified release cadence and readiness guidance for patch, minor, and major release classification.
+* Refreshed documentation branding/navigation alignment after the `2.0.2` package-icon correction.
+
+### Validation
+
+* Release-candidate validation is expected to pass through CI, Stable Release Validation, package metadata validation, template package smoke validation, external consumer smoke tests, stable package integration smoke tests, DocFX build, package SBOM generation, and artifact provenance handling before tagging.
+* Version-consistency validation should pass for `2.1.0`, including `Directory.Build.props`, `CITATION.cff`, `.zenodo.json`, optional tag `v2.1.0`, and generated package filenames when package artifacts are supplied.
+* After packages are published and visible on NuGet, Source Link repository commit metadata should be validated with:
+
+```powershell
+./scripts/Validate-Source-Link-commit-metadata.ps1 -Version 2.1.0
+```
+
+### Compatibility notes
+
+* Existing stable `2.0.0`, `2.0.1`, and `2.0.2` consumers should be able to upgrade to `2.1.0` without required source-code changes for existing APIs.
+* `2.1.0` is a minor release because it includes backward-compatible public APIs, options, developer-experience tooling, tests, and documentation alignment.
+* `AssemblyVersion` remains `2.0.0.0` for the compatible stable `2.x` line.
+* `FileVersion` should be updated to `2.1.0.0`.
+* Package `Version` and `InformationalVersion` should be updated to `2.1.0`.
+* Event Hubs, Purview, Azure-specific SDK adapters, Aspire runtime packages, robotics, immutable-storage, and additional provider packages remain outside the stable package contract unless separately reviewed and released.
+
 ## [2.0.2] - 2026-06-26
 
 ### Release summary
@@ -416,7 +468,7 @@ This release focuses on post-`1.1.0` hardening, documentation clarity, endpoint-
 * The external consumer smoke test is a package-consumer ergonomics check, not a production host template.
 * The generated smoke project intentionally avoids repository project references.
 * EF Core persistence remains host-owned: the host supplies the `DbContext`, provider, connection string, schema lifecycle, and migration strategy.
-* In-memory audit storage remains non-durable and intended for tests, samples, and local validation.
+* In-memory audit storage remains non-durable and intended only for tests, samples, and local validation.
 * AsiBackbone remains Accountable Systems Infrastructure and governance spine infrastructure, not an intelligence engine, AI model host, or artificial superintelligence implementation.
 
 ## [0.4.0-alpha.2] - 2026-06-12

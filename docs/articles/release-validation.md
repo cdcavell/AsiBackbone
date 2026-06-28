@@ -2,7 +2,7 @@
 
 This article documents the reusable release-blocking validation path for stable release lines. The current released stable package family is `2.0.x`, with `2.0.2` as the current compatible patch release and `2.0.0` as the major release boundary for the simplified `AsiBackbone.*` package and namespace identity; future `2.x` maintenance releases should continue to use the same validation posture unless a later release note supersedes it.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. Release validation should confirm that the package family remains practical governance infrastructure and that implementation claims stay within the documented software boundary.
+In this software project, **ASI** means **Accountable Systems Infrastructure**. Release validation should confirm that the package family remains practical governance infrastructure and that implementation claims stay within the documented software boundary. See [Release Cadence and Readiness](release-cadence-and-readiness.md) for the release-stream and stabilization guidance that complements this checklist.
 
 The [2.0.2 Release Readiness Record](release-readiness-202.md) is the current release-candidate control sheet for the `2.0.2` release. The [2.0.1 Release Readiness Record](release-readiness-201.md), [2.0.0 Release Readiness Record](release-readiness-200.md), [1.2.1 Release Readiness Record](release-readiness-121.md), [1.2.0 Release Readiness Record](release-readiness-120.md), and [Historical 1.1.0 Release Readiness Record](release-readiness-checklist.md) are retained for traceability and checklist-shape history.
 
@@ -12,6 +12,7 @@ Before cutting a stable release tag, confirm the following checks have passed on
 
 | Check | Where it runs | Release purpose |
 | --- | --- | --- |
+| Release stream classification | Release PR, release readiness record | Confirms the release is correctly classified as patch, minor, major, or preview and that the release notes explain why that stream is appropriate. |
 | Version metadata validation | stable release validation, package publish | Confirms central MSBuild version metadata, citation metadata, Zenodo metadata, optional tag metadata, and generated package filenames align with the intended release version. |
 | Restore | CI, stable release validation, package publish | Confirms package dependencies resolve for the solution. |
 | Build | CI, stable release validation, package publish | Confirms all release projects compile in Release configuration and configured analyzers run through the build. |
@@ -20,12 +21,15 @@ Before cutting a stable release tag, confirm the following checks have passed on
 | Package creation | CI, stable release validation, package publish | Confirms every package project under `src`, excluding template-content projects, can be packed. |
 | Package version validation | stable release validation, package publish | Confirms generated package versions and, on tag builds, tag identity align with repository version metadata. |
 | NuGet metadata validation | stable release validation, package publish | Confirms generated `.nupkg` metadata, README files, IDs, descriptions, tags, license metadata, project URL, repository URL, repository commit metadata, and stable package boundary wording align before publication. |
+| Package metadata asset checklist | release readiness record, generated package inspection, manual pre-publish package inspection | Confirms package icons, packaged README rendering, NuGet metadata, Source Link metadata, SBOM/provenance artifacts, and documentation links are reviewed before publication. |
 | Package icon validation | manual pre-publish package inspection | Confirms `PACKAGE-ICON.png` is regenerated from the source SVG, included in generated packages, and renders as a complete package icon before publication. |
 | Package SBOM generation | CI, stable release validation, package publish | Generates SPDX JSON SBOM files and an SBOM manifest for generated `.nupkg` artifacts. |
 | Package provenance attestation | CI on non-PR events, stable release validation on non-PR events, package publish | Attests generated package and SBOM artifacts where GitHub artifact attestations are available for the workflow event. |
 | Template package smoke validation | CI, stable release validation | Confirms the packed `AsiBackbone.Templates` package can be installed, generate supported host styles, restore, and build. |
 | Documentation build | publish docs, stable release validation, package publish | Confirms DocFX can build the documentation included in the release posture. |
+| Documentation link review | release readiness record, manual docs review | Confirms README links, DocFX navigation, release notes, migration guides, package documentation links, and GitHub Pages links point to current pages. |
 | External consumer smoke tests | external consumer smoke workflow, stable release validation | Confirms clean consumer-style projects can reference and wire the package family. |
+| Migration guidance review | release PR and release readiness record when breaking changes are present | Confirms major/package-identity changes include old/new package IDs, old/new namespaces, representative `PackageReference` / `using` updates, compatibility notes for the previous line, and a stabilization note. |
 | CodeQL and dependency review | CI | Confirms configured static/security checks run on pull requests where applicable. |
 | Source Link metadata validation | manual post-publish validation | Confirms published NuGet packages include expected repository type, repository URL, and Source Link repository commit metadata after packages are available from NuGet. |
 
@@ -112,6 +116,19 @@ This keeps package publication behind restore, build, test, documentation, packa
 
 This check catches release-blocking NuGet metadata mistakes before package publication because NuGet package metadata for a published version cannot be overwritten.
 
+## Pre-release metadata and asset checklist
+
+For every stable release, the release readiness record should explicitly confirm:
+
+- package icon source, generated PNG, package inclusion, and small-size rendering are acceptable;
+- packaged README files are present and render acceptably in generated packages;
+- NuGet metadata is correct for package ID, version, description, tags, license, project URL, repository URL, repository type, and repository commit where available;
+- Source Link repository commit metadata is generated and has a post-publish validation plan when NuGet download is required to confirm it;
+- package SBOM files and `sbom-manifest.json` are generated for produced `.nupkg` artifacts;
+- package and SBOM provenance artifacts are uploaded and attested where the workflow event supports attestation;
+- README, DocFX navigation, release notes, migration notes, package README links, and GitHub Pages links are current;
+- any intentionally deferred metadata, asset, Source Link, SBOM, provenance, or documentation-link check is recorded with risk and follow-up.
+
 ## Package icon validation
 
 For `2.0.2`, maintainers should confirm that the regenerated `PACKAGE-ICON.png` asset renders correctly before publication. The icon should be rebuilt from the source SVG, included in generated `.nupkg` artifacts, and inspected at package-list or package-detail display sizes before publishing the release.
@@ -131,6 +148,17 @@ After `2.0.2` packages are published and visible on NuGet, maintainers should ru
 ```
 
 This post-publish check downloads the published packages and confirms the expected repository type, repository URL, and non-empty repository commit metadata are present.
+
+## Package identity and namespace changes
+
+Package identity or namespace changes are major-release events and should not be treated as routine release metadata. Before a future identity change is tagged, release readiness should confirm:
+
+- the proposal explains why the change cannot be handled compatibly;
+- release notes identify the breaking boundary near the top;
+- the migration guide includes old/new package IDs, old/new namespaces, representative `PackageReference` and `using` updates, and the expected previous-line posture;
+- README, package README files, DocFX navigation, API compatibility notes, and article index entries identify the canonical package line;
+- external consumer smoke tests or sample validation start from a clean project using the new package identity;
+- a stabilization note explains what should settle before another breaking change is considered.
 
 ## Checks intentionally not owned by the package
 
@@ -160,6 +188,7 @@ Deferred checks should be rare for a stable release.
 
 ## Related documentation
 
+- [Release Cadence and Readiness](release-cadence-and-readiness.md)
 - [Supply-Chain Provenance and Package SBOMs](supply-chain-provenance.md)
 - [2.0.2 Release Readiness Record](release-readiness-202.md)
 - [2.0.2 Release Notes](release-notes-202.md)

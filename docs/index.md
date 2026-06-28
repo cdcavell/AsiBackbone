@@ -123,6 +123,7 @@ Use these pages to understand the vocabulary and decision-flow model after the f
 * [Core Governance Flow Diagrams](articles/core-governance-flow-diagrams.md)
 * [Core Domain Language](articles/core-domain-language.md)
 * [Policy Evaluator Pipeline](articles/policy-evaluator-pipeline.md)
+* [Custom Decision Policy Examples](articles/custom-decision-policy-examples.md)
 * [Host-Owned Execution Enforcement](articles/host-owned-execution-enforcement.md)
 * [Dynamic Liability Handshake](articles/dynamic-liability-handshake.md)
 * [Glossary](articles/glossary.md)
@@ -216,6 +217,7 @@ Scenario pages describe applied patterns. They remain optional and do not imply 
 These pages support maintainers and release validation.
 
 * [Quality Reports](quality/)
+* [Performance Benchmark Baseline](articles/performance-benchmark-baseline.md)
 * [Release Validation](articles/release-validation.md)
 * [2.0.2 Release Readiness Record](articles/release-readiness-202.md)
 * [2.0.1 Release Readiness Record](articles/release-readiness-201.md)

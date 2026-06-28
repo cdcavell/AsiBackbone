@@ -2,82 +2,34 @@
 
 Welcome to the AsiBackbone documentation site.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a .NET governance and policy-control package family inspired by broader Eden/Backbone governance concepts, but implemented as practical software infrastructure. The project is a **governance spine**, not an intelligence engine.
+In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a .NET governance and policy-control package family implemented as practical software infrastructure. The project is a governance spine, not an intelligence engine.
 
 > [!IMPORTANT]
-> AsiBackbone does not implement artificial superintelligence, host AI models, control physical systems, certify compliance, or provide production tamper-evidence by itself. It provides framework-neutral building blocks and host integration seams for governing consequential actions in software systems. For the canonical boundary reference, see [Project Boundaries and Non-Claims](articles/project-boundaries.md).
+> AsiBackbone provides framework-neutral building blocks and host integration seams for governing consequential actions in software systems. Host applications remain responsible for authentication, authorization, execution, persistence, deployment, monitoring, compliance review, and operational controls. For the canonical boundary reference, see [Project Boundaries and Non-Claims](articles/project-boundaries.md).
 
 ## Search, navigation, and source links
 
-The documentation site uses the DocFX search box in the header. Search is enabled in `docs/docfx.json`; if a newly merged page does not appear immediately, wait for the documentation publish workflow to complete and refresh the browser cache. Long pages use the left navigation tree plus the right **In this article** heading rail for local movement. Source for every page lives in the repository under `docs/`, and the top navigation includes a Repository link for viewing or editing documentation files.
+The documentation site uses the DocFX search box in the header. Source for every page lives in the repository under `docs/`, and the site header includes a Repository link for viewing or editing documentation files.
 
 ## Start here
 
-These pages are the best first stops for implementation-first adoption. The optional conceptual background remains available later in the documentation set.
+These pages are the best first stops for implementation-first adoption.
 
-* [Implementation-First Adoption Path](articles/implementation-first-adoption.md)  
-  Plain engineering translations for project terms and the recommended first reading path for .NET adopters.
-
-* [First 15 Minutes: Standard API Gating](articles/quickstart-api-gating.md)  
-  Practical package-consumer walkthrough for gating one ASP.NET Core endpoint.
-
-* [AddAsiBackbone Builder Facade](articles/add-asibackbone-builder-facade.md)  
-  Explicit host-selected provider registration without hidden infrastructure defaults.
-
-* [dotnet new Templates](articles/templates.md)  
-  Installable project templates for generating a governed ASP.NET Core host from a clean directory.
-
-* [Reference Deployment: Plain ASP.NET Core Host Evidence](articles/reference-deployment.md)  
-  Repeatable local evidence showing request, decision, audit, signing, ledger, and endpoint-governance output in a realistic host sample.
-
-* [Terminology Map](articles/terminology-map.md)  
-  Quick vocabulary bridge for .NET and application-architecture readers.
-
-* [Project Boundaries and Non-Claims](articles/project-boundaries.md)  
-  Canonical short reference for what AsiBackbone is, what it is not, and what the host still owns.
-
-* [Intent to Execution: An Accountability Pattern](articles/intent-to-execution-pattern.md)  
-  The idea on its own terms, with no .NET prerequisite. Read this when you want the broader framing after the implementation route is clear.
-
-* [Core Governance Flow Diagrams](articles/core-governance-flow-diagrams.md)  
-  Visual diagrams for the intent-to-execution spine, policy pipeline, acknowledgment sequence, capability token boundary, and outbox/emission path.
-
-* [Why AsiBackbone?](articles/why-asi-backbone.md)  
-  High-level purpose, target audience, and adoption rationale.
-
-* [Getting Started](articles/getting-started.md)  
-  Project orientation, local build instructions, and stable package direction.
-
-* [Progressive Adoption Ladder](articles/progressive-adoption.md)  
-  The smallest Core-only path first, followed by optional outbox, telemetry, DLP/classification, signing, and analyzer add-ons.
-
-* [2.0.2 Release Notes](articles/release-notes-202.md)  
-  Current patch release for the stable `2.0.x` package family.
-
-* [2.0.1 Release Notes](articles/release-notes-201.md)  
-  Previous patch release for the stable `2.0.x` package family.
-
-* [2.0.0 Release Notes](articles/release-notes-200.md)  
-  Major release boundary for the simplified `AsiBackbone.*` package and namespace identity.
-
-* [1.2.1 Release Notes](articles/release-notes-121.md)  
-  Previous patch release for the compatible `1.2.x` line.
-
-* [1.2.0 Release Notes](articles/release-notes-120.md)  
-  Minor release boundary that formalized additive adoption, diagnostics, templates, testing, and documentation-alignment surfaces.
-
-* [Upgrade Guide: 1.0.0 to 1.1.0](articles/upgrade-100-to-110.md)  
-  Incremental adoption guidance for existing `1.0.0` consumers moving into the compatible `1.x` line.
-
-* [Documentation Articles](articles/)  
-  Categorized article index separating current usage, package integration, provider docs, design-only strategy, scenarios, release process, and historical records.
-
-* [Security Policy and Vulnerability Disclosure](https://github.com/cdcavell/AsiBackbone/blob/main/SECURITY.md)  
-  Supported release-line posture and responsible reporting guidance for vulnerabilities or sensitive concerns.
+* [Implementation-First Adoption Path](articles/implementation-first-adoption.md)
+* [First 15 Minutes: Standard API Gating](articles/quickstart-api-gating.md)
+* [AddAsiBackbone Builder Facade](articles/add-asibackbone-builder-facade.md)
+* [dotnet new Templates](articles/templates.md)
+* [Reference Deployment: Plain ASP.NET Core Host Evidence](articles/reference-deployment.md)
+* [Terminology Map](articles/terminology-map.md)
+* [Project Boundaries and Non-Claims](articles/project-boundaries.md)
+* [Progressive Adoption Ladder](articles/progressive-adoption.md)
+* [Getting Started](articles/getting-started.md)
+* [Documentation Articles](articles/)
+* [Security Policy and Vulnerability Disclosure](https://github.com/cdcavell/AsiBackbone/blob/main/SECURITY.md)
 
 ## Current stable package family
 
-Stable `2.0.x` is the current release line. `2.0.2` is the current compatible patch release. It preserves the `2.0.0` public package and namespace boundary while correcting the package icon presentation issue discovered after `2.0.1` and aligning release metadata/documentation for the corrected package release. `2.0.0` established the simplified `AsiBackbone.*` package and namespace identity and covers these packages:
+Stable `2.x` is the current release line. `2.1.0` is the current compatible minor release. It preserves the `2.0.0` public package and namespace boundary while adding optional policy fast-abort support, builder-style audit residue construction, benchmark guidance, custom decision-policy examples, and in-memory outbox hardening.
 
 ```text
 AsiBackbone.Core
@@ -95,30 +47,20 @@ AsiBackbone.Signing.ManagedKey
 
 Package-specific READMEs and release notes define which surfaces are stable, optional, local-only, or future-facing. A design page being present in the documentation does not mean the corresponding provider package has shipped as stable.
 
-## Major documentation areas
+## Core documentation areas
 
 ### Implementation-first adoption
-
-Use these pages when wiring AsiBackbone into a host application.
 
 * [Implementation-First Adoption Path](articles/implementation-first-adoption.md)
 * [First 15 Minutes: Standard API Gating](articles/quickstart-api-gating.md)
 * [AddAsiBackbone Builder Facade](articles/add-asibackbone-builder-facade.md)
 * [dotnet new Templates](articles/templates.md)
 * [Reference Deployment: Plain ASP.NET Core Host Evidence](articles/reference-deployment.md)
-* [Terminology Map](articles/terminology-map.md)
-* [Project Boundaries and Non-Claims](articles/project-boundaries.md)
-* [Progressive Adoption Ladder](articles/progressive-adoption.md)
-* [ASP.NET Core Endpoint Governance](articles/aspnetcore-endpoint-governance.md)
 * [Plain ASP.NET Core Host Sample](articles/plain-aspnetcore-host-sample.md)
 * [Aspire AppHost Sample](articles/aspire-apphost-sample.md)
 * [NetCoreApplicationTemplate Host Validation](articles/netcoreapplicationtemplate-host-validation.md)
-* [Schema Versioning](articles/schema-versioning.md)
-* [API Compatibility and SemVer](articles/api-compatibility-and-semver.md)
 
 ### Core concepts and domain language
-
-Use these pages to understand the vocabulary and decision-flow model after the first runnable path is clear.
 
 * [Core Governance Flow Diagrams](articles/core-governance-flow-diagrams.md)
 * [Core Domain Language](articles/core-domain-language.md)
@@ -128,70 +70,38 @@ Use these pages to understand the vocabulary and decision-flow model after the f
 * [Dynamic Liability Handshake](articles/dynamic-liability-handshake.md)
 * [Glossary](articles/glossary.md)
 
-### Optional conceptual background
+### Package integration, observability, and signing
 
-These pages remain available for readers interested in the broader framing, but they are not required for package adoption.
+* [EF Core Integration Boundary](articles/ef-core-integration-boundary.md)
+* [ASP.NET Core Integration Boundary](articles/aspnetcore-integration-boundary.md)
+* [ASP.NET Core Endpoint Governance](articles/aspnetcore-endpoint-governance.md)
+* [Testing Harness](articles/testing-harness.md)
+* [Schema Versioning](articles/schema-versioning.md)
+* [API Compatibility and SemVer](articles/api-compatibility-and-semver.md)
+* [Observability and Governance Emission Architecture](articles/observability-and-governance-emission-architecture.md)
+* [Governance Emission Contract](articles/governance-emission-contract.md)
+* [Durable Audit and Outbox Persistence](articles/durable-audit-outbox-persistence.md)
+* [Hosted Governance Outbox Drain](articles/hosted-governance-outbox-drain.md)
+* [OpenTelemetry Governance Emission Provider](articles/opentelemetry-governance-emission-provider.md)
+* [Signing Provider Package Boundary](articles/signing-provider-package-boundary.md)
+* [Managed-Key Signing Provider](articles/managed-key-signing-provider.md)
+
+### Optional conceptual and scenario background
 
 * [Intent to Execution: An Accountability Pattern](articles/intent-to-execution-pattern.md)
 * [ASI Backbone Concept Synopsis](articles/asi-backbone-concept.md)
 * [Gateway and Regional Policy Flow](articles/gateway-and-regional-policy-flow.md)
 * [Equations and Toy Models](articles/equations-and-toy-models.md)
-
-### Package integration guides
-
-Use these pages when wiring AsiBackbone into a host application.
-
-* [Reference Deployment: Plain ASP.NET Core Host Evidence](articles/reference-deployment.md)
-* [dotnet new Templates](articles/templates.md)
-* [Aspire AppHost Sample](articles/aspire-apphost-sample.md)
-* [Progressive Adoption Ladder](articles/progressive-adoption.md)
-* [EF Core Integration Boundary](articles/ef-core-integration-boundary.md)
-* [EF Core Host Ownership and Migration Guidance](articles/ef-core-host-ownership-and-migrations.md)
-* [ASP.NET Core Integration Boundary](articles/aspnetcore-integration-boundary.md)
-* [ASP.NET Core Endpoint Governance](articles/aspnetcore-endpoint-governance.md)
-* [Plain ASP.NET Core Host Sample](articles/plain-aspnetcore-host-sample.md)
-* [NetCoreApplicationTemplate Host Validation](articles/netcoreapplicationtemplate-host-validation.md)
-* [Schema Versioning](articles/schema-versioning.md)
-* [API Compatibility and SemVer](articles/api-compatibility-and-semver.md)
-
-### Observability, outbox, signing, and governance emission
-
-These pages cover the durability and governance-emission surface introduced in `1.1.x` and carried forward into the current `2.0.x` stable package family.
-
-* [Observability and Governance Emission Architecture](articles/observability-and-governance-emission-architecture.md)
-* [Governance Emission Contract](articles/governance-emission-contract.md)
-* [Durable Audit and Outbox Persistence](articles/durable-audit-outbox-persistence.md)
-* [Hosted Governance Outbox Drain](articles/hosted-governance-outbox-drain.md)
-* [Outbox Multi-Worker Concurrency](articles/outbox-multi-worker-concurrency.md)
-* [Outbox Drain Reliability and Alerting](articles/outbox-drain-reliability-and-alerting.md)
-* [Safe Audit and Telemetry Data](articles/safe-audit-telemetry-data.md)
-* [Audit Residue Observability Schema](articles/audit-residue-observability-schema.md)
-* [DLP and Classification Failure Policy](articles/dlp-classification-failure-policy.md)
-* [DLP and Classification Scanner Integration](articles/dlp-classification-scanner-integration.md)
-
-### Released provider package documentation
-
-These pages document released provider or provider-adjacent packages.
-
-* [Roslyn Analyzers](articles/roslyn-analyzers.md)
-* [OpenTelemetry Governance Emission Provider](articles/opentelemetry-governance-emission-provider.md)
-* [Signing Provider Package Boundary](articles/signing-provider-package-boundary.md)
-* [Managed-Key Signing Provider](articles/managed-key-signing-provider.md)
-
-### Design-only and future provider strategy
-
-These pages are strategy/design material. They remain separate from released provider package documentation.
-
-* [Event Hubs Governance Emission Provider Design](articles/event-hubs-governance-emission-provider-design.md)
-* [Purview Governance and Lineage Enrichment Strategy](articles/purview-governance-lineage-enrichment-strategy.md)
+* [Governance Tool Comparisons](articles/governance-tool-comparisons.md)
+* [Adoption and Target Use Cases](articles/use-cases.md)
+* [Enterprise Adoption Personas](articles/enterprise-adoption-personas.md)
+* [Government and Regulated Systems](articles/government-and-regulated-systems.md)
 
 ### Security and cryptographic boundaries
 
-These pages explain signing-ready artifacts, provider signing, verification, chain models, vulnerability disclosure, and safe wording. They do not imply production tamper-evidence unless the host deploys a concrete signing, storage, verification, and key-management path.
-
 * [Project Boundaries and Non-Claims](articles/project-boundaries.md)
-* [Security Policy and Vulnerability Disclosure](https://github.com/cdcavell/AsiBackbone/blob/main/SECURITY.md)
 * [Production Wording and Stable Signing Boundaries](articles/production-wording-and-alpha-limitations.md)
+* [Supply-Chain Provenance and Package SBOMs](articles/supply-chain-provenance.md)
 * [Signing-Ready Receipts and Key Handling](articles/signing-ready-receipts-and-key-handling.md)
 * [Signed Audit and Outbox Records](articles/signed-audit-and-outbox-records.md)
 * [Verification Policy and Result Handling](articles/verification-policy-and-result-handling.md)
@@ -201,29 +111,14 @@ These pages explain signing-ready artifacts, provider signing, verification, cha
 * [Cryptographic Security Posture and Production Guidance](articles/cryptographic-security-posture.md)
 * [Cryptographic Security Hardening Roadmap](articles/cryptographic-security-hardening-roadmap.md)
 
-### Advanced scenarios
-
-Scenario pages describe applied patterns. They remain optional and do not imply current physical execution, robotics control, or model-hosting behavior beyond the documented package seams.
-
-* [AI Agent Gateway](articles/scenarios/ai-agent-gateway.md)
-* [Human Approval Before AI Tool Execution](articles/scenarios/human-approval-before-ai-tool-execution.md)
-* [High-Risk Administrative Action](articles/scenarios/high-risk-administrative-action.md)
-* [Sensitive Data Access Request](articles/scenarios/sensitive-data-access-request.md)
-* [Deployment or Infrastructure Change Gate](articles/scenarios/deployment-or-infrastructure-change-gate.md)
-* [Robotics Operational Gateway](articles/scenarios/robotics-operational-gateway.md)
-
 ### Quality and release process
-
-These pages support maintainers and release validation.
 
 * [Quality Reports](quality/)
 * [Performance Benchmark Baseline](articles/performance-benchmark-baseline.md)
 * [Release Validation](articles/release-validation.md)
+* [2.1.0 Release Readiness Record](articles/release-readiness-210.md)
+* [2.1.0 Release Notes](articles/release-notes-210.md)
 * [2.0.2 Release Readiness Record](articles/release-readiness-202.md)
-* [2.0.1 Release Readiness Record](articles/release-readiness-201.md)
-* [2.0.0 Release Readiness Record](articles/release-readiness-200.md)
-* [1.2.1 Release Readiness Record](articles/release-readiness-121.md)
-* [1.2.0 Release Readiness Record](articles/release-readiness-120.md)
-* [Historical 1.1.0 Release Readiness Record](articles/release-readiness-checklist.md)
+* [2.0.2 Release Notes](articles/release-notes-202.md)
 * [API Baseline and Boundary Checks](articles/api-baseline-and-boundary-checks.md)
 * [Developer Checklist](articles/developer-checklist.md)

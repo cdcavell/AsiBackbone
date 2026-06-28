@@ -7,7 +7,7 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 It provides policy, acknowledgment, audit, and capability-control primitives that can sit between intent and execution. A host application can use these primitives to evaluate a proposed action, explain why it was allowed or blocked, require human acknowledgment when appropriate, and leave an audit trail that can be reviewed later.
 
 > [!IMPORTANT]
-> AsiBackbone is not an artificial superintelligence implementation, AI model host, AI training framework, legal-compliance guarantee, or robotics control system. It is Accountable Systems Infrastructure for software systems that need governed, auditable decision flow.
+> AsiBackbone is a governance spine, not an intelligence engine. See [Project Boundaries and Non-Claims](project-boundaries.md) for the full scope statement.
 
 ## The problem it solves
 
@@ -120,13 +120,7 @@ This lets a team introduce governance incrementally without rewriting the entire
 
 The package is inspired by the broader Eden/Backbone framework, especially the idea that open possibility should not become arbitrary action. In software terms, a request should only become an executable action when the active policy structure allows it.
 
-That conceptual inspiration is useful, but the package boundary remains practical:
-
-- It implements governance-oriented software primitives.
-- It treats ASI as Accountable Systems Infrastructure.
-- It does not implement artificial superintelligence.
-- It does not prove the Eden Hypothesis or any theory of intelligence.
-- It does not replace legal review, AI safety governance, organizational accountability, or operational security.
+That conceptual inspiration is useful, but the package boundary remains practical. AsiBackbone implements governance-oriented software primitives and treats ASI as Accountable Systems Infrastructure. For the complete non-claim posture, see [Project Boundaries and Non-Claims](project-boundaries.md).
 
 ## Related documentation
 

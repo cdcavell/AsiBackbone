@@ -23,7 +23,8 @@ public sealed class AsiBackboneEndpointPolicyEvaluationOptionsMetadataTests
         IReadOnlyDictionary<string, string> metadata = descriptor.ToMetadata();
 
         Assert.True(descriptor.HasGovernanceMetadata);
-        Assert.True(descriptor.ShortCircuitOnFirstDenial);
+        Assert.True(descriptor.ShortCircuitOnFirstDenial.HasValue);
+        Assert.True(descriptor.ShortCircuitOnFirstDenial.Value);
         Assert.Equal("true", metadata["endpoint.short_circuit_on_first_denial"]);
     }
 
@@ -41,7 +42,8 @@ public sealed class AsiBackboneEndpointPolicyEvaluationOptionsMetadataTests
         IReadOnlyDictionary<string, string> metadata = descriptor.ToMetadata();
 
         Assert.True(descriptor.HasGovernanceMetadata);
-        Assert.False(descriptor.ShortCircuitOnFirstDenial);
+        Assert.True(descriptor.ShortCircuitOnFirstDenial.HasValue);
+        Assert.False(descriptor.ShortCircuitOnFirstDenial.Value);
         Assert.Equal("false", metadata["endpoint.short_circuit_on_first_denial"]);
     }
 
@@ -61,7 +63,8 @@ public sealed class AsiBackboneEndpointPolicyEvaluationOptionsMetadataTests
         ShortCircuitOnFirstDenialAttribute metadata =
             Assert.Single(endpointBuilder.Metadata.OfType<ShortCircuitOnFirstDenialAttribute>());
 
-        Assert.True(metadata.ShortCircuitOnFirstDenial);
+        Assert.True(metadata.ShortCircuitOnFirstDenial.HasValue);
+        Assert.True(metadata.ShortCircuitOnFirstDenial.Value);
     }
 
     [Fact]
@@ -78,7 +81,8 @@ public sealed class AsiBackboneEndpointPolicyEvaluationOptionsMetadataTests
         ShortCircuitOnFirstDenialAttribute metadata =
             Assert.Single(endpointBuilder.Metadata.OfType<ShortCircuitOnFirstDenialAttribute>());
 
-        Assert.False(metadata.ShortCircuitOnFirstDenial);
+        Assert.True(metadata.ShortCircuitOnFirstDenial.HasValue);
+        Assert.False(metadata.ShortCircuitOnFirstDenial.Value);
     }
 
     private static RouteEndpointBuilder CreateEndpointBuilder()

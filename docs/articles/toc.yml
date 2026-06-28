@@ -152,6 +152,8 @@
   items:
     - name: Quality Reports
       href: ../quality/index.md
+    - name: Release Cadence and Readiness
+      href: release-cadence-and-readiness.md
     - name: Release Validation
       href: release-validation.md
     - name: Supply-Chain Provenance and Package SBOMs

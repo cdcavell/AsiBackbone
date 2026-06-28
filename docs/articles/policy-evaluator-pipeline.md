@@ -15,7 +15,7 @@ intent or request
 
 ## Ownership model
 
-The current alpha ownership model is:
+The current stable package-family ownership model is:
 
 | Area | Responsibility |
 | --- | --- |
@@ -24,7 +24,7 @@ The current alpha ownership model is:
 | `AsiBackbone.AspNetCore` | Thin HTTP host adapters for service registration, current actor resolution, request correlation, audit enrichment, HTTP result mapping, and acknowledgment challenge helpers. |
 | `AsiBackbone.EntityFrameworkCore` | EF Core model configuration and durable accountability persistence while preserving host-owned `DbContext`, provider, migrations, and database lifecycle. |
 
-A future package split may move shared contracts into a dedicated abstractions package. For this alpha slice, the contracts remain in Core so the evaluator can be proven without widening the release branch into a larger package restructuring.
+A future package split may move shared contracts into a dedicated abstractions package. For the current stable package family, the contracts remain in Core so the evaluator can be used without requiring a larger package restructuring.
 
 ## Default evaluator
 

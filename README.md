@@ -193,25 +193,9 @@ A consumer should be able to use AsiBackbone in an application generated from Ne
 
 ## Alignment boundary
 
-In this repository, ASI means **Accountable Systems Infrastructure**. AsiBackbone documentation may reference the broader Eden/Backbone framework as conceptual inspiration, but implementation claims should remain grounded in practical software governance.
+AsiBackbone is a governance spine, not an intelligence engine. It implements governance-oriented software primitives for accountable decision flow and keeps execution authority with the host application. See [Project Boundaries and Non-Claims](https://cdcavell.github.io/AsiBackbone/articles/project-boundaries.html) for the full scope statement and safe wording guidance.
 
 > Current NuGet packages are not signed release artifacts from the project maintainer. Package signing may be adopted later through .NET Foundation-supported infrastructure or another reviewed release-signing process.
-
-Safe language:
-
-- AsiBackbone stands for Accountable Systems Infrastructure Backbone.
-- AsiBackbone implements governance-oriented software primitives.
-- AsiBackbone helps structure consequential decision flow through constraints, acknowledgment, audit, capability boundaries, durable outbox persistence, provider emission, and signing-provider boundaries.
-- AsiBackbone can surround intelligent or decision-producing systems with accountable execution infrastructure.
-- AsiBackbone is inspired by broader Eden/Backbone governance concepts without claiming to implement an intelligence engine.
-
-Avoid language such as:
-
-- AsiBackbone implements an intelligence engine.
-- AsiBackbone proves the Eden Hypothesis.
-- AsiBackbone is an AI model.
-- AsiBackbone is tamper-evident or immutable by default.
-- AsiBackbone replaces AI safety governance, legal review, operational security, DLP review, or organizational accountability.
 
 ## Design principles
 

@@ -15,6 +15,8 @@ Stable `2.0.x` is the current package line. `2.0.2` is the current compatible pa
 
 Released stable package surfaces include Core, DependencyInjection, Storage.InMemory, EntityFrameworkCore, AspNetCore, Testing, Templates, Analyzers, OpenTelemetry, Signing.LocalDevelopment, and Signing.ManagedKey. OpenTelemetry is the concrete released governance-emission provider. Event Hubs, Purview, Azure-specific SDK adapters, Aspire runtime packages, robotics, immutable-storage, and additional provider packages remain design-only, strategy-only, sample-only, host-owned, or future-provider work unless a later stable release explicitly ships them.
 
+The release process now includes explicit [Release Cadence and Readiness](release-cadence-and-readiness.md) guidance for patch/minor/major release selection, early-major stabilization, package metadata assets, Source Link, SBOM/provenance, documentation links, and future package identity or namespace changes.
+
 ## Start here / implementation-first usage
 
 * [Implementation-First Adoption Path](implementation-first-adoption.md)
@@ -138,6 +140,7 @@ Scenario pages describe applied patterns. They remain optional and do not imply 
 ## Quality and release process
 
 * [Quality Reports](../quality/index.md)
+* [Release Cadence and Readiness](release-cadence-and-readiness.md)
 * [Release Validation](release-validation.md)
 * [Supply-Chain Provenance and Package SBOMs](supply-chain-provenance.md)
 * [2.0.2 Release Readiness Record](release-readiness-202.md)

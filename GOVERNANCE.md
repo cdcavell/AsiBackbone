@@ -4,11 +4,11 @@ This document describes how the **AsiBackbone** project is governed: who makes
 decisions, how those decisions are reached, how contributions are triaged, and
 when releases happen. Transparency and consistency are the guiding principles.
 
-**AsiBackbone** is a stable governance‑infrastructure library. Its primary purpose 
-is to serve as a reference implementation and conceptual anchor for accountable 
-decision‑flow in .NET systems.
+**AsiBackbone** is a stable governance-infrastructure library. Its primary purpose
+is to serve as a reference implementation and conceptual anchor for accountable
+decision-flow in .NET systems.
 
-The project values clarity, accountability, and minimalism — preferring explicit 
+The project values clarity, accountability, and minimalism — preferring explicit
 boundaries over implicit behavior.
 
 ---
@@ -19,7 +19,7 @@ boundaries over implicit behavior.
 2. [Decision-Making Model](#decision-making-model)
 3. [Triage Workflow](#triage-workflow)
 4. [Issue and PR Ownership](#issue-and-pr-ownership)
-5. [Release Cadence](#release-cadence)
+5. [Release Cadence and Release Readiness](#release-cadence-and-release-readiness)
 6. [AI-Assisted Development Policy](#ai-assisted-development-policy)
 7. [Amendments to This Document](#amendments-to-this-document)
 
@@ -168,31 +168,119 @@ labels below and takes the corresponding action.
 
 ---
 
-## Release Cadence
+## Release Cadence and Release Readiness
 
-AsiBackbone follows **Semantic Versioning 2.0.0** (`MAJOR.MINOR.PATCH`).
+AsiBackbone follows **Semantic Versioning 2.0.0** (`MAJOR.MINOR.PATCH`). The
+release process should be practical and humble: a stable package line means the
+project is making a documented compatibility promise, not that every consumer
+scenario has already had a long real-world feedback window.
 
-| Stream | Frequency | Notes |
-|---|---|---|
-| **Patch** (`x.y.Z`) | As needed | Bug fixes, security patches; no new public API |
-| **Minor** (`x.Y.0`) | Approximately every 8 weeks | New features, backward-compatible changes |
-| **Major** (`X.0.0`) | As warranted | Breaking changes; requires proposal and vote |
+The detailed release-process article is [Release Cadence and Readiness](docs/articles/release-cadence-and-readiness.md).
+
+### Release stream guidance
+
+| Stream | Default use | Appropriate changes | Review expectation |
+|---|---|---|---|
+| **Patch** (`x.y.Z`) | As needed | Bug fixes, security fixes, documentation corrections, packaging fixes, NuGet metadata fixes, README/package icon corrections, Source Link metadata fixes, SBOM/provenance workflow fixes, and validation hardening that does not expand the stable public surface. | Release PR and release-readiness record. No new public API or package/namespace identity change. |
+| **Minor** (`x.Y.0`) | Approximately every 8 weeks when there is additive value | Backward-compatible public APIs, optional providers, additional templates, compatible durable-artifact additions, and provider improvements that preserve existing consumers. | Proposal-driven when the feature affects architecture, public API, provider boundaries, or release strategy. API compatibility review required. |
+| **Major** (`X.0.0`) | Only when strongly justified | Package identity changes, namespace changes, public API breaks, stable package boundary breaks, incompatible durable-artifact changes, or dependency-direction changes that cannot be shipped compatibly. | Significant-decision process, migration documentation, release-readiness stabilization plan, and explicit maintainer approval. |
+
+Patch releases may happen close together when correcting release-facing issues
+that cannot be changed after publication, such as NuGet metadata, package icon
+assets, repository URLs, README packaging, Source Link metadata, SBOM/provenance
+artifacts, or documentation links. Even then, the release notes should explain
+why a patch is appropriate and confirm that no public API expansion or breaking
+change is intended.
+
+### Current stable-line posture
+
+`2.x` is the canonical package identity line for the simplified `AsiBackbone.*`
+package IDs and namespaces. Additional breaking changes should be avoided unless
+strongly justified by consumer safety, correctness, maintainability, or a clearly
+documented architectural boundary that cannot be preserved compatibly.
+
+Future work should prefer compatible patch or minor releases on the `2.x` line.
+Any proposal that would create another package identity, namespace, or public API
+break should explain why the change cannot wait, why a compatibility shim is not
+sufficient, and what consumer migration support will be provided.
+
+### Stabilization window after major releases
+
+After a major release, maintainers should favor a stabilization window before
+broadly recommending the line for cautious consumers. During that window, the
+project should prioritize:
+
+- package metadata and asset correctness;
+- documentation currency and migration clarity;
+- consumer smoke tests and sample verification;
+- Source Link, SBOM, and provenance validation;
+- issue triage for migration blockers;
+- patch-only corrections when the public contract can remain unchanged.
+
+A major line may be described as the recommended line once release-blocking
+workflows pass, published packages are visible, the documentation site is current,
+post-publish checks are completed or explicitly deferred, and no known migration
+blocker remains unresolved.
+
+### Pre-release checklist expectations
+
+Before tagging a stable release, the release PR or release-readiness record should
+confirm:
+
+- version metadata is updated consistently across build, citation, Zenodo, release
+  notes, changelog, and generated package filenames;
+- package metadata assets are inspected, including package icon rendering,
+  packaged README presence/rendering, package IDs, descriptions, tags, license
+  metadata, project URLs, repository URLs, and documentation links;
+- Source Link repository commit metadata is generated and has a post-publish
+  validation plan when packages must be downloaded from NuGet to verify it;
+- package SBOM and provenance artifacts are generated, uploaded, and attested
+  where the workflow event supports attestation;
+- the stable package list, API compatibility promise, assembly-version policy,
+  and provider/package boundary wording are current;
+- release notes distinguish fixes, additive changes, and breaking changes;
+- any deferred release-critical check is documented with the accepted risk and
+  follow-up issue.
+
+### Package identity and namespace changes
+
+Package identity or namespace changes are major-release events. They require at
+least:
+
+- a proposal or issue explaining the reason for the identity change;
+- a migration guide with old package IDs, new package IDs, old namespaces, new
+  namespaces, and representative `PackageReference` / `using` updates;
+- release notes that call out the breaking boundary in the first release of the
+  new line;
+- README and documentation updates that identify the canonical package line;
+- compatibility notes for the previous line, including whether it is superseded,
+  deprecated, supported only for security fixes, or retained only for historical
+  traceability;
+- external consumer smoke tests or sample validation that exercise the new
+  identity from a clean project;
+- an explicit stabilization note for cautious adopters when the new line is young.
 
 ### Release process
 
 1. A Core Maintainer opens a **release PR** that:
    - Bumps the version in all relevant files,
    - Updates `CHANGELOG.md` with entries since the last release,
-   - Ensures all CI checks pass.
+   - Adds or updates release notes and the release-readiness record,
+   - Confirms the pre-release checklist above,
+   - Ensures all release-blocking CI checks pass.
 2. At least **one other Core Maintainer** reviews and approves the release PR.
 3. The merging maintainer creates an **annotated Git tag** (`git tag -a vX.Y.Z`)
    and pushes it; CI publishes the release artifact automatically.
 4. A **GitHub Release** is created, with the changelog excerpt as the body.
 5. If Zenodo integration is enabled, the tagged release is archived for DOI minting according to Zenodo's processing timeline.
+6. Post-publish validation is completed or documented, including NuGet visibility,
+   package metadata inspection, Source Link metadata validation, documentation
+   links, and any package/SBOM/provenance artifact checks that depend on
+   published artifacts.
 
-> **Note:** After the 1.2.0 release, AsiBackbone is expected to prioritize stability,
-> documentation clarity, security patches, and carefully scoped refinements.
-> New feature work should be proposal-driven and evaluated against the project's
+> **Note:** AsiBackbone should continue to prioritize stability, documentation
+> clarity, security patches, and carefully scoped refinements. New feature work
+> should be proposal-driven and evaluated against the project's
 > governance-infrastructure boundaries.
 
 ### Security releases
@@ -205,12 +293,12 @@ standard review window and may be merged by any two Core Maintainers. The
 
 ## AI-Assisted Development Policy
 
-**AI‑assisted tools may be used in this project to accelerate development, documentation, 
-and refactoring, but all contributions remain human‑reviewed and human‑owned.** Maintainers 
-are responsible for validating the correctness, originality, and appropriateness of any 
-AI‑generated code or text before it is merged. AI tools do not make architectural decisions, 
-define project direction, or act as authors of record; they serve only as optional assistants. 
-All final contributions must reflect intentional human judgment, align with the project’s 
+**AI-assisted tools may be used in this project to accelerate development, documentation,
+and refactoring, but all contributions remain human-reviewed and human-owned.** Maintainers
+are responsible for validating the correctness, originality, and appropriateness of any
+AI-generated code or text before it is merged. AI tools do not make architectural decisions,
+define project direction, or act as authors of record; they serve only as optional assistants.
+All final contributions must reflect intentional human judgment, align with the project’s
 governance boundaries, and comply with the repository’s licensing and contribution requirements.
 
 ---

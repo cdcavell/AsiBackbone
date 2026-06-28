@@ -94,6 +94,11 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
             if (result.IsDenied)
             {
                 denials.AddRange(result.Reasons);
+
+                if (options.ShortCircuitOnFirstDenial)
+                {
+                    break;
+                }
             }
             else if (result.IsWarning)
             {

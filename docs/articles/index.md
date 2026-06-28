@@ -1,6 +1,6 @@
 # Documentation Articles
 
-This section maps the AsiBackbone documentation set for the stable `2.0.x` Accountable Systems Infrastructure package family.
+This section maps the AsiBackbone documentation set for the stable `2.x` Accountable Systems Infrastructure package family.
 
 > [!IMPORTANT]
 > In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is governance infrastructure for accountable software decision flow, not an artificial superintelligence implementation. See [Project Boundaries and Non-Claims](project-boundaries.md) for the canonical boundary reference.
@@ -11,7 +11,7 @@ Use the header search box for package names, API concepts, and article titles. S
 
 ## Current stable package posture
 
-Stable `2.0.x` is the current package line. `2.0.2` is the current compatible patch release. It preserves the `2.0.0` public package and namespace boundary while correcting the package icon presentation issue discovered after `2.0.1` and aligning release metadata/documentation for the corrected package release. `2.0.0` established the simplified `AsiBackbone.*` package and namespace identity after the public rename from `CDCavell.AsiBackbone.*`.
+Stable `2.x` is the current package line. `2.1.0` is the current compatible minor release. It preserves the `2.0.0` public package and namespace boundary while adding optional policy fast-abort support, builder-style audit residue construction, benchmark guidance, custom decision-policy examples, and in-memory outbox hardening. `2.0.0` established the simplified `AsiBackbone.*` package and namespace identity after the public rename from `CDCavell.AsiBackbone.*`.
 
 Released stable package surfaces include Core, DependencyInjection, Storage.InMemory, EntityFrameworkCore, AspNetCore, Testing, Templates, Analyzers, OpenTelemetry, Signing.LocalDevelopment, and Signing.ManagedKey. OpenTelemetry is the concrete released governance-emission provider. Event Hubs, Purview, Azure-specific SDK adapters, Aspire runtime packages, robotics, immutable-storage, and additional provider packages remain design-only, strategy-only, sample-only, host-owned, or future-provider work unless a later stable release explicitly ships them.
 
@@ -30,6 +30,7 @@ The release process now includes explicit [Release Cadence and Readiness](releas
 * [AddAsiBackbone Builder Facade](add-asibackbone-builder-facade.md)
 * [dotnet new Templates](templates.md)
 * [Why AsiBackbone?](why-asi-backbone.md)
+* [2.1.0 Release Notes](release-notes-210.md)
 * [2.0.2 Release Notes](release-notes-202.md)
 * [2.0.1 Release Notes](release-notes-201.md)
 * [2.0.0 Release Notes](release-notes-200.md)
@@ -84,7 +85,7 @@ These pages remain available for readers who want the broader framing. They are 
 
 ## Durability, observability, signing, diagnostics, and developer experience
 
-These pages cover the durability, governance-emission, signing, diagnostics, testing, and template surfaces carried forward into the current `2.0.x` package family.
+These pages cover the durability, governance-emission, signing, diagnostics, testing, and template surfaces carried forward into the current `2.x` package family.
 
 * [Observability and Governance Emission Architecture](observability-and-governance-emission-architecture.md)
 * [Governance Emission Contract](governance-emission-contract.md)
@@ -145,6 +146,7 @@ Scenario pages describe applied patterns. They remain optional and do not imply 
 * [Release Cadence and Readiness](release-cadence-and-readiness.md)
 * [Release Validation](release-validation.md)
 * [Supply-Chain Provenance and Package SBOMs](supply-chain-provenance.md)
+* [2.1.0 Release Readiness Record](release-readiness-210.md)
 * [2.0.2 Release Readiness Record](release-readiness-202.md)
 * [2.0.1 Release Readiness Record](release-readiness-201.md)
 * [2.0.0 Release Readiness Record](release-readiness-200.md)
@@ -153,6 +155,7 @@ Scenario pages describe applied patterns. They remain optional and do not imply 
 * [Historical 1.1.0 Release Readiness Record](release-readiness-checklist.md)
 * [API Baseline and Boundary Checks](api-baseline-and-boundary-checks.md)
 * [Developer Checklist](developer-checklist.md)
+* [2.1.0 Release Notes](release-notes-210.md)
 * [2.0.2 Release Notes](release-notes-202.md)
 * [2.0.1 Release Notes](release-notes-201.md)
 * [2.0.0 Release Notes](release-notes-200.md)

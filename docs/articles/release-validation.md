@@ -1,10 +1,10 @@
 # Stable Release Validation
 
-This article documents the reusable release-blocking validation path for stable release lines. The current released stable package family is `2.0.x`, with `2.0.2` as the current compatible patch release and `2.0.0` as the major release boundary for the simplified `AsiBackbone.*` package and namespace identity; future `2.x` maintenance releases should continue to use the same validation posture unless a later release note supersedes it.
+This article documents the reusable release-blocking validation path for stable release lines. The current released stable package family is `2.x`, with `2.1.0` as the current compatible minor release and `2.0.0` as the major release boundary for the simplified `AsiBackbone.*` package and namespace identity.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. Release validation should confirm that the package family remains practical governance infrastructure and that implementation claims stay within the documented software boundary. See [Release Cadence and Readiness](release-cadence-and-readiness.md) for the release-stream and stabilization guidance that complements this checklist.
 
-The [2.0.2 Release Readiness Record](release-readiness-202.md) is the current release-candidate control sheet for the `2.0.2` release. The [2.0.1 Release Readiness Record](release-readiness-201.md), [2.0.0 Release Readiness Record](release-readiness-200.md), [1.2.1 Release Readiness Record](release-readiness-121.md), [1.2.0 Release Readiness Record](release-readiness-120.md), and [Historical 1.1.0 Release Readiness Record](release-readiness-checklist.md) are retained for traceability and checklist-shape history.
+The [2.1.0 Release Readiness Record](release-readiness-210.md) is the current release-candidate control sheet for the `2.1.0` release. Earlier readiness records are retained for traceability.
 
 ## Required checks before tagging a stable release
 
@@ -12,36 +12,33 @@ Before cutting a stable release tag, confirm the following checks have passed on
 
 | Check | Where it runs | Release purpose |
 | --- | --- | --- |
-| Release stream classification | Release PR, release readiness record | Confirms the release is correctly classified as patch, minor, major, or preview and that the release notes explain why that stream is appropriate. |
-| Version metadata validation | stable release validation, package publish | Confirms central MSBuild version metadata, citation metadata, Zenodo metadata, optional tag metadata, and generated package filenames align with the intended release version. |
+| Release stream classification | Release PR, release readiness record | Confirms the release is correctly classified as patch, minor, major, or preview. |
+| Version metadata validation | stable release validation, package publish | Confirms MSBuild version metadata, citation metadata, Zenodo metadata, optional tag metadata, and generated package filenames align. |
 | Restore | CI, stable release validation, package publish | Confirms package dependencies resolve for the solution. |
-| Build | CI, stable release validation, package publish | Confirms all release projects compile in Release configuration and configured analyzers run through the build. |
+| Build | CI, stable release validation, package publish | Confirms release projects compile in Release configuration. |
 | Formatting | CI, stable release validation, package publish | Confirms source formatting is stable before release. |
 | Tests | CI, stable release validation, package publish | Confirms the solution test suite passes before packaging or publishing. |
 | Package creation | CI, stable release validation, package publish | Confirms every package project under `src`, excluding template-content projects, can be packed. |
-| Package version validation | stable release validation, package publish | Confirms generated package versions and, on tag builds, tag identity align with repository version metadata. |
-| NuGet metadata validation | stable release validation, package publish | Confirms generated `.nupkg` metadata, README files, IDs, descriptions, tags, license metadata, project URL, repository URL, repository commit metadata, and stable package boundary wording align before publication. |
-| Package metadata asset checklist | release readiness record, generated package inspection, manual pre-publish package inspection | Confirms package icons, packaged README rendering, NuGet metadata, Source Link metadata, SBOM/provenance artifacts, and documentation links are reviewed before publication. |
-| Package icon validation | manual pre-publish package inspection | Confirms `PACKAGE-ICON.png` is regenerated from the source SVG, included in generated packages, and renders as a complete package icon before publication. |
+| Package version validation | stable release validation, package publish | Confirms generated package versions and tag identity align with repository version metadata. |
+| NuGet metadata validation | stable release validation, package publish | Confirms generated `.nupkg` metadata, README files, IDs, descriptions, tags, license metadata, project URL, repository URL, and repository commit metadata align before publication. |
+| Package metadata asset checklist | release readiness record, generated package inspection | Confirms package icons, packaged README rendering, NuGet metadata, Source Link metadata, SBOM/provenance artifacts, and documentation links are reviewed. |
 | Package SBOM generation | CI, stable release validation, package publish | Generates SPDX JSON SBOM files and an SBOM manifest for generated `.nupkg` artifacts. |
-| Package provenance attestation | CI on non-PR events, stable release validation on non-PR events, package publish | Attests generated package and SBOM artifacts where GitHub artifact attestations are available for the workflow event. |
+| Package provenance attestation | CI on non-PR events, stable release validation on non-PR events, package publish | Attests generated package and SBOM artifacts where supported. |
 | Template package smoke validation | CI, stable release validation | Confirms the packed `AsiBackbone.Templates` package can be installed, generate supported host styles, restore, and build. |
 | Documentation build | publish docs, stable release validation, package publish | Confirms DocFX can build the documentation included in the release posture. |
 | Documentation link review | release readiness record, manual docs review | Confirms README links, DocFX navigation, release notes, migration guides, package documentation links, and GitHub Pages links point to current pages. |
 | External consumer smoke tests | external consumer smoke workflow, stable release validation | Confirms clean consumer-style projects can reference and wire the package family. |
-| Migration guidance review | release PR and release readiness record when breaking changes are present | Confirms major/package-identity changes include old/new package IDs, old/new namespaces, representative `PackageReference` / `using` updates, compatibility notes for the previous line, and a stabilization note. |
-| CodeQL and dependency review | CI | Confirms configured static/security checks run on pull requests where applicable. |
-| Source Link metadata validation | manual post-publish validation | Confirms published NuGet packages include expected repository type, repository URL, and Source Link repository commit metadata after packages are available from NuGet. |
+| Source Link metadata validation | manual post-publish validation | Confirms published NuGet packages include expected repository type, repository URL, and repository commit metadata. |
 
 ## Release-blocking workflows
 
 The following workflows form the reusable gate for stable release candidates:
 
-- `CI` validates dependency review for pull requests, solution restore/build/test, formatting, package creation, package SBOM generation, template package smoke validation, coverage output, and CodeQL analysis. On non-pull-request events it also attests generated package and SBOM artifacts where supported.
+- `CI` validates dependency review for pull requests, solution restore/build/test, formatting, package creation, package SBOM generation, template package smoke validation, coverage output, and CodeQL analysis.
 - `External Consumer Smoke Test` validates package-consumer wiring through the external consumer and stable package integration smoke scripts.
 - `Publish Documentation` validates the DocFX build used for the documentation site.
-- `Stable Release Validation` provides a single release-candidate gate for version metadata, restore, build, formatting, tests, DocFX, package creation, generated package version validation, generated NuGet metadata validation, SBOM generation, package/SBOM provenance attestation on non-PR events, template package smoke validation, and smoke checks.
-- `Publish AsiBackbone Packages` repeats release-critical validation before package publish. The publish job depends on the validation-and-pack job, so a failed validation, SBOM, or attestation step blocks package publication.
+- `Stable Release Validation` provides a single release-candidate gate for version metadata, restore, build, formatting, tests, DocFX, package creation, generated package version validation, generated NuGet metadata validation, SBOM generation, package/SBOM provenance attestation where supported, template package smoke validation, and smoke checks.
+- `Publish AsiBackbone Packages` repeats release-critical validation before package publish.
 
 ## Tagging rule
 
@@ -51,68 +48,17 @@ If a tag is pushed and package validation fails, do not publish replacement pack
 
 ## Stable Release Validation workflow
 
-The `Stable Release Validation` workflow runs on:
+The `Stable Release Validation` workflow runs on pull requests to `main`, pushes to `main`, `v*.*.*` tags, and manual dispatch.
 
-- pull requests to `main`;
-- pushes to `main`;
-- `v*.*.*` tags;
-- manual dispatch.
-
-The workflow validates:
-
-1. .NET SDK setup from `global.json`.
-2. Version metadata before restore/build.
-3. Solution restore.
-4. Release build with `ContinuousIntegrationBuild=true`.
-5. Source formatting.
-6. Full solution tests.
-7. .NET tool restore.
-8. DocFX documentation build.
-9. Package creation for package projects under `src`, excluding template-content projects under `*/templates/*`.
-10. Generated package version metadata, including tag matching on tag builds.
-11. Generated NuGet package metadata.
-12. Package SBOM generation.
-13. Template package installation, generation, restore, and build smoke validation.
-14. External consumer smoke test.
-15. Stable package integration smoke test.
-16. Package and SBOM provenance attestation on non-pull-request events where supported.
-17. Package and SBOM artifact upload.
+The workflow validates .NET SDK setup, version metadata, restore, Release build, formatting, tests, tool restore, DocFX, package creation, package versions, NuGet metadata, package SBOM generation, template package smoke validation, external consumer smoke tests, stable package integration smoke tests, provenance handling where supported, and artifact upload.
 
 ## Package publish validation
 
-The package publish workflow performs release-critical validation before publishing packages:
-
-1. Validate version metadata.
-2. Restore dependencies.
-3. Build the solution.
-4. Verify formatting.
-5. Run tests.
-6. Restore .NET tools.
-7. Build DocFX documentation.
-8. Pack every package project under `src`, excluding template-content projects under `*/templates/*`.
-9. Validate generated package versions.
-10. Validate generated NuGet metadata.
-11. Generate package SBOMs.
-12. Attest package and SBOM provenance.
-13. Upload package and SBOM artifacts.
-14. Publish only after the validation-and-pack job succeeds.
-
-This keeps package publication behind restore, build, test, documentation, package creation, version checks, generated package metadata checks, SBOM generation, and release-artifact provenance.
+The package publish workflow performs release-critical validation before publishing packages. It validates version metadata, restores dependencies, builds the solution, verifies formatting, runs tests, restores .NET tools, builds DocFX documentation, packs package projects, validates generated package versions and NuGet metadata, generates SBOMs, handles provenance where supported, uploads artifacts, and publishes only after validation succeeds.
 
 ## NuGet metadata validation
 
-`Validate-NuGetPackageMetadata.ps1` inspects generated `.nupkg` files rather than only project files. It validates:
-
-- package ID casing;
-- package version;
-- package descriptions;
-- package tags;
-- MIT license metadata;
-- project URL and repository URL metadata;
-- repository commit metadata when repository metadata is present;
-- README metadata and packaged README presence;
-- package icon metadata and packaged icon presence;
-- package-specific README wording anchors, such as non-durable storage language for `Storage.InMemory`, provider-neutral wording for `OpenTelemetry`, local-development/managed-key boundaries for signing packages, test-harness boundaries for `Testing`, and template-scaffold boundaries for `Templates`.
+`Validate-NuGetPackageMetadata.ps1` inspects generated `.nupkg` files rather than only project files. It validates package ID casing, package version, package descriptions, package tags, license metadata, project URL, repository URL metadata, repository commit metadata when available, README metadata, packaged README presence, package icon metadata, packaged icon presence, and package-specific README wording anchors.
 
 This check catches release-blocking NuGet metadata mistakes before package publication because NuGet package metadata for a published version cannot be overwritten.
 
@@ -129,60 +75,19 @@ For every stable release, the release readiness record should explicitly confirm
 - README, DocFX navigation, release notes, migration notes, package README links, and GitHub Pages links are current;
 - any intentionally deferred metadata, asset, Source Link, SBOM, provenance, or documentation-link check is recorded with risk and follow-up.
 
-## Package icon validation
-
-For `2.0.2`, maintainers should confirm that the regenerated `PACKAGE-ICON.png` asset renders correctly before publication. The icon should be rebuilt from the source SVG, included in generated `.nupkg` artifacts, and inspected at package-list or package-detail display sizes before publishing the release.
-
-## Package SBOM and provenance artifacts
-
-`New-NuGetPackageSbom.ps1` inspects generated `.nupkg` files and emits SPDX 2.3 JSON files plus `sbom-manifest.json`. The SBOM artifacts are uploaded with the workflow run and are attested alongside package artifacts where GitHub artifact attestations are available.
-
-See [Supply-Chain Provenance and Package SBOMs](supply-chain-provenance.md) for artifact names, consumer guidance, and the current NuGet package signing posture.
-
 ## Source Link metadata validation
 
-After `2.0.2` packages are published and visible on NuGet, maintainers should run:
+After `2.1.0` packages are published and visible on NuGet, maintainers should run:
 
 ```powershell
-./scripts/Validate-Source-Link-commit-metadata.ps1 -Version 2.0.2
+./scripts/Validate-Source-Link-commit-metadata.ps1 -Version 2.1.0
 ```
 
 This post-publish check downloads the published packages and confirms the expected repository type, repository URL, and non-empty repository commit metadata are present.
 
-## Package identity and namespace changes
-
-Package identity or namespace changes are major-release events and should not be treated as routine release metadata. Before a future identity change is tagged, release readiness should confirm:
-
-- the proposal explains why the change cannot be handled compatibly;
-- release notes identify the breaking boundary near the top;
-- the migration guide includes old/new package IDs, old/new namespaces, representative `PackageReference` and `using` updates, and the expected previous-line posture;
-- README, package README files, DocFX navigation, API compatibility notes, and article index entries identify the canonical package line;
-- external consumer smoke tests or sample validation start from a clean project using the new package identity;
-- a stabilization note explains what should settle before another breaking change is considered.
-
-## Checks intentionally not owned by the package
-
-These checks do not turn AsiBackbone into a compliance product or operational enforcement system. The host remains responsible for:
-
-- production authentication and authorization;
-- database provider and migration strategy;
-- environment-specific deployment checks;
-- privacy review and metadata handling;
-- signing and key-management providers;
-- verification policy;
-- storage immutability or tamper-evidence;
-- exporter/backend configuration;
-- legal, regulatory, or audit-framework certification.
-
 ## Deferred checks
 
-If a release-critical check is intentionally deferred, document:
-
-- the deferred check;
-- why it was deferred;
-- the risk accepted;
-- the follow-up issue or milestone;
-- whether the release notes need to mention it.
+If a release-critical check is intentionally deferred, document the deferred check, the reason, the accepted risk, the follow-up issue or milestone, and whether release notes need to mention it.
 
 Deferred checks should be rare for a stable release.
 
@@ -190,20 +95,14 @@ Deferred checks should be rare for a stable release.
 
 - [Release Cadence and Readiness](release-cadence-and-readiness.md)
 - [Supply-Chain Provenance and Package SBOMs](supply-chain-provenance.md)
+- [2.1.0 Release Readiness Record](release-readiness-210.md)
+- [2.1.0 Release Notes](release-notes-210.md)
 - [2.0.2 Release Readiness Record](release-readiness-202.md)
 - [2.0.2 Release Notes](release-notes-202.md)
 - [2.0.1 Release Readiness Record](release-readiness-201.md)
 - [2.0.1 Release Notes](release-notes-201.md)
 - [2.0.0 Release Readiness Record](release-readiness-200.md)
 - [2.0.0 Release Notes](release-notes-200.md)
-- [1.2.1 Release Readiness Record](release-readiness-121.md)
-- [1.2.1 Release Notes](release-notes-121.md)
-- [1.2.0 Release Readiness Record](release-readiness-120.md)
-- [1.2.0 Release Notes](release-notes-120.md)
-- [Historical 1.1.0 Release Readiness Record](release-readiness-checklist.md)
-- [1.1.x Release Notes](release-notes-110.md)
-- [Upgrade Guide: 1.0.0 to 1.1.0](upgrade-100-to-110.md)
-- [Developer Checklist](developer-checklist.md)
 - [API Compatibility and SemVer](api-compatibility-and-semver.md)
 - [Schema Versioning](schema-versioning.md)
 - [Privacy and Signing Boundaries](privacy-and-signing-boundaries.md)

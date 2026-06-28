@@ -10,6 +10,31 @@ Audit residue should remain a framework-neutral governance record. The observabi
 
 The fields are additive. Existing hosts can keep creating audit residue with only the original identifiers, actor context, outcome, reason codes, policy fields, and metadata. New hosts can populate telemetry fields when the values are available.
 
+## Construction guidance
+
+`AuditResidue.Create`, `AuditResidue.FromDecision`, and `AuditResidue.FromConstraint` remain supported direct factory paths. They are compact for simple records, but their optional telemetry, policy, outbox, and provider fields can become hard to scan when a host populates many values.
+
+For richer records, prefer `AuditResidueBuilder` so each optional field is named at the call site while the resulting `AuditResidue` remains immutable:
+
+```csharp
+AuditResidue residue = AuditResidueBuilder.FromDecision(
+    actor,
+    "payments.approve",
+    decision)
+    .WithEventId("event-123")
+    .WithDecisionLatencyMs(42)
+    .WithConstraintSetHash("constraint-set-hash")
+    .WithConstraintCount(3)
+    .WithRiskScore(0.75)
+    .WithPolicyScope("payments")
+    .WithEmitterStatus("queued")
+    .WithEmitterProvider("open-telemetry")
+    .AddMetadata("region", "us-la")
+    .Build();
+```
+
+The builder is an ergonomic construction helper, not a mutable audit record. `Build()` delegates to the same normalization and validation path as the direct factories, including reason-code trimming, metadata normalization, timestamp normalization, non-negative numeric checks, and risk-score checks.
+
 ## Provider-neutral field reference
 
 | Field | Purpose | PII-safe guidance |

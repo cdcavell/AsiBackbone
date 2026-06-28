@@ -22,7 +22,7 @@ public sealed class AuditResidueBuilderTests
             ["risk"] = " high "
         };
 
-        AuditResidue direct = AuditResidue.Create(
+        var direct = AuditResidue.Create(
             actor,
             " documents.approve ",
             " Warning ",
@@ -99,7 +99,7 @@ public sealed class AuditResidueBuilderTests
             ["source"] = "unit-test"
         };
 
-        AuditResidue direct = AuditResidue.FromDecision(
+        var direct = AuditResidue.FromDecision(
             actor,
             "system.sync",
             decision,
@@ -151,13 +151,13 @@ public sealed class AuditResidueBuilderTests
     [Fact]
     public void BuilderFromConstraintMatchesDirectFromConstraintSemantics()
     {
-        var actor = AsiBackboneActorContext.System;
-        ConstraintEvaluationResult constraintResult = ConstraintEvaluationResult.Warning(
+        AsiBackboneActorContext actor = AsiBackboneActorContext.System;
+        var constraintResult = ConstraintEvaluationResult.Warning(
             "constraint.warning",
             "Constraint produced a warning.");
         DateTimeOffset occurredUtc = new(2026, 6, 26, 15, 30, 0, TimeSpan.Zero);
 
-        AuditResidue direct = AuditResidue.FromConstraint(
+        var direct = AuditResidue.FromConstraint(
             actor,
             "system.sync",
             constraintResult,

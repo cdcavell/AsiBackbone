@@ -53,7 +53,7 @@ public sealed class AuditResidueBuilder
         this.actor = actor;
         this.operationName = operationName;
         this.outcome = outcome;
-        WithReasonCodes(reasonCodes);
+        _ = WithReasonCodes(reasonCodes);
     }
 
     /// <summary>

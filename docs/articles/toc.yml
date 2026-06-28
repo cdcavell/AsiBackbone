@@ -152,6 +152,8 @@
   items:
     - name: Quality Reports
       href: ../quality/index.md
+    - name: Performance Benchmark Baseline
+      href: performance-benchmark-baseline.md
     - name: Release Cadence and Readiness
       href: release-cadence-and-readiness.md
     - name: Release Validation

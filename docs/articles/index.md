@@ -140,6 +140,7 @@ Scenario pages describe applied patterns. They remain optional and do not imply 
 ## Quality and release process
 
 * [Quality Reports](../quality/index.md)
+* [Performance Benchmark Baseline](performance-benchmark-baseline.md)
 * [Release Cadence and Readiness](release-cadence-and-readiness.md)
 * [Release Validation](release-validation.md)
 * [Supply-Chain Provenance and Package SBOMs](supply-chain-provenance.md)

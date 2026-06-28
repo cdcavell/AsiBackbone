@@ -23,6 +23,16 @@ public sealed class AsiBackbonePolicyEvaluatorOptions
     public bool DenyWhenNoConstraints { get; set; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether evaluation should stop after the first denied constraint result.
+    /// </summary>
+    /// <remarks>
+    /// The default value is <see langword="false" /> so the evaluator continues to collect the complete set of
+    /// warning and denial reasons for audit visibility. Set this to <see langword="true" /> only when the host
+    /// intentionally prefers latency-optimized fast-abort behavior over full reason-code aggregation.
+    /// </remarks>
+    public bool ShortCircuitOnFirstDenial { get; set; }
+
+    /// <summary>
     /// Gets or sets the machine-readable reason code used when <see cref="DenyWhenNoConstraints" /> denies an empty policy.
     /// </summary>
     public string NoConstraintsReasonCode { get; set; } = DefaultNoConstraintsReasonCode;

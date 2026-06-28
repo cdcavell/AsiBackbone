@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/images/asibackbone-icon-256.png" alt="AsiBackbone governance spine icon" width="160" height="160" />
+  <img src="docs/images/social-preview.png" alt="AsiBackbone governance spine icon" width="640" height="320" />
 </p>
 
 # AsiBackbone

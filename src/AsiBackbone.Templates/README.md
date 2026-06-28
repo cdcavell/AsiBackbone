@@ -2,7 +2,7 @@
 
 `AsiBackbone.Templates` provides `dotnet new` templates for creating Accountable Systems Infrastructure governed ASP.NET Core hosts.
 
-The package is a developer-experience scaffold. It is not a runtime dependency, production host baseline, compliance guarantee, storage provider, signing provider, or execution engine.
+The package is a developer-experience scaffold. It helps generate local adoption starting points, not production authority or operational control.
 
 ## Install
 
@@ -38,6 +38,4 @@ The `asibackbone-webapi` template includes:
 
 ## Boundary notes
 
-Generated projects are intentionally local-first. They do not provide production durability, production signing, legal non-repudiation, tamper-evidence, authentication, authorization, deployment hardening, or compliance certification by default.
-
-The generated host remains responsible for authentication, authorization, database/provider selection, migrations, signing/key-management, observability, backup, retention, legal/compliance review, and actual business execution.
+Generated projects are intentionally local-first. They are not production durability, production signing, legal non-repudiation, tamper-evidence, authentication, authorization, deployment hardening, or compliance certification by default. See [Project Boundaries and Non-Claims](https://cdcavell.github.io/AsiBackbone/articles/project-boundaries.html) for the full scope statement.

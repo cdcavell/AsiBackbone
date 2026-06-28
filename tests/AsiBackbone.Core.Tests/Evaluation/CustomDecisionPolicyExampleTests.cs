@@ -111,25 +111,19 @@ public sealed class CustomDecisionPolicyExampleTests
                 .Where(static result => result.IsDenied)
                 .SelectMany(static result => result.Reasons)];
 
-            if (denials.Length > 0)
-            {
-                return ValueTask.FromResult(GovernanceDecision.Deny(
+            return denials.Length > 0
+                ? ValueTask.FromResult(GovernanceDecision.Deny(
                     warnings.Concat(denials),
                     correlationId: context.CorrelationId,
                     policyVersion: context.PolicyVersion,
-                    policyHash: context.PolicyHash));
-            }
-
-            if (warnings.Length > 0)
-            {
-                return ValueTask.FromResult(GovernanceDecision.Warning(
+                    policyHash: context.PolicyHash))
+                : warnings.Length > 0
+                ? ValueTask.FromResult(GovernanceDecision.Warning(
                     warnings,
                     correlationId: context.CorrelationId,
                     policyVersion: context.PolicyVersion,
-                    policyHash: context.PolicyHash));
-            }
-
-            return ValueTask.FromResult(composedDecision);
+                    policyHash: context.PolicyHash))
+                : ValueTask.FromResult(composedDecision);
         }
     }
 
@@ -152,27 +146,21 @@ public sealed class CustomDecisionPolicyExampleTests
             string? region = context.Metadata.GetValueOrDefault("region");
             string? risk = context.Metadata.GetValueOrDefault("risk");
 
-            if (string.IsNullOrWhiteSpace(region) || !supportedRegions.Contains(region))
-            {
-                return ValueTask.FromResult(GovernanceDecision.Deny(
+            return string.IsNullOrWhiteSpace(region) || !supportedRegions.Contains(region)
+                ? ValueTask.FromResult(GovernanceDecision.Deny(
                     "regional.unsupported",
                     "The requested region is not enabled for this operation.",
                     correlationId: context.CorrelationId,
                     policyVersion: context.PolicyVersion,
-                    policyHash: context.PolicyHash));
-            }
-
-            if (string.Equals(risk, "high", StringComparison.OrdinalIgnoreCase))
-            {
-                return ValueTask.FromResult(GovernanceDecision.RequireAcknowledgment(
+                    policyHash: context.PolicyHash))
+                : string.Equals(risk, "high", StringComparison.OrdinalIgnoreCase)
+                ? ValueTask.FromResult(GovernanceDecision.RequireAcknowledgment(
                     "regional.acknowledgment_required",
                     "The local overlay requires acknowledgment for this high-risk operation.",
                     correlationId: context.CorrelationId,
                     policyVersion: context.PolicyVersion,
-                    policyHash: context.PolicyHash));
-            }
-
-            return ValueTask.FromResult(composedDecision);
+                    policyHash: context.PolicyHash))
+                : ValueTask.FromResult(composedDecision);
         }
     }
 

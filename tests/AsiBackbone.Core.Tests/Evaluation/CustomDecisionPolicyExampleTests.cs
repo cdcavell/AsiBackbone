@@ -40,7 +40,7 @@ public sealed class CustomDecisionPolicyExampleTests
     {
         var evaluator = new DefaultAsiBackbonePolicyEvaluator<ExamplePolicyContext>(
             [new StaticConstraint(ConstraintEvaluationResult.Allow())],
-            new RegionalOverlayDecisionPolicy(["US-LA", "US-TX"]));
+            new RegionalOverlayDecisionPolicy(CreateSupportedRegionSet()));
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(
             ExamplePolicyContext.Create("US-LA", "high"),
@@ -58,7 +58,7 @@ public sealed class CustomDecisionPolicyExampleTests
     {
         var evaluator = new DefaultAsiBackbonePolicyEvaluator<ExamplePolicyContext>(
             [new StaticConstraint(ConstraintEvaluationResult.Allow())],
-            new RegionalOverlayDecisionPolicy(["US-LA", "US-TX"]));
+            new RegionalOverlayDecisionPolicy(CreateSupportedRegionSet()));
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(
             ExamplePolicyContext.Create("EU-DE", "routine"),
@@ -75,7 +75,7 @@ public sealed class CustomDecisionPolicyExampleTests
             [new StaticConstraint(ConstraintEvaluationResult.Deny(
                 "constraint.blocked",
                 "The constraint blocked the request before regional overlay."))],
-            new RegionalOverlayDecisionPolicy(["US-LA", "US-TX"]));
+            new RegionalOverlayDecisionPolicy(CreateSupportedRegionSet()));
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(
             ExamplePolicyContext.Create("US-LA", "high"),
@@ -83,6 +83,15 @@ public sealed class CustomDecisionPolicyExampleTests
 
         Assert.True(decision.IsDenied);
         Assert.Equal("constraint.blocked", Assert.Single(decision.ReasonCodes));
+    }
+
+    private static HashSet<string> CreateSupportedRegionSet()
+    {
+        return new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "US-LA",
+            "US-TX"
+        };
     }
 
     private sealed class StrictDenyWinsDecisionPolicy : IAsiBackboneDecisionPolicy<ExamplePolicyContext>

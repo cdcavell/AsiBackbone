@@ -61,6 +61,8 @@ GovernanceDecision decision = await evaluator.EvaluateAsync(
     cancellationToken);
 ```
 
+For host-owned orchestration examples, see [Custom Decision Policy Examples](custom-decision-policy-examples.md). That article covers warning preservation, acknowledgment-required outcomes, regional overlays, gateway readiness checks, and the difference between policy evaluation and host-owned execution.
+
 ## Strict default-deny for empty policies
 
 By default, an empty constraint collection still composes to `Allowed` for backward compatibility and for hosts that intentionally run an unconstrained local validation flow. In zero-trust or dynamically configured deployments, however, an empty collection can also mean that a database, configuration, feature-flag, or dependency-injection policy load failed.

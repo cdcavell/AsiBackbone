@@ -22,20 +22,16 @@ public sealed class RequireGovernancePolicyAttribute(Type policyType) : Attribut
 /// This metadata is resolved into the endpoint governance descriptor and exported into framework-neutral evaluation metadata.
 /// Hosts still own how endpoint metadata is mapped into evaluator configuration.
 /// </remarks>
+/// <remarks>
+/// Initializes a new instance of the <see cref="ShortCircuitOnFirstDenialAttribute" /> class.
+/// </remarks>
+/// <param name="enabled">Whether first-denial short-circuit metadata is enabled for the endpoint.</param>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-public sealed class ShortCircuitOnFirstDenialAttribute : Attribute, IAsiBackboneEndpointPolicyEvaluationOptionsMetadata
+public sealed class ShortCircuitOnFirstDenialAttribute(bool enabled = true) : Attribute, IAsiBackboneEndpointPolicyEvaluationOptionsMetadata
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ShortCircuitOnFirstDenialAttribute" /> class.
-    /// </summary>
-    /// <param name="enabled">Whether first-denial short-circuit metadata is enabled for the endpoint.</param>
-    public ShortCircuitOnFirstDenialAttribute(bool enabled = true)
-    {
-        ShortCircuitOnFirstDenial = enabled;
-    }
 
     /// <inheritdoc />
-    public bool? ShortCircuitOnFirstDenial { get; }
+    public bool? ShortCircuitOnFirstDenial { get; } = enabled;
 }
 
 /// <summary>

@@ -19,7 +19,7 @@ public sealed class AsiBackboneEndpointPolicyEvaluationOptionsMetadataTests
                 new ShortCircuitOnFirstDenialAttribute()),
             "sample.fast-abort");
 
-        AsiBackboneEndpointGovernanceDescriptor descriptor = AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(endpoint);
+        var descriptor = AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(endpoint);
         IReadOnlyDictionary<string, string> metadata = descriptor.ToMetadata();
 
         Assert.True(descriptor.HasGovernanceMetadata);
@@ -38,7 +38,7 @@ public sealed class AsiBackboneEndpointPolicyEvaluationOptionsMetadataTests
                 new ShortCircuitOnFirstDenialAttribute(enabled: false)),
             "sample.fast-abort.override");
 
-        AsiBackboneEndpointGovernanceDescriptor descriptor = AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(endpoint);
+        var descriptor = AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(endpoint);
         IReadOnlyDictionary<string, string> metadata = descriptor.ToMetadata();
 
         Assert.True(descriptor.HasGovernanceMetadata);

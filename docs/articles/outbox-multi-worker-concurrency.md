@@ -36,7 +36,7 @@ See [EF Core Outbox Concurrency Validation](../quality/ef-core-outbox-concurrenc
 | `IAsiBackboneGovernanceOutboxStore.FindRetryReadyAsync` | Returns retry-ready entries ordered for delivery. | Selection only. It does not prevent another worker from selecting the same entry. |
 | `AsiBackboneGovernanceOutboxDrain` | Reads candidate entries, emits each envelope, then persists delivered/deferred/failed state. | Two workers can read the same candidate before either persists the final state. |
 | `EfCoreGovernanceOutboxStore` | Uses EF Core persistence and configured concurrency tokens for state updates. | Optimistic concurrency helps detect conflicting saves, but it does not prevent duplicate provider calls before the save. |
-| `InMemoryGovernanceOutboxStore` | Intended for tests, samples, and local validation. | Single-process only. It is not durable and does not model cross-replica concurrency. |
+| `InMemoryGovernanceOutboxStore` | Intended for tests, samples, and local validation. Same-entry status transitions use single-process compare-and-swap updates, and delivered/dead-lettered entries are terminal for later in-memory updates. | Single-process only. It is not durable, does not claim work, and does not model cross-replica concurrency. |
 | Hosted drain worker | Runs wherever it is registered and enabled. | In scaled deployments, each replica may run a worker unless the host disables or coordinates it. |
 
 ## What optimistic concurrency does and does not solve

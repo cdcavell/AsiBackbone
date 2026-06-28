@@ -9,6 +9,7 @@ namespace AsiBackbone.Storage.InMemory.Outbox;
 /// </summary>
 /// <remarks>
 /// This store is not durable across process restarts. Production hosts should use a durable provider such as EF Core or another host-owned storage adapter.
+/// Same-entry status transitions use single-process compare-and-swap updates so tests and local validation do not accidentally observe last-write-wins behavior.
 /// </remarks>
 public sealed class InMemoryGovernanceOutboxStore : IAsiBackboneGovernanceOutboxStore
 {
@@ -37,9 +38,7 @@ public sealed class InMemoryGovernanceOutboxStore : IAsiBackboneGovernanceOutbox
         ArgumentNullException.ThrowIfNull(entry);
         cancellationToken.ThrowIfCancellationRequested();
 
-        entries[entry.OutboxEntryId] = entry;
-
-        return ValueTask.FromResult(entry);
+        return ValueTask.FromResult(SaveEntry(entry, cancellationToken));
     }
 
     /// <inheritdoc />
@@ -94,7 +93,7 @@ public sealed class InMemoryGovernanceOutboxStore : IAsiBackboneGovernanceOutbox
     }
 
     /// <inheritdoc />
-    public async ValueTask<GovernanceOutboxEntry> MarkDeliveredAsync(
+    public ValueTask<GovernanceOutboxEntry> MarkDeliveredAsync(
         string outboxEntryId,
         GovernanceEmissionResult result,
         CancellationToken cancellationToken = default)
@@ -103,16 +102,16 @@ public sealed class InMemoryGovernanceOutboxStore : IAsiBackboneGovernanceOutbox
         ArgumentNullException.ThrowIfNull(result);
         cancellationToken.ThrowIfCancellationRequested();
 
-        GovernanceOutboxEntry entry = await RequireEntryAsync(outboxEntryId, cancellationToken).ConfigureAwait(false);
-        GovernanceOutboxEntry updatedEntry = entry.MarkDelivered(result);
+        GovernanceOutboxEntry updatedEntry = UpdateExistingEntry(
+            outboxEntryId,
+            entry => IsTerminal(entry) ? entry : entry.MarkDelivered(result),
+            cancellationToken);
 
-        entries[updatedEntry.OutboxEntryId] = updatedEntry;
-
-        return updatedEntry;
+        return ValueTask.FromResult(updatedEntry);
     }
 
     /// <inheritdoc />
-    public async ValueTask<GovernanceOutboxEntry> MarkFailedAsync(
+    public ValueTask<GovernanceOutboxEntry> MarkFailedAsync(
         string outboxEntryId,
         GovernanceEmissionError governanceEmissionError,
         DateTimeOffset? nextRetryUtc = null,
@@ -122,16 +121,16 @@ public sealed class InMemoryGovernanceOutboxStore : IAsiBackboneGovernanceOutbox
         ArgumentNullException.ThrowIfNull(governanceEmissionError);
         cancellationToken.ThrowIfCancellationRequested();
 
-        GovernanceOutboxEntry entry = await RequireEntryAsync(outboxEntryId, cancellationToken).ConfigureAwait(false);
-        GovernanceOutboxEntry updatedEntry = entry.MarkFailed(governanceEmissionError, nextRetryUtc);
+        GovernanceOutboxEntry updatedEntry = UpdateExistingEntry(
+            outboxEntryId,
+            entry => IsTerminal(entry) ? entry : entry.MarkFailed(governanceEmissionError, nextRetryUtc),
+            cancellationToken);
 
-        entries[updatedEntry.OutboxEntryId] = updatedEntry;
-
-        return updatedEntry;
+        return ValueTask.FromResult(updatedEntry);
     }
 
     /// <inheritdoc />
-    public async ValueTask<GovernanceOutboxEntry> MarkDeadLetteredAsync(
+    public ValueTask<GovernanceOutboxEntry> MarkDeadLetteredAsync(
         string outboxEntryId,
         GovernanceEmissionError governanceEmissionError,
         string? deadLetterReason = null,
@@ -141,25 +140,77 @@ public sealed class InMemoryGovernanceOutboxStore : IAsiBackboneGovernanceOutbox
         ArgumentNullException.ThrowIfNull(governanceEmissionError);
         cancellationToken.ThrowIfCancellationRequested();
 
-        GovernanceOutboxEntry entry = await RequireEntryAsync(outboxEntryId, cancellationToken).ConfigureAwait(false);
-        GovernanceOutboxEntry updatedEntry = entry.MarkDeadLettered(governanceEmissionError, deadLetterReason);
+        GovernanceOutboxEntry updatedEntry = UpdateExistingEntry(
+            outboxEntryId,
+            entry => IsTerminal(entry) ? entry : entry.MarkDeadLettered(governanceEmissionError, deadLetterReason),
+            cancellationToken);
 
-        entries[updatedEntry.OutboxEntryId] = updatedEntry;
-
-        return updatedEntry;
+        return ValueTask.FromResult(updatedEntry);
     }
 
-    private ValueTask<GovernanceOutboxEntry> RequireEntryAsync(
-        string outboxEntryId,
+    private GovernanceOutboxEntry SaveEntry(
+        GovernanceOutboxEntry entry,
         CancellationToken cancellationToken)
     {
-        cancellationToken.ThrowIfCancellationRequested();
+        while (true)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
 
+            if (!entries.TryGetValue(entry.OutboxEntryId, out GovernanceOutboxEntry? currentEntry))
+            {
+                if (entries.TryAdd(entry.OutboxEntryId, entry))
+                {
+                    return entry;
+                }
+
+                continue;
+            }
+
+            if (IsTerminal(currentEntry))
+            {
+                return currentEntry;
+            }
+
+            if (entries.TryUpdate(entry.OutboxEntryId, entry, currentEntry))
+            {
+                return entry;
+            }
+        }
+    }
+
+    private GovernanceOutboxEntry UpdateExistingEntry(
+        string outboxEntryId,
+        Func<GovernanceOutboxEntry, GovernanceOutboxEntry> updateEntry,
+        CancellationToken cancellationToken)
+    {
         string normalizedOutboxEntryId = outboxEntryId.Trim();
 
-        return entries.TryGetValue(normalizedOutboxEntryId, out GovernanceOutboxEntry? entry)
-            ? ValueTask.FromResult(entry)
-            : throw new InvalidOperationException($"Outbox entry '{normalizedOutboxEntryId}' was not found.");
+        while (true)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (!entries.TryGetValue(normalizedOutboxEntryId, out GovernanceOutboxEntry? currentEntry))
+            {
+                throw new InvalidOperationException($"Outbox entry '{normalizedOutboxEntryId}' was not found.");
+            }
+
+            GovernanceOutboxEntry updatedEntry = updateEntry(currentEntry);
+
+            if (ReferenceEquals(currentEntry, updatedEntry))
+            {
+                return currentEntry;
+            }
+
+            if (entries.TryUpdate(normalizedOutboxEntryId, updatedEntry, currentEntry))
+            {
+                return updatedEntry;
+            }
+        }
+    }
+
+    private static bool IsTerminal(GovernanceOutboxEntry entry)
+    {
+        return entry.IsDelivered || entry.IsDeadLettered;
     }
 
     private static int NormalizeMaxCount(int maxCount)

@@ -12,8 +12,9 @@ This package provides non-durable storage implementations that make it easy to e
 ## What this package provides
 
 - In-memory audit ledger behavior for local validation and tests.
+- In-memory governance outbox behavior for local validation, samples, and integration tests.
 - Storage implementations that depend on `AsiBackbone.Core` only.
-- A simple bridge for samples that need audit records without introducing EF Core or a database.
+- A simple bridge for samples that need audit or outbox records without introducing EF Core or a database.
 
 ## Intended usage
 
@@ -22,9 +23,16 @@ Use this package when:
 - writing unit tests or integration tests around policy evaluation;
 - building sample applications;
 - validating audit residue and audit ledger behavior locally;
+- validating governance outbox state transitions locally;
 - demonstrating host-neutral ASI Backbone flows before adding durable storage.
 
 For production persistence, use a host-owned durable storage strategy such as `AsiBackbone.EntityFrameworkCore` or a custom implementation of the Core storage contracts.
+
+## In-memory outbox concurrency semantics
+
+`InMemoryGovernanceOutboxStore` is single-process and non-durable. It does not claim work across replicas, coordinate distributed workers, or provide exactly-once provider delivery.
+
+Within that single process, same-entry outbox status transitions use compare-and-swap updates so local tests do not accidentally observe last-write-wins behavior. Delivered and dead-lettered entries are treated as terminal for subsequent in-memory state updates, and retryable failure updates against the same entry advance from the latest observed entry state.
 
 ## Boundary
 

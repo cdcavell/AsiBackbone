@@ -16,6 +16,25 @@ public sealed class RequireGovernancePolicyAttribute(Type policyType) : Attribut
 }
 
 /// <summary>
+/// Marks an ASP.NET Core endpoint as requesting latency-optimized fast-abort policy evaluation after the first denied constraint result.
+/// </summary>
+/// <remarks>
+/// This metadata is resolved into the endpoint governance descriptor and exported into framework-neutral evaluation metadata.
+/// Hosts still own how endpoint metadata is mapped into evaluator configuration.
+/// </remarks>
+/// <remarks>
+/// Initializes a new instance of the <see cref="ShortCircuitOnFirstDenialAttribute" /> class.
+/// </remarks>
+/// <param name="enabled">Whether first-denial short-circuit metadata is enabled for the endpoint.</param>
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
+public sealed class ShortCircuitOnFirstDenialAttribute(bool enabled = true) : Attribute, IAsiBackboneEndpointPolicyEvaluationOptionsMetadata
+{
+
+    /// <inheritdoc />
+    public bool? ShortCircuitOnFirstDenial { get; } = enabled;
+}
+
+/// <summary>
 /// Marks an ASP.NET Core endpoint as requiring liability-handshake support when a governance decision requires acknowledgment.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]

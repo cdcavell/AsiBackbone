@@ -34,12 +34,13 @@ The evaluator runs each constraint and composes the resulting `ConstraintEvaluat
 
 Composition rules are intentionally conservative:
 
-1. Deny wins when any constraint denies the request.
-2. Warning is returned when no constraint denies but at least one constraint warns.
-3. Allow is returned when no constraint denies or warns. This preserves the existing zero-constraint behavior unless strict empty-policy denial is enabled.
+1. Deny wins when any constraint blocks the request.
+2. Warning is returned when no constraint blocks but at least one constraint warns.
+3. Allow is returned when no constraint blocks or warns. This preserves the existing zero-constraint behavior unless strict empty-policy denial is enabled.
 4. Not-applicable constraint results do not block the request.
 5. An optional `IAsiBackboneDecisionPolicy<TContext>` can raise the composed decision to deferred, acknowledgment-required, or escalation-recommended.
 6. When `AsiBackbonePolicyEvaluatorOptions.DenyWhenNoConstraints` is enabled and the supplied constraint collection is empty, the evaluator returns a denied decision with reason code `asibackbone.policy.no_constraints`.
+7. When `AsiBackbonePolicyEvaluatorOptions.ShortCircuitOnFirstDenial` is enabled, the evaluator stops after the first blocked constraint result and preserves reasons produced up to that point.
 
 The evaluator propagates correlation, policy version, and policy hash metadata from the evaluation context into the composed governance decision.
 
@@ -81,6 +82,32 @@ When enabled and no constraints are supplied, the evaluator returns a denied `Go
 Permissive zero-constraint behavior is appropriate only when the host explicitly intends an unconstrained policy surface, such as a local sample, test harness, migration step, or separately protected flow. Strict default-deny should be used when constraints are loaded dynamically and an empty collection may indicate a policy-load failure.
 
 This option is not a substitute for authentication, authorization, or host-level configuration validation.
+
+## Optional fast-abort on first blocked result
+
+By default, the evaluator runs every registered constraint so the resulting decision and downstream decision policy have the fullest available reason visibility. This comprehensive path is the safest default for audit receipts, diagnostics, and policy review.
+
+Latency-sensitive hosts can opt into first-denial fast-abort behavior:
+
+```csharp
+var evaluator = new DefaultAsiBackbonePolicyEvaluator<MyPolicyContext>(
+    constraints: constraintsFromConfiguration,
+    decisionPolicy: new HighRiskDecisionPolicy(),
+    options: new AsiBackbonePolicyEvaluatorOptions
+    {
+        ShortCircuitOnFirstDenial = true
+    });
+```
+
+When enabled, the evaluator stops iterating constraints immediately after a blocked constraint result. The composed decision still includes the block reasons produced at the abort point and any warning reasons produced before that point. Constraints later in the list are not evaluated, so their warnings, block reasons, telemetry side effects, or expensive checks are intentionally skipped.
+
+Use this mode only when the host explicitly prefers latency or throughput over complete constraint visibility. Keep the default full-evaluation mode for audit-heavy, diagnostic, or reviewer-facing paths.
+
+### ASP.NET Core endpoint metadata exploration
+
+ASP.NET Core integration includes endpoint metadata that can express a per-controller, per-action, or Minimal API preference through `ShortCircuitOnFirstDenialAttribute` or the `.ShortCircuitOnFirstDenial()` route-builder extension.
+
+The endpoint descriptor exposes this as `ShortCircuitOnFirstDenial` and includes `endpoint.short_circuit_on_first_denial` in descriptor metadata. Host-owned ASP.NET Core policy wiring can use that metadata to decide whether to construct or resolve an evaluator with `AsiBackbonePolicyEvaluatorOptions.ShortCircuitOnFirstDenial = true` for that endpoint. The built-in default remains comprehensive unless the host explicitly maps endpoint metadata into evaluator configuration.
 
 After the decision is produced, a host or gateway can create audit residue and write it through an audit sink:
 

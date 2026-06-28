@@ -94,6 +94,11 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
             if (result.IsDenied)
             {
                 denials.AddRange(result.Reasons);
+
+                if (options.ShortCircuitOnFirstDenial)
+                {
+                    break;
+                }
             }
             else if (result.IsWarning)
             {
@@ -101,7 +106,11 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
             }
         }
 
-        GovernanceDecision composedDecision = Compose(context, denials, warnings);
+        GovernanceDecision composedDecision = Compose(
+            context,
+            denials,
+            warnings,
+            includeWarningsWhenDenied: options.ShortCircuitOnFirstDenial);
 
         return decisionPolicy is null
             ? composedDecision
@@ -113,15 +122,23 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
     private static GovernanceDecision Compose(
         TContext context,
         List<OperationReason> denials,
-        List<OperationReason> warnings)
+        List<OperationReason> warnings,
+        bool includeWarningsWhenDenied)
     {
-        return denials.Count > 0
-            ? GovernanceDecision.Deny(
-                denials,
+        if (denials.Count > 0)
+        {
+            IEnumerable<OperationReason> denialReasons = includeWarningsWhenDenied && warnings.Count > 0
+                ? warnings.Concat(denials)
+                : denials;
+
+            return GovernanceDecision.Deny(
+                denialReasons,
                 correlationId: context.CorrelationId,
                 policyVersion: context.PolicyVersion,
-                policyHash: context.PolicyHash)
-            : warnings.Count > 0
+                policyHash: context.PolicyHash);
+        }
+
+        return warnings.Count > 0
             ? GovernanceDecision.Warning(
                 warnings,
                 correlationId: context.CorrelationId,

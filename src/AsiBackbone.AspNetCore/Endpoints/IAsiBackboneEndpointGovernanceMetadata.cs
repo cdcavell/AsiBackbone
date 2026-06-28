@@ -19,6 +19,17 @@ public interface IAsiBackboneEndpointGovernancePolicyMetadata : IAsiBackboneEndp
 }
 
 /// <summary>
+/// Describes endpoint-scoped policy evaluation options attached to an ASP.NET Core endpoint.
+/// </summary>
+public interface IAsiBackboneEndpointPolicyEvaluationOptionsMetadata : IAsiBackboneEndpointGovernanceMetadata
+{
+    /// <summary>
+    /// Gets an endpoint-level override for latency-optimized first-denial short-circuit behavior, when supplied.
+    /// </summary>
+    bool? ShortCircuitOnFirstDenial { get; }
+}
+
+/// <summary>
 /// Describes whether an ASP.NET Core endpoint expects an acknowledgment challenge path when policy requires it.
 /// </summary>
 public interface IAsiBackboneEndpointLiabilityHandshakeMetadata : IAsiBackboneEndpointGovernanceMetadata

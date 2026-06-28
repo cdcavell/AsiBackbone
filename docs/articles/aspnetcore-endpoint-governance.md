@@ -30,6 +30,16 @@ app.MapPost("/high-risk-action", handler)
 
 The fluent methods add endpoint metadata. The middleware resolves that metadata into an `AsiBackboneEndpointGovernanceDescriptor`, builds a framework-neutral evaluation context, and delegates policy evaluation, capability validation, handshake creation, and audit emission to registered host-owned services.
 
+Endpoints that intentionally prefer a latency-optimized first-block fast-abort policy path can add endpoint metadata:
+
+```csharp
+app.MapPost("/high-risk-action", handler)
+    .RequireGovernancePolicy<MyStrictPolicy>()
+    .ShortCircuitOnFirstDenial();
+```
+
+The descriptor exposes this as `ShortCircuitOnFirstDenial` and includes `endpoint.short_circuit_on_first_denial` in descriptor metadata. Host-owned policy wiring remains responsible for mapping that endpoint preference into `AsiBackbonePolicyEvaluatorOptions.ShortCircuitOnFirstDenial` when constructing or resolving the evaluator.
+
 ## Controller/action attribute path
 
 ```csharp
@@ -44,6 +54,17 @@ public IActionResult ExecuteHighRiskAction()
 ```
 
 The attribute model is designed to feel familiar to ASP.NET Core developers who already use attributes such as `[Authorize]`. The attributes only add metadata. They do not by themselves validate capability grants, write durable audit records, or provide transaction guarantees.
+
+Endpoint-scoped fast-abort metadata is also available as an attribute:
+
+```csharp
+[RequireGovernancePolicy(typeof(MyStrictPolicy))]
+[ShortCircuitOnFirstDenial]
+public IActionResult ExecuteLatencySensitiveAction()
+{
+    return Ok();
+}
+```
 
 ## What the ergonomic layer does
 

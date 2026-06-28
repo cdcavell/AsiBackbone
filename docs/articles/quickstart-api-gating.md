@@ -309,6 +309,7 @@ See [OpenTelemetry Governance Emission Provider](opentelemetry-governance-emissi
 ## Next steps
 
 - Read [Policy Evaluator Pipeline](policy-evaluator-pipeline.md) for decision composition rules.
+- Read [Custom Decision Policy Examples](custom-decision-policy-examples.md) when you need host-owned acknowledgment, regional overlay, or gateway orchestration rules.
 - Read [ASP.NET Core Endpoint Governance](aspnetcore-endpoint-governance.md) for middleware-based endpoint metadata orchestration.
 - Read [Durable Audit and Outbox Persistence](durable-audit-outbox-persistence.md) before replacing the in-memory sample sink with durable storage.
 - Read [Production Wording and Alpha Limitations](production-wording-and-alpha-limitations.md) for safe production claims and host responsibilities.

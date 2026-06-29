@@ -11,7 +11,7 @@ Use the header search box for package names, API concepts, and article titles. S
 
 ## Current stable package posture
 
-Stable `2.x` is the current package line. `2.1.0` is the current compatible minor release. It preserves the `2.0.0` public package and namespace boundary while adding optional policy fast-abort support, builder-style audit residue construction, benchmark guidance, custom decision-policy examples, and in-memory outbox hardening. `2.0.0` established the simplified `AsiBackbone.*` package and namespace identity after the public rename from `CDCavell.AsiBackbone.*`.
+Stable `2.x` is the current package line. `2.1.1` is the current compatible minor release. It preserves the `2.0.0` public package and namespace boundary while adding optional policy fast-abort support, builder-style audit residue construction, benchmark guidance, custom decision-policy examples, and in-memory outbox hardening. `2.0.0` established the simplified `AsiBackbone.*` package and namespace identity after the public rename from `CDCavell.AsiBackbone.*`.
 
 Released stable package surfaces include Core, DependencyInjection, Storage.InMemory, EntityFrameworkCore, AspNetCore, Testing, Templates, Analyzers, OpenTelemetry, Signing.LocalDevelopment, and Signing.ManagedKey. OpenTelemetry is the concrete released governance-emission provider. Event Hubs, Purview, Azure-specific SDK adapters, Aspire runtime packages, robotics, immutable-storage, and additional provider packages remain design-only, strategy-only, sample-only, host-owned, or future-provider work unless a later stable release explicitly ships them.
 

@@ -29,7 +29,7 @@ These pages are the best first stops for implementation-first adoption.
 
 ## Current stable package family
 
-Stable `2.x` is the current release line. `2.1.0` is the current compatible minor release. It preserves the `2.0.0` public package and namespace boundary while adding optional policy fast-abort support, builder-style audit residue construction, benchmark guidance, custom decision-policy examples, and in-memory outbox hardening.
+Stable `2.x` is the current release line. `2.1.1` is the current compatible minor release. It preserves the `2.0.0` public package and namespace boundary while adding optional policy fast-abort support, builder-style audit residue construction, benchmark guidance, custom decision-policy examples, and in-memory outbox hardening.
 
 ```text
 AsiBackbone.Core

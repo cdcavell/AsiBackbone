@@ -130,12 +130,12 @@ jobs:
         run: ./scripts/New-NuGetPackageSbom.ps1 -PackageDirectory '${{ env.PACKAGE_OUTPUT }}' -OutputDirectory '${{ env.SBOM_OUTPUT }}'
 
       - name: Attest package provenance
-        uses: actions/attest-build-provenance@v4
+        uses: actions/attest-build-provenance@0f67c3f4856b2e3261c31976d6725780e5e4c373 # v4
         with:
           subject-path: ${{ env.PACKAGE_OUTPUT }}/*.nupkg
 
       - name: Attest package SBOM provenance
-        uses: actions/attest-build-provenance@v4
+        uses: actions/attest-build-provenance@0f67c3f4856b2e3261c31976d6725780e5e4c373 # v4
         with:
           subject-path: ${{ env.SBOM_OUTPUT }}/*.json
 

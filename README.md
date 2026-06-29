@@ -1,6 +1,8 @@
-<p align="center">
-  <img src="docs/images/social-preview.png" alt="AsiBackbone governance spine icon" width="640" height="320" />
-</p>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+![AsiBackbone governance spine icon](https://raw.githubusercontent.com/cdcavell/ASIBackbone/main/docs/images/social-preview.png)
 
 # AsiBackbone
 
@@ -126,7 +128,7 @@ For production-style hosts, add durable audit/outbox persistence, signing or ver
 
 ## Package family
 
-Stable `2.1.x` package family. `2.1.0` is the current compatible minor release. `2.0.0` began the current major release line after the public package and namespace identity moved from `CDCavell.AsiBackbone.*` to `AsiBackbone.*`. The package family carries forward the governance-spine surface with builder-facade, analyzer, OpenTelemetry, signing-provider, testing-harness, template package, endpoint diagnostics, sample, Source Link metadata, package SBOM/provenance artifacts, benchmark guidance, custom decision-policy examples, and documentation-alignment surfaces.
+Stable `2.1.x` package family. `2.1.1` is the current compatible minor release. `2.0.0` began the current major release line after the public package and namespace identity moved from `CDCavell.AsiBackbone.*` to `AsiBackbone.*`. The package family carries forward the governance-spine surface with builder-facade, analyzer, OpenTelemetry, signing-provider, testing-harness, template package, endpoint diagnostics, sample, Source Link metadata, package SBOM/provenance artifacts, benchmark guidance, custom decision-policy examples, and documentation-alignment surfaces.
 
 | Package | Role |
 | --- | --- |
@@ -171,7 +173,7 @@ The full, categorized documentation set lives at the [documentation site](https:
 
 ## Current status
 
-Stable `2.1.x` is the current released line, with `2.1.0` as the current compatible minor release. This release preserves the simplified `AsiBackbone.*` package and namespace identity established by `2.0.0` while carrying forward the Core foundation, builder-facade registration surface, in-memory validation storage, EF Core host-owned persistence, ASP.NET Core integration, test harness helpers, dotnet new templates, analyzers, the OpenTelemetry provider, local-development signing, the managed-key signing adapter boundary, samples, release validation, package SBOM/provenance artifacts, benchmark guidance, custom decision-policy examples, Source Link metadata validation, and host-validation documentation.
+Stable `2.1.x` is the current released line, with `2.1.1` as the current compatible minor release. This release preserves the simplified `AsiBackbone.*` package and namespace identity established by `2.0.0` while carrying forward the Core foundation, builder-facade registration surface, in-memory validation storage, EF Core host-owned persistence, ASP.NET Core integration, test harness helpers, dotnet new templates, analyzers, the OpenTelemetry provider, local-development signing, the managed-key signing adapter boundary, samples, release validation, package SBOM/provenance artifacts, benchmark guidance, custom decision-policy examples, Source Link metadata validation, and host-validation documentation.
 
 The stable API contract is documented in [API Compatibility and SemVer](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/api-compatibility-and-semver.md); the original `1.0.0` baseline, `1.1.0` addendum, `1.2.0` minor release boundary, `1.2.1` patch release boundary, `2.0.0` package/namespace migration boundary, `2.0.1` patch release boundary, `2.0.2` package-icon correction boundary, and `2.1.0` minor release boundary are recorded in the [Historical Stable API Review](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/stable-api-review.md), [1.1.x Release Notes](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/release-notes-110.md), [1.2.0 Release Notes](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/release-notes-120.md), [1.2.1 Release Notes](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/release-notes-121.md), [2.0.0 Release Notes](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/release-notes-200.md), [2.0.1 Release Notes](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/release-notes-201.md), [2.0.2 Release Notes](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/release-notes-202.md), and [2.1.0 Release Notes](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/release-notes-210.md).
 

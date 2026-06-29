@@ -4,6 +4,13 @@ All notable changes to this project are documented in this file.
 
 This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/) and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.1] - 2026-06-28
+
+### Fixed
+- Updated the package README image markup for NuGet.org compatibility.
+- Replaced unsupported HTML image/alignment tags with standard Markdown image syntax so the social preview image renders correctly on the NuGet package page instead of appearing as literal HTML text.
+- Adjusted the README image reference to use a NuGet-compatible hosted image URL.
+
 ## [2.1.0] - 2026-06-28
 
 ### Release summary

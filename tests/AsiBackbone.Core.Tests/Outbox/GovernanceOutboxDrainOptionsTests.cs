@@ -18,7 +18,7 @@ public sealed class GovernanceOutboxDrainOptionsTests
         GovernanceOutboxEntry queuedEntry = await outboxStore.EnqueueAsync(
             CreateEnvelope("exception"),
             TestContext.Current.CancellationToken);
-        var options = Options.Create(new AsiBackboneGovernanceOutboxOptions
+        IOptions<AsiBackboneGovernanceOutboxOptions> options = Options.Create(new AsiBackboneGovernanceOutboxOptions
         {
             RetryDelay = TimeSpan.FromMinutes(7),
             DeferredDelay = TimeSpan.FromMinutes(13)
@@ -45,10 +45,10 @@ public sealed class GovernanceOutboxDrainOptionsTests
     public async Task DrainAsyncUsesConfiguredDeferredDelayWhenDeferredResultHasNoRetryAfter()
     {
         var outboxStore = new InMemoryGovernanceOutboxStore();
-        await outboxStore.EnqueueAsync(
+        _ = await outboxStore.EnqueueAsync(
             CreateEnvelope("deferred"),
             TestContext.Current.CancellationToken);
-        var options = Options.Create(new AsiBackboneGovernanceOutboxOptions
+        IOptions<AsiBackboneGovernanceOutboxOptions> options = Options.Create(new AsiBackboneGovernanceOutboxOptions
         {
             RetryDelay = TimeSpan.FromMinutes(7),
             DeferredDelay = TimeSpan.FromMinutes(13)
@@ -70,11 +70,11 @@ public sealed class GovernanceOutboxDrainOptionsTests
     public async Task DrainAsyncPreservesEmitterRetryAfterOverConfiguredDeferredDelay()
     {
         var outboxStore = new InMemoryGovernanceOutboxStore();
-        await outboxStore.EnqueueAsync(
+        _ = await outboxStore.EnqueueAsync(
             CreateEnvelope("retry-after"),
             TestContext.Current.CancellationToken);
         DateTimeOffset retryAfterUtc = DrainUtc.AddMinutes(3);
-        var options = Options.Create(new AsiBackboneGovernanceOutboxOptions
+        IOptions<AsiBackboneGovernanceOutboxOptions> options = Options.Create(new AsiBackboneGovernanceOutboxOptions
         {
             RetryDelay = TimeSpan.FromMinutes(7),
             DeferredDelay = TimeSpan.FromMinutes(13)
@@ -95,7 +95,7 @@ public sealed class GovernanceOutboxDrainOptionsTests
     [Fact]
     public void ConstructorRejectsNegativeRetryDelayOptions()
     {
-        var options = Options.Create(new AsiBackboneGovernanceOutboxOptions
+        IOptions<AsiBackboneGovernanceOutboxOptions> options = Options.Create(new AsiBackboneGovernanceOutboxOptions
         {
             RetryDelay = TimeSpan.FromTicks(-1)
         });
@@ -109,7 +109,7 @@ public sealed class GovernanceOutboxDrainOptionsTests
     [Fact]
     public void ConstructorRejectsNegativeDeferredDelayOptions()
     {
-        var options = Options.Create(new AsiBackboneGovernanceOutboxOptions
+        IOptions<AsiBackboneGovernanceOutboxOptions> options = Options.Create(new AsiBackboneGovernanceOutboxOptions
         {
             DeferredDelay = TimeSpan.FromTicks(-1)
         });

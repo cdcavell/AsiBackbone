@@ -1,6 +1,7 @@
 using AsiBackbone.Core.Audit;
 using AsiBackbone.Core.Emissions;
 using AsiBackbone.Core.Outbox;
+using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace AsiBackbone.Core.Tests.Outbox;
@@ -89,13 +90,16 @@ public sealed class GovernanceOutboxDrainBranchTests
     }
 
     [Fact]
-    public async Task DrainAsyncMarksEmitterExceptionAsRetryableFailure()
+    public async Task DrainAsyncMarksEmitterExceptionAsRetryableFailureAndLogsOperationalContext()
     {
         GovernanceOutboxEntry entry = CreateEntry("outbox-1", "event-1");
         var store = new RecordingOutboxStore(pendingEntries: [entry]);
+        var logger = new RecordingLogger<AsiBackboneGovernanceOutboxDrain>();
+        var providerFailure = new InvalidOperationException("provider failed");
         var drain = new AsiBackboneGovernanceOutboxDrain(
             store,
-            new ThrowingEmitter(new InvalidOperationException("provider failed")));
+            new ThrowingEmitter(providerFailure),
+            logger);
 
         GovernanceOutboxEntry drained = Assert.Single(await drain.DrainAsync(
             DrainUtc,
@@ -106,6 +110,18 @@ public sealed class GovernanceOutboxDrainBranchTests
         Assert.True(drained.LastError?.IsRetryable);
         Assert.Equal(typeof(InvalidOperationException).FullName, drained.LastError?.ProviderErrorCode);
         Assert.Equal(DrainUtc.AddMinutes(1), drained.NextRetryUtc);
+
+        LogEntry logEntry = Assert.Single(logger.Entries);
+        Assert.Equal(LogLevel.Warning, logEntry.LogLevel);
+        Assert.Equal("LogGovernanceEmissionException", logEntry.EventId.Name);
+        Assert.Same(providerFailure, logEntry.Exception);
+        Assert.Contains("outbox entry outbox-1", logEntry.Message, StringComparison.Ordinal);
+        Assert.Equal("outbox-1", Assert.IsType<string>(logEntry["OutboxEntryId"]));
+        Assert.Equal(1, Assert.IsType<int>(logEntry["AttemptCount"]));
+        Assert.Equal("test-sink", Assert.IsType<string>(logEntry["EmitterProvider"]));
+        Assert.Equal(DrainUtc.AddMinutes(1), Assert.IsType<DateTimeOffset>(logEntry["NextRetryUtc"]));
+        Assert.Equal("correlation-event-1", Assert.IsType<string>(logEntry["CorrelationId"]));
+        Assert.Equal("residue-event-1", Assert.IsType<string>(logEntry["AuditResidueId"]));
     }
 
     [Fact]
@@ -208,7 +224,8 @@ public sealed class GovernanceOutboxDrainBranchTests
             policyHash: "hash",
             traceId: $"trace-{eventId}",
             operationName: "governance.emit",
-            outcome: "Queued");
+            outcome: "Queued",
+            emitterProvider: "test-sink");
     }
 
     private sealed class RecordingOutboxStore : IAsiBackboneGovernanceOutboxStore
@@ -313,6 +330,65 @@ public sealed class GovernanceOutboxDrainBranchTests
             entries[outboxEntryId] = updated;
             return ValueTask.FromResult(updated);
         }
+    }
+
+    private sealed class RecordingLogger<T> : ILogger<T>
+    {
+        private static readonly IDisposable NoopScope = new NullScope();
+
+        public List<LogEntry> Entries { get; } = [];
+
+        public IDisposable? BeginScope<TState>(TState state)
+            where TState : notnull
+        {
+            return NoopScope;
+        }
+
+        public bool IsEnabled(LogLevel logLevel)
+        {
+            return true;
+        }
+
+        public void Log<TState>(
+            LogLevel logLevel,
+            EventId eventId,
+            TState state,
+            Exception? exception,
+            Func<TState, Exception?, string> formatter)
+        {
+            ArgumentNullException.ThrowIfNull(formatter);
+
+            Entries.Add(new LogEntry(
+                logLevel,
+                eventId,
+                exception,
+                formatter(state, exception),
+                CaptureState(state)));
+        }
+
+        private static IReadOnlyList<KeyValuePair<string, object?>> CaptureState<TState>(TState state)
+        {
+            return state is IEnumerable<KeyValuePair<string, object?>> structuredState
+                ? structuredState.ToArray()
+                : [];
+        }
+
+        private sealed class NullScope : IDisposable
+        {
+            public void Dispose()
+            {
+            }
+        }
+    }
+
+    private sealed record LogEntry(
+        LogLevel LogLevel,
+        EventId EventId,
+        Exception? Exception,
+        string Message,
+        IReadOnlyList<KeyValuePair<string, object?>> State)
+    {
+        public object? this[string key] => State.FirstOrDefault(item => item.Key == key).Value;
     }
 
     private sealed class QueueEmitter(params GovernanceEmissionResult[] results) : IAsiBackboneGovernanceEmitter

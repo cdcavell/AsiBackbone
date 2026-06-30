@@ -28,6 +28,11 @@
       <Build Solution="Debug|*" Project="false" />
     </Project>
   </Folder>
+  <Folder Name="/benchmarks/">
+    <Project Path="benchmarks/AsiBackbone.Benchmarks/AsiBackbone.Benchmarks.csproj">
+      <Build Solution="Debug|*" Project="false" />
+    </Project>
+  </Folder>
   <Folder Name="/samples/">
     <Project Path="samples/AsiBackboneAspireAppHost/AsiBackbone.Samples.AspireAppHost.csproj" />
     <Project Path="samples/PlainAspNetCoreHost/AsiBackbone.Samples.PlainAspNetCoreHost.csproj">

@@ -6,6 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/AsiBackbone.AspNetCore/AsiBackbone.AspNetCore.csproj" />
     <ProjectReference Include="../../src/AsiBackbone.Core/AsiBackbone.Core.csproj" />
   </ItemGroup>
 

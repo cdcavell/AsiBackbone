@@ -32,7 +32,7 @@ public sealed class AsiBackboneGovernanceOutboxDrain(
     private readonly IAsiBackboneGovernanceOutboxStore outboxStore = outboxStore ?? throw new ArgumentNullException(nameof(outboxStore));
     private readonly IAsiBackboneGovernanceEmitter emitter = emitter ?? throw new ArgumentNullException(nameof(emitter));
     private readonly ILogger<AsiBackboneGovernanceOutboxDrain> logger = logger ?? NullLogger<AsiBackboneGovernanceOutboxDrain>.Instance;
-    private readonly AsiBackboneGovernanceOutboxOptions outboxOptions = ResolveOptions(outboxOptions);
+    private readonly AsiBackboneGovernanceOutboxOptions retryOptions = ResolveOptions(outboxOptions);
 
     /// <summary>
     /// Drains pending and retry-ready outbox entries through the configured emitter.
@@ -202,12 +202,12 @@ public sealed class AsiBackboneGovernanceOutboxDrain(
 
     private DateTimeOffset GetRetryUtc(DateTimeOffset drainUtc)
     {
-        return drainUtc.Add(outboxOptions.RetryDelay);
+        return drainUtc.Add(retryOptions.RetryDelay);
     }
 
     private DateTimeOffset GetDeferredUtc(DateTimeOffset drainUtc)
     {
-        return drainUtc.Add(outboxOptions.DeferredDelay);
+        return drainUtc.Add(retryOptions.DeferredDelay);
     }
 
     private static AsiBackboneGovernanceOutboxOptions ResolveOptions(

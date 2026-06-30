@@ -24,7 +24,7 @@ internal static class Program
 
     public static async Task<int> Main(string[] args)
     {
-        BenchmarkOptions options = BenchmarkOptions.Parse(args);
+        var options = BenchmarkOptions.Parse(args);
 
         if (options.ShowHelp)
         {
@@ -137,7 +137,7 @@ internal static class Program
 
         long allocatedBefore = GC.GetAllocatedBytesForCurrentThread();
         long gen0Before = GC.CollectionCount(0);
-        Stopwatch stopwatch = Stopwatch.StartNew();
+        var stopwatch = Stopwatch.StartNew();
 
         for (int iteration = 0; iteration < options.Iterations; iteration++)
         {
@@ -493,7 +493,7 @@ internal static class Program
         public async ValueTask<int> ExecuteAsync(CancellationToken cancellationToken)
         {
             using IServiceScope scope = services.CreateScope();
-            var drain = scope.ServiceProvider.GetRequiredService<AsiBackboneGovernanceOutboxDrain>();
+            AsiBackboneGovernanceOutboxDrain drain = scope.ServiceProvider.GetRequiredService<AsiBackboneGovernanceOutboxDrain>();
             IReadOnlyList<GovernanceOutboxEntry> entries = await drain
                 .DrainAsync(BenchmarkDrainUtc, batchSize, cancellationToken)
                 .ConfigureAwait(false);
@@ -528,7 +528,7 @@ internal static class Program
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            AuditResidue residue = AuditResidue.FromDecision(
+            var residue = AuditResidue.FromDecision(
                 actor,
                 "benchmark.operation",
                 decision,
@@ -621,7 +621,7 @@ internal static class Program
 
             for (int index = 0; index < pendingEntries.Length; index++)
             {
-                GovernanceOutboxEntry entry = GovernanceOutboxEntry.Create(CreateEnvelope(index));
+                var entry = GovernanceOutboxEntry.Create(CreateEnvelope(index));
                 pendingEntries[index] = entry;
                 entriesById.Add(entry.OutboxEntryId, entry);
             }

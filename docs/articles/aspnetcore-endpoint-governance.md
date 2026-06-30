@@ -18,6 +18,8 @@ Place `UseAsiBackboneEndpointGovernance()` after routing has selected an endpoin
 
 Hosts that use policy metadata should register an `IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>`. Hosts that use capability metadata should register an `IAsiBackboneEndpointCapabilityGrantValidator`. Hosts that request audit emission should register a host-owned `IAsiBackboneAuditSink`.
 
+Because those services may run before the protected endpoint executes, their implementation choices affect request throughput. Keep request-time evaluators, validators, and audit sinks async, cancellable, bounded, and free of blocking calls such as `.Result`, `.Wait()`, `Thread.Sleep`, synchronous network calls, synchronous database calls, or unbounded `Task.Run` work. See [High-Throughput Host Service Guidance](high-throughput-host-services.md) for request hot-path examples, anti-patterns, queue/backpressure guidance, and the framework/host responsibility boundary.
+
 ## Minimal API / fluent endpoint path
 
 ```csharp
@@ -89,6 +91,8 @@ The ergonomic endpoint layer deliberately does not own persistence. Durable audi
 | Capability-grant source, proof validation, and replay handling | Host-owned `IAsiBackboneEndpointCapabilityGrantValidator` |
 | Audit sink, ledger store, outbox store, and transactions | Host-owned storage/integration layer |
 | Legal/compliance interpretation | Host governance process |
+
+High-throughput hosts should treat every host-owned row in this table as production code that can dominate latency. If a host needs expensive provider delivery, DLP/classification, signing, or SIEM export, prefer a local durable record plus outbox handoff instead of performing that work synchronously inside request middleware.
 
 ## Failure behavior
 

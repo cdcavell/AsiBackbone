@@ -16,6 +16,8 @@ The hosted drain worker:
 
 The worker is intentionally an integration host, not an emitter provider. It can run with the no-op emitter for proof-path validation, with an in-memory store for development, or with durable EF Core storage and an OpenTelemetry-style emitter when those provider packages are available.
 
+Store and emitter implementations are host-provided services that can dominate drain throughput. Keep them async, cancellable, batch-aware, bounded, and observable. See [High-Throughput Host Service Guidance](high-throughput-host-services.md) for blocking-I/O anti-patterns, batching guidance, queue/backpressure expectations, and the host/framework responsibility boundary.
+
 ## No-op proof path
 
 For local validation, tests, and samples, wire the worker with an outbox store and the provider-neutral no-op emitter:
@@ -58,6 +60,8 @@ builder.Services.AddAsiBackboneGovernanceOutboxDrainWorker(options =>
 ```
 
 The EF Core `DbContext`, migrations, provider SDKs, exporters, authentication, storage durability, and operational monitoring remain host responsibilities.
+
+High-throughput production hosts should load-test the selected `BatchSize`, `PollingInterval`, store latency, provider latency, and retry behavior together. A larger batch size plus durable claiming or partitioning is usually safer than aggressive polling when a provider path is slow or throttled.
 
 ## Worker options
 
@@ -118,6 +122,8 @@ If the provider throws unexpectedly, the Core drain converts the exception into 
 Durable local persistence keeps governance emission records available for retry and review, but it does not prove that centralized monitoring, compliance ledgers, SIEM tools, or governance catalogs received the event.
 
 Production hosts should monitor queue depth, oldest pending record age, retry and dead-letter counts, drain failure rate, last successful drain timestamp, and worker heartbeat. Sustained backlog or stale worker heartbeat should be treated as an operational incident in review-sensitive deployments.
+
+Emitter and store latency should also be monitored because slow host-owned services can create backlog even when the worker is alive. Host services should avoid `.Result`, `.Wait()`, synchronous provider calls, thread sleeps, infinite retry loops, and unbounded per-record work inside drain passes. Use retry-after signals, bounded retries, batching, and backpressure to protect both the host and downstream providers.
 
 See [Outbox Drain Reliability and Alerting](outbox-drain-reliability-and-alerting.md) for provider-neutral monitoring, alerting, retry, dead-letter, and recovery guidance.
 

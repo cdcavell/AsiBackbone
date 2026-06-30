@@ -46,6 +46,8 @@
       href: custom-decision-policy-examples.md
     - name: Host-Owned Execution Enforcement
       href: host-owned-execution-enforcement.md
+    - name: High-Throughput Host Service Guidance
+      href: high-throughput-host-services.md
     - name: Acknowledgment Workflow
       href: dynamic-liability-handshake.md
     - name: Endpoint Governance Diagnostics

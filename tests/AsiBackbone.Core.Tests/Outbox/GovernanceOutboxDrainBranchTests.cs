@@ -366,10 +366,10 @@ public sealed class GovernanceOutboxDrainBranchTests
                 CaptureState(state)));
         }
 
-        private static IReadOnlyList<KeyValuePair<string, object?>> CaptureState<TState>(TState state)
+        private static KeyValuePair<string, object?>[] CaptureState<TState>(TState state)
         {
             return state is IEnumerable<KeyValuePair<string, object?>> structuredState
-                ? structuredState.ToArray()
+                ? [.. structuredState]
                 : [];
         }
 
@@ -386,9 +386,22 @@ public sealed class GovernanceOutboxDrainBranchTests
         EventId EventId,
         Exception? Exception,
         string Message,
-        IReadOnlyList<KeyValuePair<string, object?>> State)
+        KeyValuePair<string, object?>[] State)
     {
-        public object? this[string key] => State.FirstOrDefault(item => item.Key == key).Value;
+        public object? this[string key]
+        {
+            get
+            {
+                foreach (KeyValuePair<string, object?> item in State)
+                {
+                    if (item.Key == key)
+                    {
+                        return item.Value;
+                    }
+                }
+                return null;
+            }
+        }
     }
 
     private sealed class QueueEmitter(params GovernanceEmissionResult[] results) : IAsiBackboneGovernanceEmitter

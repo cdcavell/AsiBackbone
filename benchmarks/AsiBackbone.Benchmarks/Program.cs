@@ -2,16 +2,24 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
+using AsiBackbone.AspNetCore.DependencyInjection;
+using AsiBackbone.AspNetCore.Endpoints;
 using AsiBackbone.Core.Actors;
 using AsiBackbone.Core.Audit;
 using AsiBackbone.Core.Constraints;
 using AsiBackbone.Core.Decisions;
+using AsiBackbone.Core.Emissions;
 using AsiBackbone.Core.Evaluation;
+using AsiBackbone.Core.Outbox;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AsiBackbone.Benchmarks;
 
 internal static class Program
 {
+    private static readonly DateTimeOffset BenchmarkDrainUtc = new(2026, 6, 30, 18, 0, 0, TimeSpan.Zero);
+
     private static int benchmarkSink;
 
     public static async Task<int> Main(string[] args)
@@ -60,10 +68,34 @@ internal static class Program
                 new DefaultAsiBackbonePolicyEvaluator<BenchmarkPolicyContext>(
                     CreateStaticConstraints(4, ConstraintEvaluationResult.Allow()),
                     new EscalatePolicy())),
+            new EndpointGovernanceScenario(
+                "endpoint_governance.policy_allow",
+                "Evaluate DefaultAsiBackboneEndpointGovernanceService with a host policy evaluator returning allow.",
+                EndpointDecisionKind.Allow),
+            new EndpointGovernanceScenario(
+                "endpoint_governance.policy_warning",
+                "Evaluate DefaultAsiBackboneEndpointGovernanceService with a host policy evaluator returning warning.",
+                EndpointDecisionKind.Warning),
+            new EndpointGovernanceScenario(
+                "endpoint_governance.policy_deny",
+                "Evaluate DefaultAsiBackboneEndpointGovernanceService with a host policy evaluator returning deny.",
+                EndpointDecisionKind.Deny),
+            new OutboxDrainScenario(
+                "outbox_drain.small_batch_25",
+                "Drain a provider-neutral governance outbox batch of 25 pending entries through the no-op emitter.",
+                batchSize: 25),
+            new OutboxDrainScenario(
+                "outbox_drain.medium_batch_100",
+                "Drain a provider-neutral governance outbox batch of 100 pending entries through the no-op emitter.",
+                batchSize: 100),
+            new ScopedOutboxDrainScenario(
+                "outbox_drain.scoped_medium_batch_100",
+                "Create a DI scope, resolve AsiBackboneGovernanceOutboxDrain, and drain 100 pending entries.",
+                batchSize: 100),
             new AuditResidueFromDecisionScenario()
         ];
 
-        Console.WriteLine("# AsiBackbone policy hot-path benchmark baseline");
+        Console.WriteLine("# AsiBackbone hot-path benchmark baseline");
         Console.WriteLine();
         Console.WriteLine($"Runtime: {RuntimeInformation.FrameworkDescription}");
         Console.WriteLine($"OS: {RuntimeInformation.OSDescription}");
@@ -188,6 +220,35 @@ internal static class Program
             new StaticConstraint("warning-2", ConstraintEvaluationResult.Warning("policy.second_warning", "Second policy warning.")),
             new StaticConstraint("deny-2", ConstraintEvaluationResult.Deny("policy.second_denied", "Second policy denial."))
         ];
+    }
+
+    private static GovernanceEmissionEnvelope CreateEnvelope(int index)
+    {
+        string suffix = index.ToString("D6", CultureInfo.InvariantCulture);
+
+        return GovernanceEmissionEnvelope.Create(
+            GovernanceEmissionEventType.AuditLifecycle,
+            eventId: $"event-{suffix}",
+            occurredUtc: new DateTimeOffset(2026, 6, 30, 17, 59, 0, TimeSpan.Zero),
+            envelopeId: $"envelope-{suffix}",
+            correlationId: $"correlation-{suffix}",
+            auditResidueId: $"residue-{suffix}",
+            lifecycleStage: AuditResidueLifecycleStage.ExternalEmissionQueued,
+            policyVersion: "benchmark-policy-v1",
+            policyHash: "benchmark-policy-hash",
+            traceId: $"trace-{suffix}",
+            spanId: $"span-{suffix}",
+            parentSpanId: $"parent-span-{suffix}",
+            operationName: "governance.emit.benchmark",
+            outcome: "Queued",
+            emitterStatus: "pending",
+            emitterProvider: "outbox",
+            outboxSequence: index,
+            metadata: new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                ["benchmark"] = "outbox_drain",
+                ["batch.index"] = suffix
+            });
     }
 
     private sealed class BenchmarkOptions
@@ -315,6 +376,132 @@ internal static class Program
         }
     }
 
+    private sealed class EndpointGovernanceScenario : IBenchmarkScenario
+    {
+        private readonly IServiceScope serviceScope;
+        private readonly HttpContext httpContext;
+        private readonly AsiBackboneEndpointGovernanceDescriptor descriptor;
+        private readonly IAsiBackboneEndpointGovernanceService service;
+
+        public EndpointGovernanceScenario(
+            string name,
+            string description,
+            EndpointDecisionKind decisionKind)
+        {
+            Name = name;
+            Description = description;
+
+            ServiceProvider services = new ServiceCollection()
+                .AddAsiBackboneAspNetCore()
+                .AddSingleton<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>>(new FixedEndpointPolicyEvaluator(decisionKind))
+                .BuildServiceProvider(validateScopes: true);
+
+            serviceScope = services.CreateScope();
+            httpContext = new DefaultHttpContext
+            {
+                RequestServices = serviceScope.ServiceProvider,
+                TraceIdentifier = $"{name}.trace"
+            };
+
+            serviceScope.ServiceProvider.GetRequiredService<IHttpContextAccessor>().HttpContext = httpContext;
+
+            var endpoint = new Endpoint(
+                static _ => Task.CompletedTask,
+                new EndpointMetadataCollection(new RequireGovernancePolicyAttribute(typeof(BenchmarkEndpointPolicy))),
+                name);
+
+            descriptor = AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(endpoint);
+            service = serviceScope.ServiceProvider.GetRequiredService<IAsiBackboneEndpointGovernanceService>();
+        }
+
+        public string Name { get; }
+
+        public string Description { get; }
+
+        public async ValueTask<int> ExecuteAsync(CancellationToken cancellationToken)
+        {
+            AsiBackboneEndpointGovernanceResult result = await service
+                .EvaluateAsync(httpContext, descriptor, cancellationToken)
+                .ConfigureAwait(false);
+
+            GovernanceDecision? decision = result.Decision;
+            return (result.CanExecute ? 17 : 31) ^ (decision is null ? 0 : ((int)decision.Outcome * 397) ^ decision.ReasonCodes.Count);
+        }
+    }
+
+    private sealed class OutboxDrainScenario : IBenchmarkScenario
+    {
+        private readonly int batchSize;
+        private readonly AsiBackboneGovernanceOutboxDrain drain;
+
+        public OutboxDrainScenario(
+            string name,
+            string description,
+            int batchSize)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(batchSize);
+
+            Name = name;
+            Description = description;
+            this.batchSize = batchSize;
+            drain = new AsiBackboneGovernanceOutboxDrain(
+                new BenchmarkOutboxStore(batchSize),
+                NoOpGovernanceEmitter.Instance);
+        }
+
+        public string Name { get; }
+
+        public string Description { get; }
+
+        public async ValueTask<int> ExecuteAsync(CancellationToken cancellationToken)
+        {
+            IReadOnlyList<GovernanceOutboxEntry> entries = await drain
+                .DrainAsync(BenchmarkDrainUtc, batchSize, cancellationToken)
+                .ConfigureAwait(false);
+
+            return entries.Count ^ entries[0].Metadata.Count;
+        }
+    }
+
+    private sealed class ScopedOutboxDrainScenario : IBenchmarkScenario
+    {
+        private readonly int batchSize;
+        private readonly ServiceProvider services;
+
+        public ScopedOutboxDrainScenario(
+            string name,
+            string description,
+            int batchSize)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(batchSize);
+
+            Name = name;
+            Description = description;
+            this.batchSize = batchSize;
+            services = new ServiceCollection()
+                .AddLogging()
+                .AddSingleton<IAsiBackboneGovernanceOutboxStore>(_ => new BenchmarkOutboxStore(batchSize))
+                .AddSingleton<IAsiBackboneGovernanceEmitter>(NoOpGovernanceEmitter.Instance)
+                .AddScoped<AsiBackboneGovernanceOutboxDrain>()
+                .BuildServiceProvider(validateScopes: true);
+        }
+
+        public string Name { get; }
+
+        public string Description { get; }
+
+        public async ValueTask<int> ExecuteAsync(CancellationToken cancellationToken)
+        {
+            using IServiceScope scope = services.CreateScope();
+            var drain = scope.ServiceProvider.GetRequiredService<AsiBackboneGovernanceOutboxDrain>();
+            IReadOnlyList<GovernanceOutboxEntry> entries = await drain
+                .DrainAsync(BenchmarkDrainUtc, batchSize, cancellationToken)
+                .ConfigureAwait(false);
+
+            return entries.Count ^ entries[0].Metadata.Count;
+        }
+    }
+
     private sealed class AuditResidueFromDecisionScenario : IBenchmarkScenario
     {
         private readonly IAsiBackboneActorContext actor = AsiBackboneActorContext.Service("benchmark-service");
@@ -386,6 +573,147 @@ internal static class Program
         }
     }
 
+    private sealed class FixedEndpointPolicyEvaluator(EndpointDecisionKind decisionKind)
+        : IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>
+    {
+        public ValueTask<GovernanceDecision> EvaluateAsync(
+            AsiBackboneConstraintEvaluationContext context,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            GovernanceDecision decision = decisionKind switch
+            {
+                EndpointDecisionKind.Allow => GovernanceDecision.Allow(
+                    correlationId: context.CorrelationId,
+                    policyVersion: context.PolicyVersion,
+                    policyHash: context.PolicyHash),
+                EndpointDecisionKind.Warning => GovernanceDecision.Warning(
+                    "endpoint.policy.warning",
+                    "Endpoint governance benchmark returned warning.",
+                    correlationId: context.CorrelationId,
+                    policyVersion: context.PolicyVersion,
+                    policyHash: context.PolicyHash),
+                EndpointDecisionKind.Deny => GovernanceDecision.Deny(
+                    "endpoint.policy.denied",
+                    "Endpoint governance benchmark returned deny.",
+                    correlationId: context.CorrelationId,
+                    policyVersion: context.PolicyVersion,
+                    policyHash: context.PolicyHash),
+                _ => throw new InvalidOperationException($"Unsupported endpoint decision kind: {decisionKind}.")
+            };
+
+            return ValueTask.FromResult(decision);
+        }
+    }
+
+    private sealed class BenchmarkOutboxStore : IAsiBackboneGovernanceOutboxStore
+    {
+        private readonly GovernanceOutboxEntry[] pendingEntries;
+        private readonly Dictionary<string, GovernanceOutboxEntry> entriesById;
+
+        public BenchmarkOutboxStore(int pendingCount)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(pendingCount);
+
+            pendingEntries = new GovernanceOutboxEntry[pendingCount];
+            entriesById = new Dictionary<string, GovernanceOutboxEntry>(pendingCount, StringComparer.Ordinal);
+
+            for (int index = 0; index < pendingEntries.Length; index++)
+            {
+                GovernanceOutboxEntry entry = GovernanceOutboxEntry.Create(CreateEnvelope(index));
+                pendingEntries[index] = entry;
+                entriesById.Add(entry.OutboxEntryId, entry);
+            }
+        }
+
+        public ValueTask<GovernanceOutboxEntry> EnqueueAsync(
+            GovernanceEmissionEnvelope envelope,
+            CancellationToken cancellationToken = default)
+        {
+            ArgumentNullException.ThrowIfNull(envelope);
+            cancellationToken.ThrowIfCancellationRequested();
+            return ValueTask.FromResult(GovernanceOutboxEntry.Create(envelope));
+        }
+
+        public ValueTask<GovernanceOutboxEntry> SaveAsync(
+            GovernanceOutboxEntry entry,
+            CancellationToken cancellationToken = default)
+        {
+            ArgumentNullException.ThrowIfNull(entry);
+            cancellationToken.ThrowIfCancellationRequested();
+            return ValueTask.FromResult(entry);
+        }
+
+        public ValueTask<GovernanceOutboxEntry?> FindByOutboxEntryIdAsync(
+            string outboxEntryId,
+            CancellationToken cancellationToken = default)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(outboxEntryId);
+            cancellationToken.ThrowIfCancellationRequested();
+            _ = entriesById.TryGetValue(outboxEntryId, out GovernanceOutboxEntry? entry);
+            return ValueTask.FromResult(entry);
+        }
+
+        public ValueTask<IReadOnlyList<GovernanceOutboxEntry>> FindPendingAsync(
+            int maxCount = 100,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            int count = Math.Min(maxCount, pendingEntries.Length);
+            IReadOnlyList<GovernanceOutboxEntry> entries = pendingEntries.AsSpan(0, count).ToArray();
+            return ValueTask.FromResult(entries);
+        }
+
+        public ValueTask<IReadOnlyList<GovernanceOutboxEntry>> FindRetryReadyAsync(
+            DateTimeOffset utcNow,
+            int maxCount = 100,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            IReadOnlyList<GovernanceOutboxEntry> entries = Array.Empty<GovernanceOutboxEntry>();
+            return ValueTask.FromResult(entries);
+        }
+
+        public ValueTask<GovernanceOutboxEntry> MarkDeliveredAsync(
+            string outboxEntryId,
+            GovernanceEmissionResult result,
+            CancellationToken cancellationToken = default)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(outboxEntryId);
+            ArgumentNullException.ThrowIfNull(result);
+            cancellationToken.ThrowIfCancellationRequested();
+            GovernanceOutboxEntry entry = entriesById[outboxEntryId];
+            return ValueTask.FromResult(entry.MarkDelivered(result));
+        }
+
+        public ValueTask<GovernanceOutboxEntry> MarkFailedAsync(
+            string outboxEntryId,
+            GovernanceEmissionError governanceEmissionError,
+            DateTimeOffset? nextRetryUtc = null,
+            CancellationToken cancellationToken = default)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(outboxEntryId);
+            ArgumentNullException.ThrowIfNull(governanceEmissionError);
+            cancellationToken.ThrowIfCancellationRequested();
+            GovernanceOutboxEntry entry = entriesById[outboxEntryId];
+            return ValueTask.FromResult(entry.MarkFailed(governanceEmissionError, nextRetryUtc));
+        }
+
+        public ValueTask<GovernanceOutboxEntry> MarkDeadLetteredAsync(
+            string outboxEntryId,
+            GovernanceEmissionError governanceEmissionError,
+            string? deadLetterReason = null,
+            CancellationToken cancellationToken = default)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(outboxEntryId);
+            ArgumentNullException.ThrowIfNull(governanceEmissionError);
+            cancellationToken.ThrowIfCancellationRequested();
+            GovernanceOutboxEntry entry = entriesById[outboxEntryId];
+            return ValueTask.FromResult(entry.MarkDeadLettered(governanceEmissionError, deadLetterReason));
+        }
+    }
+
     private sealed class RequireAcknowledgmentPolicy : IAsiBackboneDecisionPolicy<BenchmarkPolicyContext>
     {
         public ValueTask<GovernanceDecision> ApplyAsync(
@@ -422,5 +750,16 @@ internal static class Program
                 policyVersion: context.PolicyVersion,
                 policyHash: context.PolicyHash));
         }
+    }
+
+    private enum EndpointDecisionKind
+    {
+        Allow,
+        Warning,
+        Deny
+    }
+
+    private sealed class BenchmarkEndpointPolicy
+    {
     }
 }

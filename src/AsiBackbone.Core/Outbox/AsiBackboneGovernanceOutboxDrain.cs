@@ -1,4 +1,6 @@
 using AsiBackbone.Core.Emissions;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace AsiBackbone.Core.Outbox;
 
@@ -13,12 +15,20 @@ namespace AsiBackbone.Core.Outbox;
 /// </remarks>
 /// <param name="outboxStore">The provider-neutral outbox store.</param>
 /// <param name="emitter">The provider-neutral governance emitter.</param>
+/// <param name="logger">The logger used to record local operational diagnostics for drain failures.</param>
 public sealed class AsiBackboneGovernanceOutboxDrain(
     IAsiBackboneGovernanceOutboxStore outboxStore,
-    IAsiBackboneGovernanceEmitter emitter)
+    IAsiBackboneGovernanceEmitter emitter,
+    ILogger<AsiBackboneGovernanceOutboxDrain>? logger = null)
 {
+    private static readonly Action<ILogger, string, int, string, DateTimeOffset, string?, string?, Exception?> LogGovernanceEmissionException = LoggerMessage.Define<string, int, string, DateTimeOffset, string?, string?>(
+        LogLevel.Warning,
+        new EventId(19701, nameof(LogGovernanceEmissionException)),
+        "Governance outbox emission threw an exception for outbox entry {OutboxEntryId} on attempt {AttemptCount}. Emitter provider: {EmitterProvider}. Next retry UTC: {NextRetryUtc}. Correlation ID: {CorrelationId}. Audit residue ID: {AuditResidueId}.");
+
     private readonly IAsiBackboneGovernanceOutboxStore outboxStore = outboxStore ?? throw new ArgumentNullException(nameof(outboxStore));
     private readonly IAsiBackboneGovernanceEmitter emitter = emitter ?? throw new ArgumentNullException(nameof(emitter));
+    private readonly ILogger<AsiBackboneGovernanceOutboxDrain> logger = logger ?? NullLogger<AsiBackboneGovernanceOutboxDrain>.Instance;
 
     /// <summary>
     /// Drains pending and retry-ready outbox entries through the configured emitter.
@@ -94,6 +104,17 @@ public sealed class AsiBackboneGovernanceOutboxDrain(
         }
         catch (Exception ex)
         {
+            DateTimeOffset nextRetryUtc = drainUtc.AddMinutes(1);
+            LogGovernanceEmissionException(
+                logger,
+                entry.OutboxEntryId,
+                entry.RetryCount + 1,
+                ResolveEmitterProvider(entry),
+                nextRetryUtc,
+                entry.Envelope.CorrelationId,
+                entry.Envelope.AuditResidueId,
+                ex);
+
             var governanceEmissionError = GovernanceEmissionError.Create(
                 "emission.exception",
                 $"Governance emission threw {ex.GetType().Name} during outbox drain.",
@@ -103,7 +124,7 @@ public sealed class AsiBackboneGovernanceOutboxDrain(
             return await outboxStore.MarkFailedAsync(
                 entry.OutboxEntryId,
                 governanceEmissionError,
-                nextRetryUtc: drainUtc.AddMinutes(1),
+                nextRetryUtc,
                 cancellationToken)
                 .ConfigureAwait(false);
         }
@@ -173,5 +194,10 @@ public sealed class AsiBackboneGovernanceOutboxDrain(
             result.RetryAfterUtc,
             cancellationToken)
             .ConfigureAwait(false);
+    }
+
+    private static string ResolveEmitterProvider(GovernanceOutboxEntry entry)
+    {
+        return entry.Envelope.EmitterProvider ?? entry.ProviderName ?? "unspecified";
     }
 }

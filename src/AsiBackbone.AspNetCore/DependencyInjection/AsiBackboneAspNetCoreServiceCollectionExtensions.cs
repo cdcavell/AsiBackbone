@@ -177,6 +177,21 @@ public static class AsiBackboneAspNetCoreServiceCollectionExtensions
             }, "Governance outbox drain worker options must be valid.")
             .ValidateOnStart();
 
+        _ = services.AddOptions<AsiBackboneGovernanceOutboxOptions>()
+            .Validate(static options =>
+            {
+                try
+                {
+                    options.Validate();
+                    return true;
+                }
+                catch (InvalidOperationException)
+                {
+                    return false;
+                }
+            }, "Governance outbox options must be valid.")
+            .ValidateOnStart();
+
         services.TryAddScoped<AsiBackboneGovernanceOutboxDrain>();
         _ = services.AddHostedService<AsiBackboneGovernanceOutboxDrainHostedService>();
 

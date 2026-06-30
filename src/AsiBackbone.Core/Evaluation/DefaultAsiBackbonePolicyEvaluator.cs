@@ -11,6 +11,9 @@ namespace AsiBackbone.Core.Evaluation;
 public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePolicyEvaluator<TContext>
     where TContext : IAsiBackboneConstraintEvaluationContext
 {
+    private static readonly IReadOnlyList<ConstraintEvaluationResult> EmptyConstraintResults =
+        Array.AsReadOnly(Array.Empty<ConstraintEvaluationResult>());
+
     private readonly IAsiBackboneConstraint<TContext>[] constraints;
     private readonly IAsiBackboneDecisionPolicy<TContext>? decisionPolicy;
     private readonly AsiBackbonePolicyEvaluatorOptions options;
@@ -57,29 +60,36 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
         ArgumentNullException.ThrowIfNull(context);
         cancellationToken.ThrowIfCancellationRequested();
 
-        if (constraints.Length == 0 && options.DenyWhenNoConstraints)
+        if (constraints.Length == 0)
         {
-            var noConstraintsDecision = GovernanceDecision.Deny(
-                options.NoConstraintsReasonCode,
-                options.NoConstraintsReasonMessage,
-                correlationId: context.CorrelationId,
-                policyVersion: context.PolicyVersion,
-                policyHash: context.PolicyHash);
+            GovernanceDecision noConstraintDecision = options.DenyWhenNoConstraints
+                ? GovernanceDecision.Deny(
+                    options.NoConstraintsReasonCode,
+                    options.NoConstraintsReasonMessage,
+                    correlationId: context.CorrelationId,
+                    policyVersion: context.PolicyVersion,
+                    policyHash: context.PolicyHash)
+                : GovernanceDecision.Allow(
+                    correlationId: context.CorrelationId,
+                    policyVersion: context.PolicyVersion,
+                    policyHash: context.PolicyHash);
 
             return decisionPolicy is null
-                ? noConstraintsDecision
+                ? noConstraintDecision
                 : await decisionPolicy
                 .ApplyAsync(
                     context,
-                    noConstraintsDecision,
-                    Array.AsReadOnly(Array.Empty<ConstraintEvaluationResult>()),
+                    noConstraintDecision,
+                    EmptyConstraintResults,
                     cancellationToken)
                 .ConfigureAwait(false);
         }
 
-        List<ConstraintEvaluationResult> results = new(constraints.Length);
-        List<OperationReason> denials = [];
-        List<OperationReason> warnings = [];
+        List<ConstraintEvaluationResult>? results = decisionPolicy is null
+            ? null
+            : new List<ConstraintEvaluationResult>(constraints.Length);
+        List<OperationReason>? denials = null;
+        List<OperationReason>? warnings = null;
 
         foreach (IAsiBackboneConstraint<TContext> constraint in constraints)
         {
@@ -89,19 +99,26 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
                 .EvaluateAsync(context, cancellationToken)
                 .ConfigureAwait(false);
 
-            results.Add(result);
+            results?.Add(result);
 
             if (result.IsDenied)
             {
+                denials ??= [];
                 denials.AddRange(result.Reasons);
+
+                if (!options.ShortCircuitOnFirstDenial)
+                {
+                    warnings = null;
+                }
 
                 if (options.ShortCircuitOnFirstDenial)
                 {
                     break;
                 }
             }
-            else if (result.IsWarning)
+            else if (result.IsWarning && denials is null)
             {
+                warnings ??= [];
                 warnings.AddRange(result.Reasons);
             }
         }
@@ -115,19 +132,19 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
         return decisionPolicy is null
             ? composedDecision
             : await decisionPolicy
-            .ApplyAsync(context, composedDecision, Array.AsReadOnly([.. results]), cancellationToken)
+            .ApplyAsync(context, composedDecision, CreateConstraintResultsSnapshot(results), cancellationToken)
             .ConfigureAwait(false);
     }
 
     private static GovernanceDecision Compose(
         TContext context,
-        List<OperationReason> denials,
-        List<OperationReason> warnings,
+        IReadOnlyList<OperationReason>? denials,
+        IReadOnlyList<OperationReason>? warnings,
         bool includeWarningsWhenDenied)
     {
-        if (denials.Count > 0)
+        if (denials is { Count: > 0 })
         {
-            IEnumerable<OperationReason> denialReasons = includeWarningsWhenDenied && warnings.Count > 0
+            IEnumerable<OperationReason> denialReasons = includeWarningsWhenDenied && warnings is { Count: > 0 }
                 ? warnings.Concat(denials)
                 : denials;
 
@@ -138,7 +155,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
                 policyHash: context.PolicyHash);
         }
 
-        return warnings.Count > 0
+        return warnings is { Count: > 0 }
             ? GovernanceDecision.Warning(
                 warnings,
                 correlationId: context.CorrelationId,
@@ -148,5 +165,13 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
             correlationId: context.CorrelationId,
             policyVersion: context.PolicyVersion,
             policyHash: context.PolicyHash);
+    }
+
+    private static IReadOnlyList<ConstraintEvaluationResult> CreateConstraintResultsSnapshot(
+        List<ConstraintEvaluationResult>? results)
+    {
+        return results is null || results.Count == 0
+            ? EmptyConstraintResults
+            : Array.AsReadOnly([.. results]);
     }
 }

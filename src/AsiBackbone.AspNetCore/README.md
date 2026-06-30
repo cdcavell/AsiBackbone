@@ -78,12 +78,20 @@ using AsiBackbone.Storage.InMemory.Outbox;
 builder.Services.AddSingleton<IAsiBackboneGovernanceOutboxStore, InMemoryGovernanceOutboxStore>();
 builder.Services.AddSingleton<IAsiBackboneGovernanceEmitter>(NoOpGovernanceEmitter.Instance);
 
+builder.Services.Configure<AsiBackboneGovernanceOutboxOptions>(options =>
+{
+    options.RetryDelay = TimeSpan.FromMinutes(2);
+    options.DeferredDelay = TimeSpan.FromMinutes(5);
+});
+
 builder.Services.AddAsiBackboneGovernanceOutboxDrainWorker(options =>
 {
     options.BatchSize = 25;
     options.PollingInterval = TimeSpan.FromSeconds(15);
 });
 ```
+
+`AsiBackboneGovernanceOutboxOptions` controls persisted retry timing when an emitter does not supply its own `RetryAfterUtc`. `RetryDelay` applies to unexpected emitter exceptions converted to retryable failures. `DeferredDelay` applies to pending/deferred emission results without a retry-after timestamp. Both default to one minute to preserve the original drain behavior.
 
 The worker resolves the drain from a scoped service provider so host-owned durable stores can depend on scoped infrastructure such as EF Core `DbContext` instances. Production hosts should avoid duplicate active drain workers against the same durable outbox unless their store implements leasing, row claiming, partitioning, or provider-side idempotency.
 

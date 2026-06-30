@@ -42,6 +42,12 @@ builder.Services.AddDbContext<AppDbContext>(/* host-owned EF Core configuration 
 builder.Services.AddScoped<IAsiBackboneGovernanceOutboxStore, EfCoreGovernanceOutboxStore>();
 builder.Services.AddScoped<IAsiBackboneGovernanceEmitter, OpenTelemetryGovernanceEmitter>();
 
+builder.Services.Configure<AsiBackboneGovernanceOutboxOptions>(options =>
+{
+    options.RetryDelay = TimeSpan.FromMinutes(2);
+    options.DeferredDelay = TimeSpan.FromMinutes(5);
+});
+
 builder.Services.AddAsiBackboneGovernanceOutboxDrainWorker(options =>
 {
     options.BatchSize = 100;
@@ -53,7 +59,7 @@ builder.Services.AddAsiBackboneGovernanceOutboxDrainWorker(options =>
 
 The EF Core `DbContext`, migrations, provider SDKs, exporters, authentication, storage durability, and operational monitoring remain host responsibilities.
 
-## Options
+## Worker options
 
 | Option | Default | Purpose |
 | --- | ---: | --- |
@@ -64,6 +70,17 @@ The EF Core `DbContext`, migrations, provider SDKs, exporters, authentication, s
 | `RetryClock` | `DateTimeOffset.UtcNow` | Clock source used for retry-ready lookups. Tests can replace this with a fixed clock. |
 | `DrainOnShutdown` | `false` | Optionally attempts one final drain pass after the background loop has stopped. Do not enable this on many replicas unless duplicate drain behavior is understood. |
 | `ShutdownDrainTimeout` | `5s` | Time budget for the optional shutdown drain. |
+
+## Core outbox retry options
+
+`AsiBackboneGovernanceOutboxOptions` controls retry timestamps persisted by the Core drain when the emitter does not supply a provider-specific retry-after value.
+
+| Option | Default | Purpose |
+| --- | ---: | --- |
+| `RetryDelay` | `1m` | Delay applied after an unexpected emitter exception is converted into a retryable governance emission failure. |
+| `DeferredDelay` | `1m` | Delay applied when an emitter returns `Pending` or `Deferred` without a `RetryAfterUtc` value. |
+
+Emitter-supplied `RetryAfterUtc` values continue to take precedence over `DeferredDelay`. Negative delays are rejected during options validation. A zero delay is allowed for hosts that intentionally want retry-ready entries to become eligible on the next drain lookup.
 
 ## Duplicate worker guidance
 
@@ -87,14 +104,14 @@ Choose polling intervals based on operational urgency and provider stability:
 
 - development/no-op validation: 5-30 seconds;
 - normal production telemetry: 15-60 seconds;
-- outage-sensitive providers: use a larger `FailureDelay` to avoid hammering unavailable infrastructure;
+- outage-sensitive providers: use a larger `FailureDelay` and `RetryDelay` to avoid hammering unavailable infrastructure;
 - high-throughput environments: prefer larger batches plus durable claiming rather than very aggressive polling.
 
 ## Provider outage guidance
 
 Emitter failures should be returned as provider-neutral `GovernanceEmissionResult` values whenever possible. The Core drain then persists deferred, retryable, failed, or dead-letter state transitions through the outbox store.
 
-If the provider throws unexpectedly, the Core drain converts the exception into a retryable provider-neutral outbox failure. If the worker itself fails before or outside emission, such as a DI or storage exception, the hosted worker waits for `FailureDelay` before the next pass.
+If the provider throws unexpectedly, the Core drain converts the exception into a retryable provider-neutral outbox failure and schedules the next retry using `AsiBackboneGovernanceOutboxOptions.RetryDelay`. If the worker itself fails before or outside emission, such as a DI or storage exception, the hosted worker waits for `FailureDelay` before the next pass.
 
 ## Operational reliability guidance
 

@@ -23,6 +23,8 @@ Governed decision
 
 The durable outbox is the reliability boundary. The drain process is the visibility bridge. If the bridge is stopped, misconfigured, or failing, the host may still retain records locally while losing centralized visibility.
 
+Drain reliability is also a throughput concern. Slow host-owned stores, emitters, exporters, or provider SDKs can create backlog even when the AsiBackbone worker is healthy. See [High-Throughput Host Service Guidance](high-throughput-host-services.md) for async/non-blocking implementation guidance, blocking-call anti-patterns, batching, queue depth, backpressure, and host-service failure behavior.
+
 ## Host responsibility boundary
 
 AsiBackbone provides provider-neutral outbox contracts, drain primitives, status vocabulary, and optional integration packages. The host remains responsible for:
@@ -175,6 +177,7 @@ It does not implement a complete outbox worker, mandate a single retry policy, g
 
 - [Durable Audit and Outbox Persistence](durable-audit-outbox-persistence.md)
 - [Hosted Governance Outbox Drain](hosted-governance-outbox-drain.md)
+- [High-Throughput Host Service Guidance](high-throughput-host-services.md)
 - [Governance Emission Contract](governance-emission-contract.md)
 - [Audit Residue Observability Schema](audit-residue-observability-schema.md)
 - [Production Wording and Alpha Limitations](production-wording-and-alpha-limitations.md)

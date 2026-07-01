@@ -29,7 +29,7 @@ These pages are the best first stops for implementation-first adoption.
 
 ## Current stable package family
 
-Stable `2.x` is the current release line. `2.1.1` is the current compatible minor release. It preserves the `2.0.0` public package and namespace boundary while adding optional policy fast-abort support, builder-style audit residue construction, benchmark guidance, custom decision-policy examples, and in-memory outbox hardening.
+Stable `2.x` is the current release line. `2.2.0` is the current compatible minor release. It preserves the `2.0.0` public package and namespace boundary while adding an opt-in reduced endpoint-governance metadata mode, endpoint-governance dependency-resolution refinement, GovernanceDecision reason-normalization allocation reduction, and the existing `2.x` governance-spine surfaces.
 
 ```text
 AsiBackbone.Core
@@ -116,6 +116,8 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 * [Quality Reports](quality/)
 * [Performance Benchmark Baseline](articles/performance-benchmark-baseline.md)
 * [Release Validation](articles/release-validation.md)
+* [2.2.0 Release Readiness Record](articles/release-readiness-220.md)
+* [2.2.0 Release Notes](articles/release-notes-220.md)
 * [2.1.0 Release Readiness Record](articles/release-readiness-210.md)
 * [2.1.0 Release Notes](articles/release-notes-210.md)
 * [2.0.2 Release Readiness Record](articles/release-readiness-202.md)

@@ -4,6 +4,40 @@ All notable changes to this project are documented in this file.
 
 This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/) and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2026-07-01
+
+### Release summary
+
+`2.2.0` is a compatible minor release for the stable `2.x` package family.
+
+This release preserves the `2.0.0` public package and namespace boundary while adding opt-in endpoint-governance reduced metadata mode and incorporating endpoint governance and Core decision hot-path allocation refinements.
+
+### Added
+
+* Added `AsiBackboneEndpointGovernanceMetadataMode` with default `Full` behavior and opt-in `Reduced` behavior.
+* Added `AsiBackboneEndpointGovernanceOptions.MetadataMode` so high-throughput ASP.NET Core hosts can forward reduced endpoint metadata through governance evaluation, audit residue, acknowledgment challenge metadata, and development diagnostics.
+* Added focused tests for default full metadata, reduced descriptor metadata, reduced evaluator metadata, and reduced development diagnostic metadata.
+* Added release notes and a release readiness record for the `2.2.0` release.
+
+### Changed
+
+* Promoted central package version metadata from `2.1.1` to `2.2.0` while preserving `AssemblyVersion` as `2.0.0.0`.
+* Updated `FileVersion` to `2.2.0.0`.
+* Updated `CITATION.cff` and `.zenodo.json` for the `2.2.0` release.
+* Updated README, documentation home, article index, DocFX navigation, release validation, API compatibility / SemVer guidance, release notes, release readiness guidance, and Source Link validation defaults.
+
+### Performance
+
+* Reduced repeated optional dependency resolution in endpoint governance evaluation.
+* Reduced avoidable allocation churn in `GovernanceDecision.NormalizeReasons`.
+* Added reduced endpoint-governance metadata mode for measured high-throughput production paths that can safely operate with only `endpoint.operation_name` metadata.
+
+### Compatibility notes
+
+* Existing stable `2.0.x` and `2.1.x` consumers should be able to upgrade to `2.2.0` without required source-code changes.
+* `2.2.0` is a minor release because it includes backward-compatible public APIs and options.
+* `AssemblyVersion` remains `2.0.0.0` for the compatible stable `2.x` line.
+
 ## [2.1.1] - 2026-06-28
 
 ### Fixed

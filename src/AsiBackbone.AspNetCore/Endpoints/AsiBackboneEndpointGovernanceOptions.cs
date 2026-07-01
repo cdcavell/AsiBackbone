@@ -18,6 +18,16 @@ public sealed class AsiBackboneEndpointGovernanceOptions
     public string? PolicyHash { get; set; }
 
     /// <summary>
+    /// Gets or sets the endpoint metadata mode used for governance evaluation contexts, audit residue, acknowledgment challenges, and diagnostics.
+    /// </summary>
+    /// <remarks>
+    /// The default keeps complete endpoint metadata for traceability. High-throughput hosts may choose
+    /// <see cref="AsiBackboneEndpointGovernanceMetadataMode.Reduced" /> to forward only the endpoint operation name
+    /// through the hot path after they have confirmed host policies do not require the omitted metadata values.
+    /// </remarks>
+    public AsiBackboneEndpointGovernanceMetadataMode MetadataMode { get; set; } = AsiBackboneEndpointGovernanceMetadataMode.Full;
+
+    /// <summary>
     /// Gets or sets a value indicating whether policy metadata should fail closed when no policy evaluator is configured.
     /// </summary>
     public bool FailClosedWhenPolicyEvaluatorMissing { get; set; } = true;
@@ -86,6 +96,11 @@ public sealed class AsiBackboneEndpointGovernanceOptions
     /// </summary>
     public void Validate()
     {
+        if (!Enum.IsDefined(MetadataMode))
+        {
+            throw new InvalidOperationException($"{nameof(MetadataMode)} must be a defined endpoint governance metadata mode.");
+        }
+
         ValidateStatusCode(ConfigurationFailureStatusCode, nameof(ConfigurationFailureStatusCode));
         ValidateStatusCode(CapabilityFailureStatusCode, nameof(CapabilityFailureStatusCode));
         ValidateStatusCode(AcknowledgmentChallengeStatusCode, nameof(AcknowledgmentChallengeStatusCode));

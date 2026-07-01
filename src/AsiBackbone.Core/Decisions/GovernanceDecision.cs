@@ -438,12 +438,9 @@ public sealed class GovernanceDecision
             normalizedReasons.Add(reason);
         }
 
-        if (firstReason is null)
-        {
-            return CreateFallbackReason(fallbackCode, fallbackMessage);
-        }
-
-        return normalizedReasons is null
+        return firstReason is null
+            ? CreateFallbackReason(fallbackCode, fallbackMessage)
+            : normalizedReasons is null
             ? CreateReadOnlyReason(firstReason)
             : normalizedReasons.AsReadOnly();
     }

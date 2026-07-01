@@ -47,7 +47,7 @@ internal static class AsiBackboneEndpointGovernanceDevelopmentDiagnostics
         ArgumentException.ThrowIfNullOrWhiteSpace(detail);
 
         Dictionary<string, string> diagnosticMetadata = metadata is null
-            ? new Dictionary<string, string>(descriptor.ToMetadata(), StringComparer.Ordinal)
+            ? new Dictionary<string, string>(descriptor.ToMetadata(options.MetadataMode), StringComparer.Ordinal)
             : new Dictionary<string, string>(metadata, StringComparer.Ordinal);
         Dictionary<string, object?> extensions = CreateExtensions(
             options,
@@ -81,6 +81,7 @@ internal static class AsiBackboneEndpointGovernanceDevelopmentDiagnostics
             ["capabilityScopes"] = descriptor.CapabilityScopes
                 .OrderBy(static scope => scope, StringComparer.Ordinal)
                 .ToArray(),
+            ["metadataMode"] = options.MetadataMode.ToString(),
             ["metadataKeys"] = metadata.Keys
                 .OrderBy(static key => key, StringComparer.Ordinal)
                 .ToArray(),

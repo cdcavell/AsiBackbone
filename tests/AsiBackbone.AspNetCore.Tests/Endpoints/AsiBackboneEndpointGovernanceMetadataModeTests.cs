@@ -16,7 +16,7 @@ public sealed class AsiBackboneEndpointGovernanceMetadataModeTests
     [Fact]
     public void DescriptorToMetadataDefaultsToFullMetadata()
     {
-        var descriptor = CreateDescriptor();
+        AsiBackboneEndpointGovernanceDescriptor descriptor = CreateDescriptor();
 
         IReadOnlyDictionary<string, string> metadata = descriptor.ToMetadata();
 
@@ -30,7 +30,7 @@ public sealed class AsiBackboneEndpointGovernanceMetadataModeTests
     [Fact]
     public void DescriptorToMetadataCanUseReducedMode()
     {
-        var descriptor = CreateDescriptor();
+        AsiBackboneEndpointGovernanceDescriptor descriptor = CreateDescriptor();
 
         IReadOnlyDictionary<string, string> metadata = descriptor.ToMetadata(AsiBackboneEndpointGovernanceMetadataMode.Reduced);
 
@@ -48,10 +48,7 @@ public sealed class AsiBackboneEndpointGovernanceMetadataModeTests
     {
         var evaluator = new CapturingPolicyEvaluator();
         using ServiceProvider services = new ServiceCollection()
-            .Configure<AsiBackboneEndpointGovernanceOptions>(options =>
-            {
-                options.MetadataMode = AsiBackboneEndpointGovernanceMetadataMode.Reduced;
-            })
+            .Configure<AsiBackboneEndpointGovernanceOptions>(options => options.MetadataMode = AsiBackboneEndpointGovernanceMetadataMode.Reduced)
             .AddAsiBackboneAspNetCore()
             .AddSingleton<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>>(evaluator)
             .BuildServiceProvider(validateScopes: true);

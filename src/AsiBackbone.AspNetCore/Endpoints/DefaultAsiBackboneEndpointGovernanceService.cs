@@ -61,6 +61,7 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
             return AsiBackboneEndpointGovernanceResult.Allow();
         }
 
+        var optionalServices = new EndpointGovernanceOptionalServiceResolver(httpContext.RequestServices, serviceProvider);
         AsiBackboneHttpRequestCorrelation correlation = requestCorrelationResolver.ResolveRequestCorrelation();
         IReadOnlyDictionary<string, string> endpointMetadata = descriptor.ToMetadata();
         AsiBackboneConstraintEvaluationContext evaluationContext = correlation.ToEvaluationContext(
@@ -76,8 +77,7 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
 
         if (descriptor.PolicyTypes.Count > 0)
         {
-            IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>? evaluator =
-                httpContext.RequestServices.GetService<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>>();
+            IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>? evaluator = optionalServices.GetPolicyEvaluator();
 
             if (evaluator is null)
             {
@@ -100,7 +100,7 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
 
         if (decision.CanProceed && descriptor.CapabilityScopes.Count > 0)
         {
-            IAsiBackboneEndpointCapabilityGrantValidator? capabilityValidator = httpContext.RequestServices.GetService<IAsiBackboneEndpointCapabilityGrantValidator>();
+            IAsiBackboneEndpointCapabilityGrantValidator? capabilityValidator = optionalServices.GetCapabilityValidator();
 
             if (capabilityValidator is null)
             {
@@ -125,7 +125,7 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
 
         if (descriptor.EmitGovernanceAudit)
         {
-            IAsiBackboneAuditSink? auditSink = serviceProvider.GetService<IAsiBackboneAuditSink>();
+            IAsiBackboneAuditSink? auditSink = optionalServices.GetAuditSink();
             if (auditSink is null)
             {
                 return endpointOptions.FailClosedWhenAuditSinkMissing
@@ -168,6 +168,51 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
         return decision.CanProceed
             ? AsiBackboneEndpointGovernanceResult.Allow(decision)
             : CreateBlockedDecisionResult(decision);
+    }
+
+    private struct EndpointGovernanceOptionalServiceResolver(
+        IServiceProvider requestServices,
+        IServiceProvider governanceServices)
+    {
+        private IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>? policyEvaluator;
+        private IAsiBackboneEndpointCapabilityGrantValidator? capabilityValidator;
+        private IAsiBackboneAuditSink? auditSink;
+        private bool policyEvaluatorResolved;
+        private bool capabilityValidatorResolved;
+        private bool auditSinkResolved;
+
+        public IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>? GetPolicyEvaluator()
+        {
+            if (!policyEvaluatorResolved)
+            {
+                policyEvaluator = requestServices.GetService<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>>();
+                policyEvaluatorResolved = true;
+            }
+
+            return policyEvaluator;
+        }
+
+        public IAsiBackboneEndpointCapabilityGrantValidator? GetCapabilityValidator()
+        {
+            if (!capabilityValidatorResolved)
+            {
+                capabilityValidator = requestServices.GetService<IAsiBackboneEndpointCapabilityGrantValidator>();
+                capabilityValidatorResolved = true;
+            }
+
+            return capabilityValidator;
+        }
+
+        public IAsiBackboneAuditSink? GetAuditSink()
+        {
+            if (!auditSinkResolved)
+            {
+                auditSink = governanceServices.GetService<IAsiBackboneAuditSink>();
+                auditSinkResolved = true;
+            }
+
+            return auditSink;
+        }
     }
 
     private AsiBackboneEndpointGovernanceResult CreateBlockedDecisionResult(GovernanceDecision decision)

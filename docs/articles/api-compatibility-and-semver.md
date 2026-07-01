@@ -2,7 +2,7 @@
 
 This article defines the public API compatibility promise for the stable AsiBackbone package family and documents how semantic versioning applies after stabilization.
 
-It complements the historical stable API review tracked in [issue #13](https://github.com/cdcavell/AsiBackbone/issues/13). The `2.0.0` release started the current `2.x` line because the public package IDs and namespaces moved from `CDCavell.AsiBackbone.*` to `AsiBackbone.*`. `2.0.1` and `2.0.2` preserved that boundary through compatible patch releases. `2.1.0` and `2.1.1` preserves the same package and namespace boundary while adding backward-compatible public/API and adoption-surface expansion.
+It complements the historical stable API review tracked in [issue #13](https://github.com/cdcavell/AsiBackbone/issues/13). The `2.0.0` release started the current `2.x` line because the public package IDs and namespaces moved from `CDCavell.AsiBackbone.*` to `AsiBackbone.*`. `2.0.1`, `2.0.2`, and `2.1.1` preserved that boundary through compatible patch releases. `2.1.0` and `2.2.0` preserve the same package and namespace boundary while adding backward-compatible public/API and adoption-surface expansion.
 
 > [!NOTE]
 > Additive public API or package surface should use a minor version bump even when the change is backward-compatible. Patch releases should be reserved for fixes, documentation, packaging, tests, and implementation hardening that do not expand the stable public surface.
@@ -43,7 +43,7 @@ The `1.1.x` and `1.2.x` releases expanded the stable `1.x` contract with compati
 
 ### Current `2.x` stable family
 
-`2.1.1` is the current stable minor release. It preserves the `2.0.0` public package and namespace boundary after the public rename from `CDCavell.AsiBackbone.*` to `AsiBackbone.*`.
+`2.2.0` is the current stable minor release. It preserves the `2.0.0` public package and namespace boundary after the public rename from `CDCavell.AsiBackbone.*` to `AsiBackbone.*`.
 
 | Package | `2.x` stable role |
 | --- | --- |
@@ -51,7 +51,7 @@ The `1.1.x` and `1.2.x` releases expanded the stable `1.x` contract with compati
 | `AsiBackbone.DependencyInjection` | Explicit builder facade and host-selected provider registration composition path. |
 | `AsiBackbone.Storage.InMemory` | Non-durable storage helpers for tests, samples, local validation, lifecycle events, and outbox proof paths. |
 | `AsiBackbone.EntityFrameworkCore` | EF Core host-owned persistence helpers for audit, acknowledgment, lifecycle, and outbox records. |
-| `AsiBackbone.AspNetCore` | ASP.NET Core host adapters, endpoint governance, development diagnostics, endpoint fast-abort metadata, and hosted outbox drain integration. |
+| `AsiBackbone.AspNetCore` | ASP.NET Core host adapters, endpoint governance, endpoint-governance metadata mode, development diagnostics, endpoint fast-abort metadata, and hosted outbox drain integration. |
 | `AsiBackbone.Testing` | Test-only harness helpers for deterministic governance and package-wiring tests. |
 | `AsiBackbone.Templates` | Developer-experience `dotnet new` templates for governed ASP.NET Core host scaffolding. |
 | `AsiBackbone.Analyzers` | Build-time analyzer safety rails, including production-signing configuration guidance. |
@@ -107,6 +107,7 @@ Expected stable-line behavior:
 | `2.0.2` | `2.0.2` | `2.0.0.0` | `2.0.2.0` | `2.0.2+...` |
 | `2.1.0` | `2.1.0` | `2.0.0.0` | `2.1.0.0` | `2.1.0+...` |
 | `2.1.1` | `2.1.1` | `2.0.0.0` | `2.1.1.0` | `2.1.1+...` |
+| `2.2.0` | `2.2.0` | `2.0.0.0` | `2.2.0.0` | `2.2.0+...` |
 
 Before cutting stable releases, release validation should verify that `AssemblyVersion`, `FileVersion`, `InformationalVersion`, package metadata, release notes, and repository tags match this policy.
 
@@ -137,6 +138,7 @@ Before cutting a stable release or stable package-family expansion, the release 
 
 ## Related documentation
 
+- [2.2.0 Release Notes](release-notes-220.md)
 - [2.1.0 Release Notes](release-notes-210.md)
 - [2.0.2 Release Notes](release-notes-202.md)
 - [2.0.1 Release Notes](release-notes-201.md)

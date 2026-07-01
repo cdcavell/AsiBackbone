@@ -39,6 +39,7 @@ When enabled, local ProblemDetails responses may include safe diagnostic fields 
 | `decisionStage` | The stage that produced or surfaced the failure. |
 | `correlationId` / `traceId` | Decision identifiers when available. |
 | `policyVersion` / `policyHash` | Policy metadata when available. |
+| `metadataMode` | The configured endpoint metadata mode used for the evaluated metadata dictionary. |
 | `metadataKeys` | Evaluated metadata keys. |
 | `metadata` | Evaluated metadata values after redaction. |
 | `documentationUrl` | Link back to this troubleshooting page when configured. |
@@ -61,6 +62,7 @@ A missing capability validator in local development may return a response shaped
     "sample.execute"
   ],
   "decisionStage": "aspnetcore.endpoint.governance.capability.configuration",
+  "metadataMode": "Full",
   "metadataKeys": [
     "endpoint.capability_scopes",
     "endpoint.emit_governance_audit",
@@ -71,7 +73,7 @@ A missing capability validator in local development may return a response shaped
 }
 ```
 
-Exact fields depend on the failing stage and the decision produced by the host-owned evaluator or validator.
+Exact fields depend on the failing stage, configured metadata mode, and the decision produced by the host-owned evaluator or validator. When `MetadataMode` is `Reduced`, `metadataKeys` and `metadata` include only the reduced metadata dictionary, while descriptor-derived fields such as `endpointPolicyTypes` and `capabilityScopes` may still appear in local diagnostics.
 
 ## Common failures and fixes
 

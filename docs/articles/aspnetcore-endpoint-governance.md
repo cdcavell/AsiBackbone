@@ -127,6 +127,30 @@ builder.Services.Configure<AsiBackboneEndpointGovernanceOptions>(options =>
 
 Use richer ProblemDetails responses only when the response body is safe for the deployment. Do not include sensitive policy internals, capability-token details, audit identifiers, or reason messages unless the host has explicitly decided those values are safe to expose.
 
+## Endpoint metadata mode
+
+Endpoint governance builds a normalized metadata dictionary for policy evaluation, audit residue, acknowledgment challenges, and development diagnostics. The default `Full` mode preserves the existing traceability behavior and includes values such as:
+
+- `endpoint.operation_name`
+- `endpoint.requires_liability_handshake`
+- `endpoint.emit_governance_audit`
+- `endpoint.policy_types`
+- `endpoint.short_circuit_on_first_denial`, when configured
+- `endpoint.capability_scopes`, when configured
+
+High-throughput production hosts that have measured endpoint metadata creation as meaningful overhead can opt into reduced metadata:
+
+```csharp
+builder.Services.Configure<AsiBackboneEndpointGovernanceOptions>(options =>
+{
+    options.MetadataMode = AsiBackboneEndpointGovernanceMetadataMode.Reduced;
+});
+```
+
+`Reduced` mode forwards only `endpoint.operation_name` through the metadata dictionary. The descriptor still uses the full ASP.NET Core endpoint metadata internally to decide whether policy evaluation, capability validation, audit emission, or acknowledgment handling should run. The tradeoff is that host policy evaluators, audit sinks, acknowledgment stores, and development diagnostics will not receive the omitted metadata values through `AsiBackboneConstraintEvaluationContext.Metadata` or related metadata payloads.
+
+Do not enable reduced metadata if host policies depend on `endpoint.policy_types`, `endpoint.capability_scopes`, or other endpoint metadata values. Prefer the default `Full` mode until benchmark output shows that the reduced path is worth the loss of diagnostic context.
+
 ## Development diagnostics
 
 Local development hosts can opt into richer ProblemDetails diagnostics for endpoint governance failures:
@@ -141,7 +165,7 @@ builder.Services.Configure<AsiBackboneEndpointGovernanceOptions>(options =>
 
 Diagnostics are emitted only when enabled and when the request service provider exposes an `IWebHostEnvironment` whose environment name is `Development`. Production-safe defaults remain conservative: diagnostics are off by default and ordinary denied decisions keep the bodyless generic `403` path unless diagnostics are explicitly enabled in development.
 
-Development diagnostics may include the governance outcome, reason codes and messages, endpoint operation name, policy marker types, requested capability scopes, decision stage, correlation/trace identifiers, redacted metadata, and a troubleshooting documentation link.
+Development diagnostics may include the governance outcome, reason codes and messages, endpoint operation name, policy marker types, requested capability scopes, decision stage, correlation/trace identifiers, metadata mode, redacted metadata, and a troubleshooting documentation link. When `MetadataMode` is `Reduced`, the diagnostic metadata keys and redacted metadata payload reflect the reduced metadata dictionary, while descriptor-derived fields such as policy marker types and capability scopes may still appear in development-only diagnostics.
 
 See [Endpoint Governance Development Diagnostics](endpoint-governance-development-diagnostics.md) for response examples, common failures, and redaction rules.
 

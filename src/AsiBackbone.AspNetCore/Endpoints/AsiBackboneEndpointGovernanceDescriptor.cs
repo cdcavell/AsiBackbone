@@ -137,12 +137,30 @@ public sealed class AsiBackboneEndpointGovernanceDescriptor
     /// <returns>A normalized metadata dictionary.</returns>
     public IReadOnlyDictionary<string, string> ToMetadata()
     {
-        Dictionary<string, string> metadata = new(StringComparer.Ordinal)
+        return ToMetadata(AsiBackboneEndpointGovernanceMetadataMode.Full);
+    }
+
+    /// <summary>
+    /// Converts descriptor values into safe metadata for framework-neutral governance evaluation and audit residue.
+    /// </summary>
+    /// <param name="metadataMode">The endpoint metadata mode to apply.</param>
+    /// <returns>A normalized metadata dictionary.</returns>
+    public IReadOnlyDictionary<string, string> ToMetadata(AsiBackboneEndpointGovernanceMetadataMode metadataMode)
+    {
+        return metadataMode switch
         {
-            ["endpoint.operation_name"] = OperationName,
-            ["endpoint.requires_liability_handshake"] = RequiresLiabilityHandshake ? "true" : "false",
-            ["endpoint.emit_governance_audit"] = EmitGovernanceAudit ? "true" : "false"
+            AsiBackboneEndpointGovernanceMetadataMode.Full => ToFullMetadata(),
+            AsiBackboneEndpointGovernanceMetadataMode.Reduced => ToReducedMetadata(),
+            _ => throw new ArgumentOutOfRangeException(nameof(metadataMode), metadataMode, "Endpoint governance metadata mode is not supported.")
         };
+    }
+
+    private Dictionary<string, string> ToFullMetadata()
+    {
+        Dictionary<string, string> metadata = ToReducedMetadata();
+
+        metadata["endpoint.requires_liability_handshake"] = RequiresLiabilityHandshake ? "true" : "false";
+        metadata["endpoint.emit_governance_audit"] = EmitGovernanceAudit ? "true" : "false";
 
         if (PolicyTypes.Count > 0)
         {
@@ -160,6 +178,14 @@ public sealed class AsiBackboneEndpointGovernanceDescriptor
         }
 
         return metadata;
+    }
+
+    private Dictionary<string, string> ToReducedMetadata()
+    {
+        return new Dictionary<string, string>(1, StringComparer.Ordinal)
+        {
+            ["endpoint.operation_name"] = OperationName
+        };
     }
 
     private static string ResolveOperationName(Endpoint endpoint)

@@ -63,7 +63,7 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
 
         var optionalServices = new EndpointGovernanceOptionalServiceResolver(httpContext.RequestServices, serviceProvider);
         AsiBackboneHttpRequestCorrelation correlation = requestCorrelationResolver.ResolveRequestCorrelation();
-        IReadOnlyDictionary<string, string> endpointMetadata = descriptor.ToMetadata();
+        IReadOnlyDictionary<string, string> endpointMetadata = descriptor.ToMetadata(endpointOptions.MetadataMode);
         AsiBackboneConstraintEvaluationContext evaluationContext = correlation.ToEvaluationContext(
             endpointOptions.PolicyVersion,
             endpointOptions.PolicyHash,

@@ -3,14 +3,14 @@
     - When no -Version value is supplied, the script validates the currently documented
       default package version below.
     - For future releases, pass the released package version explicitly, for example:
-        ./scripts/Validate-Source-Link-commit-metadata.ps1 -Version '2.1.1'
+        ./scripts/Validate-Source-Link-commit-metadata.ps1 -Version '2.2.0'
     - Use -KeepArtifacts only when troubleshooting. By default, downloaded and extracted
       NuGet package verification artifacts are cleaned up before the script exits.
 #>
 
 [CmdletBinding()]
 param(
-    [string]$Version = '2.1.1',
+    [string]$Version = '2.2.0',
     [switch]$KeepArtifacts
 )
 
@@ -79,36 +79,37 @@ try {
         $repositoryUrl = $repositoryNode.GetAttribute('url')
         $repositoryCommit = $repositoryNode.GetAttribute('commit')
 
-        if ($repositoryType -ne 'git') {
-            throw "$packageId repository type expected 'git' but found '$repositoryType'."
-        }
-
-        if ($repositoryUrl -ne $expectedRepositoryUrl) {
-            throw "$packageId repository URL expected '$expectedRepositoryUrl' but found '$repositoryUrl'."
-        }
-
-        if ([string]::IsNullOrWhiteSpace($repositoryCommit)) {
-            throw "$packageId repository commit metadata was empty."
-        }
-
         [pscustomobject]@{
-            Package = $packageId
-            Version = $Version
+            PackageId = $packageId
             RepositoryType = $repositoryType
             RepositoryUrl = $repositoryUrl
             RepositoryCommit = $repositoryCommit
+            HasCommit = -not [string]::IsNullOrWhiteSpace($repositoryCommit)
+            TypeMatches = $repositoryType -eq 'git'
+            UrlMatches = $repositoryUrl -eq $expectedRepositoryUrl
         }
     }
-}
-catch {
-    $exitCode = 1
-    Write-Host "::error::$($_.Exception.Message)"
-}
-finally {
-    if ($results.Count -gt 0) {
-        $results | Format-Table -AutoSize
+
+    foreach ($result in $results) {
+        if (-not $result.TypeMatches) {
+            Write-Error "$($result.PackageId) repository type expected 'git' but found '$($result.RepositoryType)'."
+            $exitCode = 1
+        }
+
+        if (-not $result.UrlMatches) {
+            Write-Error "$($result.PackageId) repository URL expected '$expectedRepositoryUrl' but found '$($result.RepositoryUrl)'."
+            $exitCode = 1
+        }
+
+        if (-not $result.HasCommit) {
+            Write-Error "$($result.PackageId) repository commit metadata was empty."
+            $exitCode = 1
+        }
     }
 
+    $results | Format-Table -AutoSize
+}
+finally {
     if (-not $KeepArtifacts) {
         Remove-Item -LiteralPath $workRoot -Recurse -Force -ErrorAction SilentlyContinue
     }
@@ -117,5 +118,3 @@ finally {
 if ($exitCode -ne 0) {
     exit $exitCode
 }
-
-Write-Host "Source Link repository metadata validation passed for AsiBackbone $Version."

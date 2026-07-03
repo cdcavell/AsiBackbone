@@ -226,7 +226,7 @@ public sealed class AsiBackboneEndpointGovernanceDescriptor
         return false;
     }
 
-    private IReadOnlyDictionary<string, string> CreateFullMetadata()
+    private ReadOnlyDictionary<string, string> CreateFullMetadata()
     {
         int metadataCapacity = 3
             + (PolicyTypes.Count > 0 ? 1 : 0)
@@ -258,7 +258,7 @@ public sealed class AsiBackboneEndpointGovernanceDescriptor
         return new ReadOnlyDictionary<string, string>(metadata);
     }
 
-    private static IReadOnlyDictionary<string, string> CreateReducedMetadata(string operationName)
+    private static ReadOnlyDictionary<string, string> CreateReducedMetadata(string operationName)
     {
         return new ReadOnlyDictionary<string, string>(
             new Dictionary<string, string>(1, StringComparer.Ordinal)

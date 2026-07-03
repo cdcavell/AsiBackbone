@@ -17,7 +17,7 @@ public sealed class AsiBackboneEndpointGovernanceDescriptorCacheTests
                 new RequireCapabilityGrantAttribute("robotics.execute"),
                 new EmitGovernanceAuditAttribute()),
             "sample.robotics.execute");
-        AsiBackboneEndpointGovernanceDescriptor descriptor = AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(endpoint);
+        var descriptor = AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(endpoint);
 
         IReadOnlyDictionary<string, string> firstFullMetadata = descriptor.ToMetadata();
         IReadOnlyDictionary<string, string> secondFullMetadata = descriptor.ToMetadata();

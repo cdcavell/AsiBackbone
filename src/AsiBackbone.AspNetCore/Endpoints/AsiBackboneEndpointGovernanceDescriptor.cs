@@ -11,6 +11,9 @@ public sealed class AsiBackboneEndpointGovernanceDescriptor
     private static readonly ReadOnlyCollection<Type> EmptyPolicyTypes = Array.AsReadOnly(Array.Empty<Type>());
     private static readonly ReadOnlyCollection<string> EmptyScopes = Array.AsReadOnly(Array.Empty<string>());
 
+    private readonly IReadOnlyDictionary<string, string> fullMetadata;
+    private readonly IReadOnlyDictionary<string, string> reducedMetadata;
+
     private AsiBackboneEndpointGovernanceDescriptor(
         string operationName,
         IReadOnlyList<Type> policyTypes,
@@ -27,6 +30,8 @@ public sealed class AsiBackboneEndpointGovernanceDescriptor
         RequiresLiabilityHandshake = requiresLiabilityHandshake;
         CapabilityScopes = capabilityScopes;
         EmitGovernanceAudit = emitGovernanceAudit;
+        reducedMetadata = CreateReducedMetadata(OperationName);
+        fullMetadata = CreateFullMetadata();
     }
 
     /// <summary>
@@ -80,38 +85,68 @@ public sealed class AsiBackboneEndpointGovernanceDescriptor
             return None("unresolved-endpoint");
         }
 
-        Type[] policyTypes = [.. endpoint.Metadata
-            .GetOrderedMetadata<IAsiBackboneEndpointGovernancePolicyMetadata>()
-            .Select(metadata => metadata.PolicyType)
-            .Where(static policyType => policyType is not null)
-            .Distinct()];
+        List<Type>? policyTypes = null;
+        foreach (IAsiBackboneEndpointGovernancePolicyMetadata metadata in endpoint.Metadata.GetOrderedMetadata<IAsiBackboneEndpointGovernancePolicyMetadata>())
+        {
+            if (metadata.PolicyType is not Type policyType || ContainsPolicyType(policyTypes, policyType))
+            {
+                continue;
+            }
 
-        string[] capabilityScopes = [.. endpoint.Metadata
-            .GetOrderedMetadata<IAsiBackboneEndpointCapabilityGrantMetadata>()
-            .Select(metadata => metadata.Scope)
-            .Where(static scope => !string.IsNullOrWhiteSpace(scope))
-            .Select(static scope => scope.Trim())
-            .Distinct(StringComparer.Ordinal)];
+            policyTypes ??= [];
+            policyTypes.Add(policyType);
+        }
 
-        bool? shortCircuitOnFirstDenial = endpoint.Metadata
-            .GetOrderedMetadata<IAsiBackboneEndpointPolicyEvaluationOptionsMetadata>()
-            .Select(static metadata => metadata.ShortCircuitOnFirstDenial)
-            .LastOrDefault();
+        List<string>? capabilityScopes = null;
+        foreach (IAsiBackboneEndpointCapabilityGrantMetadata metadata in endpoint.Metadata.GetOrderedMetadata<IAsiBackboneEndpointCapabilityGrantMetadata>())
+        {
+            if (string.IsNullOrWhiteSpace(metadata.Scope))
+            {
+                continue;
+            }
 
-        bool requiresLiabilityHandshake = endpoint.Metadata
-            .GetOrderedMetadata<IAsiBackboneEndpointLiabilityHandshakeMetadata>()
-            .Any(static metadata => metadata.RequiresLiabilityHandshake);
+            string scope = metadata.Scope.Trim();
+            if (ContainsScope(capabilityScopes, scope))
+            {
+                continue;
+            }
 
-        bool emitGovernanceAudit = endpoint.Metadata
-            .GetOrderedMetadata<IAsiBackboneEndpointAuditEmissionMetadata>()
-            .Any(static metadata => metadata.EmitGovernanceAudit);
+            capabilityScopes ??= [];
+            capabilityScopes.Add(scope);
+        }
+
+        bool? shortCircuitOnFirstDenial = null;
+        foreach (IAsiBackboneEndpointPolicyEvaluationOptionsMetadata metadata in endpoint.Metadata.GetOrderedMetadata<IAsiBackboneEndpointPolicyEvaluationOptionsMetadata>())
+        {
+            shortCircuitOnFirstDenial = metadata.ShortCircuitOnFirstDenial;
+        }
+
+        bool requiresLiabilityHandshake = false;
+        foreach (IAsiBackboneEndpointLiabilityHandshakeMetadata metadata in endpoint.Metadata.GetOrderedMetadata<IAsiBackboneEndpointLiabilityHandshakeMetadata>())
+        {
+            if (metadata.RequiresLiabilityHandshake)
+            {
+                requiresLiabilityHandshake = true;
+                break;
+            }
+        }
+
+        bool emitGovernanceAudit = false;
+        foreach (IAsiBackboneEndpointAuditEmissionMetadata metadata in endpoint.Metadata.GetOrderedMetadata<IAsiBackboneEndpointAuditEmissionMetadata>())
+        {
+            if (metadata.EmitGovernanceAudit)
+            {
+                emitGovernanceAudit = true;
+                break;
+            }
+        }
 
         return new AsiBackboneEndpointGovernanceDescriptor(
             ResolveOperationName(endpoint),
-            policyTypes.Length == 0 ? EmptyPolicyTypes : Array.AsReadOnly(policyTypes),
+            policyTypes is null ? EmptyPolicyTypes : Array.AsReadOnly(policyTypes.ToArray()),
             shortCircuitOnFirstDenial,
             requiresLiabilityHandshake,
-            capabilityScopes.Length == 0 ? EmptyScopes : Array.AsReadOnly(capabilityScopes),
+            capabilityScopes is null ? EmptyScopes : Array.AsReadOnly(capabilityScopes.ToArray()),
             emitGovernanceAudit);
     }
 
@@ -149,22 +184,65 @@ public sealed class AsiBackboneEndpointGovernanceDescriptor
     {
         return metadataMode switch
         {
-            AsiBackboneEndpointGovernanceMetadataMode.Full => ToFullMetadata(),
-            AsiBackboneEndpointGovernanceMetadataMode.Reduced => ToReducedMetadata(),
+            AsiBackboneEndpointGovernanceMetadataMode.Full => fullMetadata,
+            AsiBackboneEndpointGovernanceMetadataMode.Reduced => reducedMetadata,
             _ => throw new ArgumentOutOfRangeException(nameof(metadataMode), metadataMode, "Endpoint governance metadata mode is not supported.")
         };
     }
 
-    private Dictionary<string, string> ToFullMetadata()
+    private static bool ContainsPolicyType(List<Type>? policyTypes, Type policyType)
     {
-        Dictionary<string, string> metadata = ToReducedMetadata();
+        if (policyTypes is null)
+        {
+            return false;
+        }
 
-        metadata["endpoint.requires_liability_handshake"] = RequiresLiabilityHandshake ? "true" : "false";
-        metadata["endpoint.emit_governance_audit"] = EmitGovernanceAudit ? "true" : "false";
+        foreach (Type currentPolicyType in policyTypes)
+        {
+            if (currentPolicyType == policyType)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool ContainsScope(List<string>? capabilityScopes, string scope)
+    {
+        if (capabilityScopes is null)
+        {
+            return false;
+        }
+
+        foreach (string currentScope in capabilityScopes)
+        {
+            if (string.Equals(currentScope, scope, StringComparison.Ordinal))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private IReadOnlyDictionary<string, string> CreateFullMetadata()
+    {
+        int metadataCapacity = 3
+            + (PolicyTypes.Count > 0 ? 1 : 0)
+            + (ShortCircuitOnFirstDenial.HasValue ? 1 : 0)
+            + (CapabilityScopes.Count > 0 ? 1 : 0);
+
+        var metadata = new Dictionary<string, string>(metadataCapacity, StringComparer.Ordinal)
+        {
+            ["endpoint.operation_name"] = OperationName,
+            ["endpoint.requires_liability_handshake"] = RequiresLiabilityHandshake ? "true" : "false",
+            ["endpoint.emit_governance_audit"] = EmitGovernanceAudit ? "true" : "false"
+        };
 
         if (PolicyTypes.Count > 0)
         {
-            metadata["endpoint.policy_types"] = string.Join(",", PolicyTypes.Select(static policyType => policyType.FullName ?? policyType.Name));
+            metadata["endpoint.policy_types"] = JoinPolicyTypeNames(PolicyTypes);
         }
 
         if (ShortCircuitOnFirstDenial.HasValue)
@@ -177,15 +255,29 @@ public sealed class AsiBackboneEndpointGovernanceDescriptor
             metadata["endpoint.capability_scopes"] = string.Join(",", CapabilityScopes);
         }
 
-        return metadata;
+        return new ReadOnlyDictionary<string, string>(metadata);
     }
 
-    private Dictionary<string, string> ToReducedMetadata()
+    private static IReadOnlyDictionary<string, string> CreateReducedMetadata(string operationName)
     {
-        return new Dictionary<string, string>(1, StringComparer.Ordinal)
+        return new ReadOnlyDictionary<string, string>(
+            new Dictionary<string, string>(1, StringComparer.Ordinal)
+            {
+                ["endpoint.operation_name"] = operationName
+            });
+    }
+
+    private static string JoinPolicyTypeNames(IReadOnlyList<Type> policyTypes)
+    {
+        string[] policyTypeNames = new string[policyTypes.Count];
+
+        for (int index = 0; index < policyTypeNames.Length; index++)
         {
-            ["endpoint.operation_name"] = OperationName
-        };
+            Type policyType = policyTypes[index];
+            policyTypeNames[index] = policyType.FullName ?? policyType.Name;
+        }
+
+        return string.Join(",", policyTypeNames);
     }
 
     private static string ResolveOperationName(Endpoint endpoint)

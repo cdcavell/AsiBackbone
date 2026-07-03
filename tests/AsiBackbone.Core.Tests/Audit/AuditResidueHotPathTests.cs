@@ -25,7 +25,7 @@ public sealed class AuditResidueHotPathTests
         var actor = AsiBackboneActorContext.Service("benchmark-service");
         GovernanceDecision decision = CreateDecision(scenario);
 
-        AuditResidue residue = AuditResidue.FromDecision(
+        var residue = AuditResidue.FromDecision(
             actor,
             "benchmark.operation",
             decision,
@@ -44,7 +44,7 @@ public sealed class AuditResidueHotPathTests
     [Fact]
     public void FromDecisionReusesImmutableDecisionReasonCodesForAuditFidelity()
     {
-        GovernanceDecision decision = GovernanceDecision.Deny(
+        var decision = GovernanceDecision.Deny(
             "policy.denied",
             "Policy denied the benchmark operation.",
             correlationId: "benchmark-correlation",
@@ -52,7 +52,7 @@ public sealed class AuditResidueHotPathTests
             policyVersion: "benchmark-policy-v1",
             policyHash: "benchmark-policy-hash");
 
-        AuditResidue residue = AuditResidue.FromDecision(
+        var residue = AuditResidue.FromDecision(
             AsiBackboneActorContext.Service("benchmark-service"),
             "benchmark.operation",
             decision,
@@ -70,11 +70,11 @@ public sealed class AuditResidueHotPathTests
             [" source "] = " original ",
             [" "] = "ignored"
         };
-        GovernanceDecision decision = GovernanceDecision.Warning(
+        var decision = GovernanceDecision.Warning(
             "policy.warning",
             "Policy produced a warning.");
 
-        AuditResidue residue = AuditResidue.FromDecision(
+        var residue = AuditResidue.FromDecision(
             AsiBackboneActorContext.Service("benchmark-service"),
             "benchmark.operation",
             decision,

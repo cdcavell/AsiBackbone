@@ -25,6 +25,15 @@ public sealed class ConstraintEvaluationResultTests
         Assert.Empty(result.ReasonCodes);
     }
 
+    [Fact]
+    public void AllowReusesSharedPassThroughResult()
+    {
+        ConstraintEvaluationResult first = ConstraintEvaluationResult.Allow();
+        ConstraintEvaluationResult second = ConstraintEvaluationResult.Allow();
+
+        Assert.Same(first, second);
+    }
+
     /// <summary>
     /// Verifies that the Deny factory method creates a result with the expected properties for a denied outcome, including the provided reason code and message.
     /// </summary>
@@ -108,6 +117,15 @@ public sealed class ConstraintEvaluationResultTests
         Assert.True(result.IsNotApplicable);
         Assert.Empty(result.Reasons);
         Assert.Empty(result.ReasonCodes);
+    }
+
+    [Fact]
+    public void NotApplicableReusesSharedPassThroughResult()
+    {
+        ConstraintEvaluationResult first = ConstraintEvaluationResult.NotApplicable();
+        ConstraintEvaluationResult second = ConstraintEvaluationResult.NotApplicable();
+
+        Assert.Same(first, second);
     }
 
     /// <summary>

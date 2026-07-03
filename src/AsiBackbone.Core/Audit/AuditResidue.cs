@@ -11,6 +11,14 @@ namespace AsiBackbone.Core.Audit;
 /// </summary>
 public sealed class AuditResidue : IAsiBackboneAuditResidue
 {
+    private const string OutcomeAcknowledgmentRequired = "AcknowledgmentRequired";
+    private const string OutcomeAllowed = "Allowed";
+    private const string OutcomeDenied = "Denied";
+    private const string OutcomeDeferred = "Deferred";
+    private const string OutcomeEscalationRecommended = "EscalationRecommended";
+    private const string OutcomeNotApplicable = "NotApplicable";
+    private const string OutcomeWarning = "Warning";
+
     private static readonly ReadOnlyCollection<string> EmptyReasonCodes =
         Array.AsReadOnly(Array.Empty<string>());
 
@@ -243,23 +251,19 @@ public sealed class AuditResidue : IAsiBackboneAuditResidue
         string? decisionStage = null,
         string? schemaVersion = null)
     {
-        ArgumentNullException.ThrowIfNull(actor);
-
-        string normalizedEventId = NormalizeIdentifier(eventId);
-
-        return new AuditResidue(
-            normalizedEventId,
-            NormalizeAuditResidueId(auditResidueId, normalizedEventId),
-            schemaVersion ?? AsiBackboneSchemaVersions.StableArtifactsV1,
-            occurredUtc ?? DateTimeOffset.UtcNow,
-            actor.ActorId,
-            actor.ActorType,
-            actor.DisplayName,
+        return CreateCore(
+            actor,
             operationName,
             outcome,
             NormalizeReasonCodes(reasonCodes),
+            eventId,
+            occurredUtc,
             correlationId,
             traceId,
+            policyVersion,
+            policyHash,
+            metadata,
+            auditResidueId,
             spanId,
             parentSpanId,
             decisionLatencyMs,
@@ -274,9 +278,7 @@ public sealed class AuditResidue : IAsiBackboneAuditResidue
             outboxSequence,
             gatewayExecutionId,
             decisionStage,
-            policyVersion,
-            policyHash,
-            NormalizeMetadata(metadata));
+            schemaVersion);
     }
 
     /// <summary>
@@ -331,11 +333,11 @@ public sealed class AuditResidue : IAsiBackboneAuditResidue
     {
         ArgumentNullException.ThrowIfNull(decision);
 
-        return Create(
+        return CreateCore(
             actor,
             operationName,
-            decision.Outcome.ToString(),
-            decision.ReasonCodes,
+            GetOutcomeName(decision.Outcome),
+            UseTrustedReasonCodes(decision.ReasonCodes),
             eventId,
             occurredUtc,
             decision.CorrelationId,
@@ -421,11 +423,11 @@ public sealed class AuditResidue : IAsiBackboneAuditResidue
     {
         ArgumentNullException.ThrowIfNull(constraintResult);
 
-        return Create(
+        return CreateCore(
             actor,
             operationName,
-            constraintResult.Outcome.ToString(),
-            constraintResult.ReasonCodes,
+            GetOutcomeName(constraintResult.Outcome),
+            UseTrustedReasonCodes(constraintResult.ReasonCodes),
             eventId,
             occurredUtc,
             correlationId,
@@ -449,6 +451,71 @@ public sealed class AuditResidue : IAsiBackboneAuditResidue
             gatewayExecutionId,
             decisionStage,
             schemaVersion);
+    }
+
+    private static AuditResidue CreateCore(
+        IAsiBackboneActorContext actor,
+        string operationName,
+        string outcome,
+        IReadOnlyList<string> reasonCodes,
+        string? eventId,
+        DateTimeOffset? occurredUtc,
+        string? correlationId,
+        string? traceId,
+        string? policyVersion,
+        string? policyHash,
+        IReadOnlyDictionary<string, string>? metadata,
+        string? auditResidueId,
+        string? spanId,
+        string? parentSpanId,
+        long? decisionLatencyMs,
+        string? constraintSetHash,
+        int? constraintCount,
+        double? riskScore,
+        string? policyScope,
+        string? tenantHash,
+        string? organizationHash,
+        string? emitterStatus,
+        string? emitterProvider,
+        long? outboxSequence,
+        string? gatewayExecutionId,
+        string? decisionStage,
+        string? schemaVersion)
+    {
+        ArgumentNullException.ThrowIfNull(actor);
+
+        string normalizedEventId = NormalizeIdentifier(eventId);
+
+        return new AuditResidue(
+            normalizedEventId,
+            NormalizeAuditResidueId(auditResidueId, normalizedEventId),
+            schemaVersion ?? AsiBackboneSchemaVersions.StableArtifactsV1,
+            occurredUtc ?? DateTimeOffset.UtcNow,
+            actor.ActorId,
+            actor.ActorType,
+            actor.DisplayName,
+            operationName,
+            outcome,
+            reasonCodes,
+            correlationId,
+            traceId,
+            spanId,
+            parentSpanId,
+            decisionLatencyMs,
+            constraintSetHash,
+            constraintCount,
+            riskScore,
+            policyScope,
+            tenantHash,
+            organizationHash,
+            emitterStatus,
+            emitterProvider,
+            outboxSequence,
+            gatewayExecutionId,
+            decisionStage,
+            policyVersion,
+            policyHash,
+            NormalizeMetadata(metadata));
     }
 
     private static string NormalizeIdentifier(string? identifier)
@@ -497,14 +564,112 @@ public sealed class AuditResidue : IAsiBackboneAuditResidue
 
     private static ReadOnlyCollection<string> NormalizeReasonCodes(IEnumerable<string>? reasonCodes)
     {
-        string[] normalizedReasonCodes = reasonCodes?
-            .Where(reasonCode => !string.IsNullOrWhiteSpace(reasonCode))
-            .Select(reasonCode => reasonCode.Trim())
-            .ToArray() ?? [];
+        if (reasonCodes is null)
+        {
+            return EmptyReasonCodes;
+        }
 
-        return normalizedReasonCodes.Length == 0
+        if (reasonCodes is ICollection<string> collection)
+        {
+            if (collection.Count == 0)
+            {
+                return EmptyReasonCodes;
+            }
+
+            string[] normalizedReasonCodes = new string[collection.Count];
+            int normalizedCount = 0;
+
+            foreach (string? reasonCode in collection)
+            {
+                AddNormalizedReasonCode(reasonCode, normalizedReasonCodes, ref normalizedCount);
+            }
+
+            return CreateReasonCodeCollection(normalizedReasonCodes, normalizedCount);
+        }
+
+        List<string>? normalizedList = null;
+
+        foreach (string? reasonCode in reasonCodes)
+        {
+            if (string.IsNullOrWhiteSpace(reasonCode))
+            {
+                continue;
+            }
+
+            normalizedList ??= [];
+            normalizedList.Add(reasonCode.Trim());
+        }
+
+        return normalizedList is null || normalizedList.Count == 0
             ? EmptyReasonCodes
-            : Array.AsReadOnly(normalizedReasonCodes);
+            : Array.AsReadOnly([.. normalizedList]);
+    }
+
+    private static IReadOnlyList<string> UseTrustedReasonCodes(IReadOnlyList<string> reasonCodes)
+    {
+        return reasonCodes.Count == 0
+            ? EmptyReasonCodes
+            : reasonCodes;
+    }
+
+    private static void AddNormalizedReasonCode(
+        string? reasonCode,
+        string[] normalizedReasonCodes,
+        ref int normalizedCount)
+    {
+        if (string.IsNullOrWhiteSpace(reasonCode))
+        {
+            return;
+        }
+
+        normalizedReasonCodes[normalizedCount] = reasonCode.Trim();
+        normalizedCount++;
+    }
+
+    private static ReadOnlyCollection<string> CreateReasonCodeCollection(
+        string[] normalizedReasonCodes,
+        int normalizedCount)
+    {
+        if (normalizedCount == 0)
+        {
+            return EmptyReasonCodes;
+        }
+
+        if (normalizedCount == normalizedReasonCodes.Length)
+        {
+            return Array.AsReadOnly(normalizedReasonCodes);
+        }
+
+        string[] filteredReasonCodes = new string[normalizedCount];
+        Array.Copy(normalizedReasonCodes, filteredReasonCodes, normalizedCount);
+
+        return Array.AsReadOnly(filteredReasonCodes);
+    }
+
+    private static string GetOutcomeName(GovernanceDecisionOutcome outcome)
+    {
+        return outcome switch
+        {
+            GovernanceDecisionOutcome.Allowed => OutcomeAllowed,
+            GovernanceDecisionOutcome.Warning => OutcomeWarning,
+            GovernanceDecisionOutcome.Denied => OutcomeDenied,
+            GovernanceDecisionOutcome.Deferred => OutcomeDeferred,
+            GovernanceDecisionOutcome.AcknowledgmentRequired => OutcomeAcknowledgmentRequired,
+            GovernanceDecisionOutcome.EscalationRecommended => OutcomeEscalationRecommended,
+            _ => outcome.ToString()
+        };
+    }
+
+    private static string GetOutcomeName(ConstraintEvaluationOutcome outcome)
+    {
+        return outcome switch
+        {
+            ConstraintEvaluationOutcome.NotApplicable => OutcomeNotApplicable,
+            ConstraintEvaluationOutcome.Allowed => OutcomeAllowed,
+            ConstraintEvaluationOutcome.Warning => OutcomeWarning,
+            ConstraintEvaluationOutcome.Denied => OutcomeDenied,
+            _ => outcome.ToString()
+        };
     }
 
     private static IReadOnlyDictionary<string, string> NormalizeMetadata(
@@ -515,7 +680,7 @@ public sealed class AuditResidue : IAsiBackboneAuditResidue
             return EmptyMetadata;
         }
 
-        Dictionary<string, string> normalizedMetadata = new(StringComparer.Ordinal);
+        Dictionary<string, string> normalizedMetadata = new(metadata.Count, StringComparer.Ordinal);
 
         foreach (KeyValuePair<string, string> item in metadata)
         {

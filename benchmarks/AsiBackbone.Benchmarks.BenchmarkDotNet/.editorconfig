@@ -1,0 +1,9 @@
+# Benchmark fixture exceptions.
+#
+# The BenchmarkDotNet project intentionally mirrors public interfaces in a few fields so
+# benchmark scenarios stay close to consumer usage. Disposable fixture cleanup is handled
+# through BenchmarkDotNet GlobalCleanup hooks.
+[*.cs]
+dotnet_diagnostic.IDE0130.severity = none
+dotnet_diagnostic.CA1001.severity = none
+dotnet_diagnostic.CA1859.severity = none

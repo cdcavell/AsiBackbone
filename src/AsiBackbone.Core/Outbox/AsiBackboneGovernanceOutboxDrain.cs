@@ -113,10 +113,8 @@ public sealed class AsiBackboneGovernanceOutboxDrain(
 
         foreach (GovernanceOutboxEntry pendingEntry in pendingEntries)
         {
-            if (existingEntryIds.Add(pendingEntry.OutboxEntryId))
-            {
-                entriesToDrain.Add(pendingEntry);
-            }
+            _ = existingEntryIds.Add(pendingEntry.OutboxEntryId);
+            entriesToDrain.Add(pendingEntry);
         }
 
         foreach (GovernanceOutboxEntry retryReadyEntry in retryReadyEntries)

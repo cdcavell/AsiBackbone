@@ -69,11 +69,7 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
             endpointOptions.PolicyHash,
             endpointMetadata);
 
-        var decision = GovernanceDecision.Allow(
-            correlationId: evaluationContext.CorrelationId,
-            traceId: correlation.TraceId,
-            policyVersion: evaluationContext.PolicyVersion,
-            policyHash: evaluationContext.PolicyHash);
+        GovernanceDecision decision;
 
         if (descriptor.PolicyTypes.Count > 0)
         {
@@ -81,6 +77,8 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
 
             if (evaluator is null)
             {
+                GovernanceDecision allowedDecision = CreateAllowDecision(evaluationContext, correlation.TraceId);
+
                 return endpointOptions.FailClosedWhenPolicyEvaluatorMissing
                     ? CreateConfigurationFailure(
                         httpContext,
@@ -88,14 +86,18 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
                         endpointMetadata,
                         "endpoint.policy_evaluator.missing",
                         "Endpoint governance policy metadata was present, but no AsiBackbone policy evaluator was registered.",
-                        decision,
+                        allowedDecision,
                         "aspnetcore.endpoint.governance.configuration.policy_evaluator")
-                    : AsiBackboneEndpointGovernanceResult.Allow(decision);
+                    : AsiBackboneEndpointGovernanceResult.Allow(allowedDecision);
             }
 
             decision = await evaluator
                 .EvaluateAsync(evaluationContext, cancellationToken)
                 .ConfigureAwait(false);
+        }
+        else
+        {
+            decision = CreateAllowDecision(evaluationContext, correlation.TraceId);
         }
 
         if (decision.CanProceed && descriptor.CapabilityScopes.Count > 0)
@@ -121,7 +123,7 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
                 .ConfigureAwait(false);
         }
 
-        IAsiBackboneActorContext actor = actorContextResolver.ResolveActorContext();
+        IAsiBackboneActorContext? actor = null;
 
         if (descriptor.EmitGovernanceAudit)
         {
@@ -140,6 +142,7 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
                     : AsiBackboneEndpointGovernanceResult.Allow(decision);
             }
 
+            actor = actorContextResolver.ResolveActorContext();
             var residue = AuditResidue.FromDecision(
                 actor,
                 descriptor.OperationName,
@@ -152,6 +155,7 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
 
         if (decision.RequiresAcknowledgment && descriptor.RequiresLiabilityHandshake)
         {
+            actor ??= actorContextResolver.ResolveActorContext();
             AsiBackboneAcknowledgmentChallenge challenge = acknowledgmentChallengeService.CreateChallenge(
                 actor,
                 descriptor.OperationName,
@@ -168,6 +172,17 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
         return decision.CanProceed
             ? AsiBackboneEndpointGovernanceResult.Allow(decision)
             : CreateBlockedDecisionResult(decision);
+    }
+
+    private static GovernanceDecision CreateAllowDecision(
+        AsiBackboneConstraintEvaluationContext evaluationContext,
+        string? traceId)
+    {
+        return GovernanceDecision.Allow(
+            correlationId: evaluationContext.CorrelationId,
+            traceId: traceId,
+            policyVersion: evaluationContext.PolicyVersion,
+            policyHash: evaluationContext.PolicyHash);
     }
 
     private struct EndpointGovernanceOptionalServiceResolver(

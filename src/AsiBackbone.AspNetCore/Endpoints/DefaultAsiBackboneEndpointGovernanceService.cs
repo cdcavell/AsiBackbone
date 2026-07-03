@@ -123,7 +123,7 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
                 .ConfigureAwait(false);
         }
 
-        IAsiBackboneActorContext actor = actorContextResolver.ResolveActorContext();
+        IAsiBackboneActorContext? actor = null;
 
         if (descriptor.EmitGovernanceAudit)
         {
@@ -142,6 +142,7 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
                     : AsiBackboneEndpointGovernanceResult.Allow(decision);
             }
 
+            actor = actorContextResolver.ResolveActorContext();
             var residue = AuditResidue.FromDecision(
                 actor,
                 descriptor.OperationName,
@@ -154,6 +155,7 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
 
         if (decision.RequiresAcknowledgment && descriptor.RequiresLiabilityHandshake)
         {
+            actor ??= actorContextResolver.ResolveActorContext();
             AsiBackboneAcknowledgmentChallenge challenge = acknowledgmentChallengeService.CreateChallenge(
                 actor,
                 descriptor.OperationName,

@@ -23,7 +23,7 @@ public sealed class AuditResidueBranchCoverageTests
         bool expectedHasReasonCodes,
         string[] expectedReasonCodes)
     {
-        AuditResidue residue = AuditResidue.Create(
+        var residue = AuditResidue.Create(
             AsiBackboneActorContext.Service("audit-service"),
             "audit.reason.normalization",
             "Completed",
@@ -46,7 +46,7 @@ public sealed class AuditResidueBranchCoverageTests
     {
         ConstraintEvaluationResult constraintResult = CreateConstraintResult(scenario);
 
-        AuditResidue residue = AuditResidue.FromConstraint(
+        var residue = AuditResidue.FromConstraint(
             AsiBackboneActorContext.Service("audit-service"),
             "audit.constraint.outcome",
             constraintResult,
@@ -76,7 +76,7 @@ public sealed class AuditResidueBranchCoverageTests
     [Fact]
     public void CreateNormalizesOptionalFieldsAndUsesExplicitAuditResidueId()
     {
-        AuditResidue residue = AuditResidue.Create(
+        var residue = AuditResidue.Create(
             AsiBackboneActorContext.Service(" audit-service ", " Audit Service "),
             " audit.operation ",
             " Completed ",
@@ -169,7 +169,7 @@ public sealed class AuditResidueBranchCoverageTests
             ["\t"] = "also ignored"
         };
 
-        AuditResidue residue = AuditResidue.Create(
+        var residue = AuditResidue.Create(
             AsiBackboneActorContext.Service("audit-service"),
             "audit.blank_metadata",
             "Completed",

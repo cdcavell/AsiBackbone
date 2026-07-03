@@ -19,6 +19,12 @@ public sealed class ConstraintEvaluationResult
     private static readonly ReadOnlyCollection<string> EmptyReasonCodes =
         Array.AsReadOnly(Array.Empty<string>());
 
+    private static readonly ConstraintEvaluationResult AllowedResult =
+        new(ConstraintEvaluationOutcome.Allowed, EmptyReasons);
+
+    private static readonly ConstraintEvaluationResult NotApplicableResult =
+        new(ConstraintEvaluationOutcome.NotApplicable, EmptyReasons);
+
     private ConstraintEvaluationResult(
         ConstraintEvaluationOutcome outcome,
         IReadOnlyList<OperationReason> reasons)
@@ -74,7 +80,7 @@ public sealed class ConstraintEvaluationResult
     /// <returns>An allowed constraint evaluation result.</returns>
     public static ConstraintEvaluationResult Allow()
     {
-        return new ConstraintEvaluationResult(ConstraintEvaluationOutcome.Allowed, EmptyReasons);
+        return AllowedResult;
     }
 
     /// <summary>
@@ -83,7 +89,7 @@ public sealed class ConstraintEvaluationResult
     /// <returns>A not-applicable constraint evaluation result.</returns>
     public static ConstraintEvaluationResult NotApplicable()
     {
-        return new ConstraintEvaluationResult(ConstraintEvaluationOutcome.NotApplicable, EmptyReasons);
+        return NotApplicableResult;
     }
 
     /// <summary>

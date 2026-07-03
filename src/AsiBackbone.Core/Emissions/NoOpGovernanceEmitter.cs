@@ -1,3 +1,5 @@
+using System.Collections.ObjectModel;
+
 namespace AsiBackbone.Core.Emissions;
 
 /// <summary>
@@ -13,11 +15,12 @@ public sealed class NoOpGovernanceEmitter : IAsiBackboneGovernanceEmitter
     /// </summary>
     public const string ProviderName = "noop";
 
-    private static readonly IReadOnlyDictionary<string, string> DeliveredMetadata = new Dictionary<string, string>(StringComparer.Ordinal)
-    {
-        ["emitter.kind"] = "noop",
-        ["emitter.purpose"] = "outbox-drain-validation"
-    };
+    private static readonly IReadOnlyDictionary<string, string> DeliveredMetadata = new ReadOnlyDictionary<string, string>(
+        new Dictionary<string, string>(StringComparer.Ordinal)
+        {
+            ["emitter.kind"] = "noop",
+            ["emitter.purpose"] = "outbox-drain-validation"
+        });
 
     /// <summary>
     /// Gets a reusable no-op governance emitter instance.
@@ -32,7 +35,7 @@ public sealed class NoOpGovernanceEmitter : IAsiBackboneGovernanceEmitter
         ArgumentNullException.ThrowIfNull(envelope);
         cancellationToken.ThrowIfCancellationRequested();
 
-        var result = GovernanceEmissionResult.Delivered(
+        var result = GovernanceEmissionResult.DeliveredFromNormalizedMetadata(
             ProviderName,
             providerRecordId: envelope.EnvelopeId,
             DeliveredMetadata);

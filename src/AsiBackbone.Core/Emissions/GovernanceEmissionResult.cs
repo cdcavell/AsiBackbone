@@ -107,12 +107,9 @@ public sealed class GovernanceEmissionResult
         string? providerRecordId = null,
         IReadOnlyDictionary<string, string>? metadata = null)
     {
-        return new GovernanceEmissionResult(
-            GovernanceEmissionStatus.Delivered,
+        return DeliveredFromNormalizedMetadata(
             providerName,
             providerRecordId,
-            retryAfterUtc: null,
-            error: null,
             NormalizeMetadata(metadata));
     }
 
@@ -192,6 +189,20 @@ public sealed class GovernanceEmissionResult
             NormalizeMetadata(metadata));
     }
 
+    internal static GovernanceEmissionResult DeliveredFromNormalizedMetadata(
+        string? providerName = null,
+        string? providerRecordId = null,
+        IReadOnlyDictionary<string, string>? normalizedMetadata = null)
+    {
+        return new GovernanceEmissionResult(
+            GovernanceEmissionStatus.Delivered,
+            providerName,
+            providerRecordId,
+            retryAfterUtc: null,
+            error: null,
+            normalizedMetadata ?? EmptyMetadata);
+    }
+
     private static string? NormalizeOptional(string? value)
     {
         return string.IsNullOrWhiteSpace(value)
@@ -207,7 +218,7 @@ public sealed class GovernanceEmissionResult
             return EmptyMetadata;
         }
 
-        Dictionary<string, string> normalizedMetadata = new(StringComparer.Ordinal);
+        Dictionary<string, string> normalizedMetadata = new(metadata.Count, StringComparer.Ordinal);
 
         foreach (KeyValuePair<string, string> item in metadata)
         {

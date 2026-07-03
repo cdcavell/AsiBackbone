@@ -58,25 +58,27 @@ public sealed class AsiBackboneGovernanceOutboxDrain(
             .FindPendingAsync(maxCount, cancellationToken)
             .ConfigureAwait(false);
 
-        List<GovernanceOutboxEntry> entriesToDrain = [.. pendingEntries];
-
-        if (entriesToDrain.Count < maxCount)
+        if (pendingEntries.Count >= maxCount)
         {
-            IReadOnlyList<GovernanceOutboxEntry> retryReadyEntries = await outboxStore
-                .FindRetryReadyAsync(drainUtc, maxCount - entriesToDrain.Count, cancellationToken)
-                .ConfigureAwait(false);
+            return await DrainEntriesAsync(pendingEntries, drainUtc, cancellationToken).ConfigureAwait(false);
+        }
 
-            HashSet<string> existingEntryIds = new(
-                entriesToDrain.Select(entry => entry.OutboxEntryId),
-                StringComparer.Ordinal);
+        IReadOnlyList<GovernanceOutboxEntry> retryReadyEntries = await outboxStore
+            .FindRetryReadyAsync(drainUtc, maxCount - pendingEntries.Count, cancellationToken)
+            .ConfigureAwait(false);
 
-            foreach (GovernanceOutboxEntry retryReadyEntry in retryReadyEntries)
-            {
-                if (existingEntryIds.Add(retryReadyEntry.OutboxEntryId))
-                {
-                    entriesToDrain.Add(retryReadyEntry);
-                }
-            }
+        IReadOnlyList<GovernanceOutboxEntry> entriesToDrain = MergeEntries(pendingEntries, retryReadyEntries, maxCount);
+        return await DrainEntriesAsync(entriesToDrain, drainUtc, cancellationToken).ConfigureAwait(false);
+    }
+
+    private async ValueTask<IReadOnlyList<GovernanceOutboxEntry>> DrainEntriesAsync(
+        IReadOnlyList<GovernanceOutboxEntry> entriesToDrain,
+        DateTimeOffset drainUtc,
+        CancellationToken cancellationToken)
+    {
+        if (entriesToDrain.Count == 0)
+        {
+            return Array.Empty<GovernanceOutboxEntry>();
         }
 
         List<GovernanceOutboxEntry> updatedEntries = new(entriesToDrain.Count);
@@ -89,6 +91,46 @@ public sealed class AsiBackboneGovernanceOutboxDrain(
         }
 
         return updatedEntries;
+    }
+
+    private static IReadOnlyList<GovernanceOutboxEntry> MergeEntries(
+        IReadOnlyList<GovernanceOutboxEntry> pendingEntries,
+        IReadOnlyList<GovernanceOutboxEntry> retryReadyEntries,
+        int maxCount)
+    {
+        if (pendingEntries.Count == 0)
+        {
+            return retryReadyEntries;
+        }
+
+        if (retryReadyEntries.Count == 0)
+        {
+            return pendingEntries;
+        }
+
+        var entriesToDrain = new List<GovernanceOutboxEntry>(Math.Min(maxCount, pendingEntries.Count + retryReadyEntries.Count));
+        var existingEntryIds = new HashSet<string>(pendingEntries.Count + retryReadyEntries.Count, StringComparer.Ordinal);
+
+        foreach (GovernanceOutboxEntry pendingEntry in pendingEntries)
+        {
+            _ = existingEntryIds.Add(pendingEntry.OutboxEntryId);
+            entriesToDrain.Add(pendingEntry);
+        }
+
+        foreach (GovernanceOutboxEntry retryReadyEntry in retryReadyEntries)
+        {
+            if (entriesToDrain.Count >= maxCount)
+            {
+                break;
+            }
+
+            if (existingEntryIds.Add(retryReadyEntry.OutboxEntryId))
+            {
+                entriesToDrain.Add(retryReadyEntry);
+            }
+        }
+
+        return entriesToDrain;
     }
 
     private async ValueTask<GovernanceOutboxEntry> DrainEntryAsync(
@@ -146,11 +188,7 @@ public sealed class AsiBackboneGovernanceOutboxDrain(
 
         if (result.IsSuccess)
         {
-            return await outboxStore.MarkDeliveredAsync(
-                entry.OutboxEntryId,
-                result,
-                cancellationToken)
-                .ConfigureAwait(false);
+            return await outboxStore.MarkDeliveredAsync(entry.OutboxEntryId, result, cancellationToken).ConfigureAwait(false);
         }
 
         if (result.Status is GovernanceEmissionStatus.DeadLettered)
@@ -210,8 +248,7 @@ public sealed class AsiBackboneGovernanceOutboxDrain(
         return drainUtc.Add(retryOptions.DeferredDelay);
     }
 
-    private static AsiBackboneGovernanceOutboxOptions ResolveOptions(
-        IOptions<AsiBackboneGovernanceOutboxOptions>? options)
+    private static AsiBackboneGovernanceOutboxOptions ResolveOptions(IOptions<AsiBackboneGovernanceOutboxOptions>? options)
     {
         AsiBackboneGovernanceOutboxOptions resolved = options?.Value ?? new AsiBackboneGovernanceOutboxOptions();
         resolved.Validate();

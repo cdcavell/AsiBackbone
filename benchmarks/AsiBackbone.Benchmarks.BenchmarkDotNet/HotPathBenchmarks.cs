@@ -12,14 +12,14 @@ using BenchmarkDotNet.Attributes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace AsiBackbone.Benchmarks;
+namespace AsiBackbone.Benchmarks.BenchmarkDotNet;
 
 /// <summary>
 /// BenchmarkDotNet baseline for allocation-sensitive governance hot paths.
 /// </summary>
 [MemoryDiagnoser]
 [RankColumn]
-public sealed class AsiBackboneHotPathBenchmarks
+public class AsiBackboneHotPathBenchmarks
 {
     private static readonly DateTimeOffset BenchmarkDrainUtc = new(2026, 6, 30, 18, 0, 0, TimeSpan.Zero);
 

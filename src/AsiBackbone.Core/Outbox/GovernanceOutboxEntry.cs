@@ -357,30 +357,49 @@ public sealed class GovernanceOutboxEntry
         IReadOnlyDictionary<string, string> originalMetadata,
         IReadOnlyDictionary<string, string> resultMetadata)
     {
-        return NormalizeMetadata(originalMetadata, resultMetadata);
+        if (resultMetadata.Count == 0)
+        {
+            return originalMetadata;
+        }
+
+        if (originalMetadata.Count == 0)
+        {
+            return resultMetadata;
+        }
+
+        Dictionary<string, string> mergedMetadata = new(originalMetadata.Count + resultMetadata.Count, StringComparer.Ordinal);
+
+        foreach (KeyValuePair<string, string> item in originalMetadata)
+        {
+            mergedMetadata[item.Key] = item.Value;
+        }
+
+        foreach (KeyValuePair<string, string> item in resultMetadata)
+        {
+            mergedMetadata[item.Key] = item.Value;
+        }
+
+        return new ReadOnlyDictionary<string, string>(mergedMetadata);
     }
 
     private static IReadOnlyDictionary<string, string> NormalizeMetadata(
-        params IReadOnlyDictionary<string, string>?[] metadataSets)
+        IReadOnlyDictionary<string, string>? metadata)
     {
-        Dictionary<string, string> normalizedMetadata = new(StringComparer.Ordinal);
-
-        foreach (IReadOnlyDictionary<string, string>? metadata in metadataSets)
+        if (metadata is null || metadata.Count == 0)
         {
-            if (metadata is null || metadata.Count == 0)
+            return EmptyMetadata;
+        }
+
+        Dictionary<string, string> normalizedMetadata = new(metadata.Count, StringComparer.Ordinal);
+
+        foreach (KeyValuePair<string, string> item in metadata)
+        {
+            if (string.IsNullOrWhiteSpace(item.Key))
             {
                 continue;
             }
 
-            foreach (KeyValuePair<string, string> item in metadata)
-            {
-                if (string.IsNullOrWhiteSpace(item.Key))
-                {
-                    continue;
-                }
-
-                normalizedMetadata[item.Key.Trim()] = item.Value?.Trim() ?? string.Empty;
-            }
+            normalizedMetadata[item.Key.Trim()] = item.Value?.Trim() ?? string.Empty;
         }
 
         return normalizedMetadata.Count == 0

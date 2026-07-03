@@ -4,6 +4,42 @@ All notable changes to this project are documented in this file.
 
 This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/) and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.1] - 2026-07-03
+
+### Release summary
+
+`2.2.1` is a compatible patch release for the stable `2.x` package family.
+
+This release preserves the `2.0.0` public package and namespace boundary while adding BenchmarkDotNet allocation baselines and reducing allocation pressure across outbox drain, endpoint governance, policy evaluation, and audit residue decision-record hot paths. No public API expansion, package ID change, or namespace change is intended.
+
+### Added
+
+* Added BenchmarkDotNet allocation baselines for policy evaluation, endpoint governance, outbox drain, scoped outbox drain, and audit residue creation.
+* Added benchmark documentation and profiling guidance for repeatable allocation measurement.
+* Added focused tests for allocation-sensitive hot-path behavior and branch coverage preservation.
+* Added release notes and a release readiness record for the `2.2.1` release.
+
+### Changed
+
+* Promoted central package version metadata from `2.2.0` to `2.2.1` while preserving `AssemblyVersion` as `2.0.0.0`.
+* Updated `FileVersion` to `2.2.1.0`.
+* Updated `CITATION.cff` and `.zenodo.json` for the `2.2.1` release.
+* Updated README, documentation home, article index, DocFX navigation, release validation, API compatibility / SemVer guidance, release notes, release readiness guidance, and Source Link validation defaults.
+
+### Performance
+
+* Reduced allocation pressure in provider-neutral outbox drain batch handling.
+* Reduced endpoint governance hot-path allocations through descriptor metadata caching and deferred fallback object creation.
+* Reduced policy evaluator allocation overhead by reusing pass-through constraint results and avoiding eager reason-list allocation.
+* Reduced audit residue decision-record allocation by reusing immutable reason-code collections and replacing hot-path enum formatting with stable outcome-name helpers.
+
+### Compatibility notes
+
+* Existing stable `2.0.x`, `2.1.x`, and `2.2.0` consumers should be able to upgrade to `2.2.1` without required source-code changes.
+* `2.2.1` is a patch release because it focuses on benchmark-backed implementation hardening, allocation reduction, tests, documentation, and release metadata alignment.
+* `AssemblyVersion` remains `2.0.0.0` for the compatible stable `2.x` line.
+
+
 ## [2.2.0] - 2026-07-01
 
 ### Release summary

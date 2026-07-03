@@ -1,40 +1,57 @@
 # Performance Benchmark Baseline
 
-This article documents the repeatable benchmark entry point for core AsiBackbone policy, endpoint governance, audit-residue, and outbox drain hot paths.
+This article documents the repeatable benchmark entry points for core AsiBackbone policy, endpoint governance, audit-residue, and outbox drain hot paths.
 
-The benchmark baseline is measurement-first. It exists to help maintainers decide whether caching, pooling, short-circuit behavior, scoped-service changes, metadata handling, or other optimization work is justified by observed hot-path pressure. It should not be used as a substitute for unit tests, integration tests, or consumer-specific load testing.
+The benchmark baseline is measurement-first. It exists to help maintainers decide whether caching, pooling, short-circuit behavior, scoped-service changes, metadata handling, or other optimization work is justified by observed hot-path activity. It should not be used as a substitute for unit tests, integration tests, or consumer-specific load testing.
 
-## Benchmark entry point
+## Benchmark entry points
 
-The benchmark runner lives in:
+The repository now has two benchmark entry points:
 
-```text
-benchmarks/AsiBackbone.Benchmarks
+| Project | Purpose |
+| --- | --- |
+| `benchmarks/AsiBackbone.Benchmarks.BenchmarkDotNet` | Primary optimization baseline with BenchmarkDotNet `MemoryDiagnoser` allocation output. |
+| `benchmarks/AsiBackbone.Benchmarks` | Lightweight manual runner for quick smoke checks and local trend checks. |
+
+Use the BenchmarkDotNet runner for optimization PR before/after evidence.
+
+```powershell
+dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks.BenchmarkDotNet -- --filter "*"
 ```
 
-Run it from the repository root with Release configuration:
+Use focused filters when measuring one hot area:
+
+```powershell
+# Outbox drain batch 25, batch 100, and scoped batch 100
+dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks.BenchmarkDotNet -- --filter "*OutboxDrain*"
+
+# ASP.NET Core endpoint governance allow, warning, and deny paths
+dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks.BenchmarkDotNet -- --filter "*EndpointGovernance*"
+
+# Policy evaluation zero, simple, mixed, acknowledgment, and escalation paths
+dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks.BenchmarkDotNet -- --filter "*Policy*"
+
+# Audit residue creation from a governance decision
+dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks.BenchmarkDotNet -- --filter "*AuditResidue*"
+```
+
+The manual runner remains useful for quick checks while editing:
 
 ```powershell
 dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks -- --iterations 200000 --warmup 10000
 ```
 
-Use smaller iteration counts when checking the benchmark path locally after code changes:
+Use smaller iteration counts when checking the manual path locally after code changes:
 
 ```powershell
 dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks -- --iterations 1000 --warmup 100
 ```
 
-Use `--help` to view runner options:
-
-```powershell
-dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks -- --help
-```
-
-The benchmark project is included in `AsiBackbone.slnx`, but the benchmark run remains manual. It is intentionally separate from normal CI unit tests so routine builds do not fail because of machine-specific timing variation.
+The benchmark projects are included in `AsiBackbone.slnx`, but benchmark runs remain manual. They are intentionally separate from normal CI unit tests so routine builds do not fail because of machine-specific timing variation.
 
 ## Current baseline scenarios
 
-The runner captures latency and allocation measurements for representative Core, ASP.NET Core adapter, and outbox scenarios:
+The BenchmarkDotNet runner captures latency and allocation measurements for representative Core, ASP.NET Core adapter, audit, and outbox scenarios:
 
 | Scenario | Purpose |
 | --- | --- |
@@ -58,7 +75,14 @@ The outbox drain scenarios use provider-neutral fake outbox storage and the no-o
 
 ## Output fields
 
-The runner prints a Markdown table containing:
+BenchmarkDotNet output includes timing statistics and memory columns. With `MemoryDiagnoser`, the important columns are:
+
+- `Mean`: average time per operation for the selected benchmark job;
+- `Median`: midpoint time value when present in the generated report or artifacts;
+- `Gen0`: generation 0 collection activity normalized by BenchmarkDotNet;
+- `Allocated`: allocated bytes per operation.
+
+The lightweight manual runner prints a Markdown table containing:
 
 - scenario name;
 - scenario description;
@@ -69,7 +93,7 @@ The runner prints a Markdown table containing:
 - Gen0 collection count;
 - elapsed milliseconds.
 
-It also prints runtime, operating-system, process-architecture, warmup, and measurement-iteration context so results can be interpreted later.
+Both runners also print runtime, operating-system, process-architecture, warmup, and measurement context so results can be interpreted later.
 
 ## Interpretation guidance
 
@@ -81,11 +105,57 @@ Use results only when comparing:
 - the same build configuration, preferably Release;
 - the same .NET runtime family;
 - comparable repository revisions;
-- comparable iteration and warmup counts.
+- comparable benchmark filters, iteration settings, and warmup settings.
+
+Prefer at least three repeated BenchmarkDotNet runs before deciding that a small delta is meaningful. When results are noisy, use the median or repeated-run direction instead of a single run's best or worst number.
 
 Do not use these numbers to promise consumer latency. Host applications should run their own benchmarks with their actual constraints, decision policies, persistence, middleware, logging, telemetry emitters, durable stores, network providers, and deployment topology.
 
 Outbox drain benchmarks are especially sensitive to host-owned infrastructure. Real durable stores, provider SDKs, exporters, retry policies, batch sizes, row claiming, and network conditions can dominate drain runtime even if the provider-neutral drain path is lightweight.
+
+## Allocation profiling plan
+
+Start with BenchmarkDotNet `MemoryDiagnoser` output. If `Allocated`, `Gen0`, or run-to-run variance points to a hot scenario, move to process-level profiling.
+
+### dotnet-counters
+
+Use counters for a live view of allocation rate and GC activity while a focused benchmark is running:
+
+```powershell
+dotnet-counters monitor --process-id <PID> System.Runtime
+```
+
+Watch `alloc-rate`, `gen-0-gc-count`, `gc-heap-size`, and `% time in GC` while running focused filters such as `*OutboxDrain*` or `*EndpointGovernance*`.
+
+### dotnet-trace
+
+Use trace collection when allocation pressure needs call-stack evidence:
+
+```powershell
+dotnet-trace collect --process-id <PID> --providers Microsoft-Windows-DotNETRuntime:0x1C000080018:5 --output artifacts/perf/asi-backbone-hotpath.nettrace
+```
+
+Open the `.nettrace` file in Visual Studio, PerfView, or another trace viewer and inspect allocation stacks for the focused benchmark process.
+
+### dotnet-gcdump
+
+Use a GC dump when the question is what object types dominate the managed heap during a long or focused run:
+
+```powershell
+dotnet-gcdump collect --process-id <PID> --output artifacts/perf/asi-backbone-hotpath.gcdump
+```
+
+Then inspect the dump with Visual Studio or another GC dump viewer.
+
+### PerfView
+
+On Windows, PerfView can collect GC allocation stacks for deeper investigation:
+
+```powershell
+PerfView.exe /AcceptEula /NoGui /Collect:GCCollectOnly /MaxCollectSec:120 /DataFile:artifacts/perf/asi-backbone-hotpath.etl.zip collect
+```
+
+Use PerfView when BenchmarkDotNet allocation output identifies a scenario but `dotnet-trace` does not give enough allocation-stack detail.
 
 ## Optimization decision rule
 
@@ -104,6 +174,7 @@ This keeps optimization work evidence-driven and avoids adding complexity before
 - Issue #345 introduced optional first-denial short-circuit behavior.
 - Issue #362 introduced the initial benchmark baseline.
 - Issue #383 extended the baseline to endpoint governance and outbox drain paths.
+- Issue #394 added BenchmarkDotNet allocation baselines and this profiling plan.
 
 ## Related documentation
 

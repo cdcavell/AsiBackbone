@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using AsiBackbone.Core.Constraints;
 using AsiBackbone.Core.Decisions;
 using AsiBackbone.Core.Results;
@@ -140,18 +141,15 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
         OperationReasonAccumulator warnings,
         bool includeWarningsWhenDenied)
     {
-        if (denials.Count > 0)
-        {
-            return includeWarningsWhenDenied && warnings.Count > 0
+        return denials.Count > 0
+            ? includeWarningsWhenDenied && warnings.Count > 0
                 ? GovernanceDecision.Deny(
                     warnings.Concat(denials),
                     correlationId: context.CorrelationId,
                     policyVersion: context.PolicyVersion,
                     policyHash: context.PolicyHash)
-                : CreateDeniedDecision(context, denials);
-        }
-
-        return warnings.Count > 0
+                : CreateDeniedDecision(context, denials)
+            : warnings.Count > 0
             ? CreateWarningDecision(context, warnings)
             : GovernanceDecision.Allow(
             correlationId: context.CorrelationId,
@@ -230,7 +228,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
             }
         }
 
-        public readonly IReadOnlyList<OperationReason> AsReadOnlyList()
+        public readonly ReadOnlyCollection<OperationReason> AsReadOnlyList()
         {
             return Count switch
             {

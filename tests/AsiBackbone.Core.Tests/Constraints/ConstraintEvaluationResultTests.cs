@@ -28,8 +28,8 @@ public sealed class ConstraintEvaluationResultTests
     [Fact]
     public void AllowReusesSharedPassThroughResult()
     {
-        ConstraintEvaluationResult first = ConstraintEvaluationResult.Allow();
-        ConstraintEvaluationResult second = ConstraintEvaluationResult.Allow();
+        var first = ConstraintEvaluationResult.Allow();
+        var second = ConstraintEvaluationResult.Allow();
 
         Assert.Same(first, second);
     }
@@ -122,8 +122,8 @@ public sealed class ConstraintEvaluationResultTests
     [Fact]
     public void NotApplicableReusesSharedPassThroughResult()
     {
-        ConstraintEvaluationResult first = ConstraintEvaluationResult.NotApplicable();
-        ConstraintEvaluationResult second = ConstraintEvaluationResult.NotApplicable();
+        var first = ConstraintEvaluationResult.NotApplicable();
+        var second = ConstraintEvaluationResult.NotApplicable();
 
         Assert.Same(first, second);
     }

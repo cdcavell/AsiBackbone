@@ -1,6 +1,6 @@
 using BenchmarkDotNet.Running;
 
-namespace AsiBackbone.Benchmarks;
+namespace AsiBackbone.Benchmarks.BenchmarkDotNet;
 
 internal static class Program
 {

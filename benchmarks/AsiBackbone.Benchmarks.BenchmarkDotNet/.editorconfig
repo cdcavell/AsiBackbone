@@ -1,0 +1,14 @@
+# Benchmark fixture exceptions.
+#
+# The BenchmarkDotNet project intentionally mirrors public interfaces in a few fields so
+# benchmark scenarios stay close to consumer usage. Disposable fixture cleanup is handled
+# through BenchmarkDotNet GlobalCleanup hooks.
+#
+# ValueTask is consumed synchronously here to avoid adding async state-machine allocations
+# to the allocation baselines being measured. Do not copy this pattern into production code.
+[*.cs]
+dotnet_diagnostic.IDE0022.severity = none
+dotnet_diagnostic.IDE0130.severity = none
+dotnet_diagnostic.CA1001.severity = none
+dotnet_diagnostic.CA1859.severity = none
+dotnet_diagnostic.CA2012.severity = none

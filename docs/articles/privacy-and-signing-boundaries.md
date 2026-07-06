@@ -13,7 +13,7 @@ The current stable package family focuses on explicit governance records, host-o
 
 | Area | Current `1.2.x` behavior | Still not provided by default |
 | --- | --- | --- |
-| Metadata | Host-provided dictionaries and values can flow into contexts, decisions, audit residue, and ledger records. | Automatic classification, redaction, encryption, tokenization, or privacy scanning. |
+| Metadata | Host-provided dictionaries and values can flow into contexts, decisions, audit residue, and ledger records. Optional metadata budget helpers can normalize and validate count, key length, value length, estimated serialized size, and reserved key fragments. | Automatic classification, redaction, encryption, tokenization, privacy scanning, or proof that bounded metadata is non-sensitive. |
 | Identifiers | Correlation IDs, trace IDs, event IDs, record IDs, actor IDs, policy versions, and policy hashes are available for linking records. | Automatic pseudonymization, identity-proofing, cross-system identity governance, or secret handling. |
 | Signing and verification boundaries | Core records can carry signing-ready metadata and canonical hashing inputs. Released local-development signing and managed-key adapter packages support test/sample signing and host-owned managed-key integration. | Production key custody, automatic key rotation, concrete Azure Key Vault/HSM/KMS implementation, immutable storage, tamper-evidence, legal non-repudiation, or compliance guarantees. |
 | Persistence | EF Core integration supports host-owned persistence through the host application database. | Package-owned database lifecycle, retention policy, encryption-at-rest enforcement, backup policy, or immutable storage. |
@@ -47,6 +47,44 @@ Prefer stable but non-sensitive codes:
 | `workflow = document-approval` | full document body |
 | `resourceType = purchase-order` | complete financial details |
 | opaque host-owned subject ID | direct personal identifiers when not required |
+
+## Metadata budget and reserved-key guidance
+
+Metadata is useful for governance review, but it should not become an unbounded diagnostic dump. Hosts should define a budget before metadata reaches durable audit storage, telemetry export, outbox persistence, or signing metadata.
+
+The package exposes optional helper APIs under `AsiBackbone.Core.Metadata`:
+
+- `GovernanceMetadataBudget` defines host-owned limits.
+- `GovernanceMetadataBudget.Recommended` uses 32 entries, 64-character keys, 512-character values, and an 8,192-byte estimated serialized-size limit.
+- `GovernanceMetadataBudgetValidator` trims metadata, drops blank keys, preserves ordinal key comparison, reports budget violations, and flags reserved or discouraged key fragments.
+
+Recommended reserved or discouraged key fragments include secrets, credentials, passwords, API keys, access tokens, refresh tokens, bearer/authorization headers, private keys, connection strings, SSNs, and social-security identifiers. Store opaque references, classification codes, hashes, or provider record IDs instead.
+
+A passing budget check is not a privacy guarantee. Budget validation only confirms shape and key-pattern guidance; it does not classify, redact, encrypt, tokenize, or certify values.
+
+```csharp
+using AsiBackbone.Core.Metadata;
+
+var budgetResult = GovernanceMetadataBudgetValidator.Validate(metadata);
+if (!budgetResult.IsValid)
+{
+    // Host policy decides whether to deny, redact, quarantine, or trim.
+    throw new InvalidOperationException(string.Join("; ", budgetResult.Violations));
+}
+
+metadata = budgetResult.NormalizedMetadata;
+```
+
+## Canonical signing metadata boundary
+
+Canonical signing payloads intentionally exclude metadata unless the host supplies an explicit `CanonicalPayloadOptions.MetadataKeyAllowList`.
+
+This behavior is important for two reasons:
+
+- host-specific diagnostics should not silently change signing payloads;
+- metadata containing sensitive, unstable, or oversized values should not become part of a canonical payload by accident.
+
+When metadata must be included in a signed payload, prefer a small allow-list of stable governance keys such as policy version, policy hash, classification state, region code, or resource type. Avoid allow-listing raw prompts, request bodies, HTTP headers, exception messages, secrets, tokens, credentials, connection strings, or raw PII.
 
 ## Identifier handling boundary
 
@@ -91,6 +129,8 @@ The consuming application remains responsible for privacy, security, compliance,
 Before using AsiBackbone in a production or regulated environment, the host should decide:
 
 - which metadata fields are allowed;
+- which metadata count, key length, value length, and estimated serialized-size limits apply;
+- which metadata key fragments are reserved, discouraged, or blocked;
 - which metadata fields must be redacted, hashed, tokenized, or omitted;
 - whether actor IDs are personal data;
 - how long audit records are retained;
@@ -164,6 +204,8 @@ Use this checklist when preparing current stable release notes or documentation:
 - State that AsiBackbone provides Accountable Systems Infrastructure, not artificial superintelligence.
 - State that metadata is host-owned.
 - State that hosts must classify, minimize, redact, or omit sensitive metadata before passing it into package APIs.
+- State that metadata budgets are optional shape guardrails, not DLP, privacy classification, or compliance certification.
+- State that canonical signing payload metadata remains allow-list only.
 - State that signing-ready fields, local-development signing, and managed-key adapter boundaries are available where released, but production key custody, tamper-evidence, immutability, legal non-repudiation, and compliance certification remain host-owned.
 - Avoid claims of tamper-evidence unless signing or immutable storage is actually implemented and documented.
 - Avoid claims of regulatory compliance or legal non-repudiation.

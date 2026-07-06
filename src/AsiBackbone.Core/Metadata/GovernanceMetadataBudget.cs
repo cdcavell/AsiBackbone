@@ -32,8 +32,8 @@ public sealed class GovernanceMetadataBudget
     /// </summary>
     public const int DefaultMaxSerializedBytes = 8192;
 
-    private static readonly IReadOnlyList<string> DefaultReservedKeyFragments =
-        new ReadOnlyCollection<string>(
+    private static readonly ReadOnlyCollection<string> DefaultReservedKeyFragments =
+        new(
             new[]
             {
                 "accesstoken",
@@ -136,7 +136,7 @@ public sealed class GovernanceMetadataBudget
         return new string(buffer, 0, count);
     }
 
-    private static IReadOnlyList<string> NormalizeReservedKeyFragments(IEnumerable<string> reservedKeyFragments)
+    private static ReadOnlyCollection<string> NormalizeReservedKeyFragments(IEnumerable<string> reservedKeyFragments)
     {
         string[] normalizedFragments = [.. reservedKeyFragments
             .Where(fragment => !string.IsNullOrWhiteSpace(fragment))

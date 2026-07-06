@@ -1,8 +1,8 @@
 {
   "title": "ASI Backbone",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "upload_type": "software",
-  "description": "AsiBackbone is a .NET package-family project providing framework-neutral governance primitives for consequential software decision flow, including actor context, constraint evaluation, governance decisions, acknowledgment workflows, audit residue, durable outbox persistence, provider-neutral governance emission, OpenTelemetry projection, signing-provider boundaries, and ASP.NET Core endpoint governance metadata controls. Version 2.2.1 is a compatible patch release on the simplified AsiBackbone package and namespace line that adds BenchmarkDotNet allocation baselines and reduces allocation pressure across outbox drain, endpoint governance, policy evaluation, and audit residue decision-record hot paths while preserving the 2.x package and namespace boundary.",
+  "description": "AsiBackbone is a .NET package-family project providing framework-neutral governance primitives for consequential software decision flow, including actor context, constraint evaluation, governance decisions, acknowledgment workflows, audit residue, durable outbox persistence, provider-neutral governance emission, OpenTelemetry projection, signing-provider boundaries, and ASP.NET Core endpoint governance metadata controls. Version 2.3.0 is a compatible minor release on the simplified AsiBackbone package and namespace line that adds metadata budget guardrails, opt-in constraint-exception denial behavior, empty-policy warning diagnostics, managed-key signing fail-closed defaults, outbox and endpoint-governance hardening, documentation updates, and template/package metadata alignment while preserving the 2.x package and namespace boundary.",
   "creators": [
     {
       "name": "Cavell, Christopher D.",

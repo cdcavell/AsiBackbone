@@ -4,6 +4,67 @@ All notable changes to this project are documented in this file.
 
 This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/) and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.0] - 2026-07-06
+
+### Release summary
+
+`2.3.0` is a compatible minor release for the stable `2.x` package family.
+
+This release preserves the `2.0.0` public package and namespace boundary while adding host-facing governance guardrails, safer managed-key signing defaults, diagnostic policy signals, outbox/query hardening, endpoint-governance validation cleanup, template fallback alignment, tests, and release metadata alignment.
+
+### Added
+
+* Added optional `GovernanceMetadataBudget` and `GovernanceMetadataBudgetValidator` helper APIs for host-owned metadata count, key length, value length, serialized-size, and reserved-key validation.
+* Added opt-in `AsiBackbonePolicyEvaluatorOptions.TreatConstraintExceptionAsDenial` behavior so hosts can convert constraint exceptions into denied governance decisions with configured safe reason codes.
+* Added managed-key local-validation helpers through `CreateLocalValidation(...)` and `AddAsiBackboneManagedKeySigningForLocalValidation(...)` for samples, tests, diagnostics, and explicit host fallback policies.
+* Added warning-level logging when policy evaluation runs with zero constraints while permissive empty-policy behavior remains enabled.
+* Added an outbox claim/lease design record documenting future opt-in multi-worker claim behavior without mutating existing find/read APIs.
+* Added focused tests for metadata budgets, constraint-exception handling, managed-key fail-closed defaults, empty-policy warning diagnostics, EF Core outbox ordering/max-count behavior, template fallback versions, and collection-backed governance reason normalization.
+* Added `2.3.0` release notes and a `2.3.0` release readiness record.
+
+### Changed
+
+* Promoted central package version metadata from `2.2.1` to `2.3.0` while preserving `AssemblyVersion` as `2.0.0.0` for the compatible stable `2.x` line.
+* Updated `FileVersion` to `2.3.0.0`.
+* Updated `CITATION.cff` and `.zenodo.json` for the `2.3.0` release.
+* Updated README, documentation home, article index, DocFX article navigation, release validation, API compatibility / SemVer guidance, template documentation, release notes, release readiness guidance, template fallback package versions, and Source Link validation defaults for the `2.3.0` package family.
+* Changed managed-key signing to fail closed by default by making `ManagedKeySigningOptions.ReturnUnsignedOnFailure` default to `false` in production-oriented paths.
+* Removed repeated endpoint-governance option validation from the request path while preserving fail-closed startup/configured-options validation.
+* Pushed EF Core governance outbox pending and retry-ready filtering, ordering, and `Take(maxCount)` into database queries before materialization.
+* Added deterministic `OutboxEntryId` tie-breakers and related index coverage guidance for provider-neutral outbox drain paths.
+* Updated template fallback package references from `2.2.1` to `2.3.0`.
+
+### Fixed
+
+* Fixed template fallback package version drift so generated fallback `.csproj` files use the repository package version.
+* Preserved empty and all-null governance decision reason fallback behavior while optimizing collection-backed reason normalization to use a single enumeration pass for non-empty `ICollection<OperationReason>` inputs.
+* Preserved cancellation propagation for `OperationCanceledException` in the new constraint-exception policy path.
+* Preserved default permissive empty-policy behavior while documenting it as a named sharp edge and recommending fail-closed configuration/startup validation.
+* Preserved endpoint-governance configuration validation through registration/configured-options validation and `ValidateOnStart` rather than per-request validation.
+
+### Security and governance hardening
+
+* Managed-key signing now fails closed by default in production-oriented registration paths; hosts that intentionally need unsigned failure metadata should opt into local-validation or explicit fallback behavior.
+* Metadata budget validation provides a host-owned guardrail for audit, telemetry, and signing metadata before durable or external-provider boundaries.
+* Constraint-exception denial conversion is opt-in and uses safe, stable reason codes without exposing exception details through public decision reasons.
+* Empty-policy warning diagnostics make permissive no-constraint evaluation visible without changing the existing default allow behavior.
+
+### Performance and reliability
+
+* Reduced EF Core outbox selection materialization pressure by applying filtering, ordering, and max-count limits in the database query.
+* Reduced endpoint-governance request-path overhead by relying on startup/configured-options validation rather than repeated per-request validation.
+* Reduced governance decision reason normalization enumeration for collection-backed reason inputs.
+* Incorporated dependency/tooling updates for BenchmarkDotNet, dotnet-stryker, Roslyn analyzer packages, and CodeQL actions.
+
+### Compatibility notes
+
+* Existing `2.0.x`, `2.1.x`, `2.2.0`, and `2.2.1` consumers should continue to compile against existing APIs.
+* `2.3.0` is a minor release because it includes optional public/helper APIs, host-facing option surfaces, validation helpers, implementation hardening, tests, documentation, and release metadata alignment.
+* No package ID or namespace changes are included.
+* No public API removals or renamed public APIs are intended.
+* `AssemblyVersion` remains `2.0.0.0` for the compatible stable `2.x` line.
+* Hosts using `AsiBackbone.Signing.ManagedKey` should review the managed-key fail-closed default and opt into local-validation/fallback behavior only when unsigned failure metadata is intentionally required.
+
 ## [2.2.1] - 2026-07-03
 
 ### Release summary
@@ -38,7 +99,6 @@ This release preserves the `2.0.0` public package and namespace boundary while a
 * Existing stable `2.0.x`, `2.1.x`, and `2.2.0` consumers should be able to upgrade to `2.2.1` without required source-code changes.
 * `2.2.1` is a patch release because it focuses on benchmark-backed implementation hardening, allocation reduction, tests, documentation, and release metadata alignment.
 * `AssemblyVersion` remains `2.0.0.0` for the compatible stable `2.x` line.
-
 
 ## [2.2.0] - 2026-07-01
 
@@ -127,7 +187,7 @@ This release preserves the `2.0.0` public package and namespace boundary while a
 ### Compatibility notes
 
 * Existing stable `2.0.0`, `2.0.1`, and `2.0.2` consumers should be able to upgrade to `2.1.0` without required source-code changes for existing APIs.
-* `2.1.0` is a minor release because it includes backward-compatible public APIs, options, developer-experience tooling, tests, and documentation alignment.
+* `2.1.0` is a minor release because it includes additive public APIs, options, developer-experience tooling, tests, and documentation alignment.
 * `AssemblyVersion` remains `2.0.0.0` for the compatible stable `2.x` line.
 * `FileVersion` should be updated to `2.1.0.0`.
 * Package `Version` and `InformationalVersion` should be updated to `2.1.0`.
@@ -369,7 +429,7 @@ This release promotes post-`1.1.x` adoption, diagnostics, testing, templates, sa
 * `AssemblyVersion` remains `1.0.0.0` for the compatible stable `1.x` line.
 * `FileVersion` should be updated to `1.2.0.0`.
 * Package `Version` and `InformationalVersion` should be updated to `1.2.0`.
-* Event Hubs, Purview, Azure-specific SDK adapters, robotics, immutable-storage, and additional provider packages remain outside the stable package contract unless separately reviewed and released.
+* Event Hubs, Purview, Azure-specific SDK adapters, Aspire runtime packages, robotics, immutable-storage, and additional provider packages remain outside the stable package contract unless separately reviewed and released.
 
 ## [1.1.1] - 2026-06-20
 

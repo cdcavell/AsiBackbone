@@ -1,10 +1,10 @@
 # Stable Release Validation
 
-This article documents the reusable release-blocking validation path for stable release lines. The current released stable package family is `2.x`, with `2.2.1` as the current compatible patch release and `2.0.0` as the major release boundary for the simplified `AsiBackbone.*` package and namespace identity.
+This article documents the reusable release-blocking validation path for stable release lines. The current released stable package family is `2.x`, with `2.3.0` as the current compatible minor release and `2.0.0` as the major release boundary for the simplified `AsiBackbone.*` package and namespace identity.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. Release validation should confirm that the package family remains practical governance infrastructure and that implementation claims stay within the documented software boundary. See [Release Cadence and Readiness](release-cadence-and-readiness.md) for the release-stream and stabilization guidance that complements this checklist.
 
-The [2.2.1 Release Readiness Record](release-readiness-221.md) is the current release-candidate control sheet for the `2.2.1` release. Earlier readiness records are retained for traceability.
+The [2.3.0 Release Readiness Record](release-readiness-230.md) is the current release-candidate control sheet for the `2.3.0` release. Earlier readiness records are retained for traceability.
 
 ## Required checks before tagging a stable release
 
@@ -77,10 +77,10 @@ For every stable release, the release readiness record should explicitly confirm
 
 ## Source Link metadata validation
 
-After `2.2.1` packages are published and visible on NuGet, maintainers should run:
+After `2.3.0` packages are published and visible on NuGet, maintainers should run:
 
 ```powershell
-./scripts/Validate-Source-Link-commit-metadata.ps1 -Version 2.2.1
+./scripts/Validate-Source-Link-commit-metadata.ps1 -Version 2.3.0
 ```
 
 This post-publish check downloads the published packages and confirms the expected repository type, repository URL, and non-empty repository commit metadata are present.
@@ -95,6 +95,8 @@ Deferred checks should be rare for a stable release.
 
 - [Release Cadence and Readiness](release-cadence-and-readiness.md)
 - [Supply-Chain Provenance and Package SBOMs](supply-chain-provenance.md)
+- [2.3.0 Release Readiness Record](release-readiness-230.md)
+- [2.3.0 Release Notes](release-notes-230.md)
 - [2.2.1 Release Readiness Record](release-readiness-221.md)
 - [2.2.1 Release Notes](release-notes-221.md)
 - [2.2.0 Release Readiness Record](release-readiness-220.md)

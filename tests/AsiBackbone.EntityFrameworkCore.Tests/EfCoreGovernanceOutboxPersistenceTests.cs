@@ -62,6 +62,95 @@ public sealed class EfCoreGovernanceOutboxPersistenceTests
     }
 
     /// <summary>
+    /// Verifies pending outbox selection orders and limits before materializing entries from the EF Core store.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous test operation.</returns>
+    [Fact]
+    public async Task FindPendingAsyncOrdersByCreatedTimestampThenOutboxIdAndAppliesMaxCount()
+    {
+        await using SqliteConnection connection = await OpenConnectionAsync();
+        DbContextOptions<HostOwnedGovernanceDbContext> options = CreateOptions(connection);
+        await EnsureCreatedAsync(options);
+
+        DateTimeOffset createdUtc = new(2026, 6, 15, 12, 0, 0, TimeSpan.Zero);
+
+        await using HostOwnedGovernanceDbContext context = new(options);
+        var store = new EfCoreGovernanceOutboxStore(context);
+
+        GovernanceOutboxEntry delivered = GovernanceOutboxEntry
+            .Create(CreateEnvelope("event-delivered-filtered", "correlation-delivered-filtered", "audit-delivered-filtered"), "delivered-filtered", createdUtc.AddMinutes(-5))
+            .MarkDelivered(GovernanceEmissionResult.Delivered("test-provider", "provider-record-filtered"), createdUtc.AddMinutes(-4));
+
+        _ = await store.SaveAsync(delivered, TestContext.Current.CancellationToken);
+        _ = await store.SaveAsync(CreateOutboxEntry("pending-c", "event-pending-c", createdUtc), TestContext.Current.CancellationToken);
+        _ = await store.SaveAsync(CreateOutboxEntry("pending-a", "event-pending-a", createdUtc), TestContext.Current.CancellationToken);
+        _ = await store.SaveAsync(CreateOutboxEntry("pending-b", "event-pending-b", createdUtc), TestContext.Current.CancellationToken);
+
+        context.ChangeTracker.Clear();
+
+        IReadOnlyList<GovernanceOutboxEntry> pending = await store.FindPendingAsync(2, TestContext.Current.CancellationToken);
+
+        Assert.Equal(["pending-a", "pending-b"], [.. pending.Select(entry => entry.OutboxEntryId)]);
+    }
+
+    /// <summary>
+    /// Verifies retry-ready outbox selection filters, orders, and limits before materializing entries from the EF Core store.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous test operation.</returns>
+    [Fact]
+    public async Task FindRetryReadyAsyncFiltersReadyRowsOrdersDeterministicallyAndAppliesMaxCount()
+    {
+        await using SqliteConnection connection = await OpenConnectionAsync();
+        DbContextOptions<HostOwnedGovernanceDbContext> options = CreateOptions(connection);
+        await EnsureCreatedAsync(options);
+
+        DateTimeOffset utcNow = new(2026, 6, 15, 12, 0, 0, TimeSpan.Zero);
+        DateTimeOffset readyAt = utcNow.AddMinutes(-5);
+        DateTimeOffset createdUtc = utcNow.AddHours(-1);
+        DateTimeOffset updatedUtc = utcNow.AddMinutes(-10);
+        var retryableError = GovernanceEmissionError.Create(
+            "provider.retryable",
+            "Provider requested another attempt.",
+            isRetryable: true,
+            providerName: "test-provider");
+        var failedError = GovernanceEmissionError.Create(
+            "provider.failed",
+            "Provider failed without a retryable marker.",
+            providerName: "test-provider");
+
+        await using HostOwnedGovernanceDbContext context = new(options);
+        var store = new EfCoreGovernanceOutboxStore(context);
+
+        _ = await store.SaveAsync(CreateOutboxEntry("retry-ready-b", "event-retry-ready-b", createdUtc)
+            .MarkFailed(retryableError, readyAt, updatedUtc), TestContext.Current.CancellationToken);
+        _ = await store.SaveAsync(CreateOutboxEntry("retry-ready-a", "event-retry-ready-a", createdUtc)
+            .MarkDeferred(retryableError, readyAt, updatedUtc), TestContext.Current.CancellationToken);
+        _ = await store.SaveAsync(CreateOutboxEntry("retry-ready-c", "event-retry-ready-c", createdUtc)
+            .MarkFailed(failedError, utcNow.AddMinutes(-1), updatedUtc), TestContext.Current.CancellationToken);
+        _ = await store.SaveAsync(CreateOutboxEntry("retry-future", "event-retry-future", createdUtc)
+            .MarkFailed(retryableError, utcNow.AddMinutes(5), updatedUtc), TestContext.Current.CancellationToken);
+        _ = await store.SaveAsync(GovernanceOutboxEntry.Restore(
+            CreateEnvelope("event-retry-exhausted", "correlation-retry-exhausted", "audit-retry-exhausted"),
+            GovernanceEmissionStatus.Failed,
+            "retry-exhausted",
+            createdUtc,
+            updatedUtc,
+            retryCount: 5,
+            maxRetryCount: 5,
+            nextRetryUtc: readyAt,
+            lastError: failedError), TestContext.Current.CancellationToken);
+
+        context.ChangeTracker.Clear();
+
+        IReadOnlyList<GovernanceOutboxEntry> retryReady = await store.FindRetryReadyAsync(
+            utcNow,
+            2,
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(["retry-ready-a", "retry-ready-b"], [.. retryReady.Select(entry => entry.OutboxEntryId)]);
+    }
+
+    /// <summary>
     /// Verifies delivered, failed, retry-ready, deferred, and dead-letter state transitions over EF Core persistence.
     /// </summary>
     /// <returns>A task that represents the asynchronous test operation.</returns>
@@ -226,6 +315,17 @@ public sealed class EfCoreGovernanceOutboxPersistenceTests
     {
         await using HostOwnedGovernanceDbContext context = new(options);
         _ = await context.Database.EnsureCreatedAsync(TestContext.Current.CancellationToken);
+    }
+
+    private static GovernanceOutboxEntry CreateOutboxEntry(
+        string outboxEntryId,
+        string eventId,
+        DateTimeOffset createdUtc)
+    {
+        return GovernanceOutboxEntry.Create(
+            CreateEnvelope(eventId, $"correlation-{outboxEntryId}", $"audit-{outboxEntryId}"),
+            outboxEntryId,
+            createdUtc);
     }
 
     private static GovernanceEmissionEnvelope CreateEnvelope(

@@ -1,6 +1,7 @@
 using AsiBackbone.EntityFrameworkCore.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AsiBackbone.EntityFrameworkCore.Configurations;
 
@@ -24,6 +25,14 @@ public sealed class AsiBackboneGovernanceOutboxEntryEntityConfiguration
     private const int ContentTypeMaxLength = 256;
     private const int PayloadTypeMaxLength = 128;
     private const int ConcurrencyStampMaxLength = 64;
+
+    private static readonly ValueConverter<DateTimeOffset, long> DateTimeOffsetToUtcTicksConverter = new(
+        value => value.ToUniversalTime().Ticks,
+        value => new DateTimeOffset(value, TimeSpan.Zero));
+
+    private static readonly ValueConverter<DateTimeOffset?, long?> NullableDateTimeOffsetToUtcTicksConverter = new(
+        value => value.HasValue ? value.Value.ToUniversalTime().Ticks : null,
+        value => value.HasValue ? new DateTimeOffset(value.Value, TimeSpan.Zero) : null);
 
     /// <inheritdoc />
     public void Configure(EntityTypeBuilder<AsiBackboneGovernanceOutboxEntryEntity> builder)
@@ -52,10 +61,18 @@ public sealed class AsiBackboneGovernanceOutboxEntryEntityConfiguration
             .HasMaxLength(StatusMaxLength);
 
         _ = builder.Property(outboxEntry => outboxEntry.CreatedUtc)
+            .HasConversion(DateTimeOffsetToUtcTicksConverter)
             .IsRequired();
 
         _ = builder.Property(outboxEntry => outboxEntry.UpdatedUtc)
+            .HasConversion(DateTimeOffsetToUtcTicksConverter)
             .IsRequired();
+
+        _ = builder.Property(outboxEntry => outboxEntry.DeliveredUtc)
+            .HasConversion(NullableDateTimeOffsetToUtcTicksConverter);
+
+        _ = builder.Property(outboxEntry => outboxEntry.NextRetryUtc)
+            .HasConversion(NullableDateTimeOffsetToUtcTicksConverter);
 
         _ = builder.Property(outboxEntry => outboxEntry.RetryCount)
             .IsRequired();
@@ -98,9 +115,11 @@ public sealed class AsiBackboneGovernanceOutboxEntryEntityConfiguration
             .HasMaxLength(IdentifierMaxLength);
 
         _ = builder.Property(outboxEntry => outboxEntry.EnvelopeOccurredUtc)
+            .HasConversion(DateTimeOffsetToUtcTicksConverter)
             .IsRequired();
 
         _ = builder.Property(outboxEntry => outboxEntry.EnvelopeCreatedUtc)
+            .HasConversion(DateTimeOffsetToUtcTicksConverter)
             .IsRequired();
 
         _ = builder.Property(outboxEntry => outboxEntry.EnvelopeCorrelationId)
@@ -206,13 +225,15 @@ public sealed class AsiBackboneGovernanceOutboxEntryEntityConfiguration
         {
             outboxEntry.Status,
             outboxEntry.NextRetryUtc,
-            outboxEntry.UpdatedUtc
+            outboxEntry.UpdatedUtc,
+            outboxEntry.OutboxEntryId
         });
 
         _ = builder.HasIndex(outboxEntry => new
         {
             outboxEntry.Status,
-            outboxEntry.CreatedUtc
+            outboxEntry.CreatedUtc,
+            outboxEntry.OutboxEntryId
         });
 
         _ = builder.HasIndex(outboxEntry => new

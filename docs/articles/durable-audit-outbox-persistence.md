@@ -92,6 +92,17 @@ The current status model does not include a provider-neutral `Claimed` or `InPro
 * `DeadLetterReason`
 * minimized metadata
 
+## EF Core outbox selection and indexing
+
+The EF Core outbox store pushes common drain selection work into the provider query before materialization:
+
+* `FindPendingAsync` filters to `Pending`, orders by `CreatedUtc` and `OutboxEntryId`, and applies `Take(maxCount)` in the database query.
+* `FindRetryReadyAsync` filters to deferred, failed, or retryable-failure rows that have not exhausted retry count and have no future `NextRetryUtc`, orders by retry timestamp and `OutboxEntryId`, and applies `Take(maxCount)` in the database query.
+
+The built-in EF Core model includes provider-neutral indexes for common drain paths, including status, retry timestamp, created/updated timestamps, and deterministic outbox identifiers. Hosts remain responsible for reviewing the generated model against their database provider, migration strategy, workload, retention policy, and horizontal-worker pattern.
+
+Provider-specific filtered indexes, partial indexes, table partitioning, claim/lease columns, lock hints, or queue-specific SQL are intentionally host-owned migration decisions. AsiBackbone supplies the portable model and selection semantics; production hosts decide whether to add provider-specific optimization beyond that portable baseline.
+
 ## Failure handling
 
 Provider failures should be normalized into `GovernanceEmissionError` before updating the outbox. The host can then decide whether to retry, defer, dead-letter, or escalate.

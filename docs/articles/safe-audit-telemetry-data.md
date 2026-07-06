@@ -153,7 +153,7 @@ If the host needs sensitive values for policy evaluation, keep those values in m
 | `PolicyVersion` / `PolicyHash` | Store version/hash. Do not store full policy material if it includes secrets or sensitive rules. |
 | `ReasonCodes` | Prefer curated, bounded codes. Do not concatenate raw input. |
 | `ReasonMessages` | Use curated messages. Treat free-form text as sensitive until reviewed. |
-| `Metadata` dictionaries | Allow-list keys and redact values. Avoid dumping host objects or request headers. |
+| `Metadata` dictionaries | Allow-list keys, validate budgets, and redact values. Avoid dumping host objects or request headers. |
 | `ProviderName` / `ProviderRecordId` | Store provider identifiers only. Do not store provider credentials. |
 | `LastError` / error messages | Normalize and redact. Do not persist exception strings that may include payloads or secrets. |
 
@@ -162,7 +162,7 @@ If the host needs sensitive values for policy evaluation, keep those values in m
 Prefer an explicit allow-list over copying arbitrary objects into metadata.
 
 ```csharp
-var safeMetadata = new Dictionary<string, string?>
+var safeMetadata = new Dictionary<string, string>(StringComparer.Ordinal)
 {
     ["operation.name"] = context.OperationName,
     ["resource.id"] = context.ResourceId,
@@ -182,6 +182,38 @@ var unsafeMetadata = httpContext.Request.Headers
     .ToDictionary(header => header.Key, header => header.Value.ToString());
 ```
 
+## Recommended metadata budget
+
+Metadata should be treated as a bounded governance surface, not an unbounded diagnostic dump. The package provides `GovernanceMetadataBudget` and `GovernanceMetadataBudgetValidator` as optional helper APIs so hosts can validate shape before metadata becomes durable audit data, telemetry, outbox payload, or signing metadata.
+
+The default recommended helper budget is:
+
+| Budget item | Recommended default |
+| --- | ---: |
+| Maximum metadata entries | 32 |
+| Maximum key length | 64 characters |
+| Maximum value length | 512 characters |
+| Maximum estimated serialized size | 8,192 UTF-8 bytes |
+
+Example validation pattern:
+
+```csharp
+using AsiBackbone.Core.Metadata;
+
+var budgetResult = GovernanceMetadataBudgetValidator.Validate(safeMetadata);
+if (!budgetResult.IsValid)
+{
+    // Treat this as a host policy failure: reject, redact, trim, or quarantine.
+    throw new InvalidOperationException(string.Join("; ", budgetResult.Violations));
+}
+
+IReadOnlyDictionary<string, string> normalizedMetadata = budgetResult.NormalizedMetadata;
+```
+
+Recommended reserved or discouraged key patterns include secrets, credentials, passwords, API keys, access tokens, refresh tokens, bearer/authorization headers, private keys, connection strings, SSNs, and social-security identifiers. Store opaque references, hashes, classifications, or provider record IDs instead of sensitive values.
+
+Budget validation is not privacy classification. A value can pass count and length limits while still being sensitive. Hosts remain responsible for allow-listing keys, classifying values, redacting unsafe content, and setting retention policy.
+
 ## Before durable audit persistence
 
 Before writing audit residue, lifecycle events, or ledger records, hosts should verify that:
@@ -191,6 +223,8 @@ Before writing audit residue, lifecycle events, or ledger records, hosts should 
 - actor identifiers are opaque or explicitly approved for retention;
 - resource identifiers are references, not payloads;
 - metadata keys are allow-listed;
+- metadata count, key length, value length, and estimated serialized size stay within the host-approved budget;
+- reserved or discouraged metadata key patterns do not carry secrets, tokens, credentials, connection strings, or raw PII;
 - exception details are normalized and redacted;
 - sensitive data is omitted, tokenized, hashed, or classified according to host policy;
 - retention and access controls are appropriate for the stored fields.
@@ -218,6 +252,7 @@ A regulated host should consider a review/redaction layer before durable outbox 
 That layer can:
 
 - allow-list metadata keys;
+- validate metadata budgets;
 - normalize reason codes;
 - replace sensitive values with opaque IDs;
 - hash identifiers when lookup is not required;
@@ -236,6 +271,8 @@ Before enabling durable audit persistence or telemetry export, confirm:
 - [ ] Reason codes are bounded and do not include user input.
 - [ ] Reason messages are curated and redacted.
 - [ ] Metadata dictionaries use allow-listed keys.
+- [ ] Metadata dictionaries stay within an explicit host-approved budget for count, key length, value length, and estimated serialized size.
+- [ ] Reserved or discouraged metadata keys are blocked or reviewed before persistence or export.
 - [ ] Exceptions are normalized before persistence.
 - [ ] Raw prompts, request bodies, uploaded files, secrets, tokens, credentials, and connection strings are not stored or emitted.
 - [ ] Exported telemetry attributes are reviewed for data classification.

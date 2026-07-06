@@ -29,7 +29,7 @@ These pages are the best first stops for implementation-first adoption.
 
 ## Current stable package family
 
-Stable `2.x` is the current release line. `2.2.1` is the current compatible patch release. It preserves the `2.0.0` public package and namespace boundary while adding BenchmarkDotNet allocation baselines and reducing allocation pressure across outbox drain, endpoint governance, policy evaluation, and audit residue creation hot paths.
+Stable `2.x` is the current release line. `2.3.0` is the current compatible minor release. It preserves the `2.0.0` public package and namespace boundary while adding metadata budget guardrails, opt-in constraint-exception denial behavior, empty-policy warning diagnostics, managed-key signing fail-closed defaults, outbox/query hardening, endpoint-governance validation cleanup, and documentation alignment.
 
 ```text
 AsiBackbone.Core
@@ -116,6 +116,8 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 * [Quality Reports](quality/)
 * [Performance Benchmark Baseline](articles/performance-benchmark-baseline.md)
 * [Release Validation](articles/release-validation.md)
+* [2.3.0 Release Readiness Record](articles/release-readiness-230.md)
+* [2.3.0 Release Notes](articles/release-notes-230.md)
 * [2.2.1 Release Readiness Record](articles/release-readiness-221.md)
 * [2.2.1 Release Notes](articles/release-notes-221.md)
 * [2.2.0 Release Readiness Record](articles/release-readiness-220.md)

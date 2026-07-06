@@ -83,12 +83,9 @@ public sealed class ManagedKeySigningService : IAsiBackboneSigningService
         SigningRequest request,
         string failureCode)
     {
-        if (!options.ReturnUnsignedOnFailure)
-        {
-            throw new ManagedKeySigningException(failureCode, failureCode);
-        }
-
-        return CreateUnsignedFailureResult(request, failureCode, failureCode, retryAttempts: 0);
+        return !options.ReturnUnsignedOnFailure
+            ? throw new ManagedKeySigningException(failureCode, failureCode)
+            : CreateUnsignedFailureResult(request, failureCode, failureCode, retryAttempts: 0);
     }
 
     private SigningResult HandleFailure(

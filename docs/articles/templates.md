@@ -14,7 +14,7 @@ dotnet new install AsiBackbone.Templates
 For local repository validation, install the generated `.nupkg` from the package artifact directory instead:
 
 ```powershell
-dotnet new install ./artifacts/packages/AsiBackbone.Templates.2.2.1.nupkg
+dotnet new install ./artifacts/packages/AsiBackbone.Templates.2.3.0.nupkg
 ```
 
 ## Create a governed Web API

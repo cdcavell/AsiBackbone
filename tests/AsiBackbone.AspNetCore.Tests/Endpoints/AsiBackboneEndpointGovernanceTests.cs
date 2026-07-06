@@ -465,15 +465,14 @@ public sealed class AsiBackboneEndpointGovernanceTests
     }
 
     [Fact]
-    public void AddAsiBackboneAspNetCoreRejectsInvalidEndpointGovernanceOptionsDuringRegistration()
+    public void EndpointGovernanceOptionsValidateRejectsInvalidStatusCode()
     {
-        ServiceCollection services = new();
+        var options = new AsiBackboneEndpointGovernanceOptions
+        {
+            ConfigurationFailureStatusCode = 99
+        };
 
-        InvalidOperationException exception = Assert.Throws<InvalidOperationException>(() =>
-            services.AddAsiBackboneAspNetCore(options =>
-            {
-                options.ConfigurationFailureStatusCode = 99;
-            }));
+        InvalidOperationException exception = Assert.Throws<InvalidOperationException>(options.Validate);
 
         Assert.Contains(nameof(AsiBackboneEndpointGovernanceOptions.ConfigurationFailureStatusCode), exception.Message, StringComparison.Ordinal);
     }

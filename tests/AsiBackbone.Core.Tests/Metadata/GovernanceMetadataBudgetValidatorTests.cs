@@ -14,12 +14,51 @@ public sealed class GovernanceMetadataBudgetValidatorTests
             [" "] = " ignored "
         };
 
-        GovernanceMetadataBudgetValidationResult result = GovernanceMetadataBudgetValidator.Validate(metadata);
+        var result = GovernanceMetadataBudgetValidator.Validate(metadata);
 
         Assert.True(result.IsValid);
         _ = Assert.Single(result.NormalizedMetadata);
         Assert.Equal("approval.execute", result.NormalizedMetadata["operation.name"]);
         Assert.True(result.EstimatedSerializedBytes > 0);
+    }
+
+    [Fact]
+    public void ValidateReturnsValidEmptyResultForNullMetadata()
+    {
+        var result = GovernanceMetadataBudgetValidator.Validate(null);
+
+        Assert.True(result.IsValid);
+        Assert.Empty(result.NormalizedMetadata);
+        Assert.Empty(result.Violations);
+        Assert.Equal(2, result.EstimatedSerializedBytes);
+    }
+
+    [Fact]
+    public void NormalizeAndValidateReturnsNormalizedMetadataWhenBudgetPasses()
+    {
+        var metadata = new Dictionary<string, string>
+        {
+            [" region "] = " US-LA "
+        };
+
+        var normalizedMetadata = GovernanceMetadataBudgetValidator.NormalizeAndValidate(metadata);
+
+        _ = Assert.Single(normalizedMetadata);
+        Assert.Equal("US-LA", normalizedMetadata["region"]);
+    }
+
+    [Fact]
+    public void EstimateSerializedSizeBytesNormalizesMetadataBeforeCounting()
+    {
+        var metadata = new Dictionary<string, string>
+        {
+            [" key "] = " value ",
+            [" "] = " ignored "
+        };
+
+        int estimatedBytes = GovernanceMetadataBudgetValidator.EstimateSerializedSizeBytes(metadata);
+
+        Assert.Equal(16, estimatedBytes);
     }
 
     [Fact]
@@ -38,7 +77,7 @@ public sealed class GovernanceMetadataBudgetValidatorTests
             ["region"] = "US-LA"
         };
 
-        GovernanceMetadataBudgetValidationResult result = GovernanceMetadataBudgetValidator.Validate(metadata, budget);
+        var result = GovernanceMetadataBudgetValidator.Validate(metadata, budget);
 
         Assert.False(result.IsValid);
         Assert.Contains(result.Violations, violation => violation.Contains("maximum metadata count", StringComparison.Ordinal));
@@ -55,10 +94,49 @@ public sealed class GovernanceMetadataBudgetValidatorTests
             ["api_key"] = "sk-test-value"
         };
 
-        GovernanceMetadataBudgetValidationResult result = GovernanceMetadataBudgetValidator.Validate(metadata);
+        var result = GovernanceMetadataBudgetValidator.Validate(metadata);
 
         Assert.False(result.IsValid);
         Assert.Contains(result.Violations, violation => violation.Contains("reserved or discouraged key fragment 'apikey'", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void ValidateAllowsReservedLookingKeysWhenReservedFragmentsAreEmpty()
+    {
+        var budget = GovernanceMetadataBudget.Create(reservedKeyFragments: []);
+        var metadata = new Dictionary<string, string>
+        {
+            ["api_key"] = "opaque-reference-only"
+        };
+
+        var result = GovernanceMetadataBudgetValidator.Validate(metadata, budget);
+
+        Assert.True(result.IsValid);
+        Assert.Empty(result.Violations);
+    }
+
+    [Fact]
+    public void CreateNormalizesReservedKeyFragments()
+    {
+        var budget = GovernanceMetadataBudget.Create(
+            reservedKeyFragments:
+            [
+                " api-key ",
+                "api_key",
+                " ",
+                "token"
+            ]);
+
+        Assert.Equal(["apikey", "token"], budget.ReservedKeyFragments);
+    }
+
+    [Fact]
+    public void CreateRejectsInvalidBudgetLimits()
+    {
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(
+            () => GovernanceMetadataBudget.Create(maxCount: 0));
+
+        Assert.Equal("maxCount", exception.ParamName);
     }
 
     [Fact]
@@ -74,7 +152,7 @@ public sealed class GovernanceMetadataBudgetValidatorTests
             ["two"] = "2"
         };
 
-        ArgumentException exception = Assert.Throws<ArgumentException>(
+        var exception = Assert.Throws<ArgumentException>(
             () => GovernanceMetadataBudgetValidator.NormalizeAndValidate(metadata, budget));
 
         Assert.Contains("Metadata budget validation failed", exception.Message, StringComparison.Ordinal);

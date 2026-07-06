@@ -12,6 +12,8 @@ The existing APIs are safe for single active worker usage and for local/test val
 
 A future release may add an explicit claim/lease abstraction, but that should be designed deliberately because it affects schema shape, migrations, provider-specific SQL, retry semantics, and host deployment operations.
 
+The selected design direction is recorded in [Outbox Claim and Lease Design Record](outbox-claim-lease-design.md). It keeps current single-worker selection APIs supported, treats claim/lease as an explicit opt-in durable outbox capability, and preserves provider-side idempotency guidance even after claim support exists.
+
 ## Repeatable validation path
 
 Issue #311 adds a CI-friendly EF Core validation path for concurrent outbox/lifecycle writes, retryable drain failures, and drain-worker contention:
@@ -89,7 +91,7 @@ A typical host-owned claim pattern includes:
 - provider-specific locking or update semantics in the same database transaction;
 - a final delivered/failed/deferred/dead-letter transition that verifies the claim owner where appropriate.
 
-This package does not prescribe those columns or migration steps in the current release line. The host owns the database schema, migrations, and provider behavior.
+This package does not prescribe those columns or migration steps in the current release line. The host owns the database schema, migrations, and provider behavior. The future package-owned design direction is tracked in [Outbox Claim and Lease Design Record](outbox-claim-lease-design.md).
 
 ### 4. Provider-side idempotency
 
@@ -162,14 +164,15 @@ This keeps the package boundary clear and avoids overstating delivery guarantees
 
 A future claim/lease feature should be evaluated as a deliberate API and storage design, not as an incidental change to the current find-and-drain API.
 
-Open design questions include:
+The current design record selects an additive direction: explicit claim/lease contracts in Core, opt-in durable-store implementations, no silent mutation in existing find APIs, no first-step `Claimed` or `InProgress` status, and continued idempotency guidance.
 
-- whether claim APIs belong in Core or a durable-store-specific abstraction;
-- how to represent claim owner, lease expiration, and abandoned claims;
-- whether a new `Claimed` or `InProgress` status is needed;
+Open implementation questions include:
+
+- exact Core model names for claim request, claim result, owner, lease expiration, and claim token values;
+- whether the first EF Core implementation can be provider-neutral enough or should wait for provider-specific adapters;
 - how to avoid breaking existing migrations and host-owned schemas;
-- whether EF Core can provide a provider-neutral implementation or only guidance;
 - how provider idempotency keys should flow into downstream emitters;
-- how tests should model real database concurrency instead of only in-memory concurrency.
+- how tests should model real database concurrency instead of only in-memory concurrency;
+- whether later operational evidence justifies a new provider-neutral `Claimed` or `InProgress` status.
 
-Until that design exists, production multi-replica hosts should use a single active worker, partitioned workers, or host-owned claim/lease behavior.
+Until that implementation exists, production multi-replica hosts should use a single active worker, partitioned workers, or host-owned claim/lease behavior.

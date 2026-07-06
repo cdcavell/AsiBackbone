@@ -44,6 +44,8 @@ Composition rules are intentionally conservative:
 
 The evaluator propagates correlation, policy version, and policy hash metadata from the evaluation context into the composed governance decision.
 
+When an optional `ILogger<DefaultAsiBackbonePolicyEvaluator<TContext>>` is supplied and evaluation runs with zero constraints while `DenyWhenNoConstraints` is `false`, the evaluator emits a warning. This preserves backward compatibility while making the permissive empty-policy path visible in operational logs.
+
 ## Minimal usage example
 
 ```csharp
@@ -62,6 +64,30 @@ GovernanceDecision decision = await evaluator.EvaluateAsync(
 ```
 
 For host-owned orchestration examples, see [Custom Decision Policy Examples](custom-decision-policy-examples.md). That article covers warning preservation, acknowledgment-required outcomes, regional overlays, gateway readiness checks, and the difference between policy evaluation and host-owned execution.
+
+## Named sharp edge: permissive empty-policy evaluation
+
+The current stable `2.x` default keeps `AsiBackbonePolicyEvaluatorOptions.DenyWhenNoConstraints` set to `false`. That means an evaluator created with an empty constraint collection can produce an allowed decision.
+
+This default exists for backward compatibility and for intentionally unconstrained local flows. It is still a sharp edge for governance-sensitive hosts because an empty collection may also mean:
+
+- dependency injection did not register expected constraints;
+- dynamic policy discovery failed;
+- a feature flag or configuration source returned no policy entries;
+- a database-backed constraint loader returned an empty set after an outage or migration;
+- a test or sample registration path accidentally reached production.
+
+If a logger is supplied, the evaluator now emits a warning when this permissive empty-policy path is used. Treat that warning as an operational signal, not as a substitute for fail-closed configuration.
+
+Hosts that expect at least one constraint should validate configuration at startup and should prefer `DenyWhenNoConstraints = true` for governed production surfaces.
+
+```csharp
+if (!constraintsFromConfiguration.Any())
+{
+    throw new InvalidOperationException(
+        "Governance policy configuration produced no constraints for this host.");
+}
+```
 
 ## Strict default-deny for empty policies
 
@@ -84,6 +110,10 @@ When enabled and no constraints are supplied, the evaluator returns a denied `Go
 Permissive zero-constraint behavior is appropriate only when the host explicitly intends an unconstrained policy surface, such as a local sample, test harness, migration step, or separately protected flow. Strict default-deny should be used when constraints are loaded dynamically and an empty collection may indicate a policy-load failure.
 
 This option is not a substitute for authentication, authorization, or host-level configuration validation.
+
+## Future-major compatibility note
+
+Changing the default value of `DenyWhenNoConstraints` from `false` to `true` would alter documented decision behavior and should be treated as a future-major-version candidate, not as a patch or minor release change. Any future flip should include migration notes for hosts that intentionally rely on permissive empty-policy evaluation.
 
 ## Optional fast-abort on first blocked result
 

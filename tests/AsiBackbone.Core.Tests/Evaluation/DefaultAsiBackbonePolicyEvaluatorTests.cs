@@ -171,6 +171,40 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
                 }));
     }
 
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData(" ")]
+    public void ConstructorThrowsForInvalidConstraintExceptionReasonCode(string? reasonCode)
+    {
+        _ = Assert.Throws<InvalidOperationException>(() =>
+            new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+                [],
+                decisionPolicy: null,
+                options: new AsiBackbonePolicyEvaluatorOptions
+                {
+                    TreatConstraintExceptionAsDenial = true,
+                    ConstraintExceptionReasonCode = reasonCode!
+                }));
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData(" ")]
+    public void ConstructorThrowsForInvalidConstraintExceptionReasonMessage(string? reasonMessage)
+    {
+        _ = Assert.Throws<InvalidOperationException>(() =>
+            new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+                [],
+                decisionPolicy: null,
+                options: new AsiBackbonePolicyEvaluatorOptions
+                {
+                    TreatConstraintExceptionAsDenial = true,
+                    ConstraintExceptionReasonMessage = reasonMessage!
+                }));
+    }
+
     [Fact]
     public async Task EvaluateWithStrictOptionAndWarningsStillProducesWarningDecision()
     {
@@ -249,6 +283,159 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
             Assert.Single(policy.ComposedDecision.ReasonCodes));
         Assert.NotNull(policy.ConstraintResults);
         Assert.Empty(policy.ConstraintResults);
+    }
+
+    [Fact]
+    public async Task EvaluateWithConstraintExceptionPropagatesByDefault()
+    {
+        TestPolicyContext context = CreateContext();
+        var expectedException = new InvalidOperationException("Sensitive exception details should stay with the host.");
+
+        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+            [new ThrowingConstraint(expectedException)]);
+
+        InvalidOperationException exception = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken));
+
+        Assert.Same(expectedException, exception);
+    }
+
+    [Fact]
+    public async Task EvaluateWithConstraintExceptionOptionProducesDeniedDecision()
+    {
+        TestPolicyContext context = CreateContext();
+        var expectedException = new InvalidOperationException("sensitive database connection string details");
+        var logger = new CapturingLogger<DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>>();
+
+        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+            constraints: [new ThrowingConstraint(expectedException)],
+            decisionPolicy: null,
+            options: new AsiBackbonePolicyEvaluatorOptions
+            {
+                TreatConstraintExceptionAsDenial = true
+            },
+            logger: logger);
+
+        GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
+
+        Assert.True(decision.IsDenied);
+        Assert.False(decision.CanProceed);
+        Assert.Equal(
+            AsiBackbonePolicyEvaluatorOptions.DefaultConstraintExceptionReasonCode,
+            Assert.Single(decision.ReasonCodes));
+        Assert.Equal(
+            "A policy constraint failed during evaluation. The operation was denied by the evaluator failure policy.",
+            Assert.Single(decision.Reasons).Message);
+        Assert.DoesNotContain("connection string", Assert.Single(decision.Reasons).Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal(context.CorrelationId, decision.CorrelationId);
+        Assert.Equal(context.PolicyVersion, decision.PolicyVersion);
+        Assert.Equal(context.PolicyHash, decision.PolicyHash);
+
+        CapturedLogEntry entry = Assert.Single(logger.Entries);
+        Assert.Equal(LogLevel.Error, entry.LogLevel);
+        Assert.Equal(4120, entry.EventId.Id);
+        Assert.Equal("ConstraintExceptionDeniedError", entry.EventId.Name);
+        Assert.Contains("throwing-constraint", entry.Message, StringComparison.Ordinal);
+        Assert.Contains(context.CorrelationId!, entry.Message, StringComparison.Ordinal);
+        Assert.Same(expectedException, entry.Exception);
+    }
+
+    [Fact]
+    public async Task EvaluateWithConstraintExceptionOptionLogsUnnamedConstraint()
+    {
+        TestPolicyContext context = CreateContext();
+        var logger = new CapturingLogger<DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>>();
+
+        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+            constraints: [new ThrowingConstraint(new InvalidOperationException("failure"), " ")],
+            decisionPolicy: null,
+            options: new AsiBackbonePolicyEvaluatorOptions
+            {
+                TreatConstraintExceptionAsDenial = true
+            },
+            logger: logger);
+
+        GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
+
+        Assert.True(decision.IsDenied);
+        CapturedLogEntry entry = Assert.Single(logger.Entries);
+        Assert.Contains("<unnamed>", entry.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task EvaluateWithConstraintExceptionOptionUsesConfiguredReason()
+    {
+        TestPolicyContext context = CreateContext();
+
+        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+            [new ThrowingConstraint(new InvalidOperationException("sensitive failure text"))],
+            decisionPolicy: null,
+            options: new AsiBackbonePolicyEvaluatorOptions
+            {
+                TreatConstraintExceptionAsDenial = true,
+                ConstraintExceptionReasonCode = "host.constraint.exception",
+                ConstraintExceptionReasonMessage = "The host policy constraint failed closed."
+            });
+
+        GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
+
+        Assert.True(decision.IsDenied);
+        Assert.Equal("host.constraint.exception", Assert.Single(decision.ReasonCodes));
+        Assert.Equal("The host policy constraint failed closed.", Assert.Single(decision.Reasons).Message);
+    }
+
+    [Fact]
+    public async Task EvaluateWithConstraintExceptionOptionAppliesDecisionPolicyWithSyntheticDeniedResult()
+    {
+        TestPolicyContext context = CreateContext();
+        var policy = new CapturingDecisionPolicy();
+
+        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+            [
+                new StaticConstraint(ConstraintEvaluationResult.Allow()),
+                new ThrowingConstraint(new InvalidOperationException("sensitive failure text"))
+            ],
+            policy,
+            new AsiBackbonePolicyEvaluatorOptions
+            {
+                TreatConstraintExceptionAsDenial = true
+            });
+
+        GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
+
+        Assert.True(decision.IsDeferred);
+        Assert.Equal(1, policy.ApplyCount);
+        Assert.NotNull(policy.ComposedDecision);
+        Assert.True(policy.ComposedDecision.IsDenied);
+        Assert.Equal(
+            AsiBackbonePolicyEvaluatorOptions.DefaultConstraintExceptionReasonCode,
+            Assert.Single(policy.ComposedDecision.ReasonCodes));
+        Assert.NotNull(policy.ConstraintResults);
+        Assert.Equal(2, policy.ConstraintResults.Count);
+        Assert.True(policy.ConstraintResults[1].IsDenied);
+        Assert.Equal(
+            AsiBackbonePolicyEvaluatorOptions.DefaultConstraintExceptionReasonCode,
+            Assert.Single(policy.ConstraintResults[1].ReasonCodes));
+    }
+
+    [Fact]
+    public async Task EvaluateWithConstraintExceptionOptionStillPropagatesOperationCanceledException()
+    {
+        TestPolicyContext context = CreateContext();
+        var expectedException = new OperationCanceledException("Host cancellation should not be converted to denial.");
+
+        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+            [new ThrowingConstraint(expectedException)],
+            decisionPolicy: null,
+            options: new AsiBackbonePolicyEvaluatorOptions
+            {
+                TreatConstraintExceptionAsDenial = true
+            });
+
+        OperationCanceledException exception = await Assert.ThrowsAsync<OperationCanceledException>(async () =>
+            await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken));
+
+        Assert.Same(expectedException, exception);
     }
 
     [Fact]
@@ -469,6 +656,18 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
         }
     }
 
+    private sealed class ThrowingConstraint(Exception exception, string name = "throwing-constraint") : IAsiBackboneConstraint<TestPolicyContext>
+    {
+        public string Name => name;
+
+        public ValueTask<ConstraintEvaluationResult> EvaluateAsync(
+            TestPolicyContext context,
+            CancellationToken cancellationToken = default)
+        {
+            throw exception;
+        }
+    }
+
     private sealed class DelegateConstraint(
         Func<TestPolicyContext, CancellationToken, ConstraintEvaluationResult> evaluate) : IAsiBackboneConstraint<TestPolicyContext>
     {
@@ -541,11 +740,15 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
             Exception? exception,
             Func<TState, Exception?, string> formatter)
         {
-            Entries.Add(new CapturedLogEntry(logLevel, eventId, formatter(state, exception)));
+            Entries.Add(new CapturedLogEntry(logLevel, eventId, formatter(state, exception), exception));
         }
     }
 
-    private sealed record CapturedLogEntry(LogLevel LogLevel, EventId EventId, string Message);
+    private sealed record CapturedLogEntry(
+        LogLevel LogLevel,
+        EventId EventId,
+        string Message,
+        Exception? Exception);
 
     private sealed class NullScope : IDisposable
     {

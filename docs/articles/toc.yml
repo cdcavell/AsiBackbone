@@ -46,6 +46,8 @@
   items:
     - name: Policy Evaluator Pipeline
       href: policy-evaluator-pipeline.md
+    - name: Constraint Exception Policy
+      href: constraint-exception-policy.md
     - name: Custom Decision Policy Examples
       href: custom-decision-policy-examples.md
     - name: Host-Owned Execution Enforcement

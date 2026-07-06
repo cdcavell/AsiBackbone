@@ -43,6 +43,7 @@ The release process now includes explicit [Release Cadence and Readiness](releas
 ## Core engineering concepts and domain language
 
 * [Policy Evaluator Pipeline](policy-evaluator-pipeline.md)
+* [Constraint Exception Policy](constraint-exception-policy.md)
 * [Custom Decision Policy Examples](custom-decision-policy-examples.md)
 * [Host-Owned Execution Enforcement](host-owned-execution-enforcement.md)
 * [High-Throughput Host Service Guidance](high-throughput-host-services.md)

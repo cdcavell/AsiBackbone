@@ -40,7 +40,7 @@ public sealed class ManagedKeySigningService : IAsiBackboneSigningService
         string? validationFailure = ValidateSigningRequest(request);
         if (validationFailure is not null)
         {
-            return CreateUnsignedFailureResult(request, validationFailure, validationFailure, retryAttempts: 0);
+            return HandleValidationFailure(request, validationFailure);
         }
 
         int attempt = 0;
@@ -77,6 +77,18 @@ public sealed class ManagedKeySigningService : IAsiBackboneSigningService
                 return HandleFailure(request, "managedkey.signing.unsupported", exception.GetType().Name, attempt, exception);
             }
         }
+    }
+
+    private SigningResult HandleValidationFailure(
+        SigningRequest request,
+        string failureCode)
+    {
+        if (!options.ReturnUnsignedOnFailure)
+        {
+            throw new ManagedKeySigningException(failureCode, failureCode);
+        }
+
+        return CreateUnsignedFailureResult(request, failureCode, failureCode, retryAttempts: 0);
     }
 
     private SigningResult HandleFailure(

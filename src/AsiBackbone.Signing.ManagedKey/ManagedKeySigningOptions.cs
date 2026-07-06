@@ -130,8 +130,8 @@ public sealed class ManagedKeySigningOptions
             hashAlgorithm,
             requireKeyVersion,
             returnUnsignedOnFailure: true,
-            maxRetryAttempts,
-            retryDelay);
+            maxRetryAttempts: maxRetryAttempts,
+            retryDelay: retryDelay);
     }
 
     /// <summary>

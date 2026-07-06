@@ -11,7 +11,7 @@ Use the header search box for package names, API concepts, and article titles. S
 
 ## Current stable package posture
 
-Stable `2.x` is the current package line. `2.2.1` is the current compatible patch release. It preserves the `2.0.0` public package and namespace boundary while adding BenchmarkDotNet allocation baselines and reducing allocation pressure across outbox drain, endpoint governance, policy evaluation, and audit residue creation hot paths. `2.0.0` established the simplified `AsiBackbone.*` package and namespace identity after the public rename from `CDCavell.AsiBackbone.*`.
+Stable `2.x` is the current package line. `2.3.0` is the current compatible minor release. It preserves the `2.0.0` public package and namespace boundary while adding metadata budget guardrails, opt-in constraint-exception denial behavior, empty-policy warning diagnostics, managed-key signing fail-closed defaults, outbox/query hardening, endpoint-governance validation cleanup, and documentation alignment. `2.0.0` established the simplified `AsiBackbone.*` package and namespace identity after the public rename from `CDCavell.AsiBackbone.*`.
 
 Released stable package surfaces include Core, DependencyInjection, Storage.InMemory, EntityFrameworkCore, AspNetCore, Testing, Templates, Analyzers, OpenTelemetry, Signing.LocalDevelopment, and Signing.ManagedKey. OpenTelemetry is the concrete released governance-emission provider. Event Hubs, Purview, Azure-specific SDK adapters, Aspire runtime packages, robotics, immutable-storage, and additional provider packages remain design-only, strategy-only, sample-only, host-owned, or future-provider work unless a later stable release explicitly ships them.
 
@@ -30,6 +30,7 @@ The release process now includes explicit [Release Cadence and Readiness](releas
 * [AddAsiBackbone Builder Facade](add-asibackbone-builder-facade.md)
 * [dotnet new Templates](templates.md)
 * [Why AsiBackbone?](why-asi-backbone.md)
+* [2.3.0 Release Notes](release-notes-230.md)
 * [2.2.1 Release Notes](release-notes-221.md)
 * [2.2.0 Release Notes](release-notes-220.md)
 * [2.1.0 Release Notes](release-notes-210.md)
@@ -96,7 +97,7 @@ These pages cover the durability, governance-emission, signing, diagnostics, tes
 * [Durable Audit and Outbox Persistence](durable-audit-outbox-persistence.md)
 * [Hosted Governance Outbox Drain](hosted-governance-outbox-drain.md)
 * [Outbox Multi-Worker Concurrency](outbox-multi-worker-concurrency.md)
-* [Outbox Drain Reliability and Alerting](outbox-drain-reliability-and-alerting.md)
+* [Outbox Drain Reliability and Alerting](outbox-drain-reliability-alerting.md)
 * [High-Throughput Host Service Guidance](high-throughput-host-services.md)
 * [Safe Audit and Telemetry Data](safe-audit-telemetry-data.md)
 * [Audit Residue Observability Schema](audit-residue-observability-schema.md)
@@ -151,6 +152,7 @@ Scenario pages describe applied patterns. They remain optional and do not imply 
 * [Release Cadence and Readiness](release-cadence-and-readiness.md)
 * [Release Validation](release-validation.md)
 * [Supply-Chain Provenance and Package SBOMs](supply-chain-provenance.md)
+* [2.3.0 Release Readiness Record](release-readiness-230.md)
 * [2.2.1 Release Readiness Record](release-readiness-221.md)
 * [2.2.0 Release Readiness Record](release-readiness-220.md)
 * [2.1.0 Release Readiness Record](release-readiness-210.md)
@@ -162,6 +164,7 @@ Scenario pages describe applied patterns. They remain optional and do not imply 
 * [Historical 1.1.0 Release Readiness Record](release-readiness-checklist.md)
 * [API Baseline and Boundary Checks](api-baseline-and-boundary-checks.md)
 * [Developer Checklist](developer-checklist.md)
+* [2.3.0 Release Notes](release-notes-230.md)
 * [2.2.1 Release Notes](release-notes-221.md)
 * [2.2.0 Release Notes](release-notes-220.md)
 * [2.1.0 Release Notes](release-notes-210.md)

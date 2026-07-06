@@ -206,13 +206,15 @@ public sealed class AsiBackboneGovernanceOutboxEntryEntityConfiguration
         {
             outboxEntry.Status,
             outboxEntry.NextRetryUtc,
-            outboxEntry.UpdatedUtc
+            outboxEntry.UpdatedUtc,
+            outboxEntry.OutboxEntryId
         });
 
         _ = builder.HasIndex(outboxEntry => new
         {
             outboxEntry.Status,
-            outboxEntry.CreatedUtc
+            outboxEntry.CreatedUtc,
+            outboxEntry.OutboxEntryId
         });
 
         _ = builder.HasIndex(outboxEntry => new

@@ -41,6 +41,7 @@ Composition rules are intentionally conservative:
 5. An optional `IAsiBackboneDecisionPolicy<TContext>` can raise the composed decision to deferred, acknowledgment-required, or escalation-recommended.
 6. When `AsiBackbonePolicyEvaluatorOptions.DenyWhenNoConstraints` is enabled and the supplied constraint collection is empty, the evaluator returns a denied decision with reason code `asibackbone.policy.no_constraints`.
 7. When `AsiBackbonePolicyEvaluatorOptions.ShortCircuitOnFirstDenial` is enabled, the evaluator stops after the first blocked constraint result and preserves reasons produced up to that point.
+8. When `AsiBackbonePolicyEvaluatorOptions.TreatConstraintExceptionAsDenial` is enabled, a non-cancellation exception thrown by a constraint becomes a denied decision with reason code `asibackbone.policy.constraint_exception`.
 
 The evaluator propagates correlation, policy version, and policy hash metadata from the evaluation context into the composed governance decision.
 
@@ -111,9 +112,35 @@ Permissive zero-constraint behavior is appropriate only when the host explicitly
 
 This option is not a substitute for authentication, authorization, or host-level configuration validation.
 
+## Constraint exception behavior
+
+By default, if a constraint throws, the exception propagates to the host. This preserves compatibility and lets the host's existing exception handling, transaction, retry, telemetry, and incident-response policy decide what happens next.
+
+Hosts that need a governance decision artifact even when a constraint fails can opt in:
+
+```csharp
+var evaluator = new DefaultAsiBackbonePolicyEvaluator<MyPolicyContext>(
+    constraints: constraintsFromConfiguration,
+    decisionPolicy: new HighRiskDecisionPolicy(),
+    options: new AsiBackbonePolicyEvaluatorOptions
+    {
+        TreatConstraintExceptionAsDenial = true
+    });
+```
+
+When enabled, a non-cancellation exception thrown by a constraint becomes a denied `GovernanceDecision` with reason code `asibackbone.policy.constraint_exception`. The generated denial preserves correlation ID, policy version, and policy hash. If a decision policy is configured, the denied decision is passed through that policy with a synthetic denied constraint result so downstream audit and policy code can observe the denial path.
+
+Public reason messages intentionally do not include exception messages, stack traces, connection strings, raw payloads, secrets, tokens, or user input. When a logger is supplied, the exception object is attached to an error-level log entry. Hosts remain responsible for log redaction, retention, and access control.
+
+`OperationCanceledException` is not converted into a denial; cancellation continues to propagate.
+
+See [Constraint Exception Policy](constraint-exception-policy.md) for the design note and recommended host posture.
+
 ## Future-major compatibility note
 
 Changing the default value of `DenyWhenNoConstraints` from `false` to `true` would alter documented decision behavior and should be treated as a future-major-version candidate, not as a patch or minor release change. Any future flip should include migration notes for hosts that intentionally rely on permissive empty-policy evaluation.
+
+Changing the default value of `TreatConstraintExceptionAsDenial` from `false` to `true` would also alter documented exception behavior and should be handled at a future major-version boundary if the project later decides that fail-closed decision artifacts should become the default.
 
 ## Optional fast-abort on first blocked result
 

@@ -51,10 +51,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
         var logger = new CapturingLogger<DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>>();
 
         var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
-            [],
+            constraints: [],
             decisionPolicy: null,
             options: null,
-            logger);
+            logger: logger);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
@@ -64,9 +64,9 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
         Assert.Equal(4110, entry.EventId.Id);
         Assert.Equal("EmptyPolicyAllowedWarning", entry.EventId.Name);
         Assert.Contains("zero constraints", entry.Message, StringComparison.Ordinal);
-        Assert.Contains(context.CorrelationId, entry.Message, StringComparison.Ordinal);
-        Assert.Contains(context.PolicyVersion, entry.Message, StringComparison.Ordinal);
-        Assert.Contains(context.PolicyHash, entry.Message, StringComparison.Ordinal);
+        Assert.Contains(context.CorrelationId!, entry.Message, StringComparison.Ordinal);
+        Assert.Contains(context.PolicyVersion!, entry.Message, StringComparison.Ordinal);
+        Assert.Contains(context.PolicyHash!, entry.Message, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -76,13 +76,13 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
         var logger = new CapturingLogger<DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>>();
 
         var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
-            [],
+            constraints: [],
             decisionPolicy: null,
             options: new AsiBackbonePolicyEvaluatorOptions
             {
                 DenyWhenNoConstraints = true
             },
-            logger);
+            logger: logger);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 

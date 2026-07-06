@@ -455,12 +455,14 @@ public sealed class GovernanceDecision
             return CreateFallbackReason(fallbackCode, fallbackMessage);
         }
 
+        var normalizedReasons = new OperationReason[reasons.Count];
         int normalizedCount = 0;
 
         foreach (OperationReason? reason in reasons)
         {
             if (reason is not null)
             {
+                normalizedReasons[normalizedCount] = reason;
                 normalizedCount++;
             }
         }
@@ -470,19 +472,15 @@ public sealed class GovernanceDecision
             return CreateFallbackReason(fallbackCode, fallbackMessage);
         }
 
-        var normalizedReasons = new OperationReason[normalizedCount];
-        int index = 0;
-
-        foreach (OperationReason? reason in reasons)
+        if (normalizedCount == normalizedReasons.Length)
         {
-            if (reason is not null)
-            {
-                normalizedReasons[index] = reason;
-                index++;
-            }
+            return Array.AsReadOnly(normalizedReasons);
         }
 
-        return Array.AsReadOnly(normalizedReasons);
+        var filteredReasons = new OperationReason[normalizedCount];
+        Array.Copy(normalizedReasons, filteredReasons, normalizedCount);
+
+        return Array.AsReadOnly(filteredReasons);
     }
 
     private static ReadOnlyCollection<OperationReason> CreateFallbackReason(

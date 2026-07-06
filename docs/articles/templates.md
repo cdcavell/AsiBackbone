@@ -14,7 +14,7 @@ dotnet new install AsiBackbone.Templates
 For local repository validation, install the generated `.nupkg` from the package artifact directory instead:
 
 ```powershell
-dotnet new install ./artifacts/packages/AsiBackbone.Templates.2.0.0.nupkg
+dotnet new install ./artifacts/packages/AsiBackbone.Templates.2.2.1.nupkg
 ```
 
 ## Create a governed Web API
@@ -81,7 +81,7 @@ The template intentionally favors safe local defaults:
 
 ## CI validation
 
-The repository validates the template package by packing local packages, installing the generated `AsiBackbone.Templates` package, generating both supported host styles, restoring against the local package output plus NuGet, and building each generated project.
+The repository validates the template package by packing local packages, installing the generated `AsiBackbone.Templates` package, generating both supported host styles, asserting the generated `.csproj` fallback `PackageReference` versions match the repository package version, restoring against the local package output plus NuGet, and building each generated project.
 
 This proves the template can be installed and used from a clean directory without making Core depend on template infrastructure or NetCoreApplicationTemplate.
 

@@ -22,6 +22,12 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
             new EventId(4110, nameof(EmptyPolicyAllowedWarning)),
             "Policy evaluation ran with zero constraints while DenyWhenNoConstraints is false; default empty-policy behavior allows the decision. CorrelationId: {CorrelationId}; PolicyVersion: {PolicyVersion}; PolicyHash: {PolicyHash}");
 
+    private static readonly Action<ILogger, string, string, string, string, Exception?> ConstraintExceptionDeniedError =
+        LoggerMessage.Define<string, string, string, string>(
+            LogLevel.Error,
+            new EventId(4120, nameof(ConstraintExceptionDeniedError)),
+            "Policy constraint '{ConstraintName}' threw during evaluation and was converted to a denied governance decision. CorrelationId: {CorrelationId}; PolicyVersion: {PolicyVersion}; PolicyHash: {PolicyHash}");
+
     private readonly IAsiBackboneConstraint<TContext>[] constraints;
     private readonly IAsiBackboneDecisionPolicy<TContext>? decisionPolicy;
     private readonly ILogger<DefaultAsiBackbonePolicyEvaluator<TContext>>? logger;
@@ -126,9 +132,23 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            ConstraintEvaluationResult result = await constraint
-                .EvaluateAsync(context, cancellationToken)
-                .ConfigureAwait(false);
+            ConstraintEvaluationResult result;
+            try
+            {
+                result = await constraint
+                    .EvaluateAsync(context, cancellationToken)
+                    .ConfigureAwait(false);
+            }
+            catch (Exception exception) when (options.TreatConstraintExceptionAsDenial && exception is not OperationCanceledException)
+            {
+                return await CreateConstraintExceptionDecisionAsync(
+                    context,
+                    constraint,
+                    results,
+                    exception,
+                    cancellationToken)
+                    .ConfigureAwait(false);
+            }
 
             results?.Add(result);
 
@@ -229,6 +249,33 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
             : results.AsReadOnly();
     }
 
+    private async ValueTask<GovernanceDecision> CreateConstraintExceptionDecisionAsync(
+        TContext context,
+        IAsiBackboneConstraint<TContext> constraint,
+        List<ConstraintEvaluationResult>? results,
+        Exception exception,
+        CancellationToken cancellationToken)
+    {
+        LogConstraintExceptionDenied(context, constraint.Name, exception);
+
+        ConstraintEvaluationResult exceptionResult = ConstraintEvaluationResult.Deny(
+            options.ConstraintExceptionReasonCode,
+            options.ConstraintExceptionReasonMessage);
+        results?.Add(exceptionResult);
+
+        GovernanceDecision exceptionDecision = GovernanceDecision.Deny(
+            exceptionResult.Reasons,
+            correlationId: context.CorrelationId,
+            policyVersion: context.PolicyVersion,
+            policyHash: context.PolicyHash);
+
+        return decisionPolicy is null
+            ? exceptionDecision
+            : await decisionPolicy
+            .ApplyAsync(context, exceptionDecision, CreateConstraintResultsView(results), cancellationToken)
+            .ConfigureAwait(false);
+    }
+
     private void LogEmptyPolicyAllowed(TContext context)
     {
         if (logger is null)
@@ -242,6 +289,25 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
             context.PolicyVersion ?? string.Empty,
             context.PolicyHash ?? string.Empty,
             null);
+    }
+
+    private void LogConstraintExceptionDenied(
+        TContext context,
+        string constraintName,
+        Exception exception)
+    {
+        if (logger is null)
+        {
+            return;
+        }
+
+        ConstraintExceptionDeniedError(
+            logger,
+            string.IsNullOrWhiteSpace(constraintName) ? "<unnamed>" : constraintName,
+            context.CorrelationId ?? string.Empty,
+            context.PolicyVersion ?? string.Empty,
+            context.PolicyHash ?? string.Empty,
+            exception);
     }
 
     private struct OperationReasonAccumulator

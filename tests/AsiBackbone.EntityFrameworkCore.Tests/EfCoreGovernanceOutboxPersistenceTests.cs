@@ -108,12 +108,12 @@ public sealed class EfCoreGovernanceOutboxPersistenceTests
         DateTimeOffset readyAt = utcNow.AddMinutes(-5);
         DateTimeOffset createdUtc = utcNow.AddHours(-1);
         DateTimeOffset updatedUtc = utcNow.AddMinutes(-10);
-        GovernanceEmissionError retryableError = GovernanceEmissionError.Create(
+        var retryableError = GovernanceEmissionError.Create(
             "provider.retryable",
             "Provider requested another attempt.",
             isRetryable: true,
             providerName: "test-provider");
-        GovernanceEmissionError failedError = GovernanceEmissionError.Create(
+        var failedError = GovernanceEmissionError.Create(
             "provider.failed",
             "Provider failed without a retryable marker.",
             providerName: "test-provider");

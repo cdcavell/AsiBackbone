@@ -258,12 +258,12 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
     {
         LogConstraintExceptionDenied(context, constraint.Name, exception);
 
-        ConstraintEvaluationResult exceptionResult = ConstraintEvaluationResult.Deny(
+        var exceptionResult = ConstraintEvaluationResult.Deny(
             options.ConstraintExceptionReasonCode,
             options.ConstraintExceptionReasonMessage);
         results?.Add(exceptionResult);
 
-        GovernanceDecision exceptionDecision = GovernanceDecision.Deny(
+        var exceptionDecision = GovernanceDecision.Deny(
             exceptionResult.Reasons,
             correlationId: context.CorrelationId,
             policyVersion: context.PolicyVersion,

@@ -97,7 +97,7 @@ These pages cover the durability, governance-emission, signing, diagnostics, tes
 * [Durable Audit and Outbox Persistence](durable-audit-outbox-persistence.md)
 * [Hosted Governance Outbox Drain](hosted-governance-outbox-drain.md)
 * [Outbox Multi-Worker Concurrency](outbox-multi-worker-concurrency.md)
-* [Outbox Drain Reliability and Alerting](outbox-drain-reliability-alerting.md)
+* [Outbox Drain Reliability and Alerting](outbox-drain-reliability-and-alerting.md)
 * [High-Throughput Host Service Guidance](high-throughput-host-services.md)
 * [Safe Audit and Telemetry Data](safe-audit-telemetry-data.md)
 * [Audit Residue Observability Schema](audit-residue-observability-schema.md)

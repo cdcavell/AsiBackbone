@@ -17,7 +17,7 @@ public sealed class GovernanceMetadataBudgetValidatorTests
         GovernanceMetadataBudgetValidationResult result = GovernanceMetadataBudgetValidator.Validate(metadata);
 
         Assert.True(result.IsValid);
-        Assert.Single(result.NormalizedMetadata);
+        _ = Assert.Single(result.NormalizedMetadata);
         Assert.Equal("approval.execute", result.NormalizedMetadata["operation.name"]);
         Assert.True(result.EstimatedSerializedBytes > 0);
     }
@@ -25,7 +25,7 @@ public sealed class GovernanceMetadataBudgetValidatorTests
     [Fact]
     public void ValidateReportsCountLengthValueAndSerializedSizeViolations()
     {
-        GovernanceMetadataBudget budget = GovernanceMetadataBudget.Create(
+        var budget = GovernanceMetadataBudget.Create(
             maxCount: 1,
             maxKeyLength: 8,
             maxValueLength: 4,
@@ -64,7 +64,7 @@ public sealed class GovernanceMetadataBudgetValidatorTests
     [Fact]
     public void NormalizeAndValidateThrowsWhenBudgetFails()
     {
-        GovernanceMetadataBudget budget = GovernanceMetadataBudget.Create(
+        var budget = GovernanceMetadataBudget.Create(
             maxCount: 1,
             reservedKeyFragments: []);
 

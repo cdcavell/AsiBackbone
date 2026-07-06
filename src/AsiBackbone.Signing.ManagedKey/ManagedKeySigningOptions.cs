@@ -55,9 +55,13 @@ public sealed class ManagedKeySigningOptions
     public bool RequireKeyVersion { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets a value indicating whether signing failures should return unsigned metadata instead of throwing.
+    /// Gets or sets a value indicating whether signing failures should return unsigned failure metadata instead of throwing.
     /// </summary>
-    public bool ReturnUnsignedOnFailure { get; set; } = true;
+    /// <remarks>
+    /// The production-oriented default is <see langword="false" /> so signing failures fail closed unless a host explicitly
+    /// opts into unsigned failure metadata for local validation, samples, or policy-routed fallback behavior.
+    /// </remarks>
+    public bool ReturnUnsignedOnFailure { get; set; }
 
     /// <summary>
     /// Gets or sets the maximum number of retry attempts after the initial managed-key signing call.
@@ -70,7 +74,7 @@ public sealed class ManagedKeySigningOptions
     public TimeSpan RetryDelay { get; set; } = TimeSpan.FromMilliseconds(200);
 
     /// <summary>
-    /// Creates managed-key signing options.
+    /// Creates production-oriented managed-key signing options that fail closed by default when signing cannot complete.
     /// </summary>
     public static ManagedKeySigningOptions Create(
         string keyId,
@@ -79,7 +83,7 @@ public sealed class ManagedKeySigningOptions
         string? signatureAlgorithm = null,
         string? hashAlgorithm = null,
         bool requireKeyVersion = true,
-        bool returnUnsignedOnFailure = true,
+        bool returnUnsignedOnFailure = false,
         int maxRetryAttempts = 2,
         TimeSpan? retryDelay = null)
     {
@@ -98,6 +102,36 @@ public sealed class ManagedKeySigningOptions
 
         options.Validate();
         return options;
+    }
+
+    /// <summary>
+    /// Creates local-validation managed-key signing options that return unsigned failure metadata instead of throwing.
+    /// </summary>
+    /// <remarks>
+    /// Use this only for samples, tests, diagnostics, or hosts that explicitly route unsigned failure metadata through policy.
+    /// Production signing paths should prefer <see cref="Create" /> or set <see cref="ReturnUnsignedOnFailure" /> to
+    /// <see langword="false" />.
+    /// </remarks>
+    public static ManagedKeySigningOptions CreateLocalValidation(
+        string keyId,
+        string? keyVersion = null,
+        string? providerName = null,
+        string? signatureAlgorithm = null,
+        string? hashAlgorithm = null,
+        bool requireKeyVersion = true,
+        int maxRetryAttempts = 2,
+        TimeSpan? retryDelay = null)
+    {
+        return Create(
+            keyId,
+            keyVersion,
+            providerName,
+            signatureAlgorithm,
+            hashAlgorithm,
+            requireKeyVersion,
+            returnUnsignedOnFailure: true,
+            maxRetryAttempts,
+            retryDelay);
     }
 
     /// <summary>

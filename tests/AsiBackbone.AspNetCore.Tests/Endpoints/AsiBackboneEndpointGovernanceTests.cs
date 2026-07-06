@@ -464,6 +464,37 @@ public sealed class AsiBackboneEndpointGovernanceTests
         Assert.True(nextCalled);
     }
 
+    [Fact]
+    public void AddAsiBackboneAspNetCoreRejectsInvalidEndpointGovernanceOptionsDuringRegistration()
+    {
+        ServiceCollection services = new();
+
+        InvalidOperationException exception = Assert.Throws<InvalidOperationException>(() =>
+            services.AddAsiBackboneAspNetCore(options =>
+            {
+                options.ConfigurationFailureStatusCode = 99;
+            }));
+
+        Assert.Contains(nameof(AsiBackboneEndpointGovernanceOptions.ConfigurationFailureStatusCode), exception.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void EndpointGovernanceOptionsValidationRejectsPostConfiguredInvalidOptions()
+    {
+        using ServiceProvider services = new ServiceCollection()
+            .AddAsiBackboneAspNetCore()
+            .Configure<AsiBackboneEndpointGovernanceOptions>(options =>
+            {
+                options.CapabilityFailureStatusCode = 700;
+            })
+            .BuildServiceProvider(validateScopes: true);
+
+        OptionsValidationException exception = Assert.Throws<OptionsValidationException>(() =>
+            _ = services.GetRequiredService<IOptions<AsiBackboneEndpointGovernanceOptions>>().Value);
+
+        Assert.Contains("Endpoint governance options must be valid.", exception.Message, StringComparison.Ordinal);
+    }
+
     private static async Task<string> ReadResponseBodyAsync(HttpContext httpContext)
     {
         httpContext.Response.Body.Position = 0;

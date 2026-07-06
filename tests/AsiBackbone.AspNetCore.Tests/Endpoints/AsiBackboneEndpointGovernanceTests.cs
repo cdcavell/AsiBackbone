@@ -482,10 +482,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
     {
         using ServiceProvider services = new ServiceCollection()
             .AddAsiBackboneAspNetCore()
-            .Configure<AsiBackboneEndpointGovernanceOptions>(options =>
-            {
-                options.CapabilityFailureStatusCode = 700;
-            })
+            .Configure<AsiBackboneEndpointGovernanceOptions>(options => options.CapabilityFailureStatusCode = 700)
             .BuildServiceProvider(validateScopes: true);
 
         OptionsValidationException exception = Assert.Throws<OptionsValidationException>(() =>

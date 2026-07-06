@@ -20,6 +20,14 @@ Hosts that use policy metadata should register an `IAsiBackbonePolicyEvaluator<A
 
 Because those services may run before the protected endpoint executes, their implementation choices affect request throughput. Keep request-time evaluators, validators, and audit sinks async, cancellable, bounded, and free of blocking calls such as `.Result`, `.Wait()`, `Thread.Sleep`, synchronous network calls, synchronous database calls, or unbounded `Task.Run` work. See [High-Throughput Host Service Guidance](high-throughput-host-services.md) for request hot-path examples, anti-patterns, queue/backpressure guidance, and the framework/host responsibility boundary.
 
+## Options validation posture
+
+`AddAsiBackboneAspNetCore()` registers endpoint-governance options validation with startup validation. Invalid endpoint-governance options fail through the configured options validation path instead of being revalidated on every request.
+
+The middleware reads the validated `IOptions<AsiBackboneEndpointGovernanceOptions>.Value` and avoids repeating `Validate()` in the request hot path. This keeps invalid configuration fail-closed through startup/configured-options validation while avoiding per-request validation overhead for stable host options.
+
+Hosts that intentionally mutate options at runtime should validate their mutation path before applying it. The endpoint-governance middleware does not treat live option mutation as the normal production path.
+
 ## Minimal API / fluent endpoint path
 
 ```csharp

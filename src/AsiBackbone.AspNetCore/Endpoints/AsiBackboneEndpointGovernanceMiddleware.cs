@@ -35,8 +35,9 @@ public sealed class AsiBackboneEndpointGovernanceMiddleware(RequestDelegate next
         ArgumentNullException.ThrowIfNull(governanceService);
         ArgumentNullException.ThrowIfNull(endpointOptions);
 
+        // Options validation is registered with ValidateOnStart in AddAsiBackboneAspNetCore.
+        // Avoid repeating the same validation on every request in the endpoint-governance hot path.
         AsiBackboneEndpointGovernanceOptions options = endpointOptions.Value;
-        options.Validate();
 
         Endpoint? endpoint = httpContext.GetEndpoint();
         var descriptor = AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(endpoint);

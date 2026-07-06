@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using AsiBackbone.Core.Constraints;
 using AsiBackbone.Core.Decisions;
 using AsiBackbone.Core.Results;
+using Microsoft.Extensions.Logging;
 
 namespace AsiBackbone.Core.Evaluation;
 
@@ -15,8 +16,15 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
     private static readonly IReadOnlyList<ConstraintEvaluationResult> EmptyConstraintResults =
         Array.AsReadOnly(Array.Empty<ConstraintEvaluationResult>());
 
+    private static readonly Action<ILogger, string, string, string, Exception?> EmptyPolicyAllowedWarning =
+        LoggerMessage.Define<string, string, string>(
+            LogLevel.Warning,
+            new EventId(4110, nameof(EmptyPolicyAllowedWarning)),
+            "Policy evaluation ran with zero constraints while DenyWhenNoConstraints is false; default empty-policy behavior allows the decision. CorrelationId: {CorrelationId}; PolicyVersion: {PolicyVersion}; PolicyHash: {PolicyHash}");
+
     private readonly IAsiBackboneConstraint<TContext>[] constraints;
     private readonly IAsiBackboneDecisionPolicy<TContext>? decisionPolicy;
+    private readonly ILogger<DefaultAsiBackbonePolicyEvaluator<TContext>>? logger;
     private readonly AsiBackbonePolicyEvaluatorOptions options;
 
     /// <summary>
@@ -27,7 +35,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
     public DefaultAsiBackbonePolicyEvaluator(
         IEnumerable<IAsiBackboneConstraint<TContext>> constraints,
         IAsiBackboneDecisionPolicy<TContext>? decisionPolicy = null)
-        : this(constraints, decisionPolicy, options: null)
+        : this(constraints, decisionPolicy, options: null, logger: null)
     {
     }
 
@@ -41,6 +49,22 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
         IEnumerable<IAsiBackboneConstraint<TContext>> constraints,
         IAsiBackboneDecisionPolicy<TContext>? decisionPolicy,
         AsiBackbonePolicyEvaluatorOptions? options)
+        : this(constraints, decisionPolicy, options, logger: null)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}"/> class.
+    /// </summary>
+    /// <param name="constraints">The constraints that make up the active policy structure.</param>
+    /// <param name="decisionPolicy">Optional decision policy applied after constraint composition.</param>
+    /// <param name="options">Evaluator options applied during constraint composition.</param>
+    /// <param name="logger">Optional logger used to emit operational warning signals.</param>
+    public DefaultAsiBackbonePolicyEvaluator(
+        IEnumerable<IAsiBackboneConstraint<TContext>> constraints,
+        IAsiBackboneDecisionPolicy<TContext>? decisionPolicy,
+        AsiBackbonePolicyEvaluatorOptions? options,
+        ILogger<DefaultAsiBackbonePolicyEvaluator<TContext>>? logger)
     {
         ArgumentNullException.ThrowIfNull(constraints);
 
@@ -49,6 +73,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
         // from changing the evaluator's deterministic constraint order or behavior.
         this.constraints = [.. constraints];
         this.decisionPolicy = decisionPolicy;
+        this.logger = logger;
         this.options = options ?? new AsiBackbonePolicyEvaluatorOptions();
         this.options.Validate();
     }
@@ -63,6 +88,11 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
 
         if (constraints.Length == 0)
         {
+            if (!options.DenyWhenNoConstraints)
+            {
+                LogEmptyPolicyAllowed(context);
+            }
+
             GovernanceDecision noConstraintDecision = options.DenyWhenNoConstraints
                 ? GovernanceDecision.Deny(
                     options.NoConstraintsReasonCode,
@@ -197,6 +227,21 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
         return results is null || results.Count == 0
             ? EmptyConstraintResults
             : results.AsReadOnly();
+    }
+
+    private void LogEmptyPolicyAllowed(TContext context)
+    {
+        if (logger is null)
+        {
+            return;
+        }
+
+        EmptyPolicyAllowedWarning(
+            logger,
+            context.CorrelationId ?? string.Empty,
+            context.PolicyVersion ?? string.Empty,
+            context.PolicyHash ?? string.Empty,
+            null);
     }
 
     private struct OperationReasonAccumulator

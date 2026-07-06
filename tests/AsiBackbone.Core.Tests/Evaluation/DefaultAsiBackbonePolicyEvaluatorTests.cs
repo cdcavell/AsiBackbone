@@ -1,6 +1,7 @@
 using AsiBackbone.Core.Constraints;
 using AsiBackbone.Core.Decisions;
 using AsiBackbone.Core.Evaluation;
+using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace AsiBackbone.Core.Tests.Evaluation;
@@ -41,6 +42,52 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
         Assert.Equal(context.CorrelationId, decision.CorrelationId);
         Assert.Equal(context.PolicyVersion, decision.PolicyVersion);
         Assert.Equal(context.PolicyHash, decision.PolicyHash);
+    }
+
+    [Fact]
+    public async Task EvaluateWithNoConstraintsAndDefaultOptionLogsWarning()
+    {
+        TestPolicyContext context = CreateContext();
+        var logger = new CapturingLogger<DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>>();
+
+        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+            constraints: [],
+            decisionPolicy: null,
+            options: null,
+            logger: logger);
+
+        GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
+
+        Assert.True(decision.IsAllowed);
+        CapturedLogEntry entry = Assert.Single(logger.Entries);
+        Assert.Equal(LogLevel.Warning, entry.LogLevel);
+        Assert.Equal(4110, entry.EventId.Id);
+        Assert.Equal("EmptyPolicyAllowedWarning", entry.EventId.Name);
+        Assert.Contains("zero constraints", entry.Message, StringComparison.Ordinal);
+        Assert.Contains(context.CorrelationId!, entry.Message, StringComparison.Ordinal);
+        Assert.Contains(context.PolicyVersion!, entry.Message, StringComparison.Ordinal);
+        Assert.Contains(context.PolicyHash!, entry.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task EvaluateWithNoConstraintsAndStrictOptionDoesNotLogWarning()
+    {
+        TestPolicyContext context = CreateContext();
+        var logger = new CapturingLogger<DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>>();
+
+        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+            constraints: [],
+            decisionPolicy: null,
+            options: new AsiBackbonePolicyEvaluatorOptions
+            {
+                DenyWhenNoConstraints = true
+            },
+            logger: logger);
+
+        GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
+
+        Assert.True(decision.IsDenied);
+        Assert.Empty(logger.Entries);
     }
 
     [Fact]
@@ -469,6 +516,43 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
                     correlationId: context.CorrelationId,
                     policyVersion: context.PolicyVersion,
                     policyHash: context.PolicyHash));
+        }
+    }
+
+    private sealed class CapturingLogger<T> : ILogger<T>
+    {
+        public List<CapturedLogEntry> Entries { get; } = [];
+
+        public IDisposable? BeginScope<TState>(TState state)
+            where TState : notnull
+        {
+            return NullScope.Instance;
+        }
+
+        public bool IsEnabled(LogLevel logLevel)
+        {
+            return true;
+        }
+
+        public void Log<TState>(
+            LogLevel logLevel,
+            EventId eventId,
+            TState state,
+            Exception? exception,
+            Func<TState, Exception?, string> formatter)
+        {
+            Entries.Add(new CapturedLogEntry(logLevel, eventId, formatter(state, exception)));
+        }
+    }
+
+    private sealed record CapturedLogEntry(LogLevel LogLevel, EventId EventId, string Message);
+
+    private sealed class NullScope : IDisposable
+    {
+        public static NullScope Instance { get; } = new();
+
+        public void Dispose()
+        {
         }
     }
 }

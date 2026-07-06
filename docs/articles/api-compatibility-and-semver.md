@@ -2,7 +2,7 @@
 
 This article defines the public API compatibility promise for the stable AsiBackbone package family and documents how semantic versioning applies after stabilization.
 
-It complements the historical stable API review tracked in [issue #13](https://github.com/cdcavell/AsiBackbone/issues/13). The `2.0.0` release started the current `2.x` line because the public package IDs and namespaces moved from `CDCavell.AsiBackbone.*` to `AsiBackbone.*`. `2.0.1`, `2.0.2`, `2.1.1`, and `2.2.1` preserved that boundary through compatible patch releases. `2.1.0` and `2.2.0` preserve the same package and namespace boundary while adding backward-compatible public/API and adoption-surface expansion.
+It complements the historical stable API review tracked in [issue #13](https://github.com/cdcavell/AsiBackbone/issues/13). The `2.0.0` release started the current `2.x` line because the public package IDs and namespaces moved from `CDCavell.AsiBackbone.*` to `AsiBackbone.*`. `2.0.1`, `2.0.2`, `2.1.1`, and `2.2.1` preserved that boundary through compatible patch releases. `2.1.0`, `2.2.0`, and `2.3.0` preserve the same package and namespace boundary while adding backward-compatible public/API, safety, and adoption-surface expansion.
 
 > [!NOTE]
 > Additive public API or package surface should use a minor version bump even when the change is backward-compatible. Patch releases should be reserved for fixes, documentation, packaging, tests, and implementation hardening that do not expand the stable public surface.
@@ -43,21 +43,21 @@ The `1.1.x` and `1.2.x` releases expanded the stable `1.x` contract with compati
 
 ### Current `2.x` stable family
 
-`2.2.1` is the current stable patch release. It preserves the `2.0.0` public package and namespace boundary after the public rename from `CDCavell.AsiBackbone.*` to `AsiBackbone.*`.
+`2.3.0` is the current stable minor release. It preserves the `2.0.0` public package and namespace boundary after the public rename from `CDCavell.AsiBackbone.*` to `AsiBackbone.*`.
 
 | Package | `2.x` stable role |
 | --- | --- |
-| `AsiBackbone.Core` | Framework-neutral governance primitives and durable artifact contracts for the current `2.x` line, including optional policy evaluator fast-abort configuration and builder-style audit residue construction. |
+| `AsiBackbone.Core` | Framework-neutral governance primitives and durable artifact contracts for the current `2.x` line, including optional policy evaluator fast-abort configuration, metadata budget validation helpers, opt-in constraint-exception denial behavior, empty-policy warning diagnostics, and builder-style audit residue construction. |
 | `AsiBackbone.DependencyInjection` | Explicit builder facade and host-selected provider registration composition path. |
 | `AsiBackbone.Storage.InMemory` | Non-durable storage helpers for tests, samples, local validation, lifecycle events, and outbox proof paths. |
 | `AsiBackbone.EntityFrameworkCore` | EF Core host-owned persistence helpers for audit, acknowledgment, lifecycle, and outbox records. |
-| `AsiBackbone.AspNetCore` | ASP.NET Core host adapters, endpoint governance, endpoint-governance metadata mode, development diagnostics, endpoint fast-abort metadata, and hosted outbox drain integration. |
+| `AsiBackbone.AspNetCore` | ASP.NET Core host adapters, endpoint governance, endpoint-governance metadata mode, development diagnostics, endpoint fast-abort metadata, startup/configured-options validation, and hosted outbox drain integration. |
 | `AsiBackbone.Testing` | Test-only harness helpers for deterministic governance and package-wiring tests. |
 | `AsiBackbone.Templates` | Developer-experience `dotnet new` templates for governed ASP.NET Core host scaffolding. |
 | `AsiBackbone.Analyzers` | Build-time analyzer safety rails, including production-signing configuration guidance. |
 | `AsiBackbone.OpenTelemetry` | Released OpenTelemetry governance emission provider. |
 | `AsiBackbone.Signing.LocalDevelopment` | Local-development signing and verification for tests, samples, and wiring proof paths only. |
-| `AsiBackbone.Signing.ManagedKey` | Managed-key signing adapter boundary where the host supplies the actual managed-key client and operational controls. |
+| `AsiBackbone.Signing.ManagedKey` | Managed-key signing adapter boundary where the host supplies the actual managed-key client and operational controls. Production-oriented registration fails closed by default when signing cannot complete. |
 
 Stable package status does not imply that every future provider idea is stable. Event Hubs, Purview, Azure-specific SDK adapters, Aspire runtime packages, robotics, immutable storage, and additional provider packages remain outside the stable contract unless separately reviewed and released as stable packages.
 
@@ -76,6 +76,9 @@ A breaking change should require a new major version when it affects a stable pa
 - converting a host-owned integration responsibility into a package-owned requirement without a compatible opt-in path.
 
 A change is not usually breaking when it only adds new optional APIs, adds new optional configuration, improves implementation behavior without changing the public contract, fixes a bug to match documented behavior, or updates documentation and samples.
+
+> [!NOTE]
+> `2.3.0` includes managed-key signing behavioral hardening: production-oriented managed-key registration now fails closed by default when signing cannot complete. The release notes document explicit local-validation and fallback opt-in paths for hosts that intentionally require unsigned failure metadata.
 
 ## Semantic versioning expectations
 
@@ -109,6 +112,7 @@ Expected stable-line behavior:
 | `2.1.1` | `2.1.1` | `2.0.0.0` | `2.1.1.0` | `2.1.1+...` |
 | `2.2.0` | `2.2.0` | `2.0.0.0` | `2.2.0.0` | `2.2.0+...` |
 | `2.2.1` | `2.2.1` | `2.0.0.0` | `2.2.1.0` | `2.2.1+...` |
+| `2.3.0` | `2.3.0` | `2.0.0.0` | `2.3.0.0` | `2.3.0+...` |
 
 Before cutting stable releases, release validation should verify that `AssemblyVersion`, `FileVersion`, `InformationalVersion`, package metadata, release notes, and repository tags match this policy.
 
@@ -139,6 +143,7 @@ Before cutting a stable release or stable package-family expansion, the release 
 
 ## Related documentation
 
+- [2.3.0 Release Notes](release-notes-230.md)
 - [2.2.1 Release Notes](release-notes-221.md)
 - [2.2.0 Release Notes](release-notes-220.md)
 - [2.1.0 Release Notes](release-notes-210.md)

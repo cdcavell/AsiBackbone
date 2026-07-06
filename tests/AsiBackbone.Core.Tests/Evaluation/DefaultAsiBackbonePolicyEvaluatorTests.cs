@@ -341,6 +341,28 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     }
 
     [Fact]
+    public async Task EvaluateWithConstraintExceptionOptionLogsUnnamedConstraint()
+    {
+        TestPolicyContext context = CreateContext();
+        var logger = new CapturingLogger<DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>>();
+
+        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+            constraints: [new ThrowingConstraint(new InvalidOperationException("failure"), " ")],
+            decisionPolicy: null,
+            options: new AsiBackbonePolicyEvaluatorOptions
+            {
+                TreatConstraintExceptionAsDenial = true
+            },
+            logger: logger);
+
+        GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
+
+        Assert.True(decision.IsDenied);
+        CapturedLogEntry entry = Assert.Single(logger.Entries);
+        Assert.Contains("<unnamed>", entry.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task EvaluateWithConstraintExceptionOptionUsesConfiguredReason()
     {
         TestPolicyContext context = CreateContext();
@@ -634,9 +656,9 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
         }
     }
 
-    private sealed class ThrowingConstraint(Exception exception) : IAsiBackboneConstraint<TestPolicyContext>
+    private sealed class ThrowingConstraint(Exception exception, string name = "throwing-constraint") : IAsiBackboneConstraint<TestPolicyContext>
     {
-        public string Name => "throwing-constraint";
+        public string Name => name;
 
         public ValueTask<ConstraintEvaluationResult> EvaluateAsync(
             TestPolicyContext context,

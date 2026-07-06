@@ -6,6 +6,31 @@ configuration="${CONFIGURATION:-Release}"
 package_output="${1:-${PACKAGE_OUTPUT:-artifacts/packages}}"
 work_root="${TEMPLATE_SMOKE_WORK_ROOT:-${RUNNER_TEMP:-/tmp}/asi-backbone-template-smoke}"
 
+get_project_version() {
+  local project_path="$1"
+
+  dotnet msbuild "$project_path" -getProperty:Version -nologo | tr -d '\r' | awk 'NF { print; exit }'
+}
+
+assert_generated_package_version() {
+  local project_file="$1"
+  local package_id="$2"
+  local expected_version="$3"
+  local actual_version
+
+  actual_version="$(sed -nE "s/.*<PackageReference Include=\"$package_id\" Version=\"([^\"]+)\".*/\1/p" "$project_file" | head -n 1)"
+
+  if [ -z "$actual_version" ]; then
+    echo "Generated project did not contain a PackageReference for $package_id."
+    exit 1
+  fi
+
+  if [ "$actual_version" != "$expected_version" ]; then
+    echo "Generated project PackageReference for $package_id expected version $expected_version but found $actual_version."
+    exit 1
+  fi
+}
+
 make_absolute_path() {
   local path="$1"
 
@@ -27,6 +52,13 @@ to_dotnet_path() {
 }
 
 package_output="$(to_dotnet_path "$(make_absolute_path "$package_output")")"
+core_project="$repo_root/src/AsiBackbone.Core/AsiBackbone.Core.csproj"
+expected_package_version="${TEMPLATE_SMOKE_PACKAGE_VERSION:-$(get_project_version "$core_project")}"
+
+if [ -z "$expected_package_version" ]; then
+  echo "Unable to determine expected AsiBackbone package version. Set TEMPLATE_SMOKE_PACKAGE_VERSION explicitly."
+  exit 1
+fi
 
 if [ ! -d "$package_output" ]; then
   echo "Package output directory was not found: $package_output"
@@ -62,6 +94,7 @@ dotnet new install "$template_package"
 for host_style in plain netcoretemplate; do
   project_name="AsiBackboneTemplateSmoke${host_style}"
   project_dir="$work_root/$project_name"
+  generated_project="$project_dir/$project_name.csproj"
 
   echo "Generating template host style '$host_style' into $project_dir"
   dotnet new asibackbone-webapi \
@@ -74,10 +107,23 @@ for host_style in plain netcoretemplate; do
     exit 1
   fi
 
-  dotnet restore "$project_dir/$project_name.csproj" \
+  for package_id in \
+    AsiBackbone.AspNetCore \
+    AsiBackbone.Core \
+    AsiBackbone.Storage.InMemory \
+    AsiBackbone.Analyzers; do
+    assert_generated_package_version "$generated_project" "$package_id" "$expected_package_version"
+  done
+
+  if grep -Eq 'Version="1\.2\.0"' "$generated_project"; then
+    echo "Generated project still references stale 1.2.0 package versions."
+    exit 1
+  fi
+
+  dotnet restore "$generated_project" \
     --configfile "$work_root/NuGet.config"
 
-  dotnet build "$project_dir/$project_name.csproj" \
+  dotnet build "$generated_project" \
     --configuration "$configuration" \
     --no-restore
 

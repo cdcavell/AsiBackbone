@@ -24,6 +24,8 @@ Host applications provide the client implementation and credentials. Private key
 
 ## Dependency injection
 
+The production-oriented registration fails closed by default. Signing failures throw unless the host explicitly opts into unsigned failure metadata.
+
 ```csharp
 services.AddAsiBackboneManagedKeySigning(
     options =>
@@ -33,7 +35,20 @@ services.AddAsiBackboneManagedKeySigning(
         options.KeyVersion = "00000000000000000000000000000000";
         options.SignatureAlgorithm = "RSASSA-PKCS1-v1_5-SHA256-MANAGED-KEY";
         options.RequireKeyVersion = true;
-        options.ReturnUnsignedOnFailure = true;
+        options.ReturnUnsignedOnFailure = false;
+    },
+    serviceProvider => new HostOwnedManagedKeySigningClient());
+```
+
+For samples, tests, diagnostics, or explicit policy-routed fallback behavior, use the local-validation registration:
+
+```csharp
+services.AddAsiBackboneManagedKeySigningForLocalValidation(
+    options =>
+    {
+        options.ProviderName = "managed-key-local-validation";
+        options.KeyId = "local-validation-key";
+        options.KeyVersion = "local-v1";
     },
     serviceProvider => new HostOwnedManagedKeySigningClient());
 ```
@@ -41,6 +56,8 @@ services.AddAsiBackboneManagedKeySigning(
 The registration wires `ManagedKeySigningService` as `IAsiBackboneSigningService`. Verification remains a separate provider or host responsibility.
 
 ## Failure behavior
+
+When `ReturnUnsignedOnFailure` is `false`, provider, validation, and configuration-related signing failures throw so high-assurance hosts can fail closed at the governance boundary.
 
 When `ReturnUnsignedOnFailure` is `true`, signing failures return unsigned `SigningMetadata` with safe failure metadata:
 
@@ -51,7 +68,7 @@ When `ReturnUnsignedOnFailure` is `true`, signing failures return unsigned `Sign
 - `raw_private_key_loaded = false`
 - `retry_attempts`
 
-When `ReturnUnsignedOnFailure` is `false`, provider exceptions are rethrown so high-assurance hosts can fail closed.
+Unsigned failure metadata is not a successful signature and must not be described as a signed governance artifact.
 
 ## Safe metadata
 

@@ -9,8 +9,12 @@ namespace AsiBackbone.Signing.ManagedKey;
 public static class ManagedKeySigningServiceCollectionExtensions
 {
     /// <summary>
-    /// Adds managed-key signing with a host-owned managed-key client factory.
+    /// Adds production-oriented managed-key signing with a host-owned managed-key client factory.
     /// </summary>
+    /// <remarks>
+    /// The production-oriented registration fails closed by default because <see cref="ManagedKeySigningOptions.ReturnUnsignedOnFailure" />
+    /// defaults to <see langword="false" />.
+    /// </remarks>
     public static IServiceCollection AddAsiBackboneManagedKeySigning(
         this IServiceCollection services,
         Action<ManagedKeySigningOptions> configure,
@@ -24,18 +28,16 @@ public static class ManagedKeySigningServiceCollectionExtensions
         configure(options);
         options.Validate();
 
-        _ = services.AddSingleton(options);
-        _ = services.AddSingleton(clientFactory);
-        _ = services.AddSingleton<ManagedKeySigningService>();
-        _ = services.AddSingleton<IAsiBackboneSigningService>(serviceProvider =>
-            serviceProvider.GetRequiredService<ManagedKeySigningService>());
-
-        return services;
+        return AddManagedKeySigningCore(services, options, clientFactory);
     }
 
     /// <summary>
-    /// Adds managed-key signing using an already-registered <see cref="IManagedKeySigningClient" />.
+    /// Adds production-oriented managed-key signing using an already-registered <see cref="IManagedKeySigningClient" />.
     /// </summary>
+    /// <remarks>
+    /// The production-oriented registration fails closed by default because <see cref="ManagedKeySigningOptions.ReturnUnsignedOnFailure" />
+    /// defaults to <see langword="false" />.
+    /// </remarks>
     public static IServiceCollection AddAsiBackboneManagedKeySigning(
         this IServiceCollection services,
         Action<ManagedKeySigningOptions> configure)
@@ -47,6 +49,75 @@ public static class ManagedKeySigningServiceCollectionExtensions
         configure(options);
         options.Validate();
 
+        return AddManagedKeySigningCore(services, options);
+    }
+
+    /// <summary>
+    /// Adds local-validation managed-key signing with a host-owned managed-key client factory.
+    /// </summary>
+    /// <remarks>
+    /// This helper explicitly sets <see cref="ManagedKeySigningOptions.ReturnUnsignedOnFailure" /> to <see langword="true" />
+    /// so samples, tests, and diagnostics can inspect unsigned failure metadata. Do not use this helper as the default
+    /// production registration unless host policy explicitly routes unsigned failure metadata.
+    /// </remarks>
+    public static IServiceCollection AddAsiBackboneManagedKeySigningForLocalValidation(
+        this IServiceCollection services,
+        Action<ManagedKeySigningOptions> configure,
+        Func<IServiceProvider, IManagedKeySigningClient> clientFactory)
+    {
+        ArgumentNullException.ThrowIfNull(services);
+        ArgumentNullException.ThrowIfNull(configure);
+        ArgumentNullException.ThrowIfNull(clientFactory);
+
+        ManagedKeySigningOptions options = new();
+        configure(options);
+        options.ReturnUnsignedOnFailure = true;
+        options.Validate();
+
+        return AddManagedKeySigningCore(services, options, clientFactory);
+    }
+
+    /// <summary>
+    /// Adds local-validation managed-key signing using an already-registered <see cref="IManagedKeySigningClient" />.
+    /// </summary>
+    /// <remarks>
+    /// This helper explicitly sets <see cref="ManagedKeySigningOptions.ReturnUnsignedOnFailure" /> to <see langword="true" />
+    /// so samples, tests, and diagnostics can inspect unsigned failure metadata. Do not use this helper as the default
+    /// production registration unless host policy explicitly routes unsigned failure metadata.
+    /// </remarks>
+    public static IServiceCollection AddAsiBackboneManagedKeySigningForLocalValidation(
+        this IServiceCollection services,
+        Action<ManagedKeySigningOptions> configure)
+    {
+        ArgumentNullException.ThrowIfNull(services);
+        ArgumentNullException.ThrowIfNull(configure);
+
+        ManagedKeySigningOptions options = new();
+        configure(options);
+        options.ReturnUnsignedOnFailure = true;
+        options.Validate();
+
+        return AddManagedKeySigningCore(services, options);
+    }
+
+    private static IServiceCollection AddManagedKeySigningCore(
+        IServiceCollection services,
+        ManagedKeySigningOptions options,
+        Func<IServiceProvider, IManagedKeySigningClient> clientFactory)
+    {
+        _ = services.AddSingleton(options);
+        _ = services.AddSingleton(clientFactory);
+        _ = services.AddSingleton<ManagedKeySigningService>();
+        _ = services.AddSingleton<IAsiBackboneSigningService>(serviceProvider =>
+            serviceProvider.GetRequiredService<ManagedKeySigningService>());
+
+        return services;
+    }
+
+    private static IServiceCollection AddManagedKeySigningCore(
+        IServiceCollection services,
+        ManagedKeySigningOptions options)
+    {
         _ = services.AddSingleton(options);
         _ = services.AddSingleton<ManagedKeySigningService>();
         _ = services.AddSingleton<IAsiBackboneSigningService>(serviceProvider =>

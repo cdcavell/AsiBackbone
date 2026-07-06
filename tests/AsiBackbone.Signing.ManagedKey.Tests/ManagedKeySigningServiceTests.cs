@@ -47,9 +47,46 @@ public sealed class ManagedKeySigningServiceTests
     }
 
     [Fact]
-    public async Task SignAsyncReturnsUnsignedFailureForUnsupportedHashAlgorithm()
+    public async Task SignAsyncThrowsForUnsupportedHashAlgorithmByDefault()
     {
         var service = new ManagedKeySigningService(CreateOptions(), new FakeManagedKeySigningClient());
+        var request = new SigningRequest(
+            "abc123",
+            hashAlgorithm: "SHA-512",
+            purpose: CanonicalArtifactTypes.AuditLedgerRecord,
+            keyId: "managed-key-1",
+            keyVersion: "v1");
+
+        ManagedKeySigningException exception = await Assert.ThrowsAsync<ManagedKeySigningException>(async () =>
+            await service.SignAsync(request, TestContext.Current.CancellationToken));
+
+        Assert.Equal("managedkey.signing.hash-algorithm-unsupported", exception.FailureCode);
+    }
+
+    [Fact]
+    public async Task SignAsyncThrowsForProviderFailureByDefault()
+    {
+        var client = new FakeManagedKeySigningClient(retryableFailuresBeforeSuccess: 1);
+        ManagedKeySigningOptions options = CreateOptions(maxRetryAttempts: 0);
+        var service = new ManagedKeySigningService(options, client);
+        var request = new SigningRequest(
+            "abc123",
+            hashAlgorithm: "SHA-256",
+            purpose: CanonicalArtifactTypes.AuditLedgerRecord,
+            keyId: "managed-key-1",
+            keyVersion: "v1");
+
+        ManagedKeySigningException exception = await Assert.ThrowsAsync<ManagedKeySigningException>(async () =>
+            await service.SignAsync(request, TestContext.Current.CancellationToken));
+
+        Assert.Equal("managedkey.signing.provider-unavailable", exception.FailureCode);
+        Assert.Equal(1, client.CallCount);
+    }
+
+    [Fact]
+    public async Task SignAsyncReturnsUnsignedFailureForUnsupportedHashAlgorithmInLocalValidationMode()
+    {
+        var service = new ManagedKeySigningService(CreateLocalValidationOptions(), new FakeManagedKeySigningClient());
         var request = new SigningRequest(
             "abc123",
             hashAlgorithm: "SHA-512",
@@ -66,9 +103,9 @@ public sealed class ManagedKeySigningServiceTests
     }
 
     [Fact]
-    public async Task SignAsyncReturnsUnsignedFailureForMissingKeyVersionWhenRequired()
+    public async Task SignAsyncReturnsUnsignedFailureForMissingKeyVersionWhenRequiredInLocalValidationMode()
     {
-        ManagedKeySigningOptions options = CreateOptions(keyVersion: null, requireKeyVersion: true);
+        ManagedKeySigningOptions options = CreateLocalValidationOptions(keyVersion: null, requireKeyVersion: true);
         var service = new ManagedKeySigningService(options, new FakeManagedKeySigningClient());
         var request = new SigningRequest(
             "abc123",
@@ -80,6 +117,28 @@ public sealed class ManagedKeySigningServiceTests
 
         Assert.False(result.IsSigned);
         Assert.Equal("managedkey.signing.key-version-missing", result.Metadata.Metadata["failure_code"]);
+    }
+
+    [Fact]
+    public async Task SignAsyncReturnsUnsignedFailureForProviderFailureInLocalValidationMode()
+    {
+        var client = new FakeManagedKeySigningClient(retryableFailuresBeforeSuccess: 1);
+        ManagedKeySigningOptions options = CreateLocalValidationOptions(maxRetryAttempts: 0);
+        var service = new ManagedKeySigningService(options, client);
+        var request = new SigningRequest(
+            "abc123",
+            hashAlgorithm: "SHA-256",
+            purpose: CanonicalArtifactTypes.AuditLedgerRecord,
+            keyId: "managed-key-1",
+            keyVersion: "v1");
+
+        SigningResult result = await service.SignAsync(request, TestContext.Current.CancellationToken);
+
+        Assert.False(result.IsSigned);
+        Assert.Equal("failed", result.Metadata.Metadata["signing_status"]);
+        Assert.Equal("managedkey.signing.provider-unavailable", result.Metadata.Metadata["failure_code"]);
+        Assert.Equal("0", result.Metadata.Metadata["retry_attempts"]);
+        Assert.Equal(1, client.CallCount);
     }
 
     [Fact]
@@ -103,7 +162,19 @@ public sealed class ManagedKeySigningServiceTests
     }
 
     [Fact]
-    public void AddAsiBackboneManagedKeySigningRegistersSigningService()
+    public void ManagedKeySigningOptionsDefaultToFailClosed()
+    {
+        var options = new ManagedKeySigningOptions
+        {
+            KeyId = "managed-key-1",
+            KeyVersion = "v1"
+        };
+
+        Assert.False(options.ReturnUnsignedOnFailure);
+    }
+
+    [Fact]
+    public void AddAsiBackboneManagedKeySigningRegistersFailClosedSigningServiceByDefault()
     {
         ServiceCollection services = new();
         _ = services.AddAsiBackboneManagedKeySigning(
@@ -120,11 +191,35 @@ public sealed class ManagedKeySigningServiceTests
 
         Assert.NotNull(serviceProvider.GetRequiredService<ManagedKeySigningService>());
         Assert.NotNull(serviceProvider.GetRequiredService<IAsiBackboneSigningService>());
+        Assert.False(serviceProvider.GetRequiredService<ManagedKeySigningOptions>().ReturnUnsignedOnFailure);
+    }
+
+    [Fact]
+    public void AddAsiBackboneManagedKeySigningForLocalValidationRegistersFailOpenSigningService()
+    {
+        ServiceCollection services = new();
+        _ = services.AddAsiBackboneManagedKeySigningForLocalValidation(
+            options =>
+            {
+                options.ProviderName = "managed-key-test";
+                options.KeyId = "managed-key-1";
+                options.KeyVersion = "v1";
+                options.RetryDelay = TimeSpan.Zero;
+            },
+            _ => new FakeManagedKeySigningClient());
+
+        using ServiceProvider serviceProvider = services.BuildServiceProvider();
+
+        Assert.NotNull(serviceProvider.GetRequiredService<ManagedKeySigningService>());
+        Assert.NotNull(serviceProvider.GetRequiredService<IAsiBackboneSigningService>());
+        Assert.True(serviceProvider.GetRequiredService<ManagedKeySigningOptions>().ReturnUnsignedOnFailure);
     }
 
     private static ManagedKeySigningOptions CreateOptions(
         string? keyVersion = "v1",
         bool requireKeyVersion = true,
+        bool returnUnsignedOnFailure = false,
+        int maxRetryAttempts = 2,
         TimeSpan? retryDelay = null)
     {
         return ManagedKeySigningOptions.Create(
@@ -132,6 +227,23 @@ public sealed class ManagedKeySigningServiceTests
             keyVersion: keyVersion,
             providerName: "managed-key-test",
             requireKeyVersion: requireKeyVersion,
+            returnUnsignedOnFailure: returnUnsignedOnFailure,
+            maxRetryAttempts: maxRetryAttempts,
+            retryDelay: retryDelay ?? TimeSpan.Zero);
+    }
+
+    private static ManagedKeySigningOptions CreateLocalValidationOptions(
+        string? keyVersion = "v1",
+        bool requireKeyVersion = true,
+        int maxRetryAttempts = 2,
+        TimeSpan? retryDelay = null)
+    {
+        return ManagedKeySigningOptions.CreateLocalValidation(
+            keyId: "managed-key-1",
+            keyVersion: keyVersion,
+            providerName: "managed-key-test",
+            requireKeyVersion: requireKeyVersion,
+            maxRetryAttempts: maxRetryAttempts,
             retryDelay: retryDelay ?? TimeSpan.Zero);
     }
 

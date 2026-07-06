@@ -1,13 +1,13 @@
 # Managed-Key Signing Provider
 
-Issue: #210, updated for #253.
+Issue: #210, updated for #253 and #408.
 
 This article documents the released `AsiBackbone.Signing.ManagedKey` provider package.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone provides provider-neutral signing, verification, and audit metadata seams. It does not provide immutable storage, external anchoring, blockchain, legal evidence guarantees, compliance certification, or tamper-evidence by itself.
 
 > [!IMPORTANT]
-> The managed-key package is a stable `1.1.0` provider adapter and client boundary. It does not include a live Azure Key Vault, Managed HSM, cloud KMS, certificate store, or HSM implementation by default. Host applications supply the actual managed-key client, credentials, verification path, monitoring, and operational policy.
+> The managed-key package is a stable provider adapter and client boundary. It does not include a live Azure Key Vault, Managed HSM, cloud KMS, certificate store, or HSM implementation by default. Host applications supply the actual managed-key client, credentials, verification path, monitoring, and operational policy.
 
 ## Purpose
 
@@ -31,7 +31,7 @@ Core remains provider-neutral. Provider packages reference Core, not the reverse
 
 | Boundary | Status | Notes |
 | --- | --- | --- |
-| Managed-key adapter package | Released stable package in `1.1.0`. | Provides options, DI registration, signing service, and client abstraction. |
+| Managed-key adapter package | Released stable package. | Provides options, DI registration, signing service, and client abstraction. |
 | `IManagedKeySigningClient` | Host-owned implementation boundary. | The host implementation may call Azure Key Vault, Managed HSM, cloud KMS, an HSM appliance, or an organization-owned signing service. |
 | Concrete cloud/HSM/KMS client | Not shipped by default. | Host-owned or future provider-specific package work. |
 | Verification service | Separate host/provider responsibility. | Signed metadata is preserved for later verification, but hosts must provide a matching verification path when trust is required. |
@@ -64,7 +64,7 @@ The client must not return:
 
 ## Dependency injection
 
-Use `AddAsiBackboneManagedKeySigning(...)` to register the managed-key provider as `IAsiBackboneSigningService`.
+Use `AddAsiBackboneManagedKeySigning(...)` for production-oriented managed-key signing. This registration fails closed by default because `ManagedKeySigningOptions.ReturnUnsignedOnFailure` defaults to `false`.
 
 ```csharp
 services.AddAsiBackboneManagedKeySigning(
@@ -76,7 +76,7 @@ services.AddAsiBackboneManagedKeySigning(
         options.SignatureAlgorithm = "RSASSA-PKCS1-v1_5-SHA256-MANAGED-KEY";
         options.HashAlgorithm = "SHA-256";
         options.RequireKeyVersion = true;
-        options.ReturnUnsignedOnFailure = true;
+        options.ReturnUnsignedOnFailure = false;
         options.MaxRetryAttempts = 2;
     },
     serviceProvider => new HostOwnedManagedKeySigningClient());
@@ -94,6 +94,23 @@ services.AddAsiBackboneManagedKeySigning(options =>
     options.KeyVersion = "2026-06";
 });
 ```
+
+## Local validation mode
+
+Use `AddAsiBackboneManagedKeySigningForLocalValidation(...)` only when samples, tests, diagnostics, or explicit host policy need unsigned failure metadata instead of an exception.
+
+```csharp
+services.AddAsiBackboneManagedKeySigningForLocalValidation(
+    options =>
+    {
+        options.ProviderName = "managed-key-local-validation";
+        options.KeyId = "local-validation-key";
+        options.KeyVersion = "local-v1";
+    },
+    serviceProvider => new HostOwnedManagedKeySigningClient());
+```
+
+This helper explicitly sets `ReturnUnsignedOnFailure = true`. The returned result is not a successful signature; it is unsigned metadata describing why signing failed.
 
 ## Signing metadata
 
@@ -115,6 +132,10 @@ The provider adds safe metadata such as `provider_kind = managed-key`, `remote_k
 
 ## Failure handling
 
+The production-oriented default is fail closed.
+
+When `ReturnUnsignedOnFailure` is `false`, managed-key signing failures throw, including validation failures such as unsupported hash algorithm, key mismatch, or missing required key version. A high-assurance host can catch these exceptions at the governance boundary and deny, defer, dead-letter, or escalate according to host policy.
+
 When `ReturnUnsignedOnFailure` is `true`, the provider returns unsigned signing metadata with failure details:
 
 ```text
@@ -123,9 +144,7 @@ failure_code = managedkey.signing.provider-unavailable
 failure_message = TimeoutException
 ```
 
-This lets governance pipelines route failures through host policy: deny, defer, require acknowledgment, escalate, retry, or dead-letter.
-
-When `ReturnUnsignedOnFailure` is `false`, the provider rethrows the signing exception so a high-assurance host can fail closed immediately.
+Unsigned failure metadata is useful for local validation and policy-routed fallback, but it must not be treated as a signed governance artifact.
 
 Supported failure codes include:
 
@@ -181,13 +200,15 @@ Safe wording:
 - "The artifact hash was signed through the configured managed-key client."
 - "The provider returned key ID, key version, signature algorithm, signature value, and signed timestamp metadata."
 - "Private key material remains outside AsiBackbone Core."
-- "Signing failures are observable and policy-routable."
+- "Signing failures fail closed by default in the production-oriented registration."
+- "Unsigned failure metadata is diagnostic or policy-routable evidence, not a successful signature."
 - "The managed-key package is a released adapter boundary; the concrete key client is host-owned."
 
 Avoid wording such as:
 
 - "This package provides Azure Key Vault support by default."
 - "Managed-key signing makes records tamper-proof."
+- "Unsigned failure metadata means the artifact was signed."
 - "Signed means verified."
 - "The audit trail is legally non-repudiable."
 

@@ -41,10 +41,9 @@ public sealed class EfCoreGovernanceOutboxStore : IAsiBackboneGovernanceOutboxSt
 
         var entry = GovernanceOutboxEntry.Create(envelope);
 
-        _ = await dbContext
+        _ = dbContext
             .Set<AsiBackboneGovernanceOutboxEntryEntity>()
-            .AddAsync(ToEntity(entry), cancellationToken)
-            .ConfigureAwait(false);
+            .Add(ToEntity(entry));
 
         _ = await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
@@ -67,10 +66,9 @@ public sealed class EfCoreGovernanceOutboxStore : IAsiBackboneGovernanceOutboxSt
 
         if (existingEntity is null)
         {
-            _ = await dbContext
+            _ = dbContext
                 .Set<AsiBackboneGovernanceOutboxEntryEntity>()
-                .AddAsync(persistedEntity, cancellationToken)
-                .ConfigureAwait(false);
+                .Add(persistedEntity);
         }
         else
         {

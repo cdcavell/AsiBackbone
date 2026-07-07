@@ -31,7 +31,7 @@ public sealed class AsiBackboneContractCoverageTests
     [Fact]
     public void VerifyInvalidCapabilityGrantDoesNotAllowAcceptsDeniedDecision()
     {
-        GovernanceDecision decision = GovernanceDecision.Deny("contract.capability_denied", "Capability grant denied.");
+        var decision = GovernanceDecision.Deny("contract.capability_denied", "Capability grant denied.");
 
         GovernanceDecision verifiedDecision = AsiBackboneDecisionContract.VerifyInvalidCapabilityGrantDoesNotAllow(decision);
 
@@ -58,7 +58,7 @@ public sealed class AsiBackboneContractCoverageTests
             async () => await contract.VerifyEvaluatorReturnsSafeDecisionAsync(TestContext.Current.CancellationToken));
 
         Assert.Contains("must not fail open", exception.Message, StringComparison.Ordinal);
-        Assert.IsType<InvalidOperationException>(exception.InnerException);
+        _ = Assert.IsType<InvalidOperationException>(exception.InnerException);
     }
 
     [Fact]
@@ -83,7 +83,7 @@ public sealed class AsiBackboneContractCoverageTests
             async () => await contract.VerifyDecisionPolicyReturnsSafeDecisionAsync(TestContext.Current.CancellationToken));
 
         Assert.Contains("Decision-policy implementations", exception.Message, StringComparison.Ordinal);
-        Assert.IsType<InvalidOperationException>(exception.InnerException);
+        _ = Assert.IsType<InvalidOperationException>(exception.InnerException);
     }
 
     [Fact]
@@ -138,7 +138,7 @@ public sealed class AsiBackboneContractCoverageTests
             async () => await contract.VerifyConstraintReturnsSafeResultAsync(TestContext.Current.CancellationToken));
 
         Assert.Contains("must not throw", exception.Message, StringComparison.Ordinal);
-        Assert.IsType<InvalidOperationException>(exception.InnerException);
+        _ = Assert.IsType<InvalidOperationException>(exception.InnerException);
     }
 
     [Fact]
@@ -150,7 +150,7 @@ public sealed class AsiBackboneContractCoverageTests
             async () => await contract.VerifyAuditSinkAcceptsValidResidueAsync(TestContext.Current.CancellationToken));
 
         Assert.Contains("Audit sink implementations", exception.Message, StringComparison.Ordinal);
-        Assert.IsType<InvalidOperationException>(exception.InnerException);
+        _ = Assert.IsType<InvalidOperationException>(exception.InnerException);
     }
 
     public static IEnumerable<object[]> SafeDecisions()

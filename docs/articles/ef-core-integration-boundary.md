@@ -29,7 +29,7 @@ The package contributes EF Core model configuration, persistence-facing entities
 * EF Core entity type configurations for AsiBackbone persistence models
 * `ModelBuilder` extension methods for applying AsiBackbone configurations
 * EF Core-backed implementations of Core storage contracts
-* persistence models for audit records, handshake records, reason codes, metadata, and policy trace fields
+* persistence models for audit records, handshake records, reason codes, metadata, policy trace fields, lifecycle events, and governance outbox records
 * provider-neutral EF Core configuration where practical
 * integration tests proving the package works inside a host-owned `DbContext`
 
@@ -138,6 +138,16 @@ Provider-specific features should be avoided unless there is a clear extension p
 
 Provider-specific examples may appear later in samples or documentation, but the package boundary should remain host-neutral.
 
+## Metadata JSON storage strategy
+
+The governance outbox currently stores minimized metadata dictionaries in string-backed JSON columns such as `MetadataJson`, `EnvelopeMetadataJson`, and `EnvelopePayloadMetadataJson`.
+
+That remains the selected provider-neutral strategy for the current release line. Native EF Core JSON mapping can be valuable for strongly typed aggregates or complex types, but it is not adopted for the open-ended outbox metadata dictionaries because provider support, column types, compatibility levels, query translation, and migrations remain host/provider concerns.
+
+Hosts that need provider-native JSON filtering may add host-owned migrations, computed/generated columns, JSON indexes, views, or provider-specific SQL over the existing columns. The package baseline stays portable and does not silently change text-backed metadata columns to provider-native JSON column types.
+
+See [EF Core JSON Metadata Storage Strategy](ef-core-json-metadata-storage.md) for the evaluation record and future adoption criteria.
+
 ## Relationship to Core
 
 `AsiBackbone.Core` remains free of EF Core references.
@@ -180,6 +190,10 @@ The EF Core package contributes provider-neutral model configurations for:
 - handshake request metadata
 - handshake acknowledgments
 - handshake acknowledgment metadata
+- audit residue lifecycle events
+- governance outbox entries
+- governance outbox metadata JSON columns
+- governance outbox envelope and payload projection columns
 
 The host application still owns the DbContext, provider, migrations, schema lifecycle, retention policy, and deployment workflow.
 
@@ -192,6 +206,8 @@ Implemented persistence areas include:
 * audit ledger records
 * liability/responsibility handshake requests
 * liability/responsibility handshake acknowledgments
+* audit residue lifecycle events
+* governance outbox entries
 * reason codes
 * actor identifiers and actor type
 * policy version and policy hash
@@ -207,6 +223,8 @@ The first EF Core integration does not include:
 * a package-owned application `DbContext`
 * package-owned migrations
 * provider-specific schema assumptions
+* provider-native JSON column requirements
+* package-owned JSON migration strategy
 * ASP.NET Core middleware
 * endpoint mapping
 * authentication or claims translation
@@ -217,15 +235,3 @@ The first EF Core integration does not include:
 * distributed ledger implementation
 
 Those may be considered later if justified by follow-up issues.
-
-## Acceptance guidance for future implementation issues
-
-Follow-up implementation issues should preserve these rules:
-
-1. Host applications own `DbContext` and migrations.
-2. AsiBackbone contributes model configuration through extension methods.
-3. EF Core integration depends on Core, but Core does not depend on EF Core.
-4. The package remains provider-neutral unless a provider-specific extension is explicitly introduced.
-5. NetCoreApplicationTemplate is supported as a validation host, not required as a dependency.
-6. Persistence focuses first on accountable governance records.
-7. Durable storage should preserve normalized, immutable snapshots of decisions, audit residue, acknowledgments, reason codes, and metadata.

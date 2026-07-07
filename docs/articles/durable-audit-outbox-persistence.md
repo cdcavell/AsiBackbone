@@ -121,6 +121,20 @@ The built-in EF Core model includes provider-neutral indexes for common drain pa
 
 Provider-specific filtered indexes, partial indexes, table partitioning, claim/lease columns, lock hints, or queue-specific SQL are intentionally host-owned migration decisions. AsiBackbone supplies the portable model and selection semantics; production hosts decide whether to add provider-specific optimization beyond that portable baseline.
 
+## EF Core metadata JSON storage
+
+The EF Core outbox store currently serializes minimized metadata dictionaries into string-backed JSON columns:
+
+* `MetadataJson`
+* `EnvelopeMetadataJson`
+* `EnvelopePayloadMetadataJson`
+
+These columns remain text-backed JSON in the provider-neutral package model. Native EF Core JSON column mapping is not adopted as the default outbox metadata strategy because the metadata surfaces are open-ended dictionaries and the package avoids provider-specific JSON column assumptions.
+
+Hosts that need provider-native JSON filtering can add host-owned migrations, generated/computed columns, JSON indexes, views, or provider-specific SQL over the existing columns.
+
+See [EF Core JSON Metadata Storage Strategy](ef-core-json-metadata-storage.md) for the decision record and future adoption criteria.
+
 ## Failure handling
 
 Provider failures should be normalized into `GovernanceEmissionError` before updating the outbox. The host can then decide whether to retry, defer, dead-letter, or escalate.
@@ -157,6 +171,7 @@ See [Safe Audit and Telemetry Data Guidance](safe-audit-telemetry-data.md) for p
 
 - [Governance Emission Contract](governance-emission-contract.md)
 - [Governance Outbox Delivery Semantics](governance-outbox-delivery-semantics.md)
+- [EF Core JSON Metadata Storage Strategy](ef-core-json-metadata-storage.md)
 - [Observability and Governance Emission Architecture](observability-and-governance-emission-architecture.md)
 - [Outbox Drain Reliability and Alerting](outbox-drain-reliability-and-alerting.md)
 - [Outbox Multi-Worker Concurrency](outbox-multi-worker-concurrency.md)

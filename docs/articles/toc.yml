@@ -90,6 +90,8 @@
       href: quickstart-100.md
     - name: EF Core Integration Boundary
       href: ef-core-integration-boundary.md
+    - name: EF Core JSON Metadata Storage
+      href: ef-core-json-metadata-storage.md
     - name: EF Core Host Ownership and Migrations
       href: ef-core-host-ownership-and-migrations.md
     - name: ASP.NET Core Integration Boundary

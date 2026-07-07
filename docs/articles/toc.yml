@@ -119,6 +119,8 @@
       href: governance-emission-contract.md
     - name: Durable Audit and Outbox Persistence
       href: durable-audit-outbox-persistence.md
+    - name: Governance Outbox Delivery Semantics
+      href: governance-outbox-delivery-semantics.md
     - name: Hosted Governance Outbox Drain
       href: hosted-governance-outbox-drain.md
     - name: OpenTelemetry Governance Emission Provider

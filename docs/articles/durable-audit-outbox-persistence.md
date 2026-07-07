@@ -36,6 +36,24 @@ Core defines provider-neutral contracts and models only:
 
 Core does not reference Azure Monitor, Event Hubs, Purview, OpenTelemetry, SIEM SDKs, robotics packages, AI model packages, or cloud-provider SDKs.
 
+## Outbox semantic contract
+
+The governance outbox is a **durable local state record**, not a package-owned distributed queue and not an append-only event stream.
+
+The current contract is:
+
+| Question | Current answer |
+| --- | --- |
+| Are outbox entries append-only? | No. One `GovernanceOutboxEntry` changes status over its lifecycle. Use audit residue and lifecycle event stores for append-style evidence. |
+| What is the local idempotency key? | `OutboxEntryId`. The EF Core model enforces a unique index for it. |
+| What does `SaveAsync` do for an existing id? | It updates the existing row for that `OutboxEntryId` rather than appending another row. |
+| What delivery guarantee is provided? | Durable local record plus at-least-once / best-effort provider emission semantics. Exactly-once is not claimed. |
+| What ordering is provided? | Deterministic local query ordering for candidates, not global, per-correlation, or per-aggregate ordering. |
+| What protects concurrent state updates? | EF Core uses `ConcurrencyStamp` as an optimistic concurrency token. This protects row state; it does not prevent duplicate provider calls before final state is saved. |
+| What remains host-owned? | Worker topology, claim/lease behavior, provider idempotency, database migrations, duplicate-key reconciliation, retention, monitoring, and tamper-evidence infrastructure. |
+
+See [Governance Outbox Delivery Semantics](governance-outbox-delivery-semantics.md) for the complete production semantics and host checklist.
+
 ## In-memory development stores
 
 `AsiBackbone.Storage.InMemory` includes development and test stores:
@@ -99,7 +117,7 @@ The EF Core outbox store pushes common drain selection work into the provider qu
 * `FindPendingAsync` filters to `Pending`, orders by `CreatedUtc` and `OutboxEntryId`, and applies `Take(maxCount)` in the database query.
 * `FindRetryReadyAsync` filters to deferred, failed, or retryable-failure rows that have not exhausted retry count and have no future `NextRetryUtc`, orders by retry timestamp and `OutboxEntryId`, and applies `Take(maxCount)` in the database query.
 
-The built-in EF Core model includes provider-neutral indexes for common drain paths, including status, retry timestamp, created/updated timestamps, and deterministic outbox identifiers. Hosts remain responsible for reviewing the generated model against their database provider, migration strategy, workload, retention policy, and horizontal-worker pattern.
+The built-in EF Core model includes provider-neutral indexes for common drain paths, including status, retry timestamp, created/updated timestamps, deterministic outbox identifiers, correlation identifiers, audit residue identifiers, and envelope identifiers. Hosts remain responsible for reviewing the generated model against their database provider, migration strategy, workload, retention policy, and horizontal-worker pattern.
 
 Provider-specific filtered indexes, partial indexes, table partitioning, claim/lease columns, lock hints, or queue-specific SQL are intentionally host-owned migration decisions. AsiBackbone supplies the portable model and selection semantics; production hosts decide whether to add provider-specific optimization beyond that portable baseline.
 
@@ -138,6 +156,7 @@ See [Safe Audit and Telemetry Data Guidance](safe-audit-telemetry-data.md) for p
 ## Related documentation
 
 - [Governance Emission Contract](governance-emission-contract.md)
+- [Governance Outbox Delivery Semantics](governance-outbox-delivery-semantics.md)
 - [Observability and Governance Emission Architecture](observability-and-governance-emission-architecture.md)
 - [Outbox Drain Reliability and Alerting](outbox-drain-reliability-and-alerting.md)
 - [Outbox Multi-Worker Concurrency](outbox-multi-worker-concurrency.md)

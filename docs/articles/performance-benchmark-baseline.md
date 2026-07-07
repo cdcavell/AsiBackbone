@@ -1,6 +1,6 @@
 # Performance Benchmark Baseline
 
-This article documents the repeatable benchmark entry points for core AsiBackbone policy, endpoint governance, audit-residue, and outbox drain hot paths.
+This article documents the repeatable benchmark entry points for core AsiBackbone policy, endpoint governance, audit-residue, decision/result normalization, and outbox drain hot paths.
 
 The benchmark baseline is measurement-first. It exists to help maintainers decide whether caching, pooling, short-circuit behavior, scoped-service changes, metadata handling, or other optimization work is justified by observed hot-path activity. It should not be used as a substitute for unit tests, integration tests, or consumer-specific load testing.
 
@@ -22,16 +22,25 @@ dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks.BenchmarkDotNe
 Use focused filters when measuring one hot area:
 
 ```powershell
+# Decision construction with no, one, and multiple reason paths
+dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks.BenchmarkDotNet -- --filter "*Decision*"
+
+# OperationResult success/failure reason normalization paths
+dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks.BenchmarkDotNet -- --filter "*OperationResult*"
+
 # Outbox drain batch 25, batch 100, and scoped batch 100
 dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks.BenchmarkDotNet -- --filter "*OutboxDrain*"
 
 # ASP.NET Core endpoint governance allow, warning, and deny paths
 dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks.BenchmarkDotNet -- --filter "*EndpointGovernance*"
 
-# Policy evaluation zero, simple, mixed, acknowledgment, and escalation paths
+# Policy evaluation zero, simple, mixed, acknowledgment, escalation, and exception-as-denial paths
 dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks.BenchmarkDotNet -- --filter "*Policy*"
 
-# Audit residue creation from a governance decision
+# Constraint exception-as-denial path only
+dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks.BenchmarkDotNet -- --filter "*ConstraintException*"
+
+# Audit residue creation from a governance decision and builder metadata variants
 dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks.BenchmarkDotNet -- --filter "*AuditResidue*"
 ```
 
@@ -51,16 +60,24 @@ The benchmark projects are included in `AsiBackbone.slnx`, but benchmark runs re
 
 ## Current baseline scenarios
 
-The BenchmarkDotNet runner captures latency and allocation measurements for representative Core, ASP.NET Core adapter, audit, and outbox scenarios:
+The BenchmarkDotNet runner captures latency and allocation measurements for representative Core, ASP.NET Core adapter, audit, decision/result normalization, and outbox scenarios:
 
 | Scenario | Purpose |
 | --- | --- |
+| `decision.allow_no_reasons` | Measures direct allowed decision construction with no reason collection. |
+| `decision.deny_one_reason` | Measures direct denied decision construction with one prebuilt reason. |
+| `decision.deny_multiple_reasons` | Measures direct denied decision construction and reason-code projection for multiple reasons. |
+| `decision.escalate_one_reason` | Measures direct escalation-recommended decision construction. |
+| `operation_result.success_no_reasons` | Measures successful `OperationResult` construction with no reasons or warnings. |
+| `operation_result.failure_one_reason` | Measures failed `OperationResult` construction with one prebuilt reason. |
+| `operation_result.failure_multiple_reasons` | Measures failed `OperationResult` reason normalization and reason-code projection with multiple reasons. |
 | `policy.zero_constraints` | Measures the empty policy-evaluation path. |
 | `policy.all_allow_8` | Measures a common all-allow path with several constraints. |
 | `policy.warning_and_denial_full` | Measures full aggregation with allow, warning, and denial results. |
 | `policy.first_denial_short_circuit` | Measures the optional first-denial fast-abort path from issue #345. |
 | `policy.acknowledgment_required` | Measures constraint evaluation followed by acknowledgment-required decision-policy composition. |
 | `policy.escalation_recommended` | Measures constraint evaluation followed by escalation-recommended decision-policy composition. |
+| `policy.constraint_exception_as_denial` | Measures the opt-in fail-closed constraint exception path that emits a synthetic denied decision. |
 | `endpoint_governance.policy_allow` | Measures `DefaultAsiBackboneEndpointGovernanceService.EvaluateAsync` with a host policy evaluator returning allow. |
 | `endpoint_governance.policy_warning` | Measures `DefaultAsiBackboneEndpointGovernanceService.EvaluateAsync` with a host policy evaluator returning warning. |
 | `endpoint_governance.policy_deny` | Measures `DefaultAsiBackboneEndpointGovernanceService.EvaluateAsync` with a host policy evaluator returning deny. |
@@ -68,6 +85,9 @@ The BenchmarkDotNet runner captures latency and allocation measurements for repr
 | `outbox_drain.medium_batch_100` | Measures provider-neutral governance outbox drain processing for a medium batch of 100 pending entries. |
 | `outbox_drain.scoped_medium_batch_100` | Measures DI scope creation, scoped `AsiBackboneGovernanceOutboxDrain` resolution, and medium-batch drain processing. |
 | `audit_residue.from_decision` | Measures decision receipt / audit residue creation from a governance decision. |
+| `audit_residue.builder_no_metadata` | Measures fluent audit residue builder construction with no metadata supplied. |
+| `audit_residue.builder_one_metadata` | Measures fluent audit residue builder construction with one metadata entry. |
+| `audit_residue.builder_many_metadata` | Measures fluent audit residue builder construction with multiple metadata entries. |
 
 The endpoint governance scenarios use test doubles for the host policy evaluator so the measured path stays focused on the ASP.NET Core adapter, metadata descriptor, request-correlation resolution, decision mapping, and safe allow/block result handling.
 
@@ -175,6 +195,7 @@ This keeps optimization work evidence-driven and avoids adding complexity before
 - Issue #362 introduced the initial benchmark baseline.
 - Issue #383 extended the baseline to endpoint governance and outbox drain paths.
 - Issue #394 added BenchmarkDotNet allocation baselines and this profiling plan.
+- Issue #456 extended BenchmarkDotNet coverage for decision/result normalization, audit residue builder metadata paths, and exception-as-denial evaluation.
 
 ## Related documentation
 

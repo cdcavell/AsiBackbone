@@ -2,7 +2,6 @@ using System.Globalization;
 using AsiBackbone.Core.Constraints;
 using AsiBackbone.Core.Decisions;
 using AsiBackbone.Core.Evaluation;
-using AsiBackbone.Core.Results;
 using AsiBackbone.Core.ThreatModeling;
 using Xunit;
 
@@ -98,7 +97,7 @@ public sealed class PolicyInputHardeningFuzzTests
             region: "US-LA",
             capability: "read",
             capabilityToken: $"cap:read:{DateTimeOffset.UtcNow.AddMinutes(5).ToString("O", CultureInfo.InvariantCulture)}",
-            acknowledgment: "{\"accepted\":true}");
+            acknowledgment: /*lang=json,strict*/ "{\"accepted\":true}");
         DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext> evaluator = CreateHardenedEvaluator();
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
@@ -191,7 +190,7 @@ public sealed class PolicyInputHardeningFuzzTests
         string region = "US-LA",
         string capability = "read",
         string? capabilityToken = null,
-        string? acknowledgment = "{\"accepted\":true}",
+        string? acknowledgment = /*lang=json,strict*/ "{\"accepted\":true}",
         string correlationId = "corr-policy-input",
         IReadOnlyDictionary<string, string>? extraMetadata = null)
     {
@@ -250,17 +249,11 @@ public sealed class PolicyInputHardeningFuzzTests
             return "empty-intent";
         }
 
-        if (string.IsNullOrWhiteSpace(metadata["request.payload"]))
-        {
-            return "empty-request";
-        }
-
-        if (metadata["request.payload"].Length > MaxInputLength)
-        {
-            return "oversized-request-payload";
-        }
-
-        return metadata.TryGetValue("input.scenario", out string? scenario)
+        return string.IsNullOrWhiteSpace(metadata["request.payload"])
+            ? "empty-request"
+            : metadata["request.payload"].Length > MaxInputLength
+            ? "oversized-request-payload"
+            : metadata.TryGetValue("input.scenario", out string? scenario)
             ? scenario
             : "generated-policy-input";
     }
@@ -322,17 +315,11 @@ public sealed class PolicyInputHardeningFuzzTests
                 return Deny("input.capability_token.malformed", "Capability token is malformed.", ThreatCategories.CapabilityTokenMismatch, scenario, "capability.token");
             }
 
-            if (!string.Equals(parts[1], expectedCapability, StringComparison.Ordinal))
-            {
-                return Deny("input.capability_token.mismatch", "Capability token scope does not match the requested capability.", ThreatCategories.CapabilityTokenMismatch, scenario, "capability.token");
-            }
-
-            if (!DateTimeOffset.TryParse(parts[2], CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out DateTimeOffset expiresAt))
-            {
-                return Deny("input.capability_token.malformed", "Capability token expiry is malformed.", ThreatCategories.CapabilityTokenMismatch, scenario, "capability.token");
-            }
-
-            return expiresAt <= DateTimeOffset.UtcNow
+            return !string.Equals(parts[1], expectedCapability, StringComparison.Ordinal)
+                ? Deny("input.capability_token.mismatch", "Capability token scope does not match the requested capability.", ThreatCategories.CapabilityTokenMismatch, scenario, "capability.token")
+                : !DateTimeOffset.TryParse(parts[2], CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out DateTimeOffset expiresAt)
+                ? Deny("input.capability_token.malformed", "Capability token expiry is malformed.", ThreatCategories.CapabilityTokenMismatch, scenario, "capability.token")
+                : expiresAt <= DateTimeOffset.UtcNow
                 ? Deny("input.capability_token.expired", "Capability token is expired.", ThreatCategories.CapabilityTokenMismatch, scenario, "capability.token")
                 : null;
         }

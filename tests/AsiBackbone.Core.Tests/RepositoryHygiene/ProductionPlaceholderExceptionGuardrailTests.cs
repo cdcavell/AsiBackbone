@@ -6,11 +6,9 @@ namespace AsiBackbone.Core.Tests.RepositoryHygiene;
 /// <summary>
 /// Repository-level regression checks that keep production source paths free of placeholder exception traps.
 /// </summary>
-public sealed class ProductionPlaceholderExceptionGuardrailTests
+public sealed partial class ProductionPlaceholderExceptionGuardrailTests
 {
-    private static readonly Regex PlaceholderExceptionPattern = new(
-        @"\bNotImplementedException\s*\(",
-        RegexOptions.Compiled | RegexOptions.CultureInvariant);
+    private static readonly Regex PlaceholderExceptionPattern = MyRegex();
 
     /// <summary>
     /// Verifies production library source files do not contain accidental NotImplementedException placeholders.
@@ -72,4 +70,7 @@ public sealed class ProductionPlaceholderExceptionGuardrailTests
 
         throw new InvalidOperationException("Unable to locate repository root containing AsiBackbone.slnx.");
     }
+
+    [GeneratedRegex(@"\bNotImplementedException\s*\(", RegexOptions.Compiled | RegexOptions.CultureInvariant)]
+    private static partial Regex MyRegex();
 }

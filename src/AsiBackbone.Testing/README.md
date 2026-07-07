@@ -114,7 +114,7 @@ public sealed class MyPolicyEvaluatorContractTests
 }
 ```
 
-The default contract assertions verify portable invariants such as non-null decisions, reason codes for denied/deferred/acknowledgment/escalation paths, correlation and policy telemetry preservation when supplied, invalid capability-grant scenarios not returning `Allow`, and valid audit residue shape.
+The default contract assertions verify portable invariants such as non-null decisions, reason codes for denied/deferred/acknowledgment/escalation paths, correlation propagation, policy telemetry presence when supplied or resolved by the implementation, invalid capability-grant scenarios not returning `Allow`, and valid audit residue shape.
 
 ## WebApplicationFactory-style usage
 

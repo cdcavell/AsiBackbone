@@ -87,7 +87,12 @@ builder.Services.AddSingleton<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintE
         options: new AsiBackbonePolicyEvaluatorOptions
         {
             // For real API gating, fail closed if the host expected constraints but none were registered.
-            DenyWhenNoConstraints = true
+            DenyWhenNoConstraints = true,
+
+            // Keep host exception handling visible by default.
+            // Set true only when the host intentionally wants eligible constraint failures
+            // converted into denied governance decisions with monitored reason codes.
+            TreatConstraintExceptionAsDenial = false
         }));
 
 WebApplication app = builder.Build();
@@ -281,6 +286,15 @@ POST /api/orders/{region}/approve
 
 The important boundary is that AsiBackbone does not perform the order approval. The host performs the operation only after checking `decision.CanProceed`.
 
+## Production configuration note
+
+This quickstart makes two evaluator choices explicit:
+
+- `DenyWhenNoConstraints = true` because governed production surfaces should fail closed if expected constraints are missing.
+- `TreatConstraintExceptionAsDenial = false` because the safest default is to keep unexpected constraint exceptions visible to the host's existing exception, transaction, retry, telemetry, and incident-response path.
+
+Set `TreatConstraintExceptionAsDenial = true` only when the host has intentionally decided that eligible policy/constraint failures should become denied governance decisions and the host is monitoring the `asibackbone.policy.constraint_exception` reason code plus evaluator error logs.
+
 ## Where endpoint metadata fits
 
 The quickstart attaches endpoint metadata with:
@@ -309,6 +323,7 @@ See [OpenTelemetry Governance Emission Provider](opentelemetry-governance-emissi
 ## Next steps
 
 - Read [Policy Evaluator Pipeline](policy-evaluator-pipeline.md) for decision composition rules.
+- Read [Production Hardening: Evaluator and Outbox Configuration](production-hardening-evaluator-and-outbox.md) before promoting evaluator exception handling or durable outbox storage to production.
 - Read [Custom Decision Policy Examples](custom-decision-policy-examples.md) when you need host-owned acknowledgment, regional overlay, or gateway orchestration rules.
 - Read [ASP.NET Core Endpoint Governance](aspnetcore-endpoint-governance.md) for middleware-based endpoint metadata orchestration.
 - Read [Durable Audit and Outbox Persistence](durable-audit-outbox-persistence.md) before replacing the in-memory sample sink with durable storage.

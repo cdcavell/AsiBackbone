@@ -43,7 +43,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
         var httpContext = new DefaultHttpContext();
         httpContext.SetEndpoint(new Endpoint(static _ => Task.CompletedTask, new EndpointMetadataCollection(), "plain"));
         bool nextCalled = false;
-        var middleware = CreateMiddleware(_ =>
+        AsiBackboneEndpointGovernanceMiddleware middleware = CreateMiddleware(_ =>
         {
             nextCalled = true;
             return Task.CompletedTask;
@@ -70,7 +70,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
             new EndpointMetadataCollection(new RequireCapabilityGrantAttribute("robotics.execute")),
             "blocked"));
         bool nextCalled = false;
-        var middleware = CreateMiddleware(_ =>
+        AsiBackboneEndpointGovernanceMiddleware middleware = CreateMiddleware(_ =>
         {
             nextCalled = true;
             return Task.CompletedTask;
@@ -98,7 +98,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
             new EndpointMetadataCollection(new RequireCapabilityGrantAttribute("robotics.execute")),
             "blocked.default"));
         bool nextCalled = false;
-        var middleware = CreateMiddleware(_ =>
+        AsiBackboneEndpointGovernanceMiddleware middleware = CreateMiddleware(_ =>
         {
             nextCalled = true;
             return Task.CompletedTask;
@@ -132,7 +132,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
                 new RequireCapabilityGrantAttribute("robotics.execute")),
             "blocked.diagnostics"));
         bool nextCalled = false;
-        var middleware = CreateMiddleware(
+        AsiBackboneEndpointGovernanceMiddleware middleware = CreateMiddleware(
             _ =>
             {
                 nextCalled = true;
@@ -176,7 +176,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
             new EndpointMetadataCollection(new RequireGovernancePolicyAttribute(typeof(SamplePolicy))),
             "blocked.default.development"));
         bool nextCalled = false;
-        var middleware = CreateMiddleware(_ =>
+        AsiBackboneEndpointGovernanceMiddleware middleware = CreateMiddleware(_ =>
         {
             nextCalled = true;
             return Task.CompletedTask;
@@ -208,7 +208,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
             new EndpointMetadataCollection(new RequireGovernancePolicyAttribute(typeof(SamplePolicy))),
             "blocked.production"));
         bool nextCalled = false;
-        var middleware = CreateMiddleware(
+        AsiBackboneEndpointGovernanceMiddleware middleware = CreateMiddleware(
             _ =>
             {
                 nextCalled = true;
@@ -242,7 +242,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
             new EndpointMetadataCollection(new RequireCapabilityGrantAttribute("robotics.execute")),
             "blocked.configured"));
         bool nextCalled = false;
-        var middleware = CreateMiddleware(
+        AsiBackboneEndpointGovernanceMiddleware middleware = CreateMiddleware(
             _ =>
             {
                 nextCalled = true;
@@ -278,7 +278,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
             new EndpointMetadataCollection(new RequireCapabilityGrantAttribute("robotics.execute")),
             "blocked.custom"));
         bool nextCalled = false;
-        var middleware = CreateMiddleware(
+        AsiBackboneEndpointGovernanceMiddleware middleware = CreateMiddleware(
             _ =>
             {
                 nextCalled = true;
@@ -418,7 +418,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
             "plain"));
 
         bool nextCalled = false;
-        var middleware = CreateMiddleware(
+        AsiBackboneEndpointGovernanceMiddleware middleware = CreateMiddleware(
             _ =>
             {
                 nextCalled = true;
@@ -448,7 +448,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
             "public"));
 
         bool nextCalled = false;
-        var middleware = CreateMiddleware(
+        AsiBackboneEndpointGovernanceMiddleware middleware = CreateMiddleware(
             _ =>
             {
                 nextCalled = true;

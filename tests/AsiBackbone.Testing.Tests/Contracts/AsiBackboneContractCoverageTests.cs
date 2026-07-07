@@ -155,15 +155,15 @@ public sealed class AsiBackboneContractCoverageTests
         _ = Assert.IsType<InvalidOperationException>(exception.InnerException);
     }
 
-    public static TheoryData<SafeDecisionCase> SafeDecisionCases => new()
-    {
+    public static TheoryData<SafeDecisionCase> SafeDecisionCases =>
+    [
         SafeDecisionCase.Allowed,
         SafeDecisionCase.Warning,
         SafeDecisionCase.Denied,
         SafeDecisionCase.Deferred,
         SafeDecisionCase.AcknowledgmentRequired,
         SafeDecisionCase.EscalationRecommended
-    };
+    ];
 
     private static GovernanceDecision CreateSafeDecision(SafeDecisionCase safeDecisionCase)
     {

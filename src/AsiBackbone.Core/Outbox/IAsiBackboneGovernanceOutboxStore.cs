@@ -6,8 +6,9 @@ namespace AsiBackbone.Core.Outbox;
 /// Defines a provider-neutral durable outbox store for governance emission envelopes.
 /// </summary>
 /// <remarks>
-/// The provider-neutral find methods return delivery candidates. They do not imply cross-process row claiming,
-/// leasing, skip-locked selection, or exactly-once provider delivery. Hosts that run multiple drain workers against
+/// Outbox entries are durable local state records keyed by <see cref="GovernanceOutboxEntry.OutboxEntryId" />.
+/// They are not an append-only event stream and they do not imply cross-process row claiming, leasing,
+/// skip-locked selection, or exactly-once provider delivery. Hosts that run multiple drain workers against
 /// the same durable store must add host-owned claiming, partitioning, or provider-side idempotency.
 /// </remarks>
 public interface IAsiBackboneGovernanceOutboxStore
@@ -15,6 +16,10 @@ public interface IAsiBackboneGovernanceOutboxStore
     /// <summary>
     /// Enqueues a provider-neutral governance emission envelope before optional downstream provider delivery is attempted.
     /// </summary>
+    /// <remarks>
+    /// Implementations should persist a new pending state record with a stable outbox entry identifier. Provider emission
+    /// remains downstream and should be treated as at-least-once unless the host and provider supply stronger guarantees.
+    /// </remarks>
     ValueTask<GovernanceOutboxEntry> EnqueueAsync(
         GovernanceEmissionEnvelope envelope,
         CancellationToken cancellationToken = default);
@@ -22,6 +27,12 @@ public interface IAsiBackboneGovernanceOutboxStore
     /// <summary>
     /// Saves an updated outbox entry state.
     /// </summary>
+    /// <remarks>
+    /// Implementations should store the latest state for the entry's stable identifier. For durable providers that support it,
+    /// saving an already-known <see cref="GovernanceOutboxEntry.OutboxEntryId" /> should update the existing row rather than
+    /// append a second logical outbox entry. Concurrent duplicate inserts may still surface provider-specific duplicate-key or
+    /// concurrency exceptions that the host must reconcile.
+    /// </remarks>
     ValueTask<GovernanceOutboxEntry> SaveAsync(
         GovernanceOutboxEntry entry,
         CancellationToken cancellationToken = default);

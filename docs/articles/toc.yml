@@ -52,7 +52,7 @@
       href: threat-model-contributors.md
     - name: Constraint Exception Policy
       href: constraint-exception-policy.md
-    - name: Production Hardening: Evaluator and Outbox
+    - name: "Production Hardening: Evaluator and Outbox"
       href: production-hardening-evaluator-and-outbox.md
     - name: Custom Decision Policy Examples
       href: custom-decision-policy-examples.md
@@ -123,7 +123,7 @@
       href: governance-emission-contract.md
     - name: Durable Audit and Outbox Persistence
       href: durable-audit-outbox-persistence.md
-    - name: Production Hardening: Evaluator and Outbox
+    - name: "Production Hardening: Evaluator and Outbox"
       href: production-hardening-evaluator-and-outbox.md
     - name: Governance Outbox Delivery Semantics
       href: governance-outbox-delivery-semantics.md

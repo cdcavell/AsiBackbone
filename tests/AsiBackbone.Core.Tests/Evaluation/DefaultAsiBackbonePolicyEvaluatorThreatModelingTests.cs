@@ -35,6 +35,44 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
     }
 
     [Fact]
+    public async Task EvaluateNullThreatAssessmentIsIgnored()
+    {
+        TestPolicyContext context = CreateContext();
+        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+            [new StaticConstraint(ConstraintEvaluationResult.Allow())],
+            [new DelegateThreatContributor("null-threat-contributor", (_, _) => null!)]);
+
+        GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
+
+        Assert.True(decision.IsAllowed);
+        Assert.Empty(decision.ReasonCodes);
+    }
+
+    [Fact]
+    public async Task EvaluateLowSeverityAllowRecommendationPromotesToWarningWithUnnamedContributorMetadata()
+    {
+        TestPolicyContext context = CreateContext();
+        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+            [new StaticConstraint(ConstraintEvaluationResult.Allow())],
+            [new StaticThreatContributor(
+                " ",
+                ThreatAssessment.Create(
+                    ThreatSeverity.Low,
+                    ThreatCategories.InputOversized,
+                    "threat.input_oversized",
+                    "Oversized input indicator was reported.",
+                    GovernanceDecisionOutcome.Allowed))]);
+
+        GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
+
+        Assert.True(decision.IsWarning);
+        OperationReason reason = Assert.Single(decision.Reasons);
+        Assert.Equal("threat.input_oversized", reason.Code);
+        Assert.Equal("<unnamed>", reason.Metadata["threat.contributor"]);
+        Assert.Equal(GovernanceDecisionOutcome.Warning.ToString(), reason.Metadata["threat.effective_outcome"]);
+    }
+
+    [Fact]
     public async Task EvaluateHighSeverityAllowRecommendationPromotesToEscalationAndSkipsConstraints()
     {
         TestPolicyContext context = CreateContext();
@@ -61,6 +99,50 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
         Assert.True(decision.EscalationRecommended);
         Assert.False(decision.CanProceed);
         Assert.Equal("threat.policy_bypass", Assert.Single(decision.ReasonCodes));
+    }
+
+    [Fact]
+    public async Task EvaluateDeferredThreatRecommendationReturnsDeferredDecision()
+    {
+        TestPolicyContext context = CreateContext();
+        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+            [new StaticConstraint(ConstraintEvaluationResult.Allow())],
+            [new StaticThreatContributor(
+                "deferred-threat-contributor",
+                ThreatAssessment.Create(
+                    ThreatSeverity.Medium,
+                    ThreatCategories.RegionPolicyMismatch,
+                    "threat.region_policy_mismatch",
+                    "Region policy mismatch was reported.",
+                    GovernanceDecisionOutcome.Deferred))]);
+
+        GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
+
+        Assert.True(decision.IsDeferred);
+        Assert.False(decision.CanProceed);
+        Assert.Equal("threat.region_policy_mismatch", Assert.Single(decision.ReasonCodes));
+    }
+
+    [Fact]
+    public async Task EvaluateAcknowledgmentThreatRecommendationReturnsAcknowledgmentRequiredDecision()
+    {
+        TestPolicyContext context = CreateContext();
+        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+            [new StaticConstraint(ConstraintEvaluationResult.Allow())],
+            [new StaticThreatContributor(
+                "ack-threat-contributor",
+                ThreatAssessment.Create(
+                    ThreatSeverity.Medium,
+                    ThreatCategories.UnsafeExternalCommand,
+                    "threat.unsafe_external_command",
+                    "Unsafe external command request was reported.",
+                    GovernanceDecisionOutcome.AcknowledgmentRequired))]);
+
+        GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
+
+        Assert.True(decision.RequiresAcknowledgment);
+        Assert.False(decision.CanProceed);
+        Assert.Equal("threat.unsafe_external_command", Assert.Single(decision.ReasonCodes));
     }
 
     [Fact]
@@ -137,6 +219,23 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
     }
 
     [Fact]
+    public async Task EvaluateThreatContributorExceptionPropagatesWhenFailClosedDisabled()
+    {
+        TestPolicyContext context = CreateContext();
+        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+            [new StaticConstraint(ConstraintEvaluationResult.Allow())],
+            [new ThrowingThreatContributor("throwing-threat-contributor")],
+            decisionPolicy: null,
+            new AsiBackbonePolicyEvaluatorOptions
+            {
+                TreatThreatContributorExceptionAsDenial = false
+            });
+
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            async () => await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
     public async Task EvaluateThreatWarningCannotBeDowngradedToAllowByDecisionPolicyByDefault()
     {
         TestPolicyContext context = CreateContext();
@@ -157,6 +256,115 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
         Assert.True(decision.IsWarning);
         Assert.True(decision.CanProceed);
         Assert.Equal("threat.input_malformed", Assert.Single(decision.ReasonCodes));
+    }
+
+    [Fact]
+    public async Task EvaluateThreatWarningCanBeDowngradedWhenProtectionDisabled()
+    {
+        TestPolicyContext context = CreateContext();
+        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+            [new StaticConstraint(ConstraintEvaluationResult.Allow())],
+            [new StaticThreatContributor(
+                "warning-threat-contributor",
+                ThreatAssessment.Create(
+                    ThreatSeverity.Low,
+                    ThreatCategories.InputMalformed,
+                    "threat.input_malformed",
+                    "Malformed input indicator was reported.",
+                    GovernanceDecisionOutcome.Warning))],
+            new AlwaysAllowDecisionPolicy(),
+            new AsiBackbonePolicyEvaluatorOptions
+            {
+                PreventThreatAssessmentAllowDowngrade = false
+            });
+
+        GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
+
+        Assert.True(decision.IsAllowed);
+        Assert.Empty(decision.ReasonCodes);
+    }
+
+    [Fact]
+    public async Task EvaluateThreatWarningWithoutConstraintsReturnsWarningWhenEmptyPolicyAllows()
+    {
+        TestPolicyContext context = CreateContext();
+        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+            [],
+            [new StaticThreatContributor(
+                "warning-threat-contributor",
+                ThreatAssessment.Create(
+                    ThreatSeverity.Low,
+                    ThreatCategories.AuditIntegrityRisk,
+                    "threat.audit_integrity_risk",
+                    "Audit integrity risk was reported.",
+                    GovernanceDecisionOutcome.Warning))]);
+
+        GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
+
+        Assert.True(decision.IsWarning);
+        Assert.Equal("threat.audit_integrity_risk", Assert.Single(decision.ReasonCodes));
+    }
+
+    [Fact]
+    public async Task EvaluateThreatWarningWithoutConstraintsReturnsNoConstraintDenialWhenEmptyPolicyDenies()
+    {
+        TestPolicyContext context = CreateContext();
+        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+            [],
+            [new StaticThreatContributor(
+                "warning-threat-contributor",
+                ThreatAssessment.Create(
+                    ThreatSeverity.Low,
+                    ThreatCategories.AuditIntegrityRisk,
+                    "threat.audit_integrity_risk",
+                    "Audit integrity risk was reported.",
+                    GovernanceDecisionOutcome.Warning))],
+            decisionPolicy: null,
+            new AsiBackbonePolicyEvaluatorOptions
+            {
+                DenyWhenNoConstraints = true
+            });
+
+        GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
+
+        Assert.True(decision.IsDenied);
+        Assert.Equal(
+            AsiBackbonePolicyEvaluatorOptions.DefaultNoConstraintsReasonCode,
+            Assert.Single(decision.ReasonCodes));
+    }
+
+    [Fact]
+    public void ThreatAssessmentRejectsOutOfRangeConfidence()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => ThreatAssessment.Create(
+            ThreatSeverity.Low,
+            ThreatCategories.InputMalformed,
+            "threat.invalid_confidence",
+            "Invalid confidence should be rejected.",
+            GovernanceDecisionOutcome.Warning,
+            confidence: 1.1D));
+    }
+
+    [Fact]
+    public void ThreatAssessmentOperationReasonMergesCustomMetadata()
+    {
+        ThreatAssessment assessment = ThreatAssessment.Create(
+            ThreatSeverity.Medium,
+            ThreatCategories.ReplayAttempt,
+            "threat.replay_attempt",
+            "Replay attempt was reported.",
+            GovernanceDecisionOutcome.Warning,
+            confidence: 0.5D,
+            new Dictionary<string, string>
+            {
+                [" request.id "] = " 123 "
+            });
+
+        OperationReason reason = assessment.ToOperationReason(" replay-contributor ");
+
+        Assert.Equal("123", reason.Metadata["request.id"]);
+        Assert.Equal("replay-contributor", reason.Metadata["threat.contributor"]);
+        Assert.Equal("0.5", reason.Metadata["threat.confidence"]);
     }
 
     private static TestPolicyContext CreateContext()

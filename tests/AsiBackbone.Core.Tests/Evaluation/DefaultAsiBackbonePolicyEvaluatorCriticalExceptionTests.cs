@@ -16,15 +16,15 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
     /// <summary>
     /// Gets critical exception instances used to verify passthrough behavior.
     /// </summary>
-    public static TheoryData<Exception> CriticalRuntimeExceptions => new()
-    {
+    public static TheoryData<Exception> CriticalRuntimeExceptions =>
+    [
         new OutOfMemoryException("Critical host/runtime failures should not be converted to denials."),
         new StackOverflowException("Catchable stack overflow exception instances should not be converted to denials."),
         new AccessViolationException("Critical access violation failures should not be converted to denials."),
         new AppDomainUnloadedException("AppDomain unload failures should not be converted to denials."),
         new BadImageFormatException("Bad image format failures should not be converted to denials."),
         new InvalidProgramException("Invalid program failures should not be converted to denials.")
-    };
+    ];
 
     [Fact]
     public async Task ConstraintExceptionAsDenialStillConvertsNormalConstraintException()

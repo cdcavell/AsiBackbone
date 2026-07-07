@@ -26,17 +26,17 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
             new EventId(4110, nameof(EmptyPolicyAllowedWarning)),
             "Policy evaluation ran with zero constraints while DenyWhenNoConstraints is false; default empty-policy behavior allows the decision. CorrelationId: {CorrelationId}; PolicyVersion: {PolicyVersion}; PolicyHash: {PolicyHash}");
 
-    private static readonly Action<ILogger, string, string, string, string, Exception?> ConstraintExceptionDeniedError =
-        LoggerMessage.Define<string, string, string, string>(
+    private static readonly Action<ILogger, string, string, string, string, string, Exception?> ConstraintExceptionDeniedError =
+        LoggerMessage.Define<string, string, string, string, string>(
             LogLevel.Error,
             new EventId(4120, nameof(ConstraintExceptionDeniedError)),
-            "Policy constraint '{ConstraintName}' threw during evaluation and was converted to a denied governance decision. CorrelationId: {CorrelationId}; PolicyVersion: {PolicyVersion}; PolicyHash: {PolicyHash}");
+            "Policy constraint '{ConstraintName}' threw during evaluation and was converted to a denied governance decision by exception-as-denial policy. ExceptionType: {ExceptionType}; CorrelationId: {CorrelationId}; PolicyVersion: {PolicyVersion}; PolicyHash: {PolicyHash}");
 
-    private static readonly Action<ILogger, string, string, string, string, Exception?> ThreatContributorExceptionDeniedError =
-        LoggerMessage.Define<string, string, string, string>(
+    private static readonly Action<ILogger, string, string, string, string, string, Exception?> ThreatContributorExceptionDeniedError =
+        LoggerMessage.Define<string, string, string, string, string>(
             LogLevel.Error,
             new EventId(4130, nameof(ThreatContributorExceptionDeniedError)),
-            "Threat model contributor '{ContributorName}' threw during evaluation and was converted to a denied governance decision. CorrelationId: {CorrelationId}; PolicyVersion: {PolicyVersion}; PolicyHash: {PolicyHash}");
+            "Threat model contributor '{ContributorName}' threw during evaluation and was converted to a denied governance decision by exception-as-denial policy. ExceptionType: {ExceptionType}; CorrelationId: {CorrelationId}; PolicyVersion: {PolicyVersion}; PolicyHash: {PolicyHash}");
 
     private readonly IAsiBackboneConstraint<TContext>[] constraints;
     private readonly IThreatModelContributor<TContext>[] threatModelContributors;
@@ -207,7 +207,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
                     .EvaluateAsync(context, cancellationToken)
                     .ConfigureAwait(false);
             }
-            catch (Exception exception) when (options.TreatConstraintExceptionAsDenial && exception is not OperationCanceledException)
+            catch (Exception exception) when (ShouldConvertExceptionToDenial(exception, options.TreatConstraintExceptionAsDenial))
             {
                 return await CreateConstraintExceptionDecisionAsync(
                     context,
@@ -261,6 +261,24 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
             protectedThreatDecision,
             cancellationToken)
             .ConfigureAwait(false);
+    }
+
+    private static bool ShouldConvertExceptionToDenial(Exception exception, bool treatExceptionAsDenial)
+    {
+        return treatExceptionAsDenial &&
+               exception is not OperationCanceledException &&
+               !IsCriticalException(exception);
+    }
+
+    private static bool IsCriticalException(Exception exception)
+    {
+        return exception is OutOfMemoryException or
+               StackOverflowException or
+               AccessViolationException or
+               AppDomainUnloadedException or
+               BadImageFormatException or
+               InvalidProgramException ||
+               exception.InnerException is not null && IsCriticalException(exception.InnerException);
     }
 
     private static GovernanceDecision Compose(
@@ -402,7 +420,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
                     .AssessAsync(context, cancellationToken)
                     .ConfigureAwait(false);
             }
-            catch (Exception exception) when (options.TreatThreatContributorExceptionAsDenial && exception is not OperationCanceledException)
+            catch (Exception exception) when (ShouldConvertExceptionToDenial(exception, options.TreatThreatContributorExceptionAsDenial))
             {
                 return CreateThreatContributorExceptionResult(context, contributor, exception);
             }
@@ -592,6 +610,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
         ConstraintExceptionDeniedError(
             logger,
             string.IsNullOrWhiteSpace(constraintName) ? "<unnamed>" : constraintName,
+            exception.GetType().Name,
             context.CorrelationId ?? string.Empty,
             context.PolicyVersion ?? string.Empty,
             context.PolicyHash ?? string.Empty,
@@ -611,6 +630,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
         ThreatContributorExceptionDeniedError(
             logger,
             contributorName,
+            exception.GetType().Name,
             context.CorrelationId ?? string.Empty,
             context.PolicyVersion ?? string.Empty,
             context.PolicyHash ?? string.Empty,

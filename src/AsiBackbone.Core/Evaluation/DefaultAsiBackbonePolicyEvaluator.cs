@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using AsiBackbone.Core.Constraints;
 using AsiBackbone.Core.Decisions;
 using AsiBackbone.Core.Results;
+using AsiBackbone.Core.ThreatModeling;
 using Microsoft.Extensions.Logging;
 
 namespace AsiBackbone.Core.Evaluation;
@@ -28,7 +29,14 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
             new EventId(4120, nameof(ConstraintExceptionDeniedError)),
             "Policy constraint '{ConstraintName}' threw during evaluation and was converted to a denied governance decision. CorrelationId: {CorrelationId}; PolicyVersion: {PolicyVersion}; PolicyHash: {PolicyHash}");
 
+    private static readonly Action<ILogger, string, string, string, string, Exception?> ThreatContributorExceptionDeniedError =
+        LoggerMessage.Define<string, string, string, string>(
+            LogLevel.Error,
+            new EventId(4130, nameof(ThreatContributorExceptionDeniedError)),
+            "Threat model contributor '{ContributorName}' threw during evaluation and was converted to a denied governance decision. CorrelationId: {CorrelationId}; PolicyVersion: {PolicyVersion}; PolicyHash: {PolicyHash}");
+
     private readonly IAsiBackboneConstraint<TContext>[] constraints;
+    private readonly IThreatModelContributor<TContext>[] threatModelContributors;
     private readonly IAsiBackboneDecisionPolicy<TContext>? decisionPolicy;
     private readonly ILogger<DefaultAsiBackbonePolicyEvaluator<TContext>>? logger;
     private readonly AsiBackbonePolicyEvaluatorOptions options;
@@ -41,7 +49,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
     public DefaultAsiBackbonePolicyEvaluator(
         IEnumerable<IAsiBackboneConstraint<TContext>> constraints,
         IAsiBackboneDecisionPolicy<TContext>? decisionPolicy = null)
-        : this(constraints, decisionPolicy, options: null, logger: null)
+        : this(constraints, threatModelContributors: null, decisionPolicy, options: null, logger: null)
     {
     }
 
@@ -55,7 +63,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
         IEnumerable<IAsiBackboneConstraint<TContext>> constraints,
         IAsiBackboneDecisionPolicy<TContext>? decisionPolicy,
         AsiBackbonePolicyEvaluatorOptions? options)
-        : this(constraints, decisionPolicy, options, logger: null)
+        : this(constraints, threatModelContributors: null, decisionPolicy, options, logger: null)
     {
     }
 
@@ -71,13 +79,62 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
         IAsiBackboneDecisionPolicy<TContext>? decisionPolicy,
         AsiBackbonePolicyEvaluatorOptions? options,
         ILogger<DefaultAsiBackbonePolicyEvaluator<TContext>>? logger)
+        : this(constraints, threatModelContributors: null, decisionPolicy, options, logger)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}"/> class.
+    /// </summary>
+    /// <param name="constraints">The constraints that make up the active policy structure.</param>
+    /// <param name="threatModelContributors">Threat model contributors that inspect the context before constraint composition.</param>
+    /// <param name="decisionPolicy">Optional decision policy applied after composition.</param>
+    public DefaultAsiBackbonePolicyEvaluator(
+        IEnumerable<IAsiBackboneConstraint<TContext>> constraints,
+        IEnumerable<IThreatModelContributor<TContext>> threatModelContributors,
+        IAsiBackboneDecisionPolicy<TContext>? decisionPolicy = null)
+        : this(constraints, threatModelContributors, decisionPolicy, options: null, logger: null)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}"/> class.
+    /// </summary>
+    /// <param name="constraints">The constraints that make up the active policy structure.</param>
+    /// <param name="threatModelContributors">Threat model contributors that inspect the context before constraint composition.</param>
+    /// <param name="decisionPolicy">Optional decision policy applied after composition.</param>
+    /// <param name="options">Evaluator options applied during composition.</param>
+    public DefaultAsiBackbonePolicyEvaluator(
+        IEnumerable<IAsiBackboneConstraint<TContext>> constraints,
+        IEnumerable<IThreatModelContributor<TContext>> threatModelContributors,
+        IAsiBackboneDecisionPolicy<TContext>? decisionPolicy,
+        AsiBackbonePolicyEvaluatorOptions? options)
+        : this(constraints, threatModelContributors, decisionPolicy, options, logger: null)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}"/> class.
+    /// </summary>
+    /// <param name="constraints">The constraints that make up the active policy structure.</param>
+    /// <param name="threatModelContributors">Threat model contributors that inspect the context before constraint composition.</param>
+    /// <param name="decisionPolicy">Optional decision policy applied after composition.</param>
+    /// <param name="options">Evaluator options applied during composition.</param>
+    /// <param name="logger">Optional logger used to emit operational warning signals.</param>
+    public DefaultAsiBackbonePolicyEvaluator(
+        IEnumerable<IAsiBackboneConstraint<TContext>> constraints,
+        IEnumerable<IThreatModelContributor<TContext>>? threatModelContributors,
+        IAsiBackboneDecisionPolicy<TContext>? decisionPolicy,
+        AsiBackbonePolicyEvaluatorOptions? options,
+        ILogger<DefaultAsiBackbonePolicyEvaluator<TContext>>? logger)
     {
         ArgumentNullException.ThrowIfNull(constraints);
 
-        // Keep an exact-sized private snapshot rather than wrapping a caller-owned list.
-        // This avoids a per-evaluator ReadOnlyCollection<T> wrapper and prevents later caller mutations
-        // from changing the evaluator's deterministic constraint order or behavior.
+        // Keep exact-sized private snapshots rather than wrapping caller-owned lists.
+        // This avoids per-evaluator ReadOnlyCollection<T> wrappers and prevents later caller mutations
+        // from changing deterministic constraint/contributor order or behavior.
         this.constraints = [.. constraints];
+        this.threatModelContributors = threatModelContributors is null ? [] : [.. threatModelContributors];
         this.decisionPolicy = decisionPolicy;
         this.logger = logger;
         this.options = options ?? new AsiBackbonePolicyEvaluatorOptions();
@@ -92,6 +149,22 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
         ArgumentNullException.ThrowIfNull(context);
         cancellationToken.ThrowIfCancellationRequested();
 
+        ThreatEvaluationResult threatEvaluation = await EvaluateThreatModelContributorsAsync(
+            context,
+            cancellationToken)
+            .ConfigureAwait(false);
+
+        if (threatEvaluation.BlockingDecision is not null)
+        {
+            return await ApplyDecisionPolicyAsync(
+                context,
+                threatEvaluation.BlockingDecision,
+                EmptyConstraintResults,
+                protectedThreatDecision: threatEvaluation.BlockingDecision,
+                cancellationToken)
+                .ConfigureAwait(false);
+        }
+
         if (constraints.Length == 0)
         {
             if (!options.DenyWhenNoConstraints)
@@ -99,26 +172,14 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
                 LogEmptyPolicyAllowed(context);
             }
 
-            GovernanceDecision noConstraintDecision = options.DenyWhenNoConstraints
-                ? GovernanceDecision.Deny(
-                    options.NoConstraintsReasonCode,
-                    options.NoConstraintsReasonMessage,
-                    correlationId: context.CorrelationId,
-                    policyVersion: context.PolicyVersion,
-                    policyHash: context.PolicyHash)
-                : GovernanceDecision.Allow(
-                    correlationId: context.CorrelationId,
-                    policyVersion: context.PolicyVersion,
-                    policyHash: context.PolicyHash);
+            GovernanceDecision noConstraintDecision = CreateNoConstraintDecision(context, threatEvaluation.WarningReasons);
 
-            return decisionPolicy is null
-                ? noConstraintDecision
-                : await decisionPolicy
-                .ApplyAsync(
-                    context,
-                    noConstraintDecision,
-                    EmptyConstraintResults,
-                    cancellationToken)
+            return await ApplyDecisionPolicyAsync(
+                context,
+                noConstraintDecision,
+                EmptyConstraintResults,
+                protectedThreatDecision: threatEvaluation.WarningReasons.Count > 0 ? noConstraintDecision : null,
+                cancellationToken)
                 .ConfigureAwait(false);
         }
 
@@ -127,6 +188,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
             : new List<ConstraintEvaluationResult>(constraints.Length);
         var denials = new OperationReasonAccumulator();
         var warnings = new OperationReasonAccumulator();
+        warnings.AddRange(threatEvaluation.WarningReasons);
 
         foreach (IAsiBackboneConstraint<TContext> constraint in constraints)
         {
@@ -178,10 +240,20 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
             warnings,
             includeWarningsWhenDenied: options.ShortCircuitOnFirstDenial);
 
-        return decisionPolicy is null
-            ? composedDecision
-            : await decisionPolicy
-            .ApplyAsync(context, composedDecision, CreateConstraintResultsView(results), cancellationToken)
+        GovernanceDecision? protectedThreatDecision = threatEvaluation.WarningReasons.Count > 0 && composedDecision.IsAllowed
+            ? GovernanceDecision.Warning(
+                threatEvaluation.WarningReasons,
+                correlationId: context.CorrelationId,
+                policyVersion: context.PolicyVersion,
+                policyHash: context.PolicyHash)
+            : null;
+
+        return await ApplyDecisionPolicyAsync(
+            context,
+            composedDecision,
+            CreateConstraintResultsView(results),
+            protectedThreatDecision,
+            cancellationToken)
             .ConfigureAwait(false);
     }
 
@@ -202,6 +274,43 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
             : warnings.Count > 0
             ? CreateWarningDecision(context, warnings)
             : GovernanceDecision.Allow(
+            correlationId: context.CorrelationId,
+            policyVersion: context.PolicyVersion,
+            policyHash: context.PolicyHash);
+    }
+
+    private static GovernanceDecision CreateNoConstraintDecision(
+        TContext context,
+        IReadOnlyList<OperationReason> threatWarningReasons)
+    {
+        if (threatWarningReasons.Count > 0)
+        {
+            return GovernanceDecision.Warning(
+                threatWarningReasons,
+                correlationId: context.CorrelationId,
+                policyVersion: context.PolicyVersion,
+                policyHash: context.PolicyHash);
+        }
+
+        return GovernanceDecision.Allow(
+            correlationId: context.CorrelationId,
+            policyVersion: context.PolicyVersion,
+            policyHash: context.PolicyHash);
+    }
+
+    private GovernanceDecision CreateNoConstraintDecision(
+        TContext context,
+        IReadOnlyList<OperationReason> threatWarningReasons,
+        bool denyWhenNoConstraints)
+    {
+        if (!denyWhenNoConstraints)
+        {
+            return CreateNoConstraintDecision(context, threatWarningReasons);
+        }
+
+        return GovernanceDecision.Deny(
+            options.NoConstraintsReasonCode,
+            options.NoConstraintsReasonMessage,
             correlationId: context.CorrelationId,
             policyVersion: context.PolicyVersion,
             policyHash: context.PolicyHash);
@@ -249,6 +358,187 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
             : results.AsReadOnly();
     }
 
+    private async ValueTask<GovernanceDecision> ApplyDecisionPolicyAsync(
+        TContext context,
+        GovernanceDecision decision,
+        IReadOnlyList<ConstraintEvaluationResult> results,
+        GovernanceDecision? protectedThreatDecision,
+        CancellationToken cancellationToken)
+    {
+        if (decisionPolicy is null)
+        {
+            return decision;
+        }
+
+        GovernanceDecision policyDecision = await decisionPolicy
+            .ApplyAsync(context, decision, results, cancellationToken)
+            .ConfigureAwait(false);
+
+        return options.PreventThreatAssessmentAllowDowngrade && protectedThreatDecision is not null && policyDecision.IsAllowed
+            ? protectedThreatDecision
+            : policyDecision;
+    }
+
+    private async ValueTask<ThreatEvaluationResult> EvaluateThreatModelContributorsAsync(
+        TContext context,
+        CancellationToken cancellationToken)
+    {
+        if (threatModelContributors.Length == 0)
+        {
+            return ThreatEvaluationResult.Empty;
+        }
+
+        List<OperationReason>? reasons = null;
+        GovernanceDecisionOutcome? selectedOutcome = null;
+
+        foreach (IThreatModelContributor<TContext> contributor in threatModelContributors)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            ThreatAssessment? assessment;
+            try
+            {
+                assessment = await contributor
+                    .AssessAsync(context, cancellationToken)
+                    .ConfigureAwait(false);
+            }
+            catch (Exception exception) when (options.TreatThreatContributorExceptionAsDenial && exception is not OperationCanceledException)
+            {
+                return CreateThreatContributorExceptionResult(context, contributor, exception);
+            }
+
+            if (assessment is null || !assessment.IsActionable)
+            {
+                continue;
+            }
+
+            GovernanceDecisionOutcome effectiveOutcome = GetEffectiveThreatOutcome(assessment);
+            selectedOutcome = SelectMoreRestrictiveOutcome(selectedOutcome, effectiveOutcome);
+            reasons ??= [];
+            reasons.Add(assessment.ToOperationReason(GetContributorName(contributor), effectiveOutcome));
+        }
+
+        if (reasons is null || selectedOutcome is null)
+        {
+            return ThreatEvaluationResult.Empty;
+        }
+
+        return CreateThreatEvaluationResult(context, selectedOutcome.Value, reasons.AsReadOnly());
+    }
+
+    private ThreatEvaluationResult CreateThreatContributorExceptionResult(
+        TContext context,
+        IThreatModelContributor<TContext> contributor,
+        Exception exception)
+    {
+        string contributorName = GetContributorName(contributor);
+        LogThreatContributorExceptionDenied(context, contributorName, exception);
+
+        Dictionary<string, string> metadata = new(StringComparer.Ordinal)
+        {
+            ["threat.contributor"] = contributorName,
+            ["threat.failure"] = exception.GetType().Name
+        };
+
+        OperationReason reason = OperationReason.Create(
+            options.ThreatContributorExceptionReasonCode,
+            options.ThreatContributorExceptionReasonMessage,
+            metadata);
+
+        GovernanceDecision decision = GovernanceDecision.Deny(
+            reason,
+            correlationId: context.CorrelationId,
+            policyVersion: context.PolicyVersion,
+            policyHash: context.PolicyHash);
+
+        return ThreatEvaluationResult.ForBlockingDecision(decision);
+    }
+
+    private static ThreatEvaluationResult CreateThreatEvaluationResult(
+        TContext context,
+        GovernanceDecisionOutcome outcome,
+        IReadOnlyList<OperationReason> reasons)
+    {
+        return outcome switch
+        {
+            GovernanceDecisionOutcome.Denied => ThreatEvaluationResult.ForBlockingDecision(
+                GovernanceDecision.Deny(
+                    reasons,
+                    correlationId: context.CorrelationId,
+                    policyVersion: context.PolicyVersion,
+                    policyHash: context.PolicyHash)),
+            GovernanceDecisionOutcome.Deferred => ThreatEvaluationResult.ForBlockingDecision(
+                GovernanceDecision.Defer(
+                    reasons[0].Code,
+                    reasons[0].Message,
+                    correlationId: context.CorrelationId,
+                    policyVersion: context.PolicyVersion,
+                    policyHash: context.PolicyHash)),
+            GovernanceDecisionOutcome.AcknowledgmentRequired => ThreatEvaluationResult.ForBlockingDecision(
+                GovernanceDecision.RequireAcknowledgment(
+                    reasons[0].Code,
+                    reasons[0].Message,
+                    correlationId: context.CorrelationId,
+                    policyVersion: context.PolicyVersion,
+                    policyHash: context.PolicyHash)),
+            GovernanceDecisionOutcome.EscalationRecommended => ThreatEvaluationResult.ForBlockingDecision(
+                GovernanceDecision.Escalate(
+                    reasons[0].Code,
+                    reasons[0].Message,
+                    correlationId: context.CorrelationId,
+                    policyVersion: context.PolicyVersion,
+                    policyHash: context.PolicyHash)),
+            GovernanceDecisionOutcome.Warning => ThreatEvaluationResult.ForWarningReasons(reasons),
+            _ => ThreatEvaluationResult.Empty
+        };
+    }
+
+    private static GovernanceDecisionOutcome GetEffectiveThreatOutcome(ThreatAssessment assessment)
+    {
+        if (assessment.RecommendedOutcome is not GovernanceDecisionOutcome.Allowed)
+        {
+            return assessment.RecommendedOutcome;
+        }
+
+        return assessment.Severity >= ThreatSeverity.High
+            ? GovernanceDecisionOutcome.EscalationRecommended
+            : GovernanceDecisionOutcome.Warning;
+    }
+
+    private static GovernanceDecisionOutcome SelectMoreRestrictiveOutcome(
+        GovernanceDecisionOutcome? current,
+        GovernanceDecisionOutcome candidate)
+    {
+        if (current is null)
+        {
+            return candidate;
+        }
+
+        return GetThreatOutcomeRank(candidate) > GetThreatOutcomeRank(current.Value)
+            ? candidate
+            : current.Value;
+    }
+
+    private static int GetThreatOutcomeRank(GovernanceDecisionOutcome outcome)
+    {
+        return outcome switch
+        {
+            GovernanceDecisionOutcome.Denied => 5,
+            GovernanceDecisionOutcome.EscalationRecommended => 4,
+            GovernanceDecisionOutcome.AcknowledgmentRequired => 3,
+            GovernanceDecisionOutcome.Deferred => 2,
+            GovernanceDecisionOutcome.Warning => 1,
+            _ => 0
+        };
+    }
+
+    private static string GetContributorName(IThreatModelContributor<TContext> contributor)
+    {
+        return string.IsNullOrWhiteSpace(contributor.Name)
+            ? "<unnamed>"
+            : contributor.Name.Trim();
+    }
+
     private async ValueTask<GovernanceDecision> CreateConstraintExceptionDecisionAsync(
         TContext context,
         IAsiBackboneConstraint<TContext> constraint,
@@ -269,10 +559,12 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
             policyVersion: context.PolicyVersion,
             policyHash: context.PolicyHash);
 
-        return decisionPolicy is null
-            ? exceptionDecision
-            : await decisionPolicy
-            .ApplyAsync(context, exceptionDecision, CreateConstraintResultsView(results), cancellationToken)
+        return await ApplyDecisionPolicyAsync(
+            context,
+            exceptionDecision,
+            CreateConstraintResultsView(results),
+            protectedThreatDecision: null,
+            cancellationToken)
             .ConfigureAwait(false);
     }
 
@@ -308,6 +600,55 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
             context.PolicyVersion ?? string.Empty,
             context.PolicyHash ?? string.Empty,
             exception);
+    }
+
+    private void LogThreatContributorExceptionDenied(
+        TContext context,
+        string contributorName,
+        Exception exception)
+    {
+        if (logger is null)
+        {
+            return;
+        }
+
+        ThreatContributorExceptionDeniedError(
+            logger,
+            contributorName,
+            context.CorrelationId ?? string.Empty,
+            context.PolicyVersion ?? string.Empty,
+            context.PolicyHash ?? string.Empty,
+            exception);
+    }
+
+    private sealed class ThreatEvaluationResult
+    {
+        private static readonly IReadOnlyList<OperationReason> EmptyReasons =
+            Array.AsReadOnly(Array.Empty<OperationReason>());
+
+        private ThreatEvaluationResult(
+            IReadOnlyList<OperationReason> warningReasons,
+            GovernanceDecision? blockingDecision)
+        {
+            WarningReasons = warningReasons;
+            BlockingDecision = blockingDecision;
+        }
+
+        public static ThreatEvaluationResult Empty { get; } = new(EmptyReasons, blockingDecision: null);
+
+        public IReadOnlyList<OperationReason> WarningReasons { get; }
+
+        public GovernanceDecision? BlockingDecision { get; }
+
+        public static ThreatEvaluationResult ForWarningReasons(IReadOnlyList<OperationReason> reasons)
+        {
+            return new ThreatEvaluationResult(reasons, blockingDecision: null);
+        }
+
+        public static ThreatEvaluationResult ForBlockingDecision(GovernanceDecision decision)
+        {
+            return new ThreatEvaluationResult(EmptyReasons, decision);
+        }
     }
 
     private struct OperationReasonAccumulator

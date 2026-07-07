@@ -17,6 +17,9 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
     private static readonly IReadOnlyList<ConstraintEvaluationResult> EmptyConstraintResults =
         Array.AsReadOnly(Array.Empty<ConstraintEvaluationResult>());
 
+    private const string InvalidAllowedThreatOutcomeMessage =
+        "Threat model contributors cannot return an Allowed outcome. Use ThreatAssessment.NoThreat() for no finding, or return Warning, Denied, Deferred, AcknowledgmentRequired, or EscalationRecommended for actionable findings.";
+
     private static readonly Action<ILogger, string, string, string, Exception?> EmptyPolicyAllowedWarning =
         LoggerMessage.Define<string, string, string>(
             LogLevel.Warning,
@@ -483,18 +486,21 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
                     policyVersion: context.PolicyVersion,
                     policyHash: context.PolicyHash)),
             GovernanceDecisionOutcome.Warning => ThreatEvaluationResult.ForWarningReasons(reasons),
-            GovernanceDecisionOutcome.Allowed => throw new NotImplementedException(),
+            GovernanceDecisionOutcome.Allowed => throw CreateInvalidAllowedThreatOutcomeException(),
             _ => ThreatEvaluationResult.Empty
         };
     }
 
     private static GovernanceDecisionOutcome GetEffectiveThreatOutcome(ThreatAssessment assessment)
     {
-        return assessment.RecommendedOutcome is not GovernanceDecisionOutcome.Allowed
-            ? assessment.RecommendedOutcome
-            : assessment.Severity >= ThreatSeverity.High
-            ? GovernanceDecisionOutcome.EscalationRecommended
-            : GovernanceDecisionOutcome.Warning;
+        return assessment.RecommendedOutcome is GovernanceDecisionOutcome.Allowed
+            ? throw CreateInvalidAllowedThreatOutcomeException()
+            : assessment.RecommendedOutcome;
+    }
+
+    private static InvalidOperationException CreateInvalidAllowedThreatOutcomeException()
+    {
+        return new InvalidOperationException(InvalidAllowedThreatOutcomeMessage);
     }
 
     private static GovernanceDecisionOutcome SelectMoreRestrictiveOutcome(
@@ -517,7 +523,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
             GovernanceDecisionOutcome.AcknowledgmentRequired => 3,
             GovernanceDecisionOutcome.Deferred => 2,
             GovernanceDecisionOutcome.Warning => 1,
-            GovernanceDecisionOutcome.Allowed => throw new NotImplementedException(),
+            GovernanceDecisionOutcome.Allowed => throw CreateInvalidAllowedThreatOutcomeException(),
             _ => 0
         };
     }

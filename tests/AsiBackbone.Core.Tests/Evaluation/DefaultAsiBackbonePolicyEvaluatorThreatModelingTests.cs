@@ -49,31 +49,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
     }
 
     [Fact]
-    public async Task EvaluateLowSeverityAllowRecommendationPromotesToWarningWithUnnamedContributorMetadata()
-    {
-        TestPolicyContext context = CreateContext();
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
-            [new StaticConstraint(ConstraintEvaluationResult.Allow())],
-            [new StaticThreatContributor(
-                " ",
-                ThreatAssessment.Create(
-                    ThreatSeverity.Low,
-                    ThreatCategories.InputOversized,
-                    "threat.input_oversized",
-                    "Oversized input indicator was reported.",
-                    GovernanceDecisionOutcome.Allowed))]);
-
-        GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
-
-        Assert.True(decision.IsWarning);
-        OperationReason reason = Assert.Single(decision.Reasons);
-        Assert.Equal("threat.input_oversized", reason.Code);
-        Assert.Equal("<unnamed>", reason.Metadata["threat.contributor"]);
-        Assert.Equal(GovernanceDecisionOutcome.Warning.ToString(), reason.Metadata["threat.effective_outcome"]);
-    }
-
-    [Fact]
-    public async Task EvaluateHighSeverityAllowRecommendationPromotesToEscalationAndSkipsConstraints()
+    public async Task EvaluateActionableAllowedThreatRecommendationThrowsInvalidOperationExceptionAndSkipsConstraints()
     {
         TestPolicyContext context = CreateContext();
         bool constraintRan = false;
@@ -85,20 +61,20 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
                     return ConstraintEvaluationResult.Allow();
                 })],
             [new StaticThreatContributor(
-                "policy-bypass-contributor",
+                "invalid-allow-threat-contributor",
                 ThreatAssessment.Create(
-                    ThreatSeverity.High,
-                    ThreatCategories.PolicyBypassAttempt,
-                    "threat.policy_bypass",
-                    "Possible policy bypass attempt.",
+                    ThreatSeverity.Low,
+                    ThreatCategories.InputOversized,
+                    "threat.input_oversized",
+                    "Oversized input indicator was reported.",
                     GovernanceDecisionOutcome.Allowed))]);
 
-        GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
+        InvalidOperationException exception = await Assert.ThrowsAsync<InvalidOperationException>(
+            async () => await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken));
 
         Assert.False(constraintRan);
-        Assert.True(decision.EscalationRecommended);
-        Assert.False(decision.CanProceed);
-        Assert.Equal("threat.policy_bypass", Assert.Single(decision.ReasonCodes));
+        Assert.Contains("Threat model contributors cannot return an Allowed outcome", exception.Message);
+        Assert.Contains("ThreatAssessment.NoThreat", exception.Message);
     }
 
     [Fact]
@@ -133,16 +109,16 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
                 "ack-threat-contributor",
                 ThreatAssessment.Create(
                     ThreatSeverity.Medium,
-                    ThreatCategories.UnsafeExternalCommand,
-                    "threat.unsafe_external_command",
-                    "Unsafe external command request was reported.",
+                    ThreatCategories.AuditIntegrityRisk,
+                    "threat.audit_ack_required",
+                    "Audit acknowledgment was requested.",
                     GovernanceDecisionOutcome.AcknowledgmentRequired))]);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
         Assert.True(decision.RequiresAcknowledgment);
         Assert.False(decision.CanProceed);
-        Assert.Equal("threat.unsafe_external_command", Assert.Single(decision.ReasonCodes));
+        Assert.Equal("threat.audit_ack_required", Assert.Single(decision.ReasonCodes));
     }
 
     [Fact]
@@ -154,15 +130,15 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
             [new StaticConstraint(ConstraintEvaluationResult.Allow())],
             [
                 new DelegateThreatContributor(
-                    "prompt-injection-contributor",
+                    "input-shape-contributor",
                     (_, _) =>
                     {
-                        observedOrder.Add("prompt");
+                        observedOrder.Add("input");
                         return ThreatAssessment.Create(
                             ThreatSeverity.Low,
-                            ThreatCategories.PromptInjectionLikeInput,
-                            "threat.prompt_injection_like_input",
-                            "Prompt-injection-like input was reported.",
+                            ThreatCategories.InputMalformed,
+                            "threat.input_shape",
+                            "Input shape indicator was reported.",
                             GovernanceDecisionOutcome.Warning);
                     }),
                 new DelegateThreatContributor(
@@ -181,18 +157,18 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
-        Assert.Equal(["prompt", "token"], observedOrder);
+        Assert.Equal(["input", "token"], observedOrder);
         Assert.True(decision.IsDenied);
         Assert.False(decision.CanProceed);
-        Assert.Contains("threat.prompt_injection_like_input", decision.ReasonCodes);
+        Assert.Contains("threat.input_shape", decision.ReasonCodes);
         Assert.Contains("threat.capability_token_mismatch", decision.ReasonCodes);
 
         Assert.Equal(
-            ThreatCategories.PromptInjectionLikeInput,
-            decision.Reasons.Single(reason => reason.Code == "threat.prompt_injection_like_input").Metadata["threat.category"]);
+            ThreatCategories.InputMalformed,
+            decision.Reasons.Single(reason => reason.Code == "threat.input_shape").Metadata["threat.category"]);
         Assert.Equal(
-            "prompt-injection-contributor",
-            decision.Reasons.Single(reason => reason.Code == "threat.prompt_injection_like_input").Metadata["threat.contributor"]);
+            "input-shape-contributor",
+            decision.Reasons.Single(reason => reason.Code == "threat.input_shape").Metadata["threat.contributor"]);
         Assert.Equal(
             ThreatSeverity.Critical.ToString(),
             decision.Reasons.Single(reason => reason.Code == "threat.capability_token_mismatch").Metadata["threat.severity"]);

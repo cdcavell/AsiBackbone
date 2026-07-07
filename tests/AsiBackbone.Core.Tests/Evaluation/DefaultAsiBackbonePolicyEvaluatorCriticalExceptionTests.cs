@@ -6,6 +6,8 @@ using Xunit;
 
 namespace AsiBackbone.Core.Tests.Evaluation;
 
+#pragma warning disable CA2201 // Reserved runtime exception types are intentionally constructed to verify passthrough behavior.
+
 /// <summary>
 /// Regression coverage for the evaluator boundary between fail-closed policy exceptions and critical runtime failures.
 /// </summary>
@@ -160,3 +162,5 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
         }
     }
 }
+
+#pragma warning restore CA2201

@@ -6,16 +6,26 @@ using Xunit;
 
 namespace AsiBackbone.Core.Tests.Evaluation;
 
-#pragma warning disable CA2201 // Reserved runtime exception types are intentionally constructed to verify passthrough behavior.
+#pragma warning disable CA2201 // Reserved runtime exception types are intentionally constructed to verify catchable passthrough behavior.
 
 /// <summary>
 /// Regression coverage for the evaluator boundary between fail-closed policy exceptions and critical runtime failures.
 /// </summary>
+/// <remarks>
+/// These tests use manually constructed reserved exception instances so the evaluator boundary can be exercised safely.
+/// They do not imply that real corrupted-state failures, such as a process-ending stack overflow or process-corrupting
+/// access violation, are recoverable or normally catchable by modern .NET.
+/// </remarks>
 public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
 {
     /// <summary>
-    /// Gets critical exception type names used to verify passthrough behavior.
+    /// Gets critical exception type names used to verify passthrough behavior when such failures reach managed code.
     /// </summary>
+    /// <remarks>
+    /// Some of these exception types are defensive/documentary in modern .NET because real corrupted-state failures may
+    /// bypass ordinary <c>catch (Exception)</c> filters. The policy is still to propagate them if they are observed directly
+    /// or through wrapper exceptions.
+    /// </remarks>
     public static TheoryData<string> CriticalRuntimeExceptionTypes =>
     [
         nameof(OutOfMemoryException),

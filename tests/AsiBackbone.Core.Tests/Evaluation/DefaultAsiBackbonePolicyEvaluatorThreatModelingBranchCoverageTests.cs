@@ -199,10 +199,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
             "threat.null_metadata_value",
             "Null metadata value should be normalized.",
             GovernanceDecisionOutcome.Warning,
-            metadata: new Dictionary<string, string?>
+            metadata: new Dictionary<string, string>
             {
-                ["nullable.value"] = null
-            }!);
+                ["nullable.value"] = null!
+            });
 
         OperationReason reason = assessment.ToOperationReason();
 

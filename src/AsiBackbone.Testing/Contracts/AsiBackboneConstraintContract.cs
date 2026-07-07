@@ -1,4 +1,5 @@
 using AsiBackbone.Core.Constraints;
+using AsiBackbone.Core.Results;
 
 namespace AsiBackbone.Testing.Contracts;
 
@@ -74,11 +75,7 @@ public abstract class AsiBackboneConstraintContract<TContext>
 
             for (int index = 0; index < result.Reasons.Count; index++)
             {
-                var reason = result.Reasons[index];
-                if (reason is null)
-                {
-                    throw new AsiBackboneContractViolationException($"Constraint '{constraintName}' returned a null reason at index {index}.");
-                }
+                OperationReason reason = result.Reasons[index] ?? throw new AsiBackboneContractViolationException($"Constraint '{constraintName}' returned a null reason at index {index}.");
 
                 if (string.IsNullOrWhiteSpace(reason.Code))
                 {

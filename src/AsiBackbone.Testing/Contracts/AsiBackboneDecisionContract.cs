@@ -1,6 +1,7 @@
 using AsiBackbone.Core.Audit;
 using AsiBackbone.Core.Constraints;
 using AsiBackbone.Core.Decisions;
+using AsiBackbone.Core.Results;
 
 namespace AsiBackbone.Testing.Contracts;
 
@@ -33,11 +34,7 @@ public static class AsiBackboneDecisionContract
 
         for (int index = 0; index < decision.Reasons.Count; index++)
         {
-            var reason = decision.Reasons[index];
-            if (reason is null)
-            {
-                throw new AsiBackboneContractViolationException($"{contractName} contains a null reason at index {index}.");
-            }
+            OperationReason reason = decision.Reasons[index] ?? throw new AsiBackboneContractViolationException($"{contractName} contains a null reason at index {index}.");
 
             if (string.IsNullOrWhiteSpace(reason.Code))
             {
@@ -88,12 +85,9 @@ public static class AsiBackboneDecisionContract
     {
         GovernanceDecision verifiedDecision = VerifySafeDecision(decision, contractName);
 
-        if (verifiedDecision.IsAllowed)
-        {
-            throw new AsiBackboneContractViolationException($"{contractName} must not return Allow for an invalid or unsupported capability grant.");
-        }
-
-        return verifiedDecision;
+        return verifiedDecision.IsAllowed
+            ? throw new AsiBackboneContractViolationException($"{contractName} must not return Allow for an invalid or unsupported capability grant.")
+            : verifiedDecision;
     }
 
     /// <summary>
@@ -129,12 +123,9 @@ public static class AsiBackboneDecisionContract
             }
         }
 
-        if (residue.Metadata is null)
-        {
-            throw new AsiBackboneContractViolationException($"{contractName} metadata collection must not be null.");
-        }
-
-        return residue;
+        return residue.Metadata is null
+            ? throw new AsiBackboneContractViolationException($"{contractName} metadata collection must not be null.")
+            : residue;
     }
 
     private static void VerifySupportedOutcome(GovernanceDecision decision, string contractName)

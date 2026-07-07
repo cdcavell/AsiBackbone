@@ -33,6 +33,13 @@ dotnet tool run docfx docs/docfx.json --serve
 - Samples and smoke tests do not become hidden requirements for consumers.
 - Provider-specific behavior is not implied to be part of `1.0.0` unless explicitly released as stable.
 
+## Production hygiene checklist
+
+- Production source under `src/` must not use `NotImplementedException` as a placeholder.
+- Use explicit production behavior instead: fail-closed governance result, domain-specific exception, `NotSupportedException`, or `InvalidOperationException` as appropriate.
+- Keep tests, samples, and template scaffolding clearly separated from production library execution paths.
+- Update [Production Placeholder Exception Guardrails](production-placeholder-exception-guardrails.md) when an intentional allowance is added.
+
 ## Public API checklist
 
 - Is this API part of a stable package?

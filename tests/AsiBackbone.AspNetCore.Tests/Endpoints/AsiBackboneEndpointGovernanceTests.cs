@@ -43,7 +43,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
         var httpContext = new DefaultHttpContext();
         httpContext.SetEndpoint(new Endpoint(static _ => Task.CompletedTask, new EndpointMetadataCollection(), "plain"));
         bool nextCalled = false;
-        var middleware = new AsiBackboneEndpointGovernanceMiddleware(_ =>
+        AsiBackboneEndpointGovernanceMiddleware middleware = CreateMiddleware(_ =>
         {
             nextCalled = true;
             return Task.CompletedTask;
@@ -51,8 +51,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
 
         await middleware.InvokeAsync(
             httpContext,
-            new ThrowingEndpointGovernanceService(),
-            Options.Create(new AsiBackboneEndpointGovernanceOptions()));
+            new ThrowingEndpointGovernanceService());
 
         Assert.True(nextCalled);
     }
@@ -71,7 +70,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
             new EndpointMetadataCollection(new RequireCapabilityGrantAttribute("robotics.execute")),
             "blocked"));
         bool nextCalled = false;
-        var middleware = new AsiBackboneEndpointGovernanceMiddleware(_ =>
+        AsiBackboneEndpointGovernanceMiddleware middleware = CreateMiddleware(_ =>
         {
             nextCalled = true;
             return Task.CompletedTask;
@@ -79,8 +78,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
 
         await middleware.InvokeAsync(
             httpContext,
-            new BlockingEndpointGovernanceService(),
-            Options.Create(new AsiBackboneEndpointGovernanceOptions()));
+            new BlockingEndpointGovernanceService());
 
         Assert.False(nextCalled);
         Assert.Equal(StatusCodes.Status403Forbidden, httpContext.Response.StatusCode);
@@ -100,7 +98,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
             new EndpointMetadataCollection(new RequireCapabilityGrantAttribute("robotics.execute")),
             "blocked.default"));
         bool nextCalled = false;
-        var middleware = new AsiBackboneEndpointGovernanceMiddleware(_ =>
+        AsiBackboneEndpointGovernanceMiddleware middleware = CreateMiddleware(_ =>
         {
             nextCalled = true;
             return Task.CompletedTask;
@@ -108,8 +106,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
 
         await middleware.InvokeAsync(
             httpContext,
-            new DefaultBlockingEndpointGovernanceService(),
-            Options.Create(new AsiBackboneEndpointGovernanceOptions()));
+            new DefaultBlockingEndpointGovernanceService());
 
         Assert.False(nextCalled);
         Assert.Equal(StatusCodes.Status403Forbidden, httpContext.Response.StatusCode);
@@ -135,20 +132,21 @@ public sealed class AsiBackboneEndpointGovernanceTests
                 new RequireCapabilityGrantAttribute("robotics.execute")),
             "blocked.diagnostics"));
         bool nextCalled = false;
-        var middleware = new AsiBackboneEndpointGovernanceMiddleware(_ =>
-        {
-            nextCalled = true;
-            return Task.CompletedTask;
-        });
-
-        await middleware.InvokeAsync(
-            httpContext,
-            new DecisionDefaultBlockingEndpointGovernanceService(),
-            Options.Create(new AsiBackboneEndpointGovernanceOptions
+        AsiBackboneEndpointGovernanceMiddleware middleware = CreateMiddleware(
+            _ =>
+            {
+                nextCalled = true;
+                return Task.CompletedTask;
+            },
+            new AsiBackboneEndpointGovernanceOptions
             {
                 EnableDevelopmentDiagnostics = true,
                 DevelopmentDiagnosticsDocumentationBaseUrl = "https://cdcavell.github.io/AsiBackbone/articles/"
-            }));
+            });
+
+        await middleware.InvokeAsync(
+            httpContext,
+            new DecisionDefaultBlockingEndpointGovernanceService());
 
         string body = await ReadResponseBodyAsync(httpContext);
         Assert.False(nextCalled);
@@ -178,7 +176,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
             new EndpointMetadataCollection(new RequireGovernancePolicyAttribute(typeof(SamplePolicy))),
             "blocked.default.development"));
         bool nextCalled = false;
-        var middleware = new AsiBackboneEndpointGovernanceMiddleware(_ =>
+        AsiBackboneEndpointGovernanceMiddleware middleware = CreateMiddleware(_ =>
         {
             nextCalled = true;
             return Task.CompletedTask;
@@ -186,8 +184,7 @@ public sealed class AsiBackboneEndpointGovernanceTests
 
         await middleware.InvokeAsync(
             httpContext,
-            new DecisionDefaultBlockingEndpointGovernanceService(),
-            Options.Create(new AsiBackboneEndpointGovernanceOptions()));
+            new DecisionDefaultBlockingEndpointGovernanceService());
 
         Assert.False(nextCalled);
         Assert.Equal(StatusCodes.Status403Forbidden, httpContext.Response.StatusCode);
@@ -211,19 +208,20 @@ public sealed class AsiBackboneEndpointGovernanceTests
             new EndpointMetadataCollection(new RequireGovernancePolicyAttribute(typeof(SamplePolicy))),
             "blocked.production"));
         bool nextCalled = false;
-        var middleware = new AsiBackboneEndpointGovernanceMiddleware(_ =>
-        {
-            nextCalled = true;
-            return Task.CompletedTask;
-        });
+        AsiBackboneEndpointGovernanceMiddleware middleware = CreateMiddleware(
+            _ =>
+            {
+                nextCalled = true;
+                return Task.CompletedTask;
+            },
+            new AsiBackboneEndpointGovernanceOptions
+            {
+                EnableDevelopmentDiagnostics = true
+            });
 
         await middleware.InvokeAsync(
             httpContext,
-            new DecisionDefaultBlockingEndpointGovernanceService(),
-            Options.Create(new AsiBackboneEndpointGovernanceOptions
-            {
-                EnableDevelopmentDiagnostics = true
-            }));
+            new DecisionDefaultBlockingEndpointGovernanceService());
 
         Assert.False(nextCalled);
         Assert.Equal(StatusCodes.Status403Forbidden, httpContext.Response.StatusCode);
@@ -244,21 +242,22 @@ public sealed class AsiBackboneEndpointGovernanceTests
             new EndpointMetadataCollection(new RequireCapabilityGrantAttribute("robotics.execute")),
             "blocked.configured"));
         bool nextCalled = false;
-        var middleware = new AsiBackboneEndpointGovernanceMiddleware(_ =>
-        {
-            nextCalled = true;
-            return Task.CompletedTask;
-        });
-
-        await middleware.InvokeAsync(
-            httpContext,
-            new DefaultBlockingEndpointGovernanceService(),
-            Options.Create(new AsiBackboneEndpointGovernanceOptions
+        AsiBackboneEndpointGovernanceMiddleware middleware = CreateMiddleware(
+            _ =>
+            {
+                nextCalled = true;
+                return Task.CompletedTask;
+            },
+            new AsiBackboneEndpointGovernanceOptions
             {
                 DefaultForbiddenResultFactory = _ => Microsoft.AspNetCore.Http.Results.Text(
                     "rich failure response",
                     statusCode: StatusCodes.Status403Forbidden)
-            }));
+            });
+
+        await middleware.InvokeAsync(
+            httpContext,
+            new DefaultBlockingEndpointGovernanceService());
 
         Assert.False(nextCalled);
         Assert.Equal(StatusCodes.Status403Forbidden, httpContext.Response.StatusCode);
@@ -279,21 +278,22 @@ public sealed class AsiBackboneEndpointGovernanceTests
             new EndpointMetadataCollection(new RequireCapabilityGrantAttribute("robotics.execute")),
             "blocked.custom"));
         bool nextCalled = false;
-        var middleware = new AsiBackboneEndpointGovernanceMiddleware(_ =>
-        {
-            nextCalled = true;
-            return Task.CompletedTask;
-        });
-
-        await middleware.InvokeAsync(
-            httpContext,
-            new TextBlockingEndpointGovernanceService("custom failure response", StatusCodes.Status409Conflict),
-            Options.Create(new AsiBackboneEndpointGovernanceOptions
+        AsiBackboneEndpointGovernanceMiddleware middleware = CreateMiddleware(
+            _ =>
+            {
+                nextCalled = true;
+                return Task.CompletedTask;
+            },
+            new AsiBackboneEndpointGovernanceOptions
             {
                 DefaultForbiddenResultFactory = _ => Microsoft.AspNetCore.Http.Results.Text(
                     "default factory response",
                     statusCode: StatusCodes.Status403Forbidden)
-            }));
+            });
+
+        await middleware.InvokeAsync(
+            httpContext,
+            new TextBlockingEndpointGovernanceService("custom failure response", StatusCodes.Status409Conflict));
 
         Assert.False(nextCalled);
         Assert.Equal(StatusCodes.Status409Conflict, httpContext.Response.StatusCode);
@@ -418,19 +418,20 @@ public sealed class AsiBackboneEndpointGovernanceTests
             "plain"));
 
         bool nextCalled = false;
-        var middleware = new AsiBackboneEndpointGovernanceMiddleware(_ =>
-        {
-            nextCalled = true;
-            return Task.CompletedTask;
-        });
+        AsiBackboneEndpointGovernanceMiddleware middleware = CreateMiddleware(
+            _ =>
+            {
+                nextCalled = true;
+                return Task.CompletedTask;
+            },
+            new AsiBackboneEndpointGovernanceOptions
+            {
+                RequireGovernanceMetadata = true
+            });
 
         await middleware.InvokeAsync(
             httpContext,
-            new ThrowingEndpointGovernanceService(),
-            Options.Create(new AsiBackboneEndpointGovernanceOptions
-            {
-                RequireGovernanceMetadata = true
-            }));
+            new ThrowingEndpointGovernanceService());
 
         Assert.False(nextCalled);
         Assert.Equal(StatusCodes.Status403Forbidden, httpContext.Response.StatusCode);
@@ -447,19 +448,20 @@ public sealed class AsiBackboneEndpointGovernanceTests
             "public"));
 
         bool nextCalled = false;
-        var middleware = new AsiBackboneEndpointGovernanceMiddleware(_ =>
-        {
-            nextCalled = true;
-            return Task.CompletedTask;
-        });
+        AsiBackboneEndpointGovernanceMiddleware middleware = CreateMiddleware(
+            _ =>
+            {
+                nextCalled = true;
+                return Task.CompletedTask;
+            },
+            new AsiBackboneEndpointGovernanceOptions
+            {
+                RequireGovernanceMetadata = true
+            });
 
         await middleware.InvokeAsync(
             httpContext,
-            new ThrowingEndpointGovernanceService(),
-            Options.Create(new AsiBackboneEndpointGovernanceOptions
-            {
-                RequireGovernanceMetadata = true
-            }));
+            new ThrowingEndpointGovernanceService());
 
         Assert.True(nextCalled);
     }
@@ -489,6 +491,15 @@ public sealed class AsiBackboneEndpointGovernanceTests
             _ = services.GetRequiredService<IOptions<AsiBackboneEndpointGovernanceOptions>>().Value);
 
         Assert.Contains("Endpoint governance options must be valid.", exception.Message, StringComparison.Ordinal);
+    }
+
+    private static AsiBackboneEndpointGovernanceMiddleware CreateMiddleware(
+        RequestDelegate next,
+        AsiBackboneEndpointGovernanceOptions? options = null)
+    {
+        return new AsiBackboneEndpointGovernanceMiddleware(
+            next,
+            Options.Create(options ?? new AsiBackboneEndpointGovernanceOptions()));
     }
 
     private static async Task<string> ReadResponseBodyAsync(HttpContext httpContext)

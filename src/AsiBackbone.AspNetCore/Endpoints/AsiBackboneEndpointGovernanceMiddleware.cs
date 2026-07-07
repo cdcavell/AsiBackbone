@@ -6,39 +6,48 @@ namespace AsiBackbone.AspNetCore.Endpoints;
 /// <summary>
 /// Middleware that evaluates AsiBackbone endpoint governance metadata before endpoint execution.
 /// </summary>
-/// <remarks>
-/// Initializes a new instance of the <see cref="AsiBackboneEndpointGovernanceMiddleware" /> class.
-/// </remarks>
-/// <param name="next">The next request delegate.</param>
-public sealed class AsiBackboneEndpointGovernanceMiddleware(RequestDelegate next)
+public sealed class AsiBackboneEndpointGovernanceMiddleware
 {
     // Example: use a precomputed static result for the most common forbidden response
     private static readonly IResult LightweightForbiddenResult =
         Microsoft.AspNetCore.Http.Results.StatusCode(StatusCodes.Status403Forbidden);
     // Use this for default cases instead of constructing new ProblemDetails every time.
 
-    private readonly RequestDelegate next = next ?? throw new ArgumentNullException(nameof(next));
+    private readonly RequestDelegate next;
+    private readonly AsiBackboneEndpointGovernanceOptions options;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AsiBackboneEndpointGovernanceMiddleware" /> class.
+    /// </summary>
+    /// <param name="next">The next request delegate.</param>
+    /// <param name="endpointOptions">The endpoint governance options.</param>
+    public AsiBackboneEndpointGovernanceMiddleware(
+        RequestDelegate next,
+        IOptions<AsiBackboneEndpointGovernanceOptions> endpointOptions)
+    {
+        ArgumentNullException.ThrowIfNull(next);
+        ArgumentNullException.ThrowIfNull(endpointOptions);
+
+        this.next = next;
+        options = endpointOptions.Value;
+    }
 
     /// <summary>
     /// Evaluates endpoint governance metadata and either continues execution or writes a failure result.
     /// </summary>
     /// <param name="httpContext">The current HTTP context.</param>
     /// <param name="governanceService">The endpoint governance service.</param>
-    /// <param name="endpointOptions">The endpoint governance options.</param>
     /// <returns>A task that completes when the middleware has run.</returns>
     public async Task InvokeAsync(
         HttpContext httpContext,
-        IAsiBackboneEndpointGovernanceService governanceService,
-        IOptions<AsiBackboneEndpointGovernanceOptions> endpointOptions)
+        IAsiBackboneEndpointGovernanceService governanceService)
     {
         ArgumentNullException.ThrowIfNull(httpContext);
         ArgumentNullException.ThrowIfNull(governanceService);
-        ArgumentNullException.ThrowIfNull(endpointOptions);
 
         // Options validation is registered with ValidateOnStart in AddAsiBackboneAspNetCore.
-        // Avoid repeating the same validation on every request in the endpoint-governance hot path.
-        AsiBackboneEndpointGovernanceOptions options = endpointOptions.Value;
-
+        // IOptions<T> is singleton-backed, so keep the validated value from construction rather
+        // than resolving IOptions<T> again through method injection on every request.
         Endpoint? endpoint = httpContext.GetEndpoint();
         var descriptor = AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(endpoint);
 

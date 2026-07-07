@@ -243,7 +243,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
             warnings,
             includeWarningsWhenDenied: options.ShortCircuitOnFirstDenial);
 
-        GovernanceDecision? protectedThreatDecision = threatEvaluation.WarningReasons.Count > 0 && composedDecision.IsAllowed
+        GovernanceDecision? protectedThreatDecision = threatEvaluation.WarningReasons.Count > 0 && composedDecision.CanProceed
             ? GovernanceDecision.Warning(
                 threatEvaluation.WarningReasons,
                 correlationId: context.CorrelationId,
@@ -286,13 +286,16 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
         TContext context,
         IReadOnlyList<OperationReason> threatWarningReasons)
     {
-        return threatWarningReasons.Count > 0
-            ? GovernanceDecision.Warning(
+        if (threatWarningReasons.Count > 0)
+        {
+            return GovernanceDecision.Warning(
                 threatWarningReasons,
                 correlationId: context.CorrelationId,
                 policyVersion: context.PolicyVersion,
-                policyHash: context.PolicyHash)
-            : GovernanceDecision.Allow(
+                policyHash: context.PolicyHash);
+        }
+
+        return GovernanceDecision.Allow(
             correlationId: context.CorrelationId,
             policyVersion: context.PolicyVersion,
             policyHash: context.PolicyHash);
@@ -303,9 +306,12 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
         IReadOnlyList<OperationReason> threatWarningReasons,
         bool denyWhenNoConstraints)
     {
-        return !denyWhenNoConstraints
-            ? CreateNoConstraintDecision(context, threatWarningReasons)
-            : GovernanceDecision.Deny(
+        if (!denyWhenNoConstraints)
+        {
+            return CreateNoConstraintDecision(context, threatWarningReasons);
+        }
+
+        return GovernanceDecision.Deny(
             options.NoConstraintsReasonCode,
             options.NoConstraintsReasonMessage,
             correlationId: context.CorrelationId,
@@ -415,9 +421,12 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
             reasons.Add(assessment.ToOperationReason(GetContributorName(contributor), effectiveOutcome));
         }
 
-        return reasons is null || selectedOutcome is null
-            ? ThreatEvaluationResult.Empty
-            : CreateThreatEvaluationResult(context, selectedOutcome.Value, reasons.AsReadOnly());
+        if (reasons is null || selectedOutcome is null)
+        {
+            return ThreatEvaluationResult.Empty;
+        }
+
+        return CreateThreatEvaluationResult(context, selectedOutcome.Value, reasons.AsReadOnly());
     }
 
     private ThreatEvaluationResult CreateThreatContributorExceptionResult(
@@ -434,12 +443,12 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
             ["threat.failure"] = exception.GetType().Name
         };
 
-        var reason = OperationReason.Create(
+        OperationReason reason = OperationReason.Create(
             options.ThreatContributorExceptionReasonCode,
             options.ThreatContributorExceptionReasonMessage,
             metadata);
 
-        var decision = GovernanceDecision.Deny(
+        GovernanceDecision decision = GovernanceDecision.Deny(
             reason,
             correlationId: context.CorrelationId,
             policyVersion: context.PolicyVersion,
@@ -483,16 +492,18 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
                     policyVersion: context.PolicyVersion,
                     policyHash: context.PolicyHash)),
             GovernanceDecisionOutcome.Warning => ThreatEvaluationResult.ForWarningReasons(reasons),
-            GovernanceDecisionOutcome.Allowed => throw new NotImplementedException(),
             _ => ThreatEvaluationResult.Empty
         };
     }
 
     private static GovernanceDecisionOutcome GetEffectiveThreatOutcome(ThreatAssessment assessment)
     {
-        return assessment.RecommendedOutcome is not GovernanceDecisionOutcome.Allowed
-            ? assessment.RecommendedOutcome
-            : assessment.Severity >= ThreatSeverity.High
+        if (assessment.RecommendedOutcome is not GovernanceDecisionOutcome.Allowed)
+        {
+            return assessment.RecommendedOutcome;
+        }
+
+        return assessment.Severity >= ThreatSeverity.High
             ? GovernanceDecisionOutcome.EscalationRecommended
             : GovernanceDecisionOutcome.Warning;
     }
@@ -501,9 +512,12 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
         GovernanceDecisionOutcome? current,
         GovernanceDecisionOutcome candidate)
     {
-        return current is null
-            ? candidate
-            : GetThreatOutcomeRank(candidate) > GetThreatOutcomeRank(current.Value)
+        if (current is null)
+        {
+            return candidate;
+        }
+
+        return GetThreatOutcomeRank(candidate) > GetThreatOutcomeRank(current.Value)
             ? candidate
             : current.Value;
     }
@@ -517,7 +531,6 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
             GovernanceDecisionOutcome.AcknowledgmentRequired => 3,
             GovernanceDecisionOutcome.Deferred => 2,
             GovernanceDecisionOutcome.Warning => 1,
-            GovernanceDecisionOutcome.Allowed => throw new NotImplementedException(),
             _ => 0
         };
     }

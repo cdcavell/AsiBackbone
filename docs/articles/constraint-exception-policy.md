@@ -46,11 +46,15 @@ If a decision policy is configured, the generated denied decision is passed thro
 
 The evaluator does **not** convert cancellation or critical host/runtime failures into ordinary denied governance decisions. Those exceptions continue to propagate to the host error boundary.
 
+### Modern .NET catchability boundary
+
+Modern .NET does not guarantee that corrupted-state or process-failure conditions reach an ordinary `catch (Exception)` filter. A real stack overflow is generally process-ending, and a process-corrupting access violation may bypass normal managed recovery paths. AsiBackbone therefore treats the critical exception list as a defensive boundary for catchable cases, manually constructed exception instances, wrapper exceptions, or platform-specific delivery behavior. It should not be read as a claim that these failures are safe to catch, recover from, or convert into governance decisions.
+
 The critical exception filter currently includes:
 
 - `OutOfMemoryException`
-- `StackOverflowException` where catchable by the runtime
-- `AccessViolationException`
+- `StackOverflowException` where catchable by the runtime, such as manually constructed or wrapped instances used in tests
+- `AccessViolationException` where catchable by the runtime; process-corrupting access violations should still be handled as host/runtime failures
 - `AppDomainUnloadedException`
 - `BadImageFormatException`
 - `InvalidProgramException`

@@ -55,7 +55,9 @@ public sealed class AsiBackbonePolicyEvaluatorOptions
     /// The default value is <see langword="false" /> so constraint exceptions continue to propagate to the host. Set this
     /// to <see langword="true" /> when the host prefers fail-closed denied decisions with stable reason codes that can be
     /// audited by downstream governance sinks. Cancellation and critical host/runtime failures are not converted into policy
-    /// denials and continue to propagate.
+    /// denials and continue to propagate. This option is intended for ordinary policy and contributor failures; it does not
+    /// make corrupted process state recoverable, and modern .NET may not deliver some runtime failures to ordinary catch
+    /// filters.
     /// </remarks>
     public bool TreatConstraintExceptionAsDenial { get; set; }
 
@@ -66,7 +68,9 @@ public sealed class AsiBackbonePolicyEvaluatorOptions
     /// The default value is <see langword="true" /> because threat-modeling extensions are expected to fail closed when
     /// they are explicitly registered. Set this to <see langword="false" /> only when the host intentionally wants contributor
     /// exceptions to propagate instead of producing a stable denied decision. Cancellation and critical host/runtime failures
-    /// are not converted into policy denials and continue to propagate.
+    /// are not converted into policy denials and continue to propagate. This option is intended for ordinary policy and
+    /// contributor failures; it does not make corrupted process state recoverable, and modern .NET may not deliver some
+    /// runtime failures to ordinary catch filters.
     /// </remarks>
     public bool TreatThreatContributorExceptionAsDenial { get; set; } = true;
 

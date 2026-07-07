@@ -28,7 +28,7 @@ public sealed class EfCoreGovernanceOutboxJsonMetadataTests
         await using HostOwnedGovernanceDbContext context = new(options);
         var store = new EfCoreGovernanceOutboxStore(context);
 
-        GovernanceEmissionPayload payload = GovernanceEmissionPayload.Create(
+        var payload = GovernanceEmissionPayload.Create(
             "audit-residue",
             schemaVersion: "1.0.0",
             contentType: "application/json",
@@ -49,7 +49,7 @@ public sealed class EfCoreGovernanceOutboxJsonMetadataTests
                 ["envelope.future"] = "envelope-future-value"
             });
 
-        GovernanceOutboxEntry entry = GovernanceOutboxEntry.Create(
+        var entry = GovernanceOutboxEntry.Create(
             envelope,
             "outbox-json-metadata",
             new DateTimeOffset(2026, 7, 7, 10, 0, 0, TimeSpan.Zero),
@@ -67,12 +67,12 @@ public sealed class EfCoreGovernanceOutboxJsonMetadataTests
             TestContext.Current.CancellationToken);
 
         Assert.NotNull(persisted);
-        Assert.Equal("entry-value", persisted!.Metadata["entry.key"]);
+        Assert.Equal("entry-value", persisted.Metadata["entry.key"]);
         Assert.Equal("entry-future-value", persisted.Metadata["entry.future"]);
         Assert.Equal("envelope-value", persisted.Envelope.Metadata["envelope.key"]);
         Assert.Equal("envelope-future-value", persisted.Envelope.Metadata["envelope.future"]);
         Assert.NotNull(persisted.Envelope.Payload);
-        Assert.Equal("payload-value", persisted.Envelope.Payload!.Metadata["payload.key"]);
+        Assert.Equal("payload-value", persisted.Envelope.Payload.Metadata["payload.key"]);
         Assert.Equal("payload-future-value", persisted.Envelope.Payload.Metadata["payload.future"]);
     }
 
@@ -90,9 +90,9 @@ public sealed class EfCoreGovernanceOutboxJsonMetadataTests
         await using HostOwnedGovernanceDbContext context = new(options);
         var store = new EfCoreGovernanceOutboxStore(context);
 
-        GovernanceEmissionPayload payload = GovernanceEmissionPayload.Create("audit-residue");
+        var payload = GovernanceEmissionPayload.Create("audit-residue");
         GovernanceEmissionEnvelope envelope = CreateEnvelope("event-empty-metadata", payload, metadata: null);
-        GovernanceOutboxEntry entry = GovernanceOutboxEntry.Create(
+        var entry = GovernanceOutboxEntry.Create(
             envelope,
             "outbox-empty-metadata",
             new DateTimeOffset(2026, 7, 7, 10, 5, 0, TimeSpan.Zero),
@@ -106,10 +106,10 @@ public sealed class EfCoreGovernanceOutboxJsonMetadataTests
             TestContext.Current.CancellationToken);
 
         Assert.NotNull(persisted);
-        Assert.Empty(persisted!.Metadata);
+        Assert.Empty(persisted.Metadata);
         Assert.Empty(persisted.Envelope.Metadata);
         Assert.NotNull(persisted.Envelope.Payload);
-        Assert.Empty(persisted.Envelope.Payload!.Metadata);
+        Assert.Empty(persisted.Envelope.Payload.Metadata);
     }
 
     /// <summary>
@@ -135,7 +135,7 @@ public sealed class EfCoreGovernanceOutboxJsonMetadataTests
             UpdatedUtc = timestamp,
             RetryCount = 0,
             MaxRetryCount = 5,
-            MetadataJson = "{\"entry.future.key\":\"entry-future-value\",\"entry.source\":\"manual-json\"}",
+            MetadataJson = /*lang=json,strict*/ "{\"entry.future.key\":\"entry-future-value\",\"entry.source\":\"manual-json\"}",
             EnvelopeId = "envelope-future-metadata",
             EnvelopeSchemaVersion = "1.0.0",
             EnvelopeEventType = GovernanceEmissionEventType.AuditLifecycle,
@@ -146,13 +146,13 @@ public sealed class EfCoreGovernanceOutboxJsonMetadataTests
             EnvelopeAuditResidueId = "audit-future-metadata",
             EnvelopeLifecycleStage = AuditResidueLifecycleStage.ExternalEmissionQueued,
             EnvelopeLifecycleStageSequence = (int)AuditResidueLifecycleStage.ExternalEmissionQueued,
-            EnvelopeMetadataJson = "{\"envelope.future.key\":\"envelope-future-value\",\"envelope.source\":\"manual-json\"}",
+            EnvelopeMetadataJson = /*lang=json,strict*/ "{\"envelope.future.key\":\"envelope-future-value\",\"envelope.source\":\"manual-json\"}",
             EnvelopePayloadType = "audit-residue",
             EnvelopePayloadSchemaVersion = "1.0.0",
             EnvelopePayloadContentType = "application/json",
             EnvelopePayloadContentHash = "future-payload-hash",
             EnvelopePayloadSizeBytes = 128,
-            EnvelopePayloadMetadataJson = "{\"payload.future.key\":\"payload-future-value\",\"payload.source\":\"manual-json\"}"
+            EnvelopePayloadMetadataJson = /*lang=json,strict*/ "{\"payload.future.key\":\"payload-future-value\",\"payload.source\":\"manual-json\"}"
         });
         _ = await context.SaveChangesAsync(TestContext.Current.CancellationToken);
         context.ChangeTracker.Clear();
@@ -162,12 +162,12 @@ public sealed class EfCoreGovernanceOutboxJsonMetadataTests
             TestContext.Current.CancellationToken);
 
         Assert.NotNull(persisted);
-        Assert.Equal("entry-future-value", persisted!.Metadata["entry.future.key"]);
+        Assert.Equal("entry-future-value", persisted.Metadata["entry.future.key"]);
         Assert.Equal("manual-json", persisted.Metadata["entry.source"]);
         Assert.Equal("envelope-future-value", persisted.Envelope.Metadata["envelope.future.key"]);
         Assert.Equal("manual-json", persisted.Envelope.Metadata["envelope.source"]);
         Assert.NotNull(persisted.Envelope.Payload);
-        Assert.Equal("payload-future-value", persisted.Envelope.Payload!.Metadata["payload.future.key"]);
+        Assert.Equal("payload-future-value", persisted.Envelope.Payload.Metadata["payload.future.key"]);
         Assert.Equal("manual-json", persisted.Envelope.Payload.Metadata["payload.source"]);
     }
 

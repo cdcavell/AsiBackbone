@@ -254,7 +254,7 @@ public class OperationResult
             return CreateFallbackReason(fallbackCode, fallbackMessage);
         }
 
-        if (reasons.TryGetNonEnumeratedCount(out int count))
+        if (TryGetReasonCount(reasons, out int count))
         {
             if (count == 0)
             {
@@ -303,6 +303,22 @@ public class OperationResult
         return normalizedList is null || normalizedList.Count == 0
             ? CreateFallbackReason(fallbackCode, fallbackMessage)
             : Array.AsReadOnly([.. normalizedList]);
+    }
+
+    private static bool TryGetReasonCount(IEnumerable<OperationReason> reasons, out int count)
+    {
+        if (reasons.TryGetNonEnumeratedCount(out count))
+        {
+            return true;
+        }
+
+        if (reasons is IReadOnlyCollection<OperationReason> readOnlyCollection)
+        {
+            count = readOnlyCollection.Count;
+            return true;
+        }
+
+        return false;
     }
 
     private static ReadOnlyCollection<OperationReason> CreateFallbackReason(

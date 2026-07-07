@@ -13,6 +13,19 @@ namespace AsiBackbone.Core.Tests.Evaluation;
 /// </summary>
 public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
 {
+    /// <summary>
+    /// Gets critical exception instances used to verify passthrough behavior.
+    /// </summary>
+    public static TheoryData<Exception> CriticalRuntimeExceptions => new()
+    {
+        new OutOfMemoryException("Critical host/runtime failures should not be converted to denials."),
+        new StackOverflowException("Catchable stack overflow exception instances should not be converted to denials."),
+        new AccessViolationException("Critical access violation failures should not be converted to denials."),
+        new AppDomainUnloadedException("AppDomain unload failures should not be converted to denials."),
+        new BadImageFormatException("Bad image format failures should not be converted to denials."),
+        new InvalidProgramException("Invalid program failures should not be converted to denials.")
+    };
+
     [Fact]
     public async Task ConstraintExceptionAsDenialStillConvertsNormalConstraintException()
     {
@@ -34,10 +47,32 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
     }
 
     [Fact]
-    public async Task ConstraintExceptionAsDenialPropagatesCriticalRuntimeException()
+    public async Task ConstraintExceptionAsDenialStillConvertsWrappedNonCriticalConstraintException()
     {
         TestPolicyContext context = CreateContext();
-        var expectedException = new OutOfMemoryException("Critical host/runtime failures should not be converted to denials.");
+        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+            [new ThrowingConstraint(new InvalidOperationException(
+                "ordinary wrapper failure",
+                new TimeoutException("ordinary inner failure")))],
+            decisionPolicy: null,
+            options: new AsiBackbonePolicyEvaluatorOptions
+            {
+                TreatConstraintExceptionAsDenial = true
+            });
+
+        GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
+
+        Assert.True(decision.IsDenied);
+        Assert.Equal(
+            AsiBackbonePolicyEvaluatorOptions.DefaultConstraintExceptionReasonCode,
+            Assert.Single(decision.ReasonCodes));
+    }
+
+    [Theory]
+    [MemberData(nameof(CriticalRuntimeExceptions))]
+    public async Task ConstraintExceptionAsDenialPropagatesCriticalRuntimeExceptions(Exception expectedException)
+    {
+        TestPolicyContext context = CreateContext();
         var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
             [new ThrowingConstraint(expectedException)],
             decisionPolicy: null,
@@ -46,7 +81,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
                 TreatConstraintExceptionAsDenial = true
             });
 
-        OutOfMemoryException exception = await Assert.ThrowsAsync<OutOfMemoryException>(async () =>
+        Exception? exception = await Record.ExceptionAsync(async () =>
             await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken));
 
         Assert.Same(expectedException, exception);
@@ -90,15 +125,48 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
     }
 
     [Fact]
-    public async Task ThreatContributorExceptionAsDenialPropagatesCriticalRuntimeException()
+    public async Task ThreatContributorExceptionAsDenialStillConvertsWrappedNonCriticalContributorException()
     {
         TestPolicyContext context = CreateContext();
-        var expectedException = new AccessViolationException("Critical threat contributor failure should not be converted to denial.");
+        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+            [new StaticConstraint(ConstraintEvaluationResult.Allow())],
+            [new ThrowingThreatContributor(new InvalidOperationException(
+                "ordinary wrapper failure",
+                new TimeoutException("ordinary inner failure")))]);
+
+        GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
+
+        Assert.True(decision.IsDenied);
+        Assert.Equal(
+            AsiBackbonePolicyEvaluatorOptions.DefaultThreatContributorExceptionReasonCode,
+            Assert.Single(decision.ReasonCodes));
+    }
+
+    [Theory]
+    [MemberData(nameof(CriticalRuntimeExceptions))]
+    public async Task ThreatContributorExceptionAsDenialPropagatesCriticalRuntimeExceptions(Exception expectedException)
+    {
+        TestPolicyContext context = CreateContext();
         var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
             [new StaticConstraint(ConstraintEvaluationResult.Allow())],
             [new ThrowingThreatContributor(expectedException)]);
 
-        AccessViolationException exception = await Assert.ThrowsAsync<AccessViolationException>(async () =>
+        Exception? exception = await Record.ExceptionAsync(async () =>
+            await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken));
+
+        Assert.Same(expectedException, exception);
+    }
+
+    [Fact]
+    public async Task ThreatContributorExceptionAsDenialStillPropagatesOperationCanceledException()
+    {
+        TestPolicyContext context = CreateContext();
+        var expectedException = new OperationCanceledException("Threat contributor cancellation should not be converted to denial.");
+        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+            [new StaticConstraint(ConstraintEvaluationResult.Allow())],
+            [new ThrowingThreatContributor(expectedException)]);
+
+        OperationCanceledException exception = await Assert.ThrowsAsync<OperationCanceledException>(async () =>
             await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken));
 
         Assert.Same(expectedException, exception);

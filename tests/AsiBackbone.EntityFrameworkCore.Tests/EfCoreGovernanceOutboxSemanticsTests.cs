@@ -30,7 +30,7 @@ public sealed class EfCoreGovernanceOutboxSemanticsTests
 
         Assert.NotNull(entityType);
 
-        Microsoft.EntityFrameworkCore.Metadata.IIndex outboxEntryIdIndex = Assert.Single(entityType.GetIndexes().Where(index =>
+        Microsoft.EntityFrameworkCore.Metadata.IIndex outboxEntryIdIndex = Assert.Single(entityType!.GetIndexes().Where(index =>
             index.Properties.Count == 1 &&
             index.Properties[0].Name == nameof(AsiBackboneGovernanceOutboxEntryEntity.OutboxEntryId)));
 
@@ -75,7 +75,7 @@ public sealed class EfCoreGovernanceOutboxSemanticsTests
 
         Assert.Equal(1, persistedRowCount);
         Assert.NotNull(persisted);
-        Assert.Equal(outboxEntryId, persisted.OutboxEntryId);
+        Assert.Equal(outboxEntryId, persisted!.OutboxEntryId);
         Assert.Equal(GovernanceEmissionStatus.Delivered, persisted.Status);
         Assert.Equal("test-provider", persisted.ProviderName);
         Assert.Equal("provider-record-001", persisted.ProviderRecordId);

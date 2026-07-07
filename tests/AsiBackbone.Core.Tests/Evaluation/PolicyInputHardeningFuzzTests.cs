@@ -2,7 +2,6 @@ using System.Globalization;
 using AsiBackbone.Core.Constraints;
 using AsiBackbone.Core.Decisions;
 using AsiBackbone.Core.Evaluation;
-using AsiBackbone.Core.Results;
 using AsiBackbone.Core.ThreatModeling;
 using Xunit;
 
@@ -43,24 +42,24 @@ public sealed class PolicyInputHardeningFuzzTests
     }
 
     [Theory]
-    [InlineData("empty-intent", " ", "approve-safe-operation", "input.intent.empty", "US-LA", "read", null, "{\"accepted\":true}", null)]
-    [InlineData("empty-request", "approve", " ", "input.request.empty", "US-LA", "read", null, "{\"accepted\":true}", null)]
-    [InlineData("null-request-value", "approve", NullRequestCase, "input.request.empty", "US-LA", "read", null, "{\"accepted\":true}", null)]
-    [InlineData("oversized-request-payload", "approve", OversizedRequestCase, "input.request.oversized", "US-LA", "read", null, "{\"accepted\":true}", null)]
-    [InlineData("deeply-nested-metadata", "approve", "safe", "input.metadata.too_deep", "US-LA", "read", null, "{\"accepted\":true}", "deep-metadata")]
-    [InlineData("control-character-payload", "approve", ControlCharacterRequestCase, "input.control_character", "US-LA", "read", null, "{\"accepted\":true}", null)]
-    [InlineData("unicode-confusable-capability", "approve", "safe", "input.unicode_confusable", "US-LA", "admіn", null, "{\"accepted\":true}", null)]
-    [InlineData("duplicate-conflicting-metadata-keys", "approve", "safe", "input.metadata.conflicting_keys", "US-LA", "read", null, "{\"accepted\":true}", "conflicting-keys")]
-    [InlineData("invalid-region-code", "approve", "safe", "input.region.invalid", "moon-base-1", "read", null, "{\"accepted\":true}", null)]
-    [InlineData("unknown-capability", "approve", "safe", "input.capability.unknown", "US-LA", "global-root", null, "{\"accepted\":true}", null)]
-    [InlineData("malformed-capability-token", "approve", "safe", "input.capability_token.malformed", "US-LA", "read", "malformed", "{\"accepted\":true}", null)]
-    [InlineData("expired-capability-token", "approve", "safe", "input.capability_token.expired", "US-LA", "read", "expired", "{\"accepted\":true}", null)]
-    [InlineData("capability-token-mismatch", "approve", "safe", "input.capability_token.mismatch", "US-LA", "write", "mismatch", "{\"accepted\":true}", null)]
+    [InlineData("empty-intent", " ", "approve-safe-operation", "input.intent.empty", "US-LA", "read", null, /*lang=json,strict*/ "{\"accepted\":true}", null)]
+    [InlineData("empty-request", "approve", " ", "input.request.empty", "US-LA", "read", null, /*lang=json,strict*/ "{\"accepted\":true}", null)]
+    [InlineData("null-request-value", "approve", NullRequestCase, "input.request.empty", "US-LA", "read", null, /*lang=json,strict*/ "{\"accepted\":true}", null)]
+    [InlineData("oversized-request-payload", "approve", OversizedRequestCase, "input.request.oversized", "US-LA", "read", null, /*lang=json,strict*/ "{\"accepted\":true}", null)]
+    [InlineData("deeply-nested-metadata", "approve", "safe", "input.metadata.too_deep", "US-LA", "read", null, /*lang=json,strict*/ "{\"accepted\":true}", "deep-metadata")]
+    [InlineData("control-character-payload", "approve", ControlCharacterRequestCase, "input.control_character", "US-LA", "read", null, /*lang=json,strict*/ "{\"accepted\":true}", null)]
+    [InlineData("unicode-confusable-capability", "approve", "safe", "input.unicode_confusable", "US-LA", "admіn", null, /*lang=json,strict*/ "{\"accepted\":true}", null)]
+    [InlineData("duplicate-conflicting-metadata-keys", "approve", "safe", "input.metadata.conflicting_keys", "US-LA", "read", null, /*lang=json,strict*/ "{\"accepted\":true}", "conflicting-keys")]
+    [InlineData("invalid-region-code", "approve", "safe", "input.region.invalid", "moon-base-1", "read", null, /*lang=json,strict*/ "{\"accepted\":true}", null)]
+    [InlineData("unknown-capability", "approve", "safe", "input.capability.unknown", "US-LA", "global-root", null, /*lang=json,strict*/ "{\"accepted\":true}", null)]
+    [InlineData("malformed-capability-token", "approve", "safe", "input.capability_token.malformed", "US-LA", "read", "malformed", /*lang=json,strict*/ "{\"accepted\":true}", null)]
+    [InlineData("expired-capability-token", "approve", "safe", "input.capability_token.expired", "US-LA", "read", "expired", /*lang=json,strict*/ "{\"accepted\":true}", null)]
+    [InlineData("capability-token-mismatch", "approve", "safe", "input.capability_token.mismatch", "US-LA", "write", "mismatch", /*lang=json,strict*/ "{\"accepted\":true}", null)]
     [InlineData("malformed-acknowledgment-payload", "approve", "safe", "input.acknowledgment.malformed", "US-LA", "read", null, "{not-json", null)]
-    [InlineData("unexpected-enum-value", "approve", "safe", "input.enum.unexpected", "US-LA", "read", null, "{\"accepted\":true}", "unexpected-enum")]
-    [InlineData("path-traversal-string", "approve", "../../etc/passwd", "input.path_traversal", "US-LA", "read", null, "{\"accepted\":true}", null)]
-    [InlineData("command-like-string", "approve", "powershell -EncodedCommand ZQB2AGkAbAA=", "input.command_like", "US-LA", "read", null, "{\"accepted\":true}", null)]
-    [InlineData("url-script-looking-string", "approve", "<script src=https://example.invalid/payload.js></script>", "input.script_like", "US-LA", "read", null, "{\"accepted\":true}", null)]
+    [InlineData("unexpected-enum-value", "approve", "safe", "input.enum.unexpected", "US-LA", "read", null, /*lang=json,strict*/ "{\"accepted\":true}", "unexpected-enum")]
+    [InlineData("path-traversal-string", "approve", "../../etc/passwd", "input.path_traversal", "US-LA", "read", null, /*lang=json,strict*/ "{\"accepted\":true}", null)]
+    [InlineData("command-like-string", "approve", "powershell -EncodedCommand ZQB2AGkAbAA=", "input.command_like", "US-LA", "read", null, /*lang=json,strict*/ "{\"accepted\":true}", null)]
+    [InlineData("url-script-looking-string", "approve", "<script src=https://example.invalid/payload.js></script>", "input.script_like", "US-LA", "read", null, /*lang=json,strict*/ "{\"accepted\":true}", null)]
     public async Task GeneratedMalformedPolicyInputsNeverProduceAllow(
         string scenario,
         string? intent,
@@ -348,22 +347,13 @@ public sealed class PolicyInputHardeningFuzzTests
             }
 
             string[] parts = token.Split(':', 3, StringSplitOptions.None);
-            if (parts.Length != 3 || !string.Equals(parts[0], "cap", StringComparison.Ordinal))
-            {
-                return Deny("input.capability_token.malformed", "Capability token is malformed.", ThreatCategories.CapabilityTokenMismatch, scenario, "capability.token");
-            }
-
-            if (!string.Equals(parts[1], expectedCapability, StringComparison.Ordinal))
-            {
-                return Deny("input.capability_token.mismatch", "Capability token scope does not match the requested capability.", ThreatCategories.CapabilityTokenMismatch, scenario, "capability.token");
-            }
-
-            if (!DateTimeOffset.TryParse(parts[2], CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out DateTimeOffset expiresAt))
-            {
-                return Deny("input.capability_token.malformed", "Capability token expiry is malformed.", ThreatCategories.CapabilityTokenMismatch, scenario, "capability.token");
-            }
-
-            return expiresAt <= DateTimeOffset.UtcNow
+            return parts.Length != 3 || !string.Equals(parts[0], "cap", StringComparison.Ordinal)
+                ? Deny("input.capability_token.malformed", "Capability token is malformed.", ThreatCategories.CapabilityTokenMismatch, scenario, "capability.token")
+                : !string.Equals(parts[1], expectedCapability, StringComparison.Ordinal)
+                ? Deny("input.capability_token.mismatch", "Capability token scope does not match the requested capability.", ThreatCategories.CapabilityTokenMismatch, scenario, "capability.token")
+                : !DateTimeOffset.TryParse(parts[2], CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out DateTimeOffset expiresAt)
+                ? Deny("input.capability_token.malformed", "Capability token expiry is malformed.", ThreatCategories.CapabilityTokenMismatch, scenario, "capability.token")
+                : expiresAt <= DateTimeOffset.UtcNow
                 ? Deny("input.capability_token.expired", "Capability token is expired.", ThreatCategories.CapabilityTokenMismatch, scenario, "capability.token")
                 : null;
         }

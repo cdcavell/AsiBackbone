@@ -116,9 +116,9 @@ public class AsiBackboneHotPathBenchmarks
     }
 
     [Benchmark(Description = "decision.allow_no_reasons")]
-    public int DecisionAllowNoReasons()
+    public static int DecisionAllowNoReasons()
     {
-        GovernanceDecision decision = GovernanceDecision.Allow(
+        var decision = GovernanceDecision.Allow(
             correlationId: "benchmark-correlation",
             traceId: "benchmark-trace",
             policyVersion: "benchmark-policy-v1",
@@ -130,7 +130,7 @@ public class AsiBackboneHotPathBenchmarks
     [Benchmark(Description = "decision.deny_one_reason")]
     public int DecisionDenyOneReason()
     {
-        GovernanceDecision decision = GovernanceDecision.Deny(
+        var decision = GovernanceDecision.Deny(
             operationReasonOne,
             correlationId: "benchmark-correlation",
             traceId: "benchmark-trace",
@@ -143,7 +143,7 @@ public class AsiBackboneHotPathBenchmarks
     [Benchmark(Description = "decision.deny_multiple_reasons")]
     public int DecisionDenyMultipleReasons()
     {
-        GovernanceDecision decision = GovernanceDecision.Deny(
+        var decision = GovernanceDecision.Deny(
             operationReasonsMany,
             correlationId: "benchmark-correlation",
             traceId: "benchmark-trace",
@@ -154,9 +154,9 @@ public class AsiBackboneHotPathBenchmarks
     }
 
     [Benchmark(Description = "decision.escalate_one_reason")]
-    public int DecisionEscalateOneReason()
+    public static int DecisionEscalateOneReason()
     {
-        GovernanceDecision decision = GovernanceDecision.Escalate(
+        var decision = GovernanceDecision.Escalate(
             "decision.escalate",
             "The benchmark operation requires escalation.",
             correlationId: "benchmark-correlation",
@@ -168,23 +168,23 @@ public class AsiBackboneHotPathBenchmarks
     }
 
     [Benchmark(Description = "operation_result.success_no_reasons")]
-    public int OperationResultSuccessNoReasons()
+    public static int OperationResultSuccessNoReasons()
     {
-        OperationResult result = OperationResult.Success();
+        var result = OperationResult.Success();
         return Checksum(result);
     }
 
     [Benchmark(Description = "operation_result.failure_one_reason")]
     public int OperationResultFailureOneReason()
     {
-        OperationResult result = OperationResult.Failure(operationReasonOne);
+        var result = OperationResult.Failure(operationReasonOne);
         return Checksum(result);
     }
 
     [Benchmark(Description = "operation_result.failure_multiple_reasons")]
     public int OperationResultFailureMultipleReasons()
     {
-        OperationResult result = OperationResult.Failure(operationReasonsMany);
+        var result = OperationResult.Failure(operationReasonsMany);
         return Checksum(result);
     }
 

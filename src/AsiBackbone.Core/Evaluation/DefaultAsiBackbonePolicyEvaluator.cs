@@ -286,16 +286,13 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
         TContext context,
         IReadOnlyList<OperationReason> threatWarningReasons)
     {
-        if (threatWarningReasons.Count > 0)
-        {
-            return GovernanceDecision.Warning(
+        return threatWarningReasons.Count > 0
+            ? GovernanceDecision.Warning(
                 threatWarningReasons,
                 correlationId: context.CorrelationId,
                 policyVersion: context.PolicyVersion,
-                policyHash: context.PolicyHash);
-        }
-
-        return GovernanceDecision.Allow(
+                policyHash: context.PolicyHash)
+            : GovernanceDecision.Allow(
             correlationId: context.CorrelationId,
             policyVersion: context.PolicyVersion,
             policyHash: context.PolicyHash);
@@ -306,12 +303,9 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
         IReadOnlyList<OperationReason> threatWarningReasons,
         bool denyWhenNoConstraints)
     {
-        if (!denyWhenNoConstraints)
-        {
-            return CreateNoConstraintDecision(context, threatWarningReasons);
-        }
-
-        return GovernanceDecision.Deny(
+        return !denyWhenNoConstraints
+            ? CreateNoConstraintDecision(context, threatWarningReasons)
+            : GovernanceDecision.Deny(
             options.NoConstraintsReasonCode,
             options.NoConstraintsReasonMessage,
             correlationId: context.CorrelationId,
@@ -421,12 +415,9 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
             reasons.Add(assessment.ToOperationReason(GetContributorName(contributor), effectiveOutcome));
         }
 
-        if (reasons is null || selectedOutcome is null)
-        {
-            return ThreatEvaluationResult.Empty;
-        }
-
-        return CreateThreatEvaluationResult(context, selectedOutcome.Value, reasons.AsReadOnly());
+        return reasons is null || selectedOutcome is null
+            ? ThreatEvaluationResult.Empty
+            : CreateThreatEvaluationResult(context, selectedOutcome.Value, reasons.AsReadOnly());
     }
 
     private ThreatEvaluationResult CreateThreatContributorExceptionResult(
@@ -443,12 +434,12 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
             ["threat.failure"] = exception.GetType().Name
         };
 
-        OperationReason reason = OperationReason.Create(
+        var reason = OperationReason.Create(
             options.ThreatContributorExceptionReasonCode,
             options.ThreatContributorExceptionReasonMessage,
             metadata);
 
-        GovernanceDecision decision = GovernanceDecision.Deny(
+        var decision = GovernanceDecision.Deny(
             reason,
             correlationId: context.CorrelationId,
             policyVersion: context.PolicyVersion,
@@ -492,18 +483,16 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
                     policyVersion: context.PolicyVersion,
                     policyHash: context.PolicyHash)),
             GovernanceDecisionOutcome.Warning => ThreatEvaluationResult.ForWarningReasons(reasons),
+            GovernanceDecisionOutcome.Allowed => throw new NotImplementedException(),
             _ => ThreatEvaluationResult.Empty
         };
     }
 
     private static GovernanceDecisionOutcome GetEffectiveThreatOutcome(ThreatAssessment assessment)
     {
-        if (assessment.RecommendedOutcome is not GovernanceDecisionOutcome.Allowed)
-        {
-            return assessment.RecommendedOutcome;
-        }
-
-        return assessment.Severity >= ThreatSeverity.High
+        return assessment.RecommendedOutcome is not GovernanceDecisionOutcome.Allowed
+            ? assessment.RecommendedOutcome
+            : assessment.Severity >= ThreatSeverity.High
             ? GovernanceDecisionOutcome.EscalationRecommended
             : GovernanceDecisionOutcome.Warning;
     }
@@ -512,12 +501,9 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
         GovernanceDecisionOutcome? current,
         GovernanceDecisionOutcome candidate)
     {
-        if (current is null)
-        {
-            return candidate;
-        }
-
-        return GetThreatOutcomeRank(candidate) > GetThreatOutcomeRank(current.Value)
+        return current is null
+            ? candidate
+            : GetThreatOutcomeRank(candidate) > GetThreatOutcomeRank(current.Value)
             ? candidate
             : current.Value;
     }
@@ -531,6 +517,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
             GovernanceDecisionOutcome.AcknowledgmentRequired => 3,
             GovernanceDecisionOutcome.Deferred => 2,
             GovernanceDecisionOutcome.Warning => 1,
+            GovernanceDecisionOutcome.Allowed => throw new NotImplementedException(),
             _ => 0
         };
     }

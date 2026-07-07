@@ -48,6 +48,8 @@
   items:
     - name: Policy Evaluator Pipeline
       href: policy-evaluator-pipeline.md
+    - name: Threat Model Contributors
+      href: threat-model-contributors.md
     - name: Constraint Exception Policy
       href: constraint-exception-policy.md
     - name: Custom Decision Policy Examples

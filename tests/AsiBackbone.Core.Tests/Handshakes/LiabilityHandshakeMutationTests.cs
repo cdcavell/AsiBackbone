@@ -1,7 +1,6 @@
 using AsiBackbone.Core.Actors;
 using AsiBackbone.Core.Decisions;
 using AsiBackbone.Core.Handshakes;
-using AsiBackbone.Core.Results;
 using Xunit;
 
 namespace AsiBackbone.Core.Tests.Handshakes;

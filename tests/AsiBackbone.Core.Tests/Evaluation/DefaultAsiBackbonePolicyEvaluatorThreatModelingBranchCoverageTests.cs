@@ -1,7 +1,6 @@
 using AsiBackbone.Core.Constraints;
 using AsiBackbone.Core.Decisions;
 using AsiBackbone.Core.Evaluation;
-using AsiBackbone.Core.Results;
 using AsiBackbone.Core.ThreatModeling;
 using Xunit;
 
@@ -121,7 +120,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
     [Fact]
     public void ThreatAssessmentNoThreatCreatesNonActionableAllowedAssessment()
     {
-        ThreatAssessment assessment = ThreatAssessment.NoThreat();
+        var assessment = ThreatAssessment.NoThreat();
 
         Assert.False(assessment.IsActionable);
         Assert.Equal(ThreatSeverity.None, assessment.Severity);
@@ -132,7 +131,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
     [Fact]
     public void ThreatAssessmentRejectsBlankCategory()
     {
-        Assert.Throws<ArgumentException>(() => ThreatAssessment.Create(
+        _ = Assert.Throws<ArgumentException>(() => ThreatAssessment.Create(
             ThreatSeverity.Low,
             " ",
             "threat.blank_category",
@@ -143,7 +142,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
     [Fact]
     public void ThreatAssessmentRejectsBlankReasonCode()
     {
-        Assert.Throws<ArgumentException>(() => ThreatAssessment.Create(
+        _ = Assert.Throws<ArgumentException>(() => ThreatAssessment.Create(
             ThreatSeverity.Low,
             ThreatCategories.InputMalformed,
             " ",
@@ -154,7 +153,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
     [Fact]
     public void ThreatAssessmentRejectsBlankDescription()
     {
-        Assert.Throws<ArgumentException>(() => ThreatAssessment.Create(
+        _ = Assert.Throws<ArgumentException>(() => ThreatAssessment.Create(
             ThreatSeverity.Low,
             ThreatCategories.InputMalformed,
             "threat.blank_description",
@@ -165,7 +164,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
     [Fact]
     public void ThreatAssessmentRejectsNegativeConfidence()
     {
-        Assert.Throws<ArgumentOutOfRangeException>(() => ThreatAssessment.Create(
+        _ = Assert.Throws<ArgumentOutOfRangeException>(() => ThreatAssessment.Create(
             ThreatSeverity.Low,
             ThreatCategories.InputMalformed,
             "threat.negative_confidence",
@@ -177,14 +176,14 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
     [Fact]
     public void ThreatAssessmentOperationReasonOmitsContributorMetadataWhenNameIsBlank()
     {
-        ThreatAssessment assessment = ThreatAssessment.Create(
+        var assessment = ThreatAssessment.Create(
             ThreatSeverity.Low,
             ThreatCategories.InputMalformed,
             "threat.input_malformed",
             "Malformed input indicator was reported.",
             GovernanceDecisionOutcome.Warning);
 
-        OperationReason reason = assessment.ToOperationReason(" ");
+        var reason = assessment.ToOperationReason(" ");
 
         Assert.False(reason.Metadata.ContainsKey("threat.contributor"));
         Assert.Equal(ThreatCategories.InputMalformed, reason.Metadata["threat.category"]);
@@ -193,7 +192,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
     [Fact]
     public void ThreatAssessmentOperationReasonNormalizesNullMetadataValue()
     {
-        ThreatAssessment assessment = ThreatAssessment.Create(
+        var assessment = ThreatAssessment.Create(
             ThreatSeverity.Low,
             ThreatCategories.InputMalformed,
             "threat.null_metadata_value",
@@ -204,7 +203,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
                 ["nullable.value"] = null!
             });
 
-        OperationReason reason = assessment.ToOperationReason();
+        var reason = assessment.ToOperationReason();
 
         Assert.Equal(string.Empty, reason.Metadata["nullable.value"]);
     }

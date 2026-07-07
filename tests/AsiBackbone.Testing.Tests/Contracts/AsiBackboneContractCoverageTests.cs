@@ -153,15 +153,15 @@ public sealed class AsiBackboneContractCoverageTests
         _ = Assert.IsType<InvalidOperationException>(exception.InnerException);
     }
 
-    public static IEnumerable<object[]> SafeDecisions()
+    public static TheoryData<GovernanceDecision> SafeDecisions => new()
     {
-        yield return [GovernanceDecision.Allow("contract-correlation", policyVersion: "policy-v1", policyHash: "policy-hash")];
-        yield return [GovernanceDecision.Warning("contract.warning", "Warning reason.")];
-        yield return [GovernanceDecision.Deny("contract.denied", "Denied reason.")];
-        yield return [GovernanceDecision.Defer("contract.deferred", "Deferred reason.")];
-        yield return [GovernanceDecision.RequireAcknowledgment("contract.acknowledgment", "Acknowledgment reason.")];
-        yield return [GovernanceDecision.Escalate("contract.escalated", "Escalation reason.")];
-    }
+        GovernanceDecision.Allow("contract-correlation", policyVersion: "policy-v1", policyHash: "policy-hash"),
+        GovernanceDecision.Warning("contract.warning", "Warning reason."),
+        GovernanceDecision.Deny("contract.denied", "Denied reason."),
+        GovernanceDecision.Defer("contract.deferred", "Deferred reason."),
+        GovernanceDecision.RequireAcknowledgment("contract.acknowledgment", "Acknowledgment reason."),
+        GovernanceDecision.Escalate("contract.escalated", "Escalation reason.")
+    };
 
     private sealed class PolicyEvaluatorContract(
         IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext> evaluator)

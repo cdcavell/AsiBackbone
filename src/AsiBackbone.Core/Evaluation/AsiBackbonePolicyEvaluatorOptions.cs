@@ -54,7 +54,8 @@ public sealed class AsiBackbonePolicyEvaluatorOptions
     /// <remarks>
     /// The default value is <see langword="false" /> so constraint exceptions continue to propagate to the host. Set this
     /// to <see langword="true" /> when the host prefers fail-closed denied decisions with stable reason codes that can be
-    /// audited by downstream governance sinks.
+    /// audited by downstream governance sinks. Cancellation and critical host/runtime failures are not converted into policy
+    /// denials and continue to propagate.
     /// </remarks>
     public bool TreatConstraintExceptionAsDenial { get; set; }
 
@@ -64,7 +65,8 @@ public sealed class AsiBackbonePolicyEvaluatorOptions
     /// <remarks>
     /// The default value is <see langword="true" /> because threat-modeling extensions are expected to fail closed when
     /// they are explicitly registered. Set this to <see langword="false" /> only when the host intentionally wants contributor
-    /// exceptions to propagate instead of producing a stable denied decision.
+    /// exceptions to propagate instead of producing a stable denied decision. Cancellation and critical host/runtime failures
+    /// are not converted into policy denials and continue to propagate.
     /// </remarks>
     public bool TreatThreatContributorExceptionAsDenial { get; set; } = true;
 

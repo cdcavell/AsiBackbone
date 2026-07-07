@@ -231,7 +231,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
                 TreatThreatContributorExceptionAsDenial = false
             });
 
-        await Assert.ThrowsAsync<InvalidOperationException>(
+        _ = await Assert.ThrowsAsync<InvalidOperationException>(
             async () => await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken));
     }
 
@@ -336,7 +336,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
     [Fact]
     public void ThreatAssessmentRejectsOutOfRangeConfidence()
     {
-        Assert.Throws<ArgumentOutOfRangeException>(() => ThreatAssessment.Create(
+        _ = Assert.Throws<ArgumentOutOfRangeException>(() => ThreatAssessment.Create(
             ThreatSeverity.Low,
             ThreatCategories.InputMalformed,
             "threat.invalid_confidence",
@@ -348,7 +348,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
     [Fact]
     public void ThreatAssessmentOperationReasonMergesCustomMetadata()
     {
-        ThreatAssessment assessment = ThreatAssessment.Create(
+        var assessment = ThreatAssessment.Create(
             ThreatSeverity.Medium,
             ThreatCategories.ReplayAttempt,
             "threat.replay_attempt",
@@ -360,7 +360,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
                 [" request.id "] = " 123 "
             });
 
-        OperationReason reason = assessment.ToOperationReason(" replay-contributor ");
+        var reason = assessment.ToOperationReason(" replay-contributor ");
 
         Assert.Equal("123", reason.Metadata["request.id"]);
         Assert.Equal("replay-contributor", reason.Metadata["threat.contributor"]);

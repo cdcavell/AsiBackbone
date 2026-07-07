@@ -11,9 +11,11 @@ namespace AsiBackbone.Testing.Tests.Contracts;
 public sealed class AsiBackboneContractCoverageTests
 {
     [Theory]
-    [MemberData(nameof(SafeDecisions))]
-    public void VerifySafeDecisionAcceptsSupportedSafeDecisionShapes(GovernanceDecision decision)
+    [MemberData(nameof(SafeDecisionCases))]
+    public void VerifySafeDecisionAcceptsSupportedSafeDecisionShapes(SafeDecisionCase safeDecisionCase)
     {
+        GovernanceDecision decision = CreateSafeDecision(safeDecisionCase);
+
         GovernanceDecision verifiedDecision = AsiBackboneDecisionContract.VerifySafeDecision(decision, "coverage decision");
 
         Assert.Same(decision, verifiedDecision);
@@ -153,15 +155,61 @@ public sealed class AsiBackboneContractCoverageTests
         _ = Assert.IsType<InvalidOperationException>(exception.InnerException);
     }
 
-    public static TheoryData<GovernanceDecision> SafeDecisions => new()
+    public static TheoryData<SafeDecisionCase> SafeDecisionCases => new()
     {
-        GovernanceDecision.Allow("contract-correlation", policyVersion: "policy-v1", policyHash: "policy-hash"),
-        GovernanceDecision.Warning("contract.warning", "Warning reason."),
-        GovernanceDecision.Deny("contract.denied", "Denied reason."),
-        GovernanceDecision.Defer("contract.deferred", "Deferred reason."),
-        GovernanceDecision.RequireAcknowledgment("contract.acknowledgment", "Acknowledgment reason."),
-        GovernanceDecision.Escalate("contract.escalated", "Escalation reason.")
+        SafeDecisionCase.Allowed,
+        SafeDecisionCase.Warning,
+        SafeDecisionCase.Denied,
+        SafeDecisionCase.Deferred,
+        SafeDecisionCase.AcknowledgmentRequired,
+        SafeDecisionCase.EscalationRecommended
     };
+
+    private static GovernanceDecision CreateSafeDecision(SafeDecisionCase safeDecisionCase)
+    {
+        return safeDecisionCase switch
+        {
+            SafeDecisionCase.Allowed => GovernanceDecision.Allow(
+                "contract-correlation",
+                policyVersion: "policy-v1",
+                policyHash: "policy-hash"),
+
+            SafeDecisionCase.Warning => GovernanceDecision.Warning(
+                "contract.warning",
+                "Warning reason."),
+
+            SafeDecisionCase.Denied => GovernanceDecision.Deny(
+                "contract.denied",
+                "Denied reason."),
+
+            SafeDecisionCase.Deferred => GovernanceDecision.Defer(
+                "contract.deferred",
+                "Deferred reason."),
+
+            SafeDecisionCase.AcknowledgmentRequired => GovernanceDecision.RequireAcknowledgment(
+                "contract.acknowledgment",
+                "Acknowledgment reason."),
+
+            SafeDecisionCase.EscalationRecommended => GovernanceDecision.Escalate(
+                "contract.escalated",
+                "Escalation reason."),
+
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(safeDecisionCase),
+                safeDecisionCase,
+                "Unsupported safe decision case.")
+        };
+    }
+
+    public enum SafeDecisionCase
+    {
+        Allowed,
+        Warning,
+        Denied,
+        Deferred,
+        AcknowledgmentRequired,
+        EscalationRecommended
+    }
 
     private sealed class PolicyEvaluatorContract(
         IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext> evaluator)

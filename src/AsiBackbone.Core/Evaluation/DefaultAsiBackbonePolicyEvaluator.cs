@@ -278,7 +278,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
                AppDomainUnloadedException or
                BadImageFormatException or
                InvalidProgramException ||
-               exception.InnerException is not null && IsCriticalException(exception.InnerException);
+               (exception.InnerException is not null && IsCriticalException(exception.InnerException));
     }
 
     private static GovernanceDecision Compose(

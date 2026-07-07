@@ -24,7 +24,7 @@ public sealed class AsiBackboneContractFixtureTests
 
         Assert.True(decision.IsDenied);
         Assert.Equal("contract-correlation", decision.CorrelationId);
-        Assert.Equal("contract-policy-v1", decision.PolicyVersion);
+        Assert.Equal("test-harness", decision.PolicyVersion);
         Assert.Equal("contract-policy-hash", decision.PolicyHash);
         Assert.Contains("contract.policy_denied", decision.ReasonCodes);
     }

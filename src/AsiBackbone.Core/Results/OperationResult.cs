@@ -254,17 +254,17 @@ public class OperationResult
             return CreateFallbackReason(fallbackCode, fallbackMessage);
         }
 
-        if (reasons is ICollection<OperationReason> collection)
+        if (TryGetReasonCount(reasons, out int count))
         {
-            if (collection.Count == 0)
+            if (count == 0)
             {
                 return CreateFallbackReason(fallbackCode, fallbackMessage);
             }
 
-            var normalizedReasons = new OperationReason[collection.Count];
+            var normalizedReasons = new OperationReason[count];
             int normalizedCount = 0;
 
-            foreach (OperationReason? reason in collection)
+            foreach (OperationReason? reason in reasons)
             {
                 if (reason is not null)
                 {
@@ -303,6 +303,22 @@ public class OperationResult
         return normalizedList is null || normalizedList.Count == 0
             ? CreateFallbackReason(fallbackCode, fallbackMessage)
             : Array.AsReadOnly([.. normalizedList]);
+    }
+
+    private static bool TryGetReasonCount(IEnumerable<OperationReason> reasons, out int count)
+    {
+        if (reasons.TryGetNonEnumeratedCount(out count))
+        {
+            return true;
+        }
+
+        if (reasons is IReadOnlyCollection<OperationReason> readOnlyCollection)
+        {
+            count = readOnlyCollection.Count;
+            return true;
+        }
+
+        return false;
     }
 
     private static ReadOnlyCollection<OperationReason> CreateFallbackReason(

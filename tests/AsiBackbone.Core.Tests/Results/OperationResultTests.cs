@@ -1,3 +1,4 @@
+using System.Collections;
 using Xunit;
 
 namespace AsiBackbone.Core.Tests.Results;
@@ -292,6 +293,40 @@ public sealed class OperationResultTests
         Assert.Equal("Operation failed.", reason.Message);
     }
 
+    /// <summary>
+    /// Verifies that IReadOnlyCollection inputs use non-enumerated count discovery before normalization.
+    /// </summary>
+    [Fact]
+    public void Failure_WithReadOnlyCollectionReasons_UsesNonEnumeratedCountAndStoresReasonCodes()
+    {
+        var reasons = new CountingReadOnlyReasonCollection(
+            OperationReason.Create("policy.denied", "Policy denied the request."),
+            OperationReason.Create("constraint.failed", "Constraint failed."));
+
+        var result = OperationResult.Failure(reasons);
+
+        Assert.False(result.Succeeded);
+        Assert.Equal(1, reasons.CountAccessCount);
+        Assert.Equal(1, reasons.EnumerationCount);
+        Assert.Equal(["policy.denied", "constraint.failed"], result.ReasonCodes);
+    }
+
+    /// <summary>
+    /// Verifies that empty IReadOnlyCollection inputs can fall back without enumeration.
+    /// </summary>
+    [Fact]
+    public void Failure_WithEmptyReadOnlyCollectionReasons_UsesDefaultFailureReasonWithoutEnumeration()
+    {
+        var reasons = new ThrowingEmptyReadOnlyReasonCollection();
+
+        var result = OperationResult.Failure(reasons);
+
+        Assert.Equal(1, reasons.CountAccessCount);
+        OperationReason reason = Assert.Single(result.Reasons);
+        Assert.Equal("operation.failed", reason.Code);
+        Assert.Equal("Operation failed.", reason.Message);
+    }
+
     private static IEnumerable<OperationReason> EnumerateReasons(params OperationReason?[]? reasons)
     {
         if (reasons is null)
@@ -302,6 +337,61 @@ public sealed class OperationResultTests
         foreach (OperationReason? reason in reasons)
         {
             yield return reason!;
+        }
+    }
+
+    private sealed class CountingReadOnlyReasonCollection(params OperationReason?[] reasons) : IReadOnlyCollection<OperationReason>
+    {
+        public int CountAccessCount { get; private set; }
+
+        public int EnumerationCount { get; private set; }
+
+        public int Count
+        {
+            get
+            {
+                CountAccessCount++;
+                return reasons.Length;
+            }
+        }
+
+        public IEnumerator<OperationReason> GetEnumerator()
+        {
+            EnumerationCount++;
+
+            foreach (OperationReason? reason in reasons)
+            {
+                yield return reason!;
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+    }
+
+    private sealed class ThrowingEmptyReadOnlyReasonCollection : IReadOnlyCollection<OperationReason>
+    {
+        public int CountAccessCount { get; private set; }
+
+        public int Count
+        {
+            get
+            {
+                CountAccessCount++;
+                return 0;
+            }
+        }
+
+        public IEnumerator<OperationReason> GetEnumerator()
+        {
+            throw new InvalidOperationException("Empty read-only collection should not be enumerated after count discovery.");
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

@@ -189,7 +189,7 @@ public sealed class AuditResidueBuilderTests
     [Fact]
     public void BuilderDoesNotAllocateMetadataStorageWhenNoMetadataIsAdded()
     {
-        AuditResidueBuilder builder = AuditResidueBuilder.Create(
+        var builder = AuditResidueBuilder.Create(
             AsiBackboneActorContext.System,
             "system.sync",
             "Allowed");
@@ -206,7 +206,7 @@ public sealed class AuditResidueBuilderTests
     [Fact]
     public void AddMetadataInitializesStorageAndBuildsSingleEntry()
     {
-        AuditResidueBuilder builder = AuditResidueBuilder.Create(
+        var builder = AuditResidueBuilder.Create(
             AsiBackboneActorContext.System,
             "system.sync",
             "Allowed");
@@ -217,14 +217,14 @@ public sealed class AuditResidueBuilderTests
 
         Dictionary<string, string>? storage = GetMetadataStorage(builder);
         Assert.NotNull(storage);
-        Assert.Single(storage);
+        _ = Assert.Single(storage);
         Assert.Equal("unit-test", residue.Metadata["source"]);
     }
 
     [Fact]
     public void WithMetadataInitializesStorageAndBuildsMultipleEntries()
     {
-        AuditResidueBuilder builder = AuditResidueBuilder.Create(
+        var builder = AuditResidueBuilder.Create(
             AsiBackboneActorContext.System,
             "system.sync",
             "Allowed");
@@ -256,7 +256,7 @@ public sealed class AuditResidueBuilderTests
             .AddMetadata("source", "updated")
             .Build();
 
-        Assert.Single(residue.Metadata);
+        _ = Assert.Single(residue.Metadata);
         Assert.Equal("updated", residue.Metadata["source"]);
     }
 

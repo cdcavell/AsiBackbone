@@ -65,6 +65,7 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 * [Core Governance Flow Diagrams](articles/core-governance-flow-diagrams.md)
 * [Core Domain Language](articles/core-domain-language.md)
 * [Policy Evaluator Pipeline](articles/policy-evaluator-pipeline.md)
+* [Threat Model Contributors](articles/threat-model-contributors.md)
 * [Custom Decision Policy Examples](articles/custom-decision-policy-examples.md)
 * [Host-Owned Execution Enforcement](articles/host-owned-execution-enforcement.md)
 * [Dynamic Liability Handshake](articles/dynamic-liability-handshake.md)

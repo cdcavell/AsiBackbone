@@ -172,7 +172,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
                 LogEmptyPolicyAllowed(context);
             }
 
-            GovernanceDecision noConstraintDecision = CreateNoConstraintDecision(context, threatEvaluation.WarningReasons);
+            GovernanceDecision noConstraintDecision = CreateNoConstraintDecision(
+                context,
+                threatEvaluation.WarningReasons,
+                options.DenyWhenNoConstraints);
 
             return await ApplyDecisionPolicyAsync(
                 context,

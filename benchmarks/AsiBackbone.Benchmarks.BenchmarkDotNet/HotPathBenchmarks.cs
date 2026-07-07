@@ -8,6 +8,7 @@ using AsiBackbone.Core.Decisions;
 using AsiBackbone.Core.Emissions;
 using AsiBackbone.Core.Evaluation;
 using AsiBackbone.Core.Outbox;
+using AsiBackbone.Core.Results;
 using BenchmarkDotNet.Attributes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,6 +30,30 @@ public class AsiBackboneHotPathBenchmarks
     private readonly BdnBenchmarkPolicyContext firstDenialContext = CreateContext("policy.first_denial_short_circuit");
     private readonly BdnBenchmarkPolicyContext acknowledgmentContext = CreateContext("policy.acknowledgment_required");
     private readonly BdnBenchmarkPolicyContext escalationContext = CreateContext("policy.escalation_recommended");
+    private readonly BdnBenchmarkPolicyContext exceptionAsDenialContext = CreateContext("policy.constraint_exception_as_denial");
+
+    private readonly OperationReason operationReasonOne = OperationReason.Create(
+        "operation.denied",
+        "The benchmark operation was denied.");
+
+    private readonly OperationReason[] operationReasonsMany =
+    [
+        OperationReason.Create("operation.first_denied", "The first benchmark operation reason denied execution."),
+        OperationReason.Create("operation.second_denied", "The second benchmark operation reason denied execution."),
+        OperationReason.Create("operation.third_denied", "The third benchmark operation reason denied execution.")
+    ];
+
+    private readonly IReadOnlyDictionary<string, string> auditBuilderMetadataOne = new Dictionary<string, string>(StringComparer.Ordinal)
+    {
+        ["benchmark"] = "audit_residue.builder_one_metadata"
+    };
+
+    private readonly IReadOnlyDictionary<string, string> auditBuilderMetadataMany = new Dictionary<string, string>(StringComparer.Ordinal)
+    {
+        ["benchmark"] = "audit_residue.builder_many_metadata",
+        ["risk"] = "routine",
+        ["policy.scope"] = "benchmark"
+    };
 
     private readonly IAsiBackbonePolicyEvaluator<BdnBenchmarkPolicyContext> zeroConstraintsEvaluator =
         new DefaultAsiBackbonePolicyEvaluator<BdnBenchmarkPolicyContext>([]);
@@ -54,6 +79,12 @@ public class AsiBackboneHotPathBenchmarks
         new DefaultAsiBackbonePolicyEvaluator<BdnBenchmarkPolicyContext>(
             CreateStaticConstraints(4, ConstraintEvaluationResult.Allow()),
             new BdnEscalatePolicy());
+
+    private readonly IAsiBackbonePolicyEvaluator<BdnBenchmarkPolicyContext> exceptionAsDenialEvaluator =
+        new DefaultAsiBackbonePolicyEvaluator<BdnBenchmarkPolicyContext>(
+            [new BdnThrowingConstraint(new InvalidOperationException("Benchmark constraint failure."))],
+            decisionPolicy: null,
+            options: new AsiBackbonePolicyEvaluatorOptions { TreatConstraintExceptionAsDenial = true });
 
     private readonly EndpointGovernanceHarness endpointAllow = new("endpoint_governance.policy_allow", EndpointDecisionKind.Allow);
     private readonly EndpointGovernanceHarness endpointWarning = new("endpoint_governance.policy_warning", EndpointDecisionKind.Warning);
@@ -82,6 +113,79 @@ public class AsiBackboneHotPathBenchmarks
         endpointWarning.Dispose();
         endpointDeny.Dispose();
         scopedOutbox100.Dispose();
+    }
+
+    [Benchmark(Description = "decision.allow_no_reasons")]
+    public int DecisionAllowNoReasons()
+    {
+        GovernanceDecision decision = GovernanceDecision.Allow(
+            correlationId: "benchmark-correlation",
+            traceId: "benchmark-trace",
+            policyVersion: "benchmark-policy-v1",
+            policyHash: "benchmark-policy-hash");
+
+        return Checksum(decision);
+    }
+
+    [Benchmark(Description = "decision.deny_one_reason")]
+    public int DecisionDenyOneReason()
+    {
+        GovernanceDecision decision = GovernanceDecision.Deny(
+            operationReasonOne,
+            correlationId: "benchmark-correlation",
+            traceId: "benchmark-trace",
+            policyVersion: "benchmark-policy-v1",
+            policyHash: "benchmark-policy-hash");
+
+        return Checksum(decision);
+    }
+
+    [Benchmark(Description = "decision.deny_multiple_reasons")]
+    public int DecisionDenyMultipleReasons()
+    {
+        GovernanceDecision decision = GovernanceDecision.Deny(
+            operationReasonsMany,
+            correlationId: "benchmark-correlation",
+            traceId: "benchmark-trace",
+            policyVersion: "benchmark-policy-v1",
+            policyHash: "benchmark-policy-hash");
+
+        return Checksum(decision);
+    }
+
+    [Benchmark(Description = "decision.escalate_one_reason")]
+    public int DecisionEscalateOneReason()
+    {
+        GovernanceDecision decision = GovernanceDecision.Escalate(
+            "decision.escalate",
+            "The benchmark operation requires escalation.",
+            correlationId: "benchmark-correlation",
+            traceId: "benchmark-trace",
+            policyVersion: "benchmark-policy-v1",
+            policyHash: "benchmark-policy-hash");
+
+        return Checksum(decision);
+    }
+
+    [Benchmark(Description = "operation_result.success_no_reasons")]
+    public int OperationResultSuccessNoReasons()
+    {
+        OperationResult result = OperationResult.Success();
+        return Checksum(result);
+    }
+
+    [Benchmark(Description = "operation_result.failure_one_reason")]
+    public int OperationResultFailureOneReason()
+    {
+        OperationResult result = OperationResult.Failure(operationReasonOne);
+        return Checksum(result);
+    }
+
+    [Benchmark(Description = "operation_result.failure_multiple_reasons")]
+    public int OperationResultFailureMultipleReasons()
+    {
+        OperationResult result = OperationResult.Failure(operationReasonsMany);
+        return Checksum(result);
     }
 
     [Benchmark(Description = "policy.zero_constraints")]
@@ -123,6 +227,13 @@ public class AsiBackboneHotPathBenchmarks
     public int PolicyEscalationRecommended()
     {
         GovernanceDecision decision = escalationEvaluator.EvaluateAsync(escalationContext).GetAwaiter().GetResult();
+        return Checksum(decision);
+    }
+
+    [Benchmark(Description = "policy.constraint_exception_as_denial")]
+    public int PolicyConstraintExceptionAsDenial()
+    {
+        GovernanceDecision decision = exceptionAsDenialEvaluator.EvaluateAsync(exceptionAsDenialContext).GetAwaiter().GetResult();
         return Checksum(decision);
     }
 
@@ -169,10 +280,61 @@ public class AsiBackboneHotPathBenchmarks
             emitterStatus: "queued",
             emitterProvider: "local");
 
-        return residue.ReasonCodes.Count ^ residue.Metadata.Count;
+        return Checksum(residue);
+    }
+
+    [Benchmark(Description = "audit_residue.builder_no_metadata")]
+    public int AuditResidueBuilderNoMetadata()
+    {
+        AuditResidue residue = AuditResidueBuilder.Create(actor, "benchmark.operation", "Allowed")
+            .WithEventId("benchmark-builder-no-metadata")
+            .WithOccurredUtc(BenchmarkDrainUtc)
+            .WithCorrelationId("benchmark-correlation")
+            .WithTraceId("benchmark-trace")
+            .WithPolicyVersion("benchmark-policy-v1")
+            .WithPolicyHash("benchmark-policy-hash")
+            .Build();
+
+        return Checksum(residue);
+    }
+
+    [Benchmark(Description = "audit_residue.builder_one_metadata")]
+    public int AuditResidueBuilderOneMetadata()
+    {
+        AuditResidue residue = AuditResidueBuilder.Create(actor, "benchmark.operation", "Allowed")
+            .WithEventId("benchmark-builder-one-metadata")
+            .WithOccurredUtc(BenchmarkDrainUtc)
+            .WithCorrelationId("benchmark-correlation")
+            .WithTraceId("benchmark-trace")
+            .WithPolicyVersion("benchmark-policy-v1")
+            .WithPolicyHash("benchmark-policy-hash")
+            .WithMetadata(auditBuilderMetadataOne)
+            .Build();
+
+        return Checksum(residue);
+    }
+
+    [Benchmark(Description = "audit_residue.builder_many_metadata")]
+    public int AuditResidueBuilderManyMetadata()
+    {
+        AuditResidue residue = AuditResidueBuilder.Create(actor, "benchmark.operation", "Allowed")
+            .WithEventId("benchmark-builder-many-metadata")
+            .WithOccurredUtc(BenchmarkDrainUtc)
+            .WithCorrelationId("benchmark-correlation")
+            .WithTraceId("benchmark-trace")
+            .WithPolicyVersion("benchmark-policy-v1")
+            .WithPolicyHash("benchmark-policy-hash")
+            .WithMetadata(auditBuilderMetadataMany)
+            .Build();
+
+        return Checksum(residue);
     }
 
     private static int Checksum(GovernanceDecision decision) => ((int)decision.Outcome * 397) ^ decision.ReasonCodes.Count;
+
+    private static int Checksum(OperationResult result) => (result.Succeeded ? 17 : 31) ^ result.ReasonCodes.Count ^ result.Warnings.Count;
+
+    private static int Checksum(AuditResidue residue) => residue.ReasonCodes.Count ^ residue.Metadata.Count ^ residue.EventId.Length;
 
     private static BdnBenchmarkPolicyContext CreateContext(string scenarioName)
     {
@@ -423,6 +585,17 @@ public class AsiBackboneHotPathBenchmarks
         {
             cancellationToken.ThrowIfCancellationRequested();
             return ValueTask.FromResult(result);
+        }
+    }
+
+    private sealed class BdnThrowingConstraint(Exception exception) : IAsiBackboneConstraint<BdnBenchmarkPolicyContext>
+    {
+        public string Name => "throwing-benchmark-constraint";
+
+        public ValueTask<ConstraintEvaluationResult> EvaluateAsync(BdnBenchmarkPolicyContext context, CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            throw exception;
         }
     }
 

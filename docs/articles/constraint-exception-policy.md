@@ -26,7 +26,7 @@ var evaluator = new DefaultAsiBackbonePolicyEvaluator<MyPolicyContext>(
     });
 ```
 
-When enabled, a non-cancellation exception thrown by a constraint becomes a denied `GovernanceDecision` with reason code:
+When enabled, an expected non-cancellation, non-critical exception thrown by a constraint becomes a denied `GovernanceDecision` with reason code:
 
 ```text
 asibackbone.policy.constraint_exception
@@ -39,6 +39,24 @@ The generated denial preserves:
 - `PolicyHash`
 
 If a decision policy is configured, the generated denied decision is passed through that policy with a synthetic denied `ConstraintEvaluationResult` so downstream policy code can still observe a denial path.
+
+## Critical host/runtime failures still propagate
+
+`TreatConstraintExceptionAsDenial` is for expected policy/constraint failures. It is not a host corruption, runtime-failure, or infrastructure-failure suppression switch.
+
+The evaluator does **not** convert cancellation or critical host/runtime failures into ordinary denied governance decisions. Those exceptions continue to propagate to the host error boundary.
+
+The critical exception filter currently includes:
+
+- `OutOfMemoryException`
+- `StackOverflowException` where catchable by the runtime
+- `AccessViolationException`
+- `AppDomainUnloadedException`
+- `BadImageFormatException`
+- `InvalidProgramException`
+- wrapper exceptions whose `InnerException` contains one of the critical exception types above
+
+This keeps fail-closed governance separate from systemic host failure. A critical runtime condition should be visible to the host's incident, restart, health-check, or crash-handling path rather than being reported as a normal policy denial.
 
 ## Sensitive exception details
 
@@ -53,6 +71,16 @@ A policy constraint failed during evaluation. The operation was denied by the ev
 Hosts may override the reason code and message, but should keep them curated, bounded, and free of sensitive data.
 
 When a logger is supplied to `DefaultAsiBackbonePolicyEvaluator<TContext>`, the converted exception is logged at error level with the exception object attached to the log entry. This is host-owned operational telemetry, not public decision output. Hosts should apply their normal log redaction, retention, and access-control policy.
+
+The log event for a converted constraint exception is:
+
+```text
+EventId: 4120
+Name: ConstraintExceptionDeniedError
+Meaning: exception-as-denial path for a policy constraint failure
+```
+
+The log message includes the constraint name, exception type, correlation ID, policy version, and policy hash. It intentionally distinguishes exception-as-denial from a normal constraint-returned denial.
 
 ## Cancellation remains cancellation
 
@@ -70,12 +98,14 @@ Use `TreatConstraintExceptionAsDenial = true` when:
 
 - every governed attempt should produce a decision artifact;
 - ASP.NET Core endpoint governance or another host layer should be able to audit the resulting denial normally;
-- the host wants a consistent fail-closed policy surface for constraint failures;
+- the host wants a consistent fail-closed policy surface for expected constraint failures;
 - downstream systems rely on reason codes rather than exception propagation.
+
+Do not use `TreatConstraintExceptionAsDenial` to hide critical runtime failures, broken host dependencies, corrupted process state, or other incidents that should be escalated through host operations.
 
 ## Boundary
 
-This option does not make exception data safe, sanitized, or compliance-ready by itself. It only converts the evaluator outcome into a denied decision with stable reason codes. Host applications still own logging policy, audit persistence, redaction, telemetry export, retention, and incident response.
+This option does not make exception data safe, sanitized, or compliance-ready by itself. It only converts eligible evaluator outcomes into a denied decision with stable reason codes. Host applications still own logging policy, audit persistence, redaction, telemetry export, retention, critical-failure escalation, and incident response.
 
 ## Related documentation
 

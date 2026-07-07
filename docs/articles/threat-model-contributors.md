@@ -166,11 +166,19 @@ These examples are illustrative. Hosts should define exact thresholds and outcom
 
 ## Fail-closed behavior
 
-`TreatThreatContributorExceptionAsDenial` defaults to `true`. If a registered contributor throws, the evaluator returns a denied governance decision with the stable reason code `asibackbone.threat.contributor_exception`.
+`TreatThreatContributorExceptionAsDenial` defaults to `true`. If a registered contributor throws an expected non-cancellation, non-critical exception, the evaluator returns a denied governance decision with the stable reason code `asibackbone.threat.contributor_exception`.
 
 Set this option to `false` only when the host intentionally wants contributor exceptions to propagate to its own error boundary.
 
 Fail-closed behavior is especially important when a contributor is responsible for capability-token integrity, regional policy checks, replay detection, or external command screening. A broken check should not silently create a path to execution.
+
+### Critical failures still propagate
+
+Fail-closed contributor handling is not a substitute for host/runtime failure handling. The evaluator does not convert cancellation or critical host/runtime failures into ordinary denied governance decisions.
+
+Critical exceptions, including `OutOfMemoryException`, `StackOverflowException` where catchable, `AccessViolationException`, `AppDomainUnloadedException`, `BadImageFormatException`, `InvalidProgramException`, and wrapper exceptions containing those failures, continue to propagate. Hosts should handle those through health checks, process restart policy, incident response, or other operational mechanisms rather than treating them as normal threat-contributor denials.
+
+When a contributor exception is converted to denial, the evaluator logs event `4130` (`ThreatContributorExceptionDeniedError`) with the contributor name, exception type, correlation ID, policy version, and policy hash. This event identifies the exception-as-denial path and is distinct from an ordinary threat assessment denial.
 
 ## Allow-downgrade protection
 
@@ -208,6 +216,7 @@ Recommended contract tests:
 - high or critical findings short-circuit to a constrained outcome where intended;
 - low-severity findings become `Warning` only when execution is intentionally permitted;
 - contributor exceptions fail closed by default;
+- cancellation and critical contributor failures still propagate to the host;
 - `PreventThreatAssessmentAllowDowngrade` prevents a custom decision policy from erasing actionable findings;
 - reason metadata includes contributor, category, severity, confidence, and sanitized host metadata;
 - policy version and policy hash remain attached to the final decision when supplied by the context.
@@ -239,7 +248,7 @@ Prefer contributors that:
 - avoid network calls unless the host has a clear timeout and failure policy;
 - treat missing context as suspicious when that context is required for safe evaluation;
 - document the intended severity, category, and recommended outcome;
-- include tests for valid input, invalid input, contributor failure, and downgrade protection.
+- include tests for valid input, invalid input, contributor failure, critical failure passthrough, and downgrade protection.
 
 Avoid contributors that:
 
@@ -257,15 +266,3 @@ Threat model contributors are useful for future gateway, robotics, agent-tool, a
 For gateway-style integrations, contributors can inspect whether the request is shaped like an authorized external command, whether the capability grant matches the requested operation, whether the region or policy resolver agrees with the command, and whether required audit/signing context is present.
 
 For robotics-style or physical-world execution scenarios, keep the same software boundary: AsiBackbone can help produce constrained governance decisions, but the host remains responsible for the operational gateway, device safety controls, hardware interlocks, regional legal review, monitoring, and emergency stop behavior. Do not present a contributor as a robot safety system.
-
-A future integration should preserve the same invariant:
-
-```text
-Global or high-level intent should pass through regional/local policy checks,
-capability gates, operational gateways, and audit receipts before execution.
-Suspicious input should become a constrained decision, not a physical action.
-```
-
-## Boundary statement
-
-Threat model contributors do not claim to detect all security threats, validate legal compliance, or provide legal protection. They are policy-pipeline hardening hooks: a host-owned way to transform threat-relevant signals into explicit, auditable governance decisions.

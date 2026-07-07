@@ -17,8 +17,8 @@ public sealed class AuditResidueBuilder
     private readonly string operationName;
     private readonly string outcome;
     private readonly List<string> reasonCodes = [];
-    private readonly Dictionary<string, string> metadata = new(StringComparer.Ordinal);
 
+    private Dictionary<string, string>? metadata;
     private string? eventId;
     private DateTimeOffset? occurredUtc;
     private string? correlationId;
@@ -188,13 +188,13 @@ public sealed class AuditResidueBuilder
     /// </summary>
     public AuditResidueBuilder WithMetadata(IReadOnlyDictionary<string, string>? values)
     {
-        metadata.Clear();
+        metadata = null;
 
         if (values is not null)
         {
             foreach (KeyValuePair<string, string> item in values)
             {
-                metadata[item.Key] = item.Value;
+                (metadata ??= new Dictionary<string, string>(StringComparer.Ordinal))[item.Key] = item.Value;
             }
         }
 
@@ -206,7 +206,7 @@ public sealed class AuditResidueBuilder
     /// </summary>
     public AuditResidueBuilder AddMetadata(string key, string value)
     {
-        metadata[key] = value;
+        (metadata ??= new Dictionary<string, string>(StringComparer.Ordinal))[key] = value;
         return this;
     }
 

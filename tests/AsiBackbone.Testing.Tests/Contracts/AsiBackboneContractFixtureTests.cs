@@ -15,8 +15,7 @@ public sealed class AsiBackboneContractFixtureTests
     [Fact]
     public async Task PolicyEvaluatorContractPassesForHarnessEvaluator()
     {
-        AsiBackboneTestHarnessOptions options = new()
-        ;
+        AsiBackboneTestHarnessOptions options = new();
         _ = options.DenyAllPolicies("contract.policy_denied", "Denied by contract test.");
         var evaluator = new AsiBackboneTestHarnessPolicyEvaluator(options);
         var contract = new HarnessPolicyEvaluatorContract(evaluator);

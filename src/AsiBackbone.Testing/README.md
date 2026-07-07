@@ -64,6 +64,58 @@ Assert.Single(auditSink.Entries);
 
 The audit sink is in-memory and process-local. It is intended for assertion-friendly automated tests, not durable records or tamper-evidence.
 
+## Reusable contract fixtures
+
+`AsiBackbone.Testing.Contracts` contains framework-neutral contract fixtures and assertions for extension authors. The helpers throw `AsiBackboneContractViolationException` instead of depending on xUnit, NUnit, or MSTest directly, so test projects can reuse the same safe-collapse invariants from any test runner.
+
+Available fixtures include:
+
+- `AsiBackbonePolicyEvaluatorContract<TContext>`
+- `AsiBackboneDecisionPolicyContract<TContext>`
+- `AsiBackboneConstraintContract<TContext>`
+- `AsiBackboneEndpointCapabilityGrantValidatorContract`
+- `AsiBackboneAuditSinkContract`
+- `AsiBackboneDecisionContract` assertion helpers
+
+Example xUnit usage for a custom policy evaluator:
+
+```csharp
+using AsiBackbone.Core.Constraints;
+using AsiBackbone.Core.Evaluation;
+using AsiBackbone.Testing.Contracts;
+using Xunit;
+
+public sealed class MyPolicyEvaluatorContractTests
+{
+    [Fact]
+    public async Task Evaluator_returns_safe_decision()
+    {
+        var contract = new MyPolicyEvaluatorContract();
+
+        await contract.VerifyEvaluatorReturnsSafeDecisionAsync(TestContext.Current.CancellationToken);
+    }
+
+    private sealed class MyPolicyEvaluatorContract
+        : AsiBackbonePolicyEvaluatorContract<AsiBackboneConstraintEvaluationContext>
+    {
+        protected override IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext> CreateEvaluator()
+        {
+            return new MyPolicyEvaluator();
+        }
+
+        protected override AsiBackboneConstraintEvaluationContext CreateEvaluationContext()
+        {
+            return new AsiBackboneConstraintEvaluationContext(
+                correlationId: "contract-correlation",
+                policyVersion: "policy-v1",
+                policyHash: "policy-hash");
+        }
+    }
+}
+```
+
+The default contract assertions verify portable invariants such as non-null decisions, reason codes for denied/deferred/acknowledgment/escalation paths, correlation propagation, policy telemetry presence when supplied or resolved by the implementation, invalid capability-grant scenarios not returning `Allow`, and valid audit residue shape.
+
 ## WebApplicationFactory-style usage
 
 ```csharp

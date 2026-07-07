@@ -254,17 +254,17 @@ public class OperationResult
             return CreateFallbackReason(fallbackCode, fallbackMessage);
         }
 
-        if (reasons is ICollection<OperationReason> collection)
+        if (reasons.TryGetNonEnumeratedCount(out int count))
         {
-            if (collection.Count == 0)
+            if (count == 0)
             {
                 return CreateFallbackReason(fallbackCode, fallbackMessage);
             }
 
-            var normalizedReasons = new OperationReason[collection.Count];
+            var normalizedReasons = new OperationReason[count];
             int normalizedCount = 0;
 
-            foreach (OperationReason? reason in collection)
+            foreach (OperationReason? reason in reasons)
             {
                 if (reason is not null)
                 {

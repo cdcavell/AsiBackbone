@@ -14,16 +14,16 @@ namespace AsiBackbone.Core.Tests.Evaluation;
 public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
 {
     /// <summary>
-    /// Gets critical exception instances used to verify passthrough behavior.
+    /// Gets critical exception type names used to verify passthrough behavior.
     /// </summary>
-    public static TheoryData<Exception> CriticalRuntimeExceptions =>
+    public static TheoryData<string> CriticalRuntimeExceptionTypes =>
     [
-        new OutOfMemoryException("Critical host/runtime failures should not be converted to denials."),
-        new StackOverflowException("Catchable stack overflow exception instances should not be converted to denials."),
-        new AccessViolationException("Critical access violation failures should not be converted to denials."),
-        new AppDomainUnloadedException("AppDomain unload failures should not be converted to denials."),
-        new BadImageFormatException("Bad image format failures should not be converted to denials."),
-        new InvalidProgramException("Invalid program failures should not be converted to denials.")
+        nameof(OutOfMemoryException),
+        nameof(StackOverflowException),
+        nameof(AccessViolationException),
+        nameof(AppDomainUnloadedException),
+        nameof(BadImageFormatException),
+        nameof(InvalidProgramException)
     ];
 
     [Fact]
@@ -69,10 +69,11 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
     }
 
     [Theory]
-    [MemberData(nameof(CriticalRuntimeExceptions))]
-    public async Task ConstraintExceptionAsDenialPropagatesCriticalRuntimeExceptions(Exception expectedException)
+    [MemberData(nameof(CriticalRuntimeExceptionTypes))]
+    public async Task ConstraintExceptionAsDenialPropagatesCriticalRuntimeExceptions(string criticalExceptionType)
     {
         TestPolicyContext context = CreateContext();
+        Exception expectedException = CreateCriticalException(criticalExceptionType);
         var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
             [new ThrowingConstraint(expectedException)],
             decisionPolicy: null,
@@ -143,10 +144,11 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
     }
 
     [Theory]
-    [MemberData(nameof(CriticalRuntimeExceptions))]
-    public async Task ThreatContributorExceptionAsDenialPropagatesCriticalRuntimeExceptions(Exception expectedException)
+    [MemberData(nameof(CriticalRuntimeExceptionTypes))]
+    public async Task ThreatContributorExceptionAsDenialPropagatesCriticalRuntimeExceptions(string criticalExceptionType)
     {
         TestPolicyContext context = CreateContext();
+        Exception expectedException = CreateCriticalException(criticalExceptionType);
         var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
             [new StaticConstraint(ConstraintEvaluationResult.Allow())],
             [new ThrowingThreatContributor(expectedException)]);
@@ -179,6 +181,20 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
             CorrelationId = "corr-critical-123",
             PolicyVersion = "v-critical",
             PolicyHash = "hash-critical"
+        };
+    }
+
+    private static Exception CreateCriticalException(string criticalExceptionType)
+    {
+        return criticalExceptionType switch
+        {
+            nameof(OutOfMemoryException) => new OutOfMemoryException("Critical host/runtime failures should not be converted to denials."),
+            nameof(StackOverflowException) => new StackOverflowException("Catchable stack overflow exception instances should not be converted to denials."),
+            nameof(AccessViolationException) => new AccessViolationException("Critical access violation failures should not be converted to denials."),
+            nameof(AppDomainUnloadedException) => new AppDomainUnloadedException("AppDomain unload failures should not be converted to denials."),
+            nameof(BadImageFormatException) => new BadImageFormatException("Bad image format failures should not be converted to denials."),
+            nameof(InvalidProgramException) => new InvalidProgramException("Invalid program failures should not be converted to denials."),
+            _ => throw new ArgumentOutOfRangeException(nameof(criticalExceptionType), criticalExceptionType, "Unknown critical exception type.")
         };
     }
 

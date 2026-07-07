@@ -195,7 +195,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
                     return ThreatAssessment.NoThreat();
                 })]);
 
-        await Assert.ThrowsAsync<OperationCanceledException>(
+        _ = await Assert.ThrowsAsync<OperationCanceledException>(
             async () => await evaluator.EvaluateAsync(context, cancellationTokenSource.Token));
         Assert.False(contributorRan);
     }
@@ -210,7 +210,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
                 "canceling-threat-contributor",
                 (_, _) => throw new OperationCanceledException())]);
 
-        await Assert.ThrowsAsync<OperationCanceledException>(
+        _ = await Assert.ThrowsAsync<OperationCanceledException>(
             async () => await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken));
     }
 
@@ -222,7 +222,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
             [new ThrowingConstraint(new OperationCanceledException())],
             []);
 
-        await Assert.ThrowsAsync<OperationCanceledException>(
+        _ = await Assert.ThrowsAsync<OperationCanceledException>(
             async () => await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken));
     }
 

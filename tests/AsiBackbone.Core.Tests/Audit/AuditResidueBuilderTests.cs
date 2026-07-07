@@ -1,3 +1,4 @@
+using System.Reflection;
 using AsiBackbone.Core.Actors;
 using AsiBackbone.Core.Audit;
 using AsiBackbone.Core.Constraints;
@@ -186,6 +187,129 @@ public sealed class AuditResidueBuilderTests
     }
 
     [Fact]
+    public void BuilderDoesNotAllocateMetadataStorageWhenNoMetadataIsAdded()
+    {
+        var builder = AuditResidueBuilder.Create(
+            AsiBackboneActorContext.System,
+            "system.sync",
+            "Allowed");
+
+        Assert.Null(GetMetadataStorage(builder));
+
+        AuditResidue residue = builder.Build();
+
+        Assert.False(residue.HasMetadata);
+        Assert.Empty(residue.Metadata);
+        Assert.Null(GetMetadataStorage(builder));
+    }
+
+    [Fact]
+    public void AddMetadataInitializesStorageAndBuildsSingleEntry()
+    {
+        var builder = AuditResidueBuilder.Create(
+            AsiBackboneActorContext.System,
+            "system.sync",
+            "Allowed");
+
+        AuditResidue residue = builder
+            .AddMetadata("source", "unit-test")
+            .Build();
+
+        Dictionary<string, string>? storage = GetMetadataStorage(builder);
+        Assert.NotNull(storage);
+        _ = Assert.Single(storage);
+        Assert.Equal("unit-test", residue.Metadata["source"]);
+    }
+
+    [Fact]
+    public void WithMetadataInitializesStorageAndBuildsMultipleEntries()
+    {
+        var builder = AuditResidueBuilder.Create(
+            AsiBackboneActorContext.System,
+            "system.sync",
+            "Allowed");
+        Dictionary<string, string> metadata = new(StringComparer.Ordinal)
+        {
+            ["source"] = "unit-test",
+            ["region"] = "us-la"
+        };
+
+        AuditResidue residue = builder
+            .WithMetadata(metadata)
+            .Build();
+
+        Dictionary<string, string>? storage = GetMetadataStorage(builder);
+        Assert.NotNull(storage);
+        Assert.Equal(2, storage.Count);
+        Assert.Equal("unit-test", residue.Metadata["source"]);
+        Assert.Equal("us-la", residue.Metadata["region"]);
+    }
+
+    [Fact]
+    public void AddMetadataOverwritesExistingEntry()
+    {
+        AuditResidue residue = AuditResidueBuilder.Create(
+            AsiBackboneActorContext.System,
+            "system.sync",
+            "Allowed")
+            .AddMetadata("source", "original")
+            .AddMetadata("source", "updated")
+            .Build();
+
+        _ = Assert.Single(residue.Metadata);
+        Assert.Equal("updated", residue.Metadata["source"]);
+    }
+
+    [Fact]
+    public void WithMetadataClearsStorageForNullAndEmptyInputs()
+    {
+        AuditResidueBuilder builder = AuditResidueBuilder.Create(
+            AsiBackboneActorContext.System,
+            "system.sync",
+            "Allowed")
+            .AddMetadata("source", "original");
+
+        Assert.NotNull(GetMetadataStorage(builder));
+
+        AuditResidue nullMetadataResidue = builder
+            .WithMetadata(null)
+            .Build();
+
+        Assert.Null(GetMetadataStorage(builder));
+        Assert.Empty(nullMetadataResidue.Metadata);
+
+        AuditResidue emptyMetadataResidue = builder
+            .AddMetadata("source", "replacement")
+            .WithMetadata(new Dictionary<string, string>(StringComparer.Ordinal))
+            .Build();
+
+        Assert.Null(GetMetadataStorage(builder));
+        Assert.Empty(emptyMetadataResidue.Metadata);
+    }
+
+    [Fact]
+    public void BuiltResidueMetadataIsImmutable()
+    {
+        Dictionary<string, string> sourceMetadata = new(StringComparer.Ordinal)
+        {
+            ["source"] = "original"
+        };
+
+        AuditResidue residue = AuditResidueBuilder.Create(
+            AsiBackboneActorContext.System,
+            "system.sync",
+            "Allowed")
+            .WithMetadata(sourceMetadata)
+            .Build();
+
+        sourceMetadata["source"] = "mutated";
+
+        Assert.Equal("original", residue.Metadata["source"]);
+        IDictionary<string, string> mutableMetadata = Assert.IsAssignableFrom<IDictionary<string, string>>(residue.Metadata);
+        _ = Assert.Throws<NotSupportedException>(() => mutableMetadata["source"] = "mutated");
+    }
+
+    [Fact]
     public void BuiltResidueDoesNotChangeWhenBuilderIsReused()
     {
         AuditResidueBuilder builder = AuditResidueBuilder.Create(
@@ -225,6 +349,14 @@ public sealed class AuditResidueBuilderTests
                 AsiBackboneActorContext.System,
                 "system.sync",
                 constraintResult: null!));
+    }
+
+    private static Dictionary<string, string>? GetMetadataStorage(AuditResidueBuilder builder)
+    {
+        FieldInfo? field = typeof(AuditResidueBuilder).GetField("metadata", BindingFlags.Instance | BindingFlags.NonPublic);
+        Assert.NotNull(field);
+
+        return (Dictionary<string, string>?)field.GetValue(builder);
     }
 
     private static void AssertEquivalentResidue(AuditResidue expected, AuditResidue actual)

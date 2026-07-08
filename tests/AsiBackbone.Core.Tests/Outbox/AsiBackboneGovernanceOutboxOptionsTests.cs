@@ -3,8 +3,14 @@ using Xunit;
 
 namespace AsiBackbone.Core.Tests.Outbox;
 
+/// <summary>
+/// Unit tests for the <see cref="AsiBackboneGovernanceOutboxOptions"/> class.
+/// </summary>
 public sealed class AsiBackboneGovernanceOutboxOptionsTests
 {
+    /// <summary>
+    /// Validates that the default options are accepted without throwing exceptions.
+    /// </summary>
     [Fact]
     public void ValidateAcceptsDefaultOptions()
     {
@@ -17,6 +23,9 @@ public sealed class AsiBackboneGovernanceOutboxOptionsTests
         Assert.True(options.ClaimLeaseDuration > TimeSpan.Zero);
     }
 
+    /// <summary>
+    /// Validates that the options with claim leases and a valid worker ID are accepted without throwing exceptions.
+    /// </summary>
     [Fact]
     public void ValidateAcceptsClaimLeaseOptionsWithWorkerId()
     {
@@ -30,6 +39,9 @@ public sealed class AsiBackboneGovernanceOutboxOptionsTests
         options.Validate();
     }
 
+    /// <summary>
+    /// Validates that the options with invalid timing values are rejected.
+    /// </summary>
     [Fact]
     public void ValidateRejectsInvalidTimingOptions()
     {
@@ -49,6 +61,9 @@ public sealed class AsiBackboneGovernanceOutboxOptionsTests
         }.Validate());
     }
 
+    /// <summary>
+    /// Validates that the options require a worker ID when claim leases are enabled.
+    /// </summary>
     [Fact]
     public void ValidateRequiresWorkerIdWhenClaimLeasesAreEnabled()
     {

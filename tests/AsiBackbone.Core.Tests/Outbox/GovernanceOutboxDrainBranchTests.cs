@@ -6,11 +6,17 @@ using Xunit;
 
 namespace AsiBackbone.Core.Tests.Outbox;
 
+/// <summary>
+/// Tests for the <see cref="AsiBackboneGovernanceOutboxDrain"/> class, which is responsible for draining governance outbox entries and emitting them to the appropriate sinks.
+/// </summary>
 public sealed class GovernanceOutboxDrainBranchTests
 {
     private static readonly DateTimeOffset DrainUtc = new(2026, 6, 18, 1, 30, 0, TimeSpan.Zero);
     private static readonly DateTimeOffset CreatedUtc = new(2026, 6, 18, 1, 0, 0, TimeSpan.Zero);
 
+    /// <summary>
+    /// Tests that the constructor of <see cref="AsiBackboneGovernanceOutboxDrain"/> throws an <see cref="ArgumentNullException"/> when either the outbox store or the emitter is null.
+    /// </summary>
     [Fact]
     public void ConstructorRejectsNullDependencies()
     {
@@ -21,6 +27,12 @@ public sealed class GovernanceOutboxDrainBranchTests
         _ = Assert.Throws<ArgumentNullException>(() => new AsiBackboneGovernanceOutboxDrain(store, null!));
     }
 
+    /// <summary>
+    /// Tests that the DrainAsync method throws an <see cref="ArgumentOutOfRangeException"/> when the maxCount parameter is not positive.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous test operation.
+    /// </returns>
     [Fact]
     public async Task DrainAsyncRejectsNonPositiveMaxCount()
     {
@@ -32,6 +44,12 @@ public sealed class GovernanceOutboxDrainBranchTests
             async () => await drain.DrainAsync(maxCount: 0, cancellationToken: TestContext.Current.CancellationToken));
     }
 
+    /// <summary>
+    /// Tests that the DrainAsync method does not query for retry-ready entries when the number of pending entries fills the maxCount limit.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous test operation.
+    /// </returns>
     [Fact]
     public async Task DrainAsyncDoesNotQueryRetryReadyWhenPendingEntriesFillMaxCount()
     {
@@ -58,6 +76,12 @@ public sealed class GovernanceOutboxDrainBranchTests
         Assert.All(drained, entry => Assert.True(entry.IsDelivered));
     }
 
+    /// <summary>
+    /// Tests that the DrainAsync method deduplicates retry-ready entries against pending entries, ensuring that only unique entries are processed.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous test operation.
+    /// </returns>
     [Fact]
     public async Task DrainAsyncDeduplicatesRetryReadyEntriesAgainstPendingEntries()
     {
@@ -89,6 +113,12 @@ public sealed class GovernanceOutboxDrainBranchTests
         Assert.Contains(drained, entry => entry.OutboxEntryId == "outbox-2");
     }
 
+    /// <summary>
+    /// Tests that the DrainAsync method marks an emitter exception as a retryable failure and logs the operational context correctly.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous test operation.
+    /// </returns>
     [Fact]
     public async Task DrainAsyncMarksEmitterExceptionAsRetryableFailureAndLogsOperationalContext()
     {
@@ -124,6 +154,12 @@ public sealed class GovernanceOutboxDrainBranchTests
         Assert.Equal("residue-event-1", Assert.IsType<string>(logEntry["AuditResidueId"]));
     }
 
+    /// <summary>
+    /// Tests that the DrainAsync method rethrows an OperationCanceledException when cancellation is requested by the emitter during the emission process.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous test operation.
+    /// </returns>
     [Fact]
     public async Task DrainAsyncRethrowsOperationCanceledExceptionWhenCancellationIsRequestedByEmitter()
     {
@@ -140,6 +176,12 @@ public sealed class GovernanceOutboxDrainBranchTests
                 cancellationToken: cancellationTokenSource.Token));
     }
 
+    /// <summary>
+    /// Tests that the DrainAsync method marks an entry as dead-lettered when the emitter returns a dead-lettered result, and verifies that the entry's status and error information are updated accordingly.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous test operation.
+    /// </returns>
     [Fact]
     public async Task DrainAsyncMarksDeadLetteredResult()
     {
@@ -163,6 +205,12 @@ public sealed class GovernanceOutboxDrainBranchTests
         Assert.Equal("Provider rejected the envelope.", drained.DeadLetterReason);
     }
 
+    /// <summary>
+    /// Tests that the DrainAsync method defers a pending result with a fallback error when the emitter returns a pending result, and verifies that the entry's status, error information, and next retry time are updated accordingly.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous test operation.
+    /// </returns>
     [Fact]
     public async Task DrainAsyncDefersPendingResultWithFallbackError()
     {
@@ -183,6 +231,12 @@ public sealed class GovernanceOutboxDrainBranchTests
         Assert.Equal(DrainUtc.AddMinutes(1), drained.NextRetryUtc);
     }
 
+    /// <summary>
+    /// Tests that the DrainAsync method defers a deferred result without an error when the emitter returns a deferred result, and verifies that the entry's status and next retry time are updated accordingly.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous test operation.
+    /// </returns>
     [Fact]
     public async Task DrainAsyncDefersDeferredResultWithoutError()
     {

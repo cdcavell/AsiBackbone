@@ -3,8 +3,14 @@ using Xunit;
 
 namespace AsiBackbone.Core.Tests.Metadata;
 
+/// <summary>
+/// Unit tests for the <see cref="GovernanceMetadataBudgetValidator"/> class.
+/// </summary>
 public sealed class GovernanceMetadataBudgetValidatorTests
 {
+    /// <summary>
+    /// Validates that the <see cref="GovernanceMetadataBudgetValidator.Validate"/> method normalizes metadata and drops blank keys.
+    /// </summary>
     [Fact]
     public void ValidateNormalizesMetadataAndDropsBlankKeys()
     {
@@ -22,6 +28,9 @@ public sealed class GovernanceMetadataBudgetValidatorTests
         Assert.True(result.EstimatedSerializedBytes > 0);
     }
 
+    /// <summary>
+    /// Validates that the <see cref="GovernanceMetadataBudgetValidator.Validate"/> method returns a valid empty result when given null metadata.
+    /// </summary>
     [Fact]
     public void ValidateReturnsValidEmptyResultForNullMetadata()
     {
@@ -33,6 +42,9 @@ public sealed class GovernanceMetadataBudgetValidatorTests
         Assert.Equal(2, result.EstimatedSerializedBytes);
     }
 
+    /// <summary>
+    /// Validates that the <see cref="GovernanceMetadataBudgetValidator.NormalizeAndValidate"/> method returns normalized metadata when the budget passes.
+    /// </summary>
     [Fact]
     public void NormalizeAndValidateReturnsNormalizedMetadataWhenBudgetPasses()
     {
@@ -47,6 +59,9 @@ public sealed class GovernanceMetadataBudgetValidatorTests
         Assert.Equal("US-LA", normalizedMetadata["region"]);
     }
 
+    /// <summary>
+    /// Validates that the <see cref="GovernanceMetadataBudgetValidator.EstimateSerializedSizeBytes"/> method normalizes metadata before counting the serialized size.
+    /// </summary>
     [Fact]
     public void EstimateSerializedSizeBytesNormalizesMetadataBeforeCounting()
     {
@@ -61,6 +76,9 @@ public sealed class GovernanceMetadataBudgetValidatorTests
         Assert.Equal(16, estimatedBytes);
     }
 
+    /// <summary>
+    /// Validates that the <see cref="GovernanceMetadataBudgetValidator.Validate"/> method reports violations for exceeding the maximum count, key length, value length, and serialized size limits.
+    /// </summary>
     [Fact]
     public void ValidateReportsCountLengthValueAndSerializedSizeViolations()
     {
@@ -86,6 +104,9 @@ public sealed class GovernanceMetadataBudgetValidatorTests
         Assert.Contains(result.Violations, violation => violation.Contains("maximum serialized metadata size", StringComparison.Ordinal));
     }
 
+    /// <summary>
+    /// Validates that the <see cref="GovernanceMetadataBudgetValidator.Validate"/> method reports violations for reserved sensitive key fragments.
+    /// </summary>
     [Fact]
     public void ValidateReportsReservedSensitiveKeyFragments()
     {
@@ -100,6 +121,9 @@ public sealed class GovernanceMetadataBudgetValidatorTests
         Assert.Contains(result.Violations, violation => violation.Contains("reserved or discouraged key fragment 'apikey'", StringComparison.Ordinal));
     }
 
+    /// <summary>
+    /// Validates that the <see cref="GovernanceMetadataBudgetValidator.Validate"/> method allows reserved-looking keys when the reserved fragments list is empty.
+    /// </summary>
     [Fact]
     public void ValidateAllowsReservedLookingKeysWhenReservedFragmentsAreEmpty()
     {
@@ -115,6 +139,9 @@ public sealed class GovernanceMetadataBudgetValidatorTests
         Assert.Empty(result.Violations);
     }
 
+    /// <summary>
+    /// Validates that the <see cref="GovernanceMetadataBudget.Create"/> method normalizes reserved key fragments by trimming whitespace and converting to lowercase.
+    /// </summary>
     [Fact]
     public void CreateNormalizesReservedKeyFragments()
     {
@@ -130,6 +157,9 @@ public sealed class GovernanceMetadataBudgetValidatorTests
         Assert.Equal(["apikey", "token"], budget.ReservedKeyFragments);
     }
 
+    /// <summary>
+    /// Validates that the <see cref="GovernanceMetadataBudget.Create"/> method rejects invalid budget limits, such as a maximum count of zero.
+    /// </summary>
     [Fact]
     public void CreateRejectsInvalidBudgetLimits()
     {
@@ -139,6 +169,9 @@ public sealed class GovernanceMetadataBudgetValidatorTests
         Assert.Equal("maxCount", exception.ParamName);
     }
 
+    /// <summary>
+    /// Validates that the <see cref="GovernanceMetadataBudgetValidator.NormalizeAndValidate"/> method throws an exception when the metadata fails to meet the budget constraints.
+    /// </summary>
     [Fact]
     public void NormalizeAndValidateThrowsWhenBudgetFails()
     {

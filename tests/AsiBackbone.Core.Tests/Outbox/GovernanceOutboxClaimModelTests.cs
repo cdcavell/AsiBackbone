@@ -4,8 +4,14 @@ using Xunit;
 
 namespace AsiBackbone.Core.Tests.Outbox;
 
+/// <summary>
+/// Tests for the <see cref="GovernanceOutboxClaimRequest"/> and <see cref="GovernanceOutboxClaim"/> models, including validation and normalization of values, as well as lease state evaluation for outbox entries.
+/// </summary>
 public sealed class GovernanceOutboxClaimModelTests
 {
+    /// <summary>
+    /// Tests that the <see cref="GovernanceOutboxClaimRequest.Create"/> method normalizes input values correctly, including trimming whitespace from the worker ID and converting the current time to UTC.
+    /// </summary>
     [Fact]
     public void ClaimRequestCreateNormalizesValues()
     {
@@ -24,6 +30,9 @@ public sealed class GovernanceOutboxClaimModelTests
         Assert.Equal(now.ToUniversalTime().AddMinutes(3), request.ClaimExpiresUtc);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="GovernanceOutboxClaimRequest.Create"/> method rejects invalid input values.
+    /// </summary>
     [Fact]
     public void ClaimRequestCreateRejectsInvalidValues()
     {
@@ -32,6 +41,9 @@ public sealed class GovernanceOutboxClaimModelTests
         _ = Assert.Throws<ArgumentOutOfRangeException>(() => GovernanceOutboxClaimRequest.Create("worker-1", maxCount: 0));
     }
 
+    /// <summary>
+    /// Tests that the <see cref="GovernanceOutboxClaim.Create"/> method normalizes input values correctly, including trimming whitespace from the worker ID and claim token, and evaluates the expiration state of the claim.
+    /// </summary>
     [Fact]
     public void ClaimCreateNormalizesAndEvaluatesExpiration()
     {
@@ -52,6 +64,9 @@ public sealed class GovernanceOutboxClaimModelTests
         Assert.True(claim.IsExpired(expiresUtc));
     }
 
+    /// <summary>
+    /// Tests that the <see cref="GovernanceOutboxClaim.Create"/> method rejects invalid expiration values, such as when the expiration time is before the claimed time.
+    /// </summary>
     [Fact]
     public void ClaimCreateRejectsInvalidExpiration()
     {
@@ -66,6 +81,9 @@ public sealed class GovernanceOutboxClaimModelTests
             claimedUtc));
     }
 
+    /// <summary>
+    /// Tests that the <see cref="GovernanceOutboxEntry"/> methods for claiming and releasing entries correctly evaluate the lease state, including whether an entry has an active claim, can be claimed, and whether it is claimed by a specific claim.
+    /// </summary>
     [Fact]
     public void OutboxEntryClaimHelpersEvaluateLeaseState()
     {
@@ -104,6 +122,9 @@ public sealed class GovernanceOutboxClaimModelTests
         Assert.True(releasedEntry.CanBeClaimed(claimedUtc.AddMinutes(2)));
     }
 
+    /// <summary>
+    /// Tests that the <see cref="GovernanceOutboxEntry.MarkClaimed"/> method rejects invalid lease durations, such as a zero or negative duration.
+    /// </summary>
     [Fact]
     public void OutboxEntryMarkClaimedRejectsInvalidLeaseDuration()
     {

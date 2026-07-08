@@ -5,8 +5,17 @@ using Xunit;
 
 namespace AsiBackbone.Core.Tests.Outbox;
 
+/// <summary>
+/// Tests for the <see cref="InMemoryGovernanceOutboxStore"/> class, focusing on the behavior of claiming pending outbox entries and ensuring that active leases are respected.
+/// </summary>
 public sealed class GovernanceOutboxClaimStoreTests
 {
+    /// <summary>
+    /// Tests that the <see cref="InMemoryGovernanceOutboxStore.ClaimPendingAsync"/> method correctly skips entries that are already claimed by another worker, ensuring that active leases are respected and not overwritten.
+    /// </summary>
+    /// <returns>
+    /// A <see cref="Task"/> representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task ClaimPendingAsyncSkipsActiveLease()
     {

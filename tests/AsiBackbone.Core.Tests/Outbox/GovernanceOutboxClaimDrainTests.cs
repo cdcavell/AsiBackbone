@@ -6,8 +6,17 @@ using Xunit;
 
 namespace AsiBackbone.Core.Tests.Outbox;
 
+/// <summary>
+/// Tests for the <see cref="AsiBackboneGovernanceOutboxDrain"/> class when claim leases are enabled and a claim store is used.
+/// </summary>
 public sealed class GovernanceOutboxClaimDrainTests
 {
+    /// <summary>
+    /// Tests that the <see cref="AsiBackboneGovernanceOutboxDrain.DrainAsync"/> method throws an <see cref="InvalidOperationException"/> when claim leases are enabled but no claim store is provided.
+    /// </summary>
+    /// <returns>
+    /// A <see cref="Task"/> representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task DrainAsyncThrowsWhenClaimLeasesEnabledWithoutClaimStore()
     {
@@ -24,6 +33,12 @@ public sealed class GovernanceOutboxClaimDrainTests
             await drain.DrainAsync(cancellationToken: TestContext.Current.CancellationToken));
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AsiBackboneGovernanceOutboxDrain.DrainAsync"/> method drains a pending entry and marks it as delivered when claim leases are enabled and a claim store is used.
+    /// </summary>
+    /// <returns>
+    /// A <see cref="Task"/> representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task DrainAsyncClaimsPendingEntryBeforeDeliveryWhenClaimLeasesEnabled()
     {
@@ -49,6 +64,12 @@ public sealed class GovernanceOutboxClaimDrainTests
         Assert.False(storedEntry.HasClaim);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AsiBackboneGovernanceOutboxDrain.DrainAsync"/> method returns an empty list when the claim store has no eligible entries to drain.
+    /// </summary>
+    /// <returns>
+    /// A <see cref="Task"/> representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task DrainAsyncReturnsEmptyWhenClaimStoreHasNoEligibleEntries()
     {
@@ -62,6 +83,12 @@ public sealed class GovernanceOutboxClaimDrainTests
         Assert.Empty(drainedEntries);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AsiBackboneGovernanceOutboxDrain.DrainAsync"/> method drains a retry-ready entry and marks it as delivered when claim leases are enabled and a claim store is used, even if there are no pending entries to claim.
+    /// </summary>
+    /// <returns>
+    /// A <see cref="Task"/> representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task DrainAsyncUsesRetryReadyClaimsWhenNoPendingEntriesAreClaimed()
     {
@@ -87,6 +114,12 @@ public sealed class GovernanceOutboxClaimDrainTests
         Assert.Equal("record-event-1", drainedEntry.ProviderRecordId);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AsiBackboneGovernanceOutboxDrain.DrainAsync"/> method stops draining after reaching the specified maximum count of pending claims, even if there are retry-ready entries available.
+    /// </summary>
+    /// <returns>
+    /// A <see cref="Task"/> representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task DrainAsyncStopsAfterPendingClaimLimitBeforeRetryReadyLookup()
     {
@@ -104,6 +137,12 @@ public sealed class GovernanceOutboxClaimDrainTests
         Assert.True(drainedEntry.IsDelivered);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AsiBackboneGovernanceOutboxDrain.DrainAsync"/> method saves a deferred result and clears the claim when claim leases are enabled and a claim store is used.
+    /// </summary>
+    /// <returns>
+    /// A <see cref="Task"/> representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task DrainAsyncSavesDeferredResultAndClearsClaim()
     {
@@ -132,6 +171,12 @@ public sealed class GovernanceOutboxClaimDrainTests
         Assert.False(storedEntry.HasClaim);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AsiBackboneGovernanceOutboxDrain.DrainAsync"/> method saves a pending result as deferred with the default retry interval when claim leases are enabled and a claim store is used.
+    /// </summary>
+    /// <returns>
+    /// A <see cref="Task"/> representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task DrainAsyncSavesPendingResultAsDeferredWithDefaultRetry()
     {
@@ -151,6 +196,12 @@ public sealed class GovernanceOutboxClaimDrainTests
         Assert.Equal("emission.pending", drainedEntry.LastError.Code);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AsiBackboneGovernanceOutboxDrain.DrainAsync"/> method marks a claim as dead-lettered when the emitter returns a dead-letter result, and clears the claim from the entry.
+    /// </summary>
+    /// <returns>
+    /// A <see cref="Task"/> representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task DrainAsyncMarksClaimDeadLetteredForDeadLetterResult()
     {
@@ -169,6 +220,12 @@ public sealed class GovernanceOutboxClaimDrainTests
         Assert.False(drainedEntry.HasClaim);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AsiBackboneGovernanceOutboxDrain.DrainAsync"/> method marks a claim as failed when the emitter returns a failed result, and clears the claim from the entry.
+    /// </summary>
+    /// <returns>
+    /// A <see cref="Task"/> representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task DrainAsyncMarksClaimFailedForFailedResult()
     {
@@ -187,6 +244,12 @@ public sealed class GovernanceOutboxClaimDrainTests
         Assert.False(drainedEntry.HasClaim);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AsiBackboneGovernanceOutboxDrain.DrainAsync"/> method marks a claim as failed when the emitter throws an exception, and clears the claim from the entry.
+    /// </summary>
+    /// <returns>
+    /// A <see cref="Task"/> representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task DrainAsyncMarksClaimFailedWhenEmitterThrows()
     {

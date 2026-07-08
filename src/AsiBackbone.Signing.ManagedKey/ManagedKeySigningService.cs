@@ -325,12 +325,7 @@ public sealed class ManagedKeySigningService : IAsiBackboneSigningService
 
     private static bool IsReservedDiagnosticMetadataKey(string key)
     {
-        if (string.IsNullOrWhiteSpace(key))
-        {
-            return false;
-        }
-
-        return key.Trim() switch
+        return !string.IsNullOrWhiteSpace(key) && key.Trim() switch
         {
             "failure_code" => true,
             "failure_exception_type" => true,

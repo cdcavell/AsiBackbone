@@ -26,7 +26,7 @@ public sealed class LocalDevelopmentSigningOptions
     /// <summary>
     /// Gets the default provider-neutral signature algorithm descriptor.
     /// </summary>
-    public const string DefaultSignatureAlgorithm = "RSASSA-PKCS1-v1_5-SHA256-LOCAL-DEV";
+    public const string DefaultSignatureAlgorithm = "RSASSA-PSS-SHA256-LOCAL-DEV";
 
     /// <summary>
     /// Gets the default RSA key size for generated local-development keys.

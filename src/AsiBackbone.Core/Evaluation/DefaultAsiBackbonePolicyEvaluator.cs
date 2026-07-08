@@ -157,41 +157,27 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
             cancellationToken)
             .ConfigureAwait(false);
 
-        if (threatEvaluation.BlockingDecision is not null)
+        if (threatEvaluation.BlockingDecision is GovernanceDecision threatDecision)
         {
             return await ApplyDecisionPolicyAsync(
                 context,
-                threatEvaluation.BlockingDecision,
+                threatDecision,
                 EmptyConstraintResults,
-                protectedThreatDecision: threatEvaluation.BlockingDecision,
+                protectedThreatDecision: threatDecision,
                 cancellationToken)
                 .ConfigureAwait(false);
         }
 
         if (constraints.Length == 0)
         {
-            if (!options.DenyWhenNoConstraints)
-            {
-                LogEmptyPolicyAllowed(context);
-            }
-
-            GovernanceDecision noConstraintDecision = CreateNoConstraintDecision(
+            return await EvaluateEmptyPolicyAsync(
                 context,
                 threatEvaluation.WarningReasons,
-                options.DenyWhenNoConstraints);
-
-            return await ApplyDecisionPolicyAsync(
-                context,
-                noConstraintDecision,
-                EmptyConstraintResults,
-                protectedThreatDecision: threatEvaluation.WarningReasons.Count > 0 ? noConstraintDecision : null,
                 cancellationToken)
                 .ConfigureAwait(false);
         }
 
-        List<ConstraintEvaluationResult>? results = decisionPolicy is null
-            ? null
-            : new List<ConstraintEvaluationResult>(constraints.Length);
+        List<ConstraintEvaluationResult>? results = CreateConstraintResultsBuffer();
         var denials = new OperationReasonAccumulator();
         var warnings = new OperationReasonAccumulator();
         warnings.AddRange(threatEvaluation.WarningReasons);
@@ -220,23 +206,13 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
 
             results?.Add(result);
 
-            if (result.IsDenied)
+            if (!AccumulateConstraintResult(
+                    result,
+                    ref denials,
+                    ref warnings,
+                    options.ShortCircuitOnFirstDenial))
             {
-                denials.AddRange(result.Reasons);
-
-                if (!options.ShortCircuitOnFirstDenial)
-                {
-                    warnings = default;
-                }
-
-                if (options.ShortCircuitOnFirstDenial)
-                {
-                    break;
-                }
-            }
-            else if (result.IsWarning && denials.Count == 0)
-            {
-                warnings.AddRange(result.Reasons);
+                break;
             }
         }
 
@@ -246,19 +222,11 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
             warnings,
             includeWarningsWhenDenied: options.ShortCircuitOnFirstDenial);
 
-        GovernanceDecision? protectedThreatDecision = threatEvaluation.WarningReasons.Count > 0 && composedDecision.CanProceed
-            ? GovernanceDecision.Warning(
-                threatEvaluation.WarningReasons,
-                correlationId: context.CorrelationId,
-                policyVersion: context.PolicyVersion,
-                policyHash: context.PolicyHash)
-            : null;
-
         return await ApplyDecisionPolicyAsync(
             context,
             composedDecision,
             CreateConstraintResultsView(results),
-            protectedThreatDecision,
+            CreateProtectedThreatWarningDecision(context, threatEvaluation.WarningReasons, composedDecision),
             cancellationToken)
             .ConfigureAwait(false);
     }
@@ -279,6 +247,63 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
                BadImageFormatException or
                InvalidProgramException ||
                (exception.InnerException is not null && IsCriticalException(exception.InnerException));
+    }
+
+    private List<ConstraintEvaluationResult>? CreateConstraintResultsBuffer()
+    {
+        return decisionPolicy is null
+            ? null
+            : new List<ConstraintEvaluationResult>(constraints.Length);
+    }
+
+    private static bool AccumulateConstraintResult(
+        ConstraintEvaluationResult result,
+        ref OperationReasonAccumulator denials,
+        ref OperationReasonAccumulator warnings,
+        bool shortCircuitOnFirstDenial)
+    {
+        if (result.IsDenied)
+        {
+            denials.AddRange(result.Reasons);
+
+            if (!shortCircuitOnFirstDenial)
+            {
+                warnings = default;
+            }
+
+            return !shortCircuitOnFirstDenial;
+        }
+
+        if (result.IsWarning && denials.Count == 0)
+        {
+            warnings.AddRange(result.Reasons);
+        }
+
+        return true;
+    }
+
+    private async ValueTask<GovernanceDecision> EvaluateEmptyPolicyAsync(
+        TContext context,
+        IReadOnlyList<OperationReason> threatWarningReasons,
+        CancellationToken cancellationToken)
+    {
+        if (!options.DenyWhenNoConstraints)
+        {
+            LogEmptyPolicyAllowed(context);
+        }
+
+        GovernanceDecision noConstraintDecision = CreateNoConstraintDecision(
+            context,
+            threatWarningReasons,
+            options.DenyWhenNoConstraints);
+
+        return await ApplyDecisionPolicyAsync(
+            context,
+            noConstraintDecision,
+            EmptyConstraintResults,
+            protectedThreatDecision: threatWarningReasons.Count > 0 ? noConstraintDecision : null,
+            cancellationToken)
+            .ConfigureAwait(false);
     }
 
     private static GovernanceDecision Compose(
@@ -374,6 +399,20 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
         return results is null || results.Count == 0
             ? EmptyConstraintResults
             : results.AsReadOnly();
+    }
+
+    private static GovernanceDecision? CreateProtectedThreatWarningDecision(
+        TContext context,
+        IReadOnlyList<OperationReason> threatWarningReasons,
+        GovernanceDecision composedDecision)
+    {
+        return threatWarningReasons.Count > 0 && composedDecision.CanProceed
+            ? GovernanceDecision.Warning(
+                threatWarningReasons,
+                correlationId: context.CorrelationId,
+                policyVersion: context.PolicyVersion,
+                policyHash: context.PolicyHash)
+            : null;
     }
 
     private async ValueTask<GovernanceDecision> ApplyDecisionPolicyAsync(

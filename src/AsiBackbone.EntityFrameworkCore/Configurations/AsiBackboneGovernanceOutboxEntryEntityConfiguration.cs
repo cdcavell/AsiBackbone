@@ -98,6 +98,21 @@ public sealed class AsiBackboneGovernanceOutboxEntryEntityConfiguration
         _ = builder.Property(outboxEntry => outboxEntry.MetadataJson)
             .IsRequired();
 
+        _ = builder.Property(outboxEntry => outboxEntry.ClaimOwner)
+            .HasMaxLength(IdentifierMaxLength);
+
+        _ = builder.Property(outboxEntry => outboxEntry.ClaimToken)
+            .HasMaxLength(IdentifierMaxLength);
+
+        _ = builder.Property(outboxEntry => outboxEntry.ClaimedUtc)
+            .HasConversion(NullableDateTimeOffsetToUtcTicksConverter);
+
+        _ = builder.Property(outboxEntry => outboxEntry.ClaimExpiresUtc)
+            .HasConversion(NullableDateTimeOffsetToUtcTicksConverter);
+
+        _ = builder.Property(outboxEntry => outboxEntry.ClaimAttemptCount)
+            .IsRequired();
+
         _ = builder.Property(outboxEntry => outboxEntry.EnvelopeId)
             .IsRequired()
             .HasMaxLength(IdentifierMaxLength);
@@ -205,6 +220,12 @@ public sealed class AsiBackboneGovernanceOutboxEntryEntityConfiguration
 
         _ = builder.HasIndex(outboxEntry => outboxEntry.LastErrorCode);
 
+        _ = builder.HasIndex(outboxEntry => outboxEntry.ClaimOwner);
+
+        _ = builder.HasIndex(outboxEntry => outboxEntry.ClaimToken);
+
+        _ = builder.HasIndex(outboxEntry => outboxEntry.ClaimExpiresUtc);
+
         _ = builder.HasIndex(outboxEntry => outboxEntry.EnvelopeId);
 
         _ = builder.HasIndex(outboxEntry => outboxEntry.EnvelopeEventId);
@@ -220,6 +241,23 @@ public sealed class AsiBackboneGovernanceOutboxEntryEntityConfiguration
         _ = builder.HasIndex(outboxEntry => outboxEntry.EnvelopeTraceId);
 
         _ = builder.HasIndex(outboxEntry => outboxEntry.EnvelopeOutboxSequence);
+
+        _ = builder.HasIndex(outboxEntry => new
+        {
+            outboxEntry.Status,
+            outboxEntry.ClaimExpiresUtc,
+            outboxEntry.CreatedUtc,
+            outboxEntry.OutboxEntryId
+        });
+
+        _ = builder.HasIndex(outboxEntry => new
+        {
+            outboxEntry.Status,
+            outboxEntry.ClaimExpiresUtc,
+            outboxEntry.NextRetryUtc,
+            outboxEntry.UpdatedUtc,
+            outboxEntry.OutboxEntryId
+        });
 
         _ = builder.HasIndex(outboxEntry => new
         {

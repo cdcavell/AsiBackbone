@@ -133,7 +133,7 @@ public class AsiBackboneHotPathBenchmarks
     /// An integer checksum representing the decision outcome and reason count, used for validation in benchmarks.
     /// </returns>
     [Benchmark(Description = "decision.allow_no_reasons")]
-    public static int DecisionAllowNoReasons()
+    public int DecisionAllowNoReasons()
     {
         var decision = GovernanceDecision.Allow(
             correlationId: "benchmark-correlation",
@@ -189,7 +189,7 @@ public class AsiBackboneHotPathBenchmarks
     /// An integer checksum representing the decision outcome and reason count, used for validation in benchmarks.
     /// </returns>
     [Benchmark(Description = "decision.escalate_one_reason")]
-    public static int DecisionEscalateOneReason()
+    public int DecisionEscalateOneReason()
     {
         var decision = GovernanceDecision.Escalate(
             "decision.escalate",
@@ -209,7 +209,7 @@ public class AsiBackboneHotPathBenchmarks
     /// An integer checksum representing the decision outcome and reason count, used for validation in benchmarks.
     /// </returns>
     [Benchmark(Description = "operation_result.success_no_reasons")]
-    public static int OperationResultSuccessNoReasons()
+    public int OperationResultSuccessNoReasons()
     {
         var result = OperationResult.Success();
         return Checksum(result);

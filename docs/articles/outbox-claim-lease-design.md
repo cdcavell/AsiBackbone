@@ -2,15 +2,15 @@
 
 This design record captures the selected direction for multi-worker governance outbox claim and lease support.
 
-Issue: [#407](https://github.com/cdcavell/AsiBackbone/issues/407)
+Issue: [#407](https://github.com/cdcavell/AsiBackbone/issues/407), implemented baseline for [#464](https://github.com/cdcavell/AsiBackbone/issues/464)
 
-Status: **Accepted design direction; implementation deferred to a future minor release unless separately scoped.**
+Status: **Accepted design direction; initial provider-neutral claim contracts and opt-in drain/store support implemented.** Provider-specific stronger atomic claim patterns remain host/provider-owned.
 
 ## Context
 
-The current provider-neutral governance outbox drain reads pending or retry-ready entries, emits each envelope to a provider, and then saves the resulting delivered, deferred, failed, retryable-failure, or dead-lettered state.
+The provider-neutral governance outbox drain can read pending or retry-ready entries, emit each envelope to a provider, and then save the resulting delivered, deferred, failed, retryable-failure, or dead-lettered state.
 
-That behavior is appropriate for a single active worker or a host that already partitions workers so each worker reads a disjoint durable outbox slice. It is not sufficient by itself for multiple workers reading the same durable outbox rows.
+That default behavior remains appropriate for a single active worker or a host that partitions workers so each worker reads a disjoint durable outbox slice. It is not sufficient by itself for multiple workers reading the same durable outbox rows.
 
 The risk is duplicate provider emission:
 
@@ -27,23 +27,21 @@ Optimistic concurrency can protect the persisted row from some conflicting final
 
 ## Decision
 
-Claim and lease support should be treated as an explicit durable outbox capability, not as a silent behavior change to the existing `FindPendingAsync`, `FindRetryReadyAsync`, or drain APIs.
+Claim and lease support is treated as an explicit durable outbox capability, not as a silent behavior change to the existing `FindPendingAsync`, `FindRetryReadyAsync`, or default drain APIs.
 
-The selected direction is:
+The implemented baseline direction is:
 
 1. Keep current single-worker selection APIs supported.
-2. Add future opt-in claim/lease contracts in Core so the concept remains provider-neutral.
-3. Implement concrete claim/lease behavior in durable storage packages, starting with EF Core only when its provider-neutral limits are clearly documented.
-4. Allow provider-specific packages or host-owned adapters to implement stronger atomic claim patterns where the database/provider supports them.
-5. Continue requiring provider-side idempotency guidance because claim/lease improves duplicate selection risk but does not create universal exactly-once delivery.
+2. Add opt-in Core claim/lease contracts so the concept remains provider-neutral.
+3. Add an opt-in drain path that uses claim leases only when `AsiBackboneGovernanceOutboxOptions.UseClaimLeases` is enabled.
+4. Implement baseline claim/lease behavior in the in-memory and EF Core stores.
+5. Continue requiring provider-side idempotency guidance because claim/lease reduces duplicate selection risk but does not create universal exactly-once delivery.
 
 This preserves existing package behavior while creating a path for scaled durable drains.
 
-## Proposed future contract shape
+## Implemented contract shape
 
-A future claim-capable outbox store should be additive. It should not replace `IAsiBackboneGovernanceOutboxStore` for hosts that only need local tests, samples, or one active worker.
-
-Potential Core contract:
+The claim-capable contract is additive. It does not replace `IAsiBackboneGovernanceOutboxStore` for hosts that only need local tests, samples, or one active worker.
 
 ```csharp
 public interface IAsiBackboneGovernanceOutboxClaimStore : IAsiBackboneGovernanceOutboxStore
@@ -56,41 +54,56 @@ public interface IAsiBackboneGovernanceOutboxClaimStore : IAsiBackboneGovernance
         GovernanceOutboxClaimRequest request,
         CancellationToken cancellationToken = default);
 
-    ValueTask<GovernanceOutboxEntry> CompleteClaimAsync(
+    ValueTask<GovernanceOutboxEntry> MarkClaimDeliveredAsync(
         GovernanceOutboxClaim claim,
         GovernanceEmissionResult result,
         CancellationToken cancellationToken = default);
 
-    ValueTask ReleaseClaimAsync(
+    ValueTask<GovernanceOutboxEntry> MarkClaimFailedAsync(
+        GovernanceOutboxClaim claim,
+        GovernanceEmissionError governanceEmissionError,
+        DateTimeOffset? nextRetryUtc = null,
+        CancellationToken cancellationToken = default);
+
+    ValueTask<GovernanceOutboxEntry> MarkClaimDeadLetteredAsync(
+        GovernanceOutboxClaim claim,
+        GovernanceEmissionError governanceEmissionError,
+        string? deadLetterReason = null,
+        CancellationToken cancellationToken = default);
+
+    ValueTask<GovernanceOutboxEntry> SaveClaimAsync(
+        GovernanceOutboxClaim claim,
+        GovernanceOutboxEntry entry,
+        CancellationToken cancellationToken = default);
+
+    ValueTask<GovernanceOutboxEntry?> ReleaseClaimAsync(
         GovernanceOutboxClaim claim,
         string? reason = null,
         CancellationToken cancellationToken = default);
 }
 ```
 
-The exact API names may change during implementation, but the important design boundary is that claim operations are explicit. A host should know when it has opted into a claim-capable durable path.
+The important design boundary remains that claim operations are explicit. A host should know when it has opted into a claim-capable durable path.
 
-## Candidate model fields
+## Claim model fields
 
-The durable outbox row will likely need these additional fields if claim support is implemented in EF Core:
+Claim support uses separate claim fields rather than a new provider-neutral emission status:
 
 | Field | Purpose |
 | --- | --- |
-| `ClaimedBy` | Stable worker, process, node, or partition owner identifier. |
+| `ClaimOwner` | Stable worker, process, node, or partition owner identifier. |
 | `ClaimedUtc` | UTC timestamp when the claim was acquired. |
 | `ClaimExpiresUtc` | UTC timestamp when the lease expires and another worker may reclaim. |
 | `ClaimToken` | Opaque value used to verify the same claim owner during final state transition. |
-| `ClaimAttemptCount` | Optional operational counter for repeated claims/reclaims. |
+| `ClaimAttemptCount` | Operational counter for repeated claims/reclaims. |
 
-`ClaimToken` is preferred over relying only on `ClaimedBy` because worker names can be reused across process restarts. A token allows finalization to prove that the completing worker still holds the same lease instance.
+`ClaimToken` is preferred over relying only on `ClaimOwner` because worker names can be reused across process restarts. A token allows finalization to prove that the completing worker still holds the same lease instance.
 
 ## Status model decision
 
-Do **not** add a provider-neutral `Claimed` or `InProgress` status as the first design step.
+Do **not** add a provider-neutral `Claimed` or `InProgress` status as the first implementation step.
 
-The current `GovernanceEmissionStatus` values describe provider-neutral emission state: pending, delivered, deferred, failed, retryable failure, and dead-lettered. A claim is a lease over a row, not necessarily an emission state. Keeping claim as separate metadata avoids broadening status semantics and reduces migration/API churn.
-
-A future `Claimed` or `InProgress` status may still be considered if evidence shows it materially improves diagnostics, operational queries, or provider integration. That should be a separate API review because it would affect stable status semantics and documentation.
+The current `GovernanceEmissionStatus` values describe provider-neutral emission state: pending, delivered, deferred, failed, retryable failure, and dead-lettered. A claim is a lease over a row, not necessarily an emission state. Keeping claim as separate metadata avoids broadening status semantics and reduces status migration/API churn.
 
 ## Claim lifecycle
 
@@ -110,16 +123,14 @@ If a worker crashes after claiming but before completing, the row becomes eligib
 
 ## EF Core implementation direction
 
-EF Core should expose a portable claim-capable implementation only if the operation can be expressed safely enough for the supported provider set.
-
-A minimal EF Core implementation could use optimistic concurrency:
+The EF Core store implements a baseline provider-neutral claim path using optimistic concurrency:
 
 1. Query eligible unclaimed or expired rows.
-2. Attempt to update claim fields with the current `ConcurrencyStamp`.
-3. Save changes.
-4. Return only rows whose claim update succeeded.
+2. Attempt to update claim fields with the current tracked row and concurrency token.
+3. Return only rows whose claim update succeeded.
+4. Complete final state transitions only when the claim owner/token still matches.
 
-That approach is portable but may be less efficient than provider-specific SQL. It reduces duplicate provider calls only when workers respect the claim result and emit after claim success.
+This reduces duplicate provider calls when workers respect the claim result and emit only after claim success. It is intentionally not advertised as a universal exactly-once guarantee.
 
 Provider-specific implementations may be better for high-throughput drains:
 
@@ -129,11 +140,11 @@ Provider-specific implementations may be better for high-throughput drains:
 | PostgreSQL | `SELECT ... FOR UPDATE SKIP LOCKED` or `UPDATE ... RETURNING` patterns. |
 | Cloud queues | Visibility timeout or native lease semantics. |
 
-These stronger patterns are intentionally provider-specific. They should live in provider-specific packages or host-owned adapters unless a portable EF Core implementation is proven sufficient.
+These stronger patterns are intentionally provider-specific. They should live in provider-specific packages or host-owned adapters unless a portable EF Core implementation is proven sufficient for the host's workload.
 
 ## Completion and ownership verification
 
-Claim completion should verify the claim owner/token before writing delivered, failed, retryable, deferred, or dead-lettered state.
+Claim completion verifies the claim owner/token before writing delivered, failed, retryable, deferred, or dead-lettered state.
 
 A final transition should fail or no-op when:
 
@@ -159,50 +170,23 @@ Claim/lease support can reduce duplicate selection risk. It does not by itself p
 
 ## Compatibility and migration boundaries
 
-Claim support should be introduced as a backward-compatible additive feature when possible:
+Claim support is introduced as a backward-compatible additive feature where possible:
 
-* Existing single-worker drains should continue to use the current APIs.
-* New claim-capable APIs should be opt-in.
-* EF Core claim fields should require an explicit host migration.
-* Hosts that do not add claim columns should remain able to use the existing durable outbox model.
+* Existing single-worker drains continue to use the current APIs by default.
+* New claim-capable APIs are opt-in.
+* EF Core claim fields require an explicit host migration.
+* Hosts that do not add claim columns should continue to use the existing durable outbox behavior until they opt into claim leases.
 * Release notes should identify claim support as a minor release feature unless a breaking schema/API decision is made.
 
-The package should not silently change an existing host's durable table shape or deployment behavior without documentation and migration guidance.
-
-## Recommended next implementation sequence
-
-1. Add Core claim request/result/claim-token models and a claim-capable store interface.
-2. Add an opt-in drain path that prefers `IAsiBackboneGovernanceOutboxClaimStore` when configured.
-3. Add EF Core claim fields and indexes behind explicit migrations owned by the host.
-4. Add EF Core tests for two workers racing to claim the same row before provider emission.
-5. Add docs and samples showing one active worker, partitioned workers, and claim-capable multi-worker drains.
-6. Preserve provider-side idempotency guidance in all multi-worker examples.
-
-## Rejected alternatives
-
-### Silent claim inside existing find methods
-
-Rejected. It would surprise existing consumers because methods named `FindPendingAsync` and `FindRetryReadyAsync` would mutate durable state.
-
-### Claim status only
-
-Rejected as the first step. A status-only design does not prove ownership during completion and risks conflating row lease state with provider emission state.
-
-### Provider-neutral exactly-once guarantee
-
-Rejected. Exactly-once delivery requires provider participation, durable idempotency semantics, and failure-mode proof beyond the package boundary.
-
-### Package-owned distributed lock manager
-
-Rejected for the current direction. Distributed locking is infrastructure-specific and can become a hidden deployment dependency. Hosts should explicitly choose platform locking, provider-specific claims, partitioning, or a single active worker.
+The package does not silently change an existing host's deployed database without a host-owned migration.
 
 ## Documentation outcome
 
-Until claim/lease support is implemented, the recommended production guidance remains:
+With the initial claim/lease support available, the recommended production guidance is:
 
-* use one active worker per durable outbox partition;
-* use disjoint partitions when running multiple workers;
-* use host-owned claim/lease behavior if scaling drain workers against the same durable rows;
+* use one active worker per durable outbox partition when simple operations are preferred;
+* use disjoint partitions when running multiple workers without claim leases;
+* enable the claim-capable drain path only when the configured store implements `IAsiBackboneGovernanceOutboxClaimStore` and the host has applied any required schema migration;
 * use provider-side idempotency keys wherever the downstream provider supports them.
 
-This design record records the target direction without overstating current runtime behavior.
+This design record records the implemented baseline without overstating runtime guarantees.

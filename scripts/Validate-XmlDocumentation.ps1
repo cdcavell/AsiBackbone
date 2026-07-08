@@ -102,11 +102,11 @@ foreach ($projectPath in $Project) {
     $absoluteProjectPath = Resolve-RepositoryPath -Path $projectPath
 
     if (-not (Test-Path -LiteralPath $absoluteProjectPath)) {
-        throw "Project path '$projectPath' does not exist."
+        throw ('Project path does not exist: ' + $projectPath)
     }
 
     $displayProjectPath = Get-RepositoryRelativePath -Path $absoluteProjectPath
-    Write-Host "Validating XML documentation coverage for $displayProjectPath"
+    Write-Host ('Validating XML documentation coverage for ' + $displayProjectPath)
 
     $buildArguments = @(
         'build',
@@ -117,7 +117,7 @@ foreach ($projectPath in $Project) {
         '/p:ContinuousIntegrationBuild=true',
         '/p:GenerateDocumentationFile=true',
         '/p:AsiBackboneSuppressMissingXmlDocs=false',
-        "/p:AsiBackboneEnforceMissingXmlDocs=$enforceXmlDocs"
+        ('/p:AsiBackboneEnforceMissingXmlDocs=' + $enforceXmlDocs)
     )
 
     if ($NoRestore) {
@@ -175,9 +175,9 @@ New-Item -ItemType Directory -Path $outputDirectory -Force | Out-Null
 $report = @(
     '# Public API XML Documentation Inventory',
     '',
-    "Generated: $generatedAt",
+    ('Generated: {0}' -f $generatedAt),
     '',
-    "Mode: `$Mode`",
+    ('Mode: `{0}`' -f $Mode),
     '',
     'This report is produced by `scripts/Validate-XmlDocumentation.ps1` with `CS1591` unsuppressed for the selected public package projects. Inventory mode records gaps without treating them as release-blocking. Enforce mode treats `CS1591` as an error for projects listed in `eng/xml-docs/staged-enforcement-projects.txt` or passed with `-Project`.',
     ''
@@ -247,9 +247,9 @@ if ($buildFailures.Count -gt 0) {
 }
 
 if ($Mode -eq 'Enforce' -and $findings.Count -gt 0) {
-    throw "Found $($findings.Count) CS1591 public API XML documentation gaps in enforced projects."
+    throw ('Found ' + $findings.Count + ' CS1591 public API XML documentation gaps in enforced projects.')
 }
 
 if ($findings.Count -gt 0) {
-    Write-Warning "Found $($findings.Count) CS1591 public API XML documentation gaps."
+    Write-Warning ('Found ' + $findings.Count + ' CS1591 public API XML documentation gaps.')
 }

@@ -52,6 +52,7 @@ Before tagging `v2.3.0`, confirm:
 - Template fallback `PackageReference` versions use `2.3.0`.
 - Release notes state that no package ID or namespace changes are included.
 - Release notes document the managed-key signing fail-closed default and the explicit local-validation opt-in path.
+- Release notes state that NuGet package signing remains deferred and that `2.3.0` packages should not be described as maintainer-signed, repository-signed, or Authenticode-signed.
 - Release notes state that existing APIs should continue to compile, while hosts relying on managed-key unsigned failure metadata should review the behavioral hardening note.
 - CI passes on the release-candidate commit.
 - Stable Release Validation passes on the release-candidate commit.
@@ -60,6 +61,12 @@ Before tagging `v2.3.0`, confirm:
 - Template package smoke validation passes.
 - External consumer smoke tests pass.
 - DocFX documentation build passes.
+
+## Package signing readiness
+
+NuGet package signing remains an open supply-chain readiness item for `2.3.0`. This release may include NuGet repository metadata, Source Link commit metadata, package SBOMs, and package/SBOM provenance artifacts where supported by the workflow event, but it does not introduce maintainer-signed, repository-signed, or Authenticode-signed package artifacts.
+
+If package signing becomes available in a later release, the release-preparation PR should update `SECURITY.md`, `Stable Release Validation`, the current release-readiness record, the release notes, and consumer verification guidance before public wording claims signed package artifacts.
 
 ## Compatibility notes
 
@@ -77,4 +84,4 @@ After packages are published and visible on NuGet, validate Source Link reposito
 ./scripts/Validate-Source-Link-commit-metadata.ps1 -Version 2.3.0
 ```
 
-If package metadata, Source Link metadata, SBOM artifacts, or provenance artifacts are incorrect after publish, document the failure and prepare a follow-up patch rather than attempting to overwrite immutable NuGet package metadata.
+If package metadata, Source Link metadata, SBOM artifacts, provenance artifacts, or package-signing documentation are incorrect after publish, document the failure and prepare a follow-up patch rather than attempting to overwrite immutable NuGet package metadata.

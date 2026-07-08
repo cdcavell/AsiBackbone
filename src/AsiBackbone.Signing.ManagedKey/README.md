@@ -22,6 +22,8 @@ public interface IManagedKeySigningClient
 
 Host applications provide the client implementation and credentials. Private keys, symmetric keys, access tokens, client secrets, connection strings, managed identity tokens, and raw key material must not be returned to AsiBackbone.
 
+The default managed-key signature descriptor is `RSASSA-PSS-SHA256-MANAGED-KEY`. It is provider-neutral metadata that the host-owned managed-key client maps to the concrete algorithm name used by its KMS, HSM, or signing service. Hosts whose key service still requires PKCS#1 v1.5 should override `SignatureAlgorithm` explicitly and document that compatibility choice.
+
 ## Dependency injection
 
 The production-oriented registration fails closed by default. Signing failures throw unless the host explicitly opts into unsigned failure metadata.
@@ -33,7 +35,7 @@ services.AddAsiBackboneManagedKeySigning(
         options.ProviderName = "azure-key-vault";
         options.KeyId = "https://vault-name.vault.azure.net/keys/audit-signing-key";
         options.KeyVersion = "00000000000000000000000000000000";
-        options.SignatureAlgorithm = "RSASSA-PKCS1-v1_5-SHA256-MANAGED-KEY";
+        options.SignatureAlgorithm = "RSASSA-PSS-SHA256-MANAGED-KEY";
         options.RequireKeyVersion = true;
         options.ReturnUnsignedOnFailure = false;
     },

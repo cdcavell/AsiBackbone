@@ -1,8 +1,8 @@
 # Historical Stable API Review
 
-This review records the public API review for the initial stable AsiBackbone package family before the `1.0.0` surface was established. It is retained as a historical API-shape baseline for the compatible `1.x` line.
+This review records the public API review for the initial stable AsiBackbone package family before the `1.0.0` surface was established. It is retained as a historical API-shape baseline for the original compatible `1.x` line and the `1.1.0` additive package-family expansion.
 
-The current released stable package family is documented in [1.2.1 Release Notes](release-notes-121.md). The current `1.2.1` package family carries forward the stable analyzer, OpenTelemetry, and signing-provider packages reviewed in the `1.1.0` addendum, while preserving the original `1.0.0` package compatibility promise. Future stable packages or public API expansions should continue to use release validation, package-boundary review, and follow-up API review notes when needed.
+Current package status is documented in [API Compatibility and Semantic Versioning](api-compatibility-and-semver.md), [3.0.0 Release Notes](release-notes-300.md), and the current release-readiness record. This page is intentionally historical and should not be read as the current stable package-family index.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. This review is limited to implemented .NET package APIs and does not treat AsiBackbone as an artificial superintelligence implementation, AI model host, legal/compliance guarantee, or robot controller.
 
@@ -13,7 +13,7 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 | Public API review documented | Complete for the initial `1.0.0` stable surface. |
 | Required breaking changes identified | None identified in the initial `1.0.0` review. |
 | Package boundaries reviewed | Complete for the initial package family; `1.1.0` stable package-family addendum recorded below. |
-| Dependency direction reviewed | Complete for the initial package family and still valid for the compatible `1.x` line. |
+| Dependency direction reviewed | Complete for the initial package family and still valid as historical boundary context. |
 | Stable release dependency | Historical: the `1.0.0` tag was not to be cut until release validation passed and later review findings were resolved or intentionally deferred. For current releases, use [Stable Release Validation](release-validation.md). |
 
 ## Reviewed package family for `1.0.0`
@@ -44,17 +44,17 @@ The `1.1.0` stable package family is an additive compatible expansion over the `
 
 The `1.1.0` addendum does not bring future Event Hubs, Purview, Azure-specific SDK adapters, robotics, immutable storage, external anchoring, Azure Key Vault-specific implementation packages, HSM-specific implementation packages, or other future providers into the stable contract. Those must complete their own review before being documented as stable packages.
 
-## `1.2.x` current package-family note
+## Historical `1.2.x` package-family note
 
-The current `1.2.x` package family carries forward the `1.0.0` stable baseline and the `1.1.0` additive package-family expansion.
+The `1.2.x` package family carried forward the `1.0.0` stable baseline and the `1.1.0` additive package-family expansion.
 
-Additional current package surfaces such as `AsiBackbone.DependencyInjection`, `AsiBackbone.Testing`, and `AsiBackbone.Templates` should be treated as stable only within the release lines where they are explicitly documented, validated, and released.
+Additional `1.2.x` package surfaces such as `AsiBackbone.DependencyInjection`, `AsiBackbone.Testing`, and `AsiBackbone.Templates` should be treated as stable only within the release lines where they were explicitly documented, validated, and released.
 
-This historical API review remains the baseline record for the initial stable API shape and the `1.1.0` addendum, while current package status should be read from the `1.2.1` release documentation.
+This historical API review remains the baseline record for the initial stable API shape and the `1.1.0` addendum, while current package status should be read from the current release documentation.
 
 ## Public naming review
 
-The reviewed public naming pattern was acceptable for `1.0.0` and remains acceptable for the compatible `1.x` line:
+The reviewed public naming pattern was acceptable for `1.0.0` and remains useful historical context:
 
 - package names consistently use `AsiBackbone.*`;
 - namespaces mirror package boundaries;
@@ -67,7 +67,7 @@ No required renames were identified for the stable `1.x` documentation review.
 
 ## Namespace review
 
-The namespace layout was acceptable for `1.0.0` and is corrected here for the current public API:
+The namespace layout was acceptable for `1.0.0` and is corrected here for the public API shape known at the time of the historical review:
 
 | Namespace area | Review result |
 | --- | --- |
@@ -94,7 +94,7 @@ The stale `AsiBackbone.Core.Tokens` reference from the historical review is corr
 
 ## Dependency direction review
 
-The dependency direction was acceptable for the initial stable package family and remains the rule for compatible `1.x` package additions:
+The dependency direction was acceptable for the initial stable package family and remains the rule for compatible package additions:
 
 ```text
 AsiBackbone.Core
@@ -151,7 +151,7 @@ No required breaking changes were identified.
 
 Stable persisted or exported artifacts should remain covered by schema-version guidance.
 
-Reviewed artifact families now include:
+Reviewed artifact families include:
 
 - audit residue;
 - audit ledger records;
@@ -174,14 +174,14 @@ Review decision:
 
 ### Required breaking changes
 
-None identified in this review.
+None identified in this historical review.
 
 ### Non-blocking follow-up considerations
 
 The following were not required before `1.0.0`, but should remain visible for later milestones:
 
 - Core architecture boundary checks are tracked by [API Baseline and Architecture Boundary Checks](api-baseline-and-boundary-checks.md) and should continue to protect Core from integration/provider dependencies;
-- generated public API baseline files remain explicitly deferred to a later `1.x` milestone so the project can choose one stable public API drift process;
+- generated public API baseline files remain explicitly deferred to a later milestone so the project can choose one stable public API drift process;
 - consider adding package-specific API review notes for future provider packages before those packages become stable;
 - consider adding upgrade notes if any later provider package introduces stable serialized artifacts;
 - keep release notes and package READMEs aligned when new stable packages are added.
@@ -192,12 +192,14 @@ For future release lines, Event Hubs, Purview, Azure-specific SDK adapters, robo
 
 The initial stable package family was acceptable to proceed toward `1.0.0` from an API-shape perspective, provided release validation passed and any new API concerns discovered before tagging were resolved or intentionally deferred with follow-up issues.
 
-The `1.1.0` stable package-family expansion is additive and compatible with the original `1.0.0` package-family boundary. Its added stable package surfaces should be treated as part of the compatible `1.x` contract once released.
+The `1.1.0` stable package-family expansion is additive and compatible with the original `1.0.0` package-family boundary. Its added stable package surfaces should be treated as part of the compatible contract once released.
 
 This review does not replace CI, tests, package smoke validation, DocFX validation, or release version checks. It documents the historical stable public API and package-boundary review for issue #13 plus the `1.1.0` stable package-family addendum.
 
 ## Related documentation
 
+- [3.0.0 Release Notes](release-notes-300.md)
+- [2.3.0 Release Notes](release-notes-230.md)
 - [1.2.1 Release Notes](release-notes-121.md)
 - [1.2.0 Release Notes](release-notes-120.md)
 - [1.1.x Release Notes](release-notes-110.md)

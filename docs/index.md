@@ -29,7 +29,7 @@ These pages are the best first stops for implementation-first adoption.
 
 ## Current stable package family
 
-Stable `2.x` is the current release line. `2.3.0` is the current compatible minor release. It preserves the `2.0.0` public package and namespace boundary while adding metadata budget guardrails, opt-in constraint-exception denial behavior, empty-policy warning diagnostics, managed-key signing fail-closed defaults, outbox/query hardening, endpoint-governance validation cleanup, and documentation alignment.
+Stable `3.x` is the current release line. `3.0.0` establishes the current major line and binary assembly identity while preserving the existing `AsiBackbone.*` package IDs and namespaces. The release carries forward the Core foundation, builder-facade registration surface, in-memory validation storage, EF Core host-owned persistence, ASP.NET Core integration, test harness helpers, dotnet new templates, analyzers, the OpenTelemetry provider, local-development signing, the managed-key signing adapter boundary, samples, release validation, package SBOM/provenance artifacts, BenchmarkDotNet allocation baselines, benchmark guidance, custom decision-policy examples, Source Link metadata validation, endpoint-governance reduced metadata mode, metadata budget guardrails, constraint-exception denial opt-in behavior, empty-policy warning diagnostics, managed-key signing fail-closed defaults, threat-model contributor hooks, strict governance profile helpers, EF Core JSON metadata storage guidance, policy-input hardening guidance, production placeholder guardrails, and host-validation documentation.
 
 ```text
 AsiBackbone.Core
@@ -66,6 +66,7 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 * [Core Domain Language](articles/core-domain-language.md)
 * [Policy Evaluator Pipeline](articles/policy-evaluator-pipeline.md)
 * [Threat Model Contributors](articles/threat-model-contributors.md)
+* [Strict Governance Profile](articles/strict-governance-profile.md)
 * [Custom Decision Policy Examples](articles/custom-decision-policy-examples.md)
 * [Host-Owned Execution Enforcement](articles/host-owned-execution-enforcement.md)
 * [Dynamic Liability Handshake](articles/dynamic-liability-handshake.md)
@@ -74,6 +75,7 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 ### Package integration, observability, and signing
 
 * [EF Core Integration Boundary](articles/ef-core-integration-boundary.md)
+* [EF Core JSON Metadata Storage](articles/ef-core-json-metadata-storage.md)
 * [ASP.NET Core Integration Boundary](articles/aspnetcore-integration-boundary.md)
 * [ASP.NET Core Endpoint Governance](articles/aspnetcore-endpoint-governance.md)
 * [Testing Harness](articles/testing-harness.md)
@@ -117,6 +119,8 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 * [Quality Reports](quality/)
 * [Performance Benchmark Baseline](articles/performance-benchmark-baseline.md)
 * [Release Validation](articles/release-validation.md)
+* [3.0.0 Release Readiness Record](articles/release-readiness-300.md)
+* [3.0.0 Release Notes](articles/release-notes-300.md)
 * [2.3.0 Release Readiness Record](articles/release-readiness-230.md)
 * [2.3.0 Release Notes](articles/release-notes-230.md)
 * [2.2.1 Release Readiness Record](articles/release-readiness-221.md)

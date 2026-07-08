@@ -1,6 +1,6 @@
 # Documentation Articles
 
-This section maps the AsiBackbone documentation set for the stable `2.x` Accountable Systems Infrastructure package family.
+This section maps the AsiBackbone documentation set for the stable `3.x` Accountable Systems Infrastructure package family.
 
 > [!IMPORTANT]
 > In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is governance infrastructure for accountable software decision flow, not an artificial superintelligence implementation. See [Project Boundaries and Non-Claims](project-boundaries.md) for the canonical boundary reference.
@@ -11,11 +11,11 @@ Use the header search box for package names, API concepts, and article titles. S
 
 ## Current stable package posture
 
-Stable `2.x` is the current package line. `2.3.0` is the current compatible minor release. It preserves the `2.0.0` public package and namespace boundary while adding metadata budget guardrails, opt-in constraint-exception denial behavior, empty-policy warning diagnostics, managed-key signing fail-closed defaults, outbox/query hardening, endpoint-governance validation cleanup, and documentation alignment. `2.0.0` established the simplified `AsiBackbone.*` package and namespace identity after the public rename from `CDCavell.AsiBackbone.*`.
+Stable `3.x` is the current package line. `3.0.0` establishes the current major line and binary assembly identity while preserving the `AsiBackbone.*` package IDs and namespaces established by the `2.0.0` public rename from `CDCavell.AsiBackbone.*`.
 
 Released stable package surfaces include Core, DependencyInjection, Storage.InMemory, EntityFrameworkCore, AspNetCore, Testing, Templates, Analyzers, OpenTelemetry, Signing.LocalDevelopment, and Signing.ManagedKey. OpenTelemetry is the concrete released governance-emission provider. Event Hubs, Purview, Azure-specific SDK adapters, Aspire runtime packages, robotics, immutable-storage, and additional provider packages remain design-only, strategy-only, sample-only, host-owned, or future-provider work unless a later stable release explicitly ships them.
 
-The release process now includes explicit [Release Cadence and Readiness](release-cadence-and-readiness.md) guidance for patch/minor/major release selection, early-major stabilization, package metadata assets, Source Link, SBOM/provenance, documentation links, and future package identity or namespace changes.
+The release process includes explicit [Release Cadence and Readiness](release-cadence-and-readiness.md) guidance for patch/minor/major release selection, early-major stabilization, package metadata assets, Source Link, SBOM/provenance, documentation links, and future package identity or namespace changes.
 
 ## Start here / implementation-first usage
 
@@ -30,6 +30,7 @@ The release process now includes explicit [Release Cadence and Readiness](releas
 * [AddAsiBackbone Builder Facade](add-asibackbone-builder-facade.md)
 * [dotnet new Templates](templates.md)
 * [Why AsiBackbone?](why-asi-backbone.md)
+* [3.0.0 Release Notes](release-notes-300.md)
 * [2.3.0 Release Notes](release-notes-230.md)
 * [2.2.1 Release Notes](release-notes-221.md)
 * [2.2.0 Release Notes](release-notes-220.md)
@@ -46,6 +47,7 @@ The release process now includes explicit [Release Cadence and Readiness](releas
 * [Policy Evaluator Pipeline](policy-evaluator-pipeline.md)
 * [Threat Model Contributors](threat-model-contributors.md)
 * [Constraint Exception Policy](constraint-exception-policy.md)
+* [Strict Governance Profile](strict-governance-profile.md)
 * [Production Hardening: Evaluator and Outbox Configuration](production-hardening-evaluator-and-outbox.md)
 * [Custom Decision Policy Examples](custom-decision-policy-examples.md)
 * [Host-Owned Execution Enforcement](host-owned-execution-enforcement.md)
@@ -79,6 +81,7 @@ These pages remain available for readers who want the broader framing. They are 
 * [Aspire AppHost Sample](aspire-apphost-sample.md)
 * [1.0.0 Quickstart](quickstart-100.md)
 * [EF Core Integration Boundary](ef-core-integration-boundary.md)
+* [EF Core JSON Metadata Storage](ef-core-json-metadata-storage.md)
 * [EF Core Host Ownership and Migration Guidance](ef-core-host-ownership-and-migrations.md)
 * [ASP.NET Core Integration Boundary](aspnetcore-integration-boundary.md)
 * [ASP.NET Core Endpoint Governance](aspnetcore-endpoint-governance.md)
@@ -92,7 +95,7 @@ These pages remain available for readers who want the broader framing. They are 
 
 ## Durability, observability, signing, diagnostics, and developer experience
 
-These pages cover the durability, governance-emission, signing, diagnostics, testing, and template surfaces carried forward into the current `2.x` package family.
+These pages cover the durability, governance-emission, signing, diagnostics, testing, and template surfaces carried forward into the current `3.x` package family.
 
 * [Observability and Governance Emission Architecture](observability-and-governance-emission-architecture.md)
 * [Governance Emission Contract](governance-emission-contract.md)
@@ -155,6 +158,7 @@ Scenario pages describe applied patterns. They remain optional and do not imply 
 * [Release Cadence and Readiness](release-cadence-and-readiness.md)
 * [Release Validation](release-validation.md)
 * [Supply-Chain Provenance and Package SBOMs](supply-chain-provenance.md)
+* [3.0.0 Release Readiness Record](release-readiness-300.md)
 * [2.3.0 Release Readiness Record](release-readiness-230.md)
 * [2.2.1 Release Readiness Record](release-readiness-221.md)
 * [2.2.0 Release Readiness Record](release-readiness-220.md)
@@ -168,6 +172,7 @@ Scenario pages describe applied patterns. They remain optional and do not imply 
 * [API Baseline and Boundary Checks](api-baseline-and-boundary-checks.md)
 * [Implicit Usings Posture](implicit-usings-posture.md)
 * [Developer Checklist](developer-checklist.md)
+* [3.0.0 Release Notes](release-notes-300.md)
 * [2.3.0 Release Notes](release-notes-230.md)
 * [2.2.1 Release Notes](release-notes-221.md)
 * [2.2.0 Release Notes](release-notes-220.md)

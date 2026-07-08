@@ -1,16 +1,14 @@
 # Strict Governance Profile
 
-`AddAsiBackboneStrictGovernance()` is the 2.x migration bridge for hosts that want a fail-closed governance posture without waiting for a possible 3.0.0 default change.
+`AddAsiBackboneStrictGovernance()` is the explicit fail-closed governance profile for hosts that want production-oriented defaults without hiding those choices behind implicit package behavior.
 
-The helper does not register authentication, authorization, host policy rules, audit persistence, endpoint middleware, or business execution. It configures the high-consequence AsiBackbone options that decide whether missing policy structure, policy exceptions, and ungoverned endpoints fail open or fail closed.
+The helper does not register authentication, authorization, host policy rules, audit persistence, endpoint middleware, or business execution. It configures the high-consequence AsiBackbone options that decide whether missing policy structure, policy exceptions, threat-contributor failures, and ungoverned endpoints fail open or fail closed.
 
 ## Why this exists
 
-Stable 2.x preserves backward-compatible defaults. That means a host that intentionally constructs a permissive evaluator can still allow empty-policy flows, keep ordinary constraint exceptions in the host exception pipeline, and let endpoint governance ignore endpoints that do not carry governance metadata.
+The current `3.x` line keeps strict posture explicit. A host can still construct an intentionally permissive evaluator for local validation, tests, samples, or explicitly unconstrained flows, but production hosts often want the opposite posture: missing governance structure should stop execution visibly instead of allowing the operation quietly.
 
-That compatibility is useful during adoption, but production hosts often want the opposite posture: missing governance structure should stop execution visibly instead of allowing the operation quietly.
-
-The strict profile gives that posture one discoverable registration call.
+The strict profile gives that posture one discoverable registration call while keeping final execution authority with the host application.
 
 ## Registration
 
@@ -52,7 +50,7 @@ Configuration order still matters. Later `Configure<TOptions>(...)` calls can in
 
 ## Empty-policy behavior
 
-With default 2.x behavior, an evaluator with no constraints preserves backward compatibility by allowing the decision and emitting an empty-policy warning when a logger is supplied.
+Without the strict profile, an evaluator with no constraints can preserve permissive evaluation behavior and emit an empty-policy warning when a logger is supplied.
 
 With the strict profile applied, hosts should pass the configured `AsiBackbonePolicyEvaluatorOptions` into evaluator registrations. Empty-policy evaluation then returns a denied decision with the default `asibackbone.policy.no_constraints` reason code.
 
@@ -78,22 +76,28 @@ With the strict profile applied, eligible ordinary constraint failures are conve
 
 `OperationCanceledException` and critical host/runtime failures continue to propagate. The strict profile is a governance failure policy, not a corrupted-process recovery mechanism.
 
+## Threat-contributor behavior
+
+Threat-model contributor failures are also configured to fail closed. When a registered contributor fails with an eligible ordinary exception, the evaluator produces a denied decision with a stable reason code rather than silently continuing to execution.
+
+This is especially important when a contributor screens replay indicators, capability-token mismatch, region-policy mismatch, prompt-injection-like tool requests, or unsafe external commands.
+
 ## Endpoint metadata behavior
 
 When `RequireGovernanceMetadata` is enabled, endpoint governance treats unmarked endpoints as configuration failures. Public or intentionally ungoverned endpoints should opt out explicitly with the endpoint metadata helper provided by the ASP.NET Core package.
 
 Use this to distinguish intentional public surface area from accidentally ungoverned execution paths.
 
-## Possible 3.0.0 migration path
+## 3.x adoption path
 
-A future 3.0.0 release could make fail-closed behavior the default. Hosts can prepare during 2.x by following this path:
+Hosts upgrading to or starting with `3.0.0` can use this path:
 
 1. Add `AddAsiBackboneStrictGovernance()` in non-production or staging first.
 2. Confirm every governed endpoint has policy, capability, and audit metadata where expected.
 3. Mark intentionally public endpoints with the explicit missing-governance-metadata opt-out.
 4. Make policy evaluator registrations consume `IOptions<AsiBackbonePolicyEvaluatorOptions>` instead of creating unrelated option instances.
-5. Monitor denied decisions for `asibackbone.policy.no_constraints` and `asibackbone.policy.constraint_exception` reason codes.
+5. Monitor denied decisions for `asibackbone.policy.no_constraints`, `asibackbone.policy.constraint_exception`, and `asibackbone.threat.contributor_exception` reason codes.
 6. Remove accidental empty-policy flows before enabling the profile in production.
-7. If 3.0.0 later flips defaults, keep the helper as documentation of intent or remove it once the host's default posture is verified.
+7. Keep the helper in production when the host wants the fail-closed posture to be visible in code review and startup configuration.
 
-This path keeps 2.x compatibility intact while giving production hosts an early, explicit fail-closed posture.
+This path keeps strict governance intentional while preserving the package boundary: AsiBackbone provides the evaluation posture, and the host owns execution enforcement, persistence, authentication, authorization, monitoring, and operational response.

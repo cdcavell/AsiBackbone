@@ -7,8 +7,14 @@ using Xunit;
 
 namespace AsiBackbone.AspNetCore.Tests.Handshakes;
 
+/// <summary>
+/// Unit tests for the <see cref="DefaultAsiBackboneAcknowledgmentChallengeService"/> class, which handles the creation and processing of acknowledgment challenges in the AsiBackbone framework.
+/// </summary>
 public sealed class AsiBackboneAcknowledgmentChallengeServiceTests
 {
+    /// <summary>
+    /// Tests that the <see cref="DefaultAsiBackboneAcknowledgmentChallengeService.CreateChallenge"/> method correctly builds a host-friendly acknowledgment challenge from a given acknowledgment decision, including all relevant metadata and options.
+    /// </summary>
     [Fact]
     public void CreateChallengeBuildsHostFriendlyChallengeFromAcknowledgmentDecision()
     {
@@ -55,6 +61,9 @@ public sealed class AsiBackboneAcknowledgmentChallengeServiceTests
         Assert.Equal(challenge.HandshakeId, challenge.HandshakeRequest.HandshakeId);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="DefaultAsiBackboneAcknowledgmentChallengeService.CreateChallenge"/> method hides optional diagnostic fields (TraceId, PolicyVersion, PolicyHash) by default when creating an acknowledgment challenge.
+    /// </summary>
     [Fact]
     public void CreateChallengeHidesOptionalDiagnosticFieldsByDefault()
     {
@@ -77,6 +86,9 @@ public sealed class AsiBackboneAcknowledgmentChallengeServiceTests
         Assert.Null(challenge.PolicyHash);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="DefaultAsiBackboneAcknowledgmentChallengeService.CreateChallenge"/> method can be configured to hide the reason message in the acknowledgment challenge when the <see cref="AsiBackboneAcknowledgmentChallengeOptions.IncludeReasonMessage"/> option is set to false.
+    /// </summary>
     [Fact]
     public void CreateChallengeCanHideReasonMessage()
     {
@@ -92,6 +104,9 @@ public sealed class AsiBackboneAcknowledgmentChallengeServiceTests
         Assert.Null(challenge.ReasonMessage);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="DefaultAsiBackboneAcknowledgmentChallengeService.CreateChallenge"/> method throws an <see cref="InvalidOperationException"/> when attempting to create a challenge for a decision that does not require acknowledgment, ensuring that only valid acknowledgment decisions are processed.
+    /// </summary>
     [Fact]
     public void CreateChallengeRejectsDecisionThatDoesNotRequireAcknowledgment()
     {
@@ -105,6 +120,9 @@ public sealed class AsiBackboneAcknowledgmentChallengeServiceTests
         Assert.Contains("acknowledgment-required", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="DefaultAsiBackboneAcknowledgmentChallengeService.HandleResponse"/> method correctly processes a valid acknowledgment response that matches the challenge, resulting in an accepted acknowledgment with the expected properties.
+    /// </summary>
     [Fact]
     public void HandleResponseCreatesAcceptedAcknowledgmentWhenResponseMatchesChallenge()
     {
@@ -145,6 +163,9 @@ public sealed class AsiBackboneAcknowledgmentChallengeServiceTests
         Assert.Equal(occurredUtc, result.Acknowledgment.OccurredUtc);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="DefaultAsiBackboneAcknowledgmentChallengeService.HandleResponse"/> method correctly processes a response where the actor declines to acknowledge, resulting in a rejected acknowledgment with the expected properties.
+    /// </summary>
     [Fact]
     public void HandleResponseCreatesRejectedAcknowledgmentWhenActorDeclines()
     {
@@ -168,6 +189,9 @@ public sealed class AsiBackboneAcknowledgmentChallengeServiceTests
         Assert.True(result.Acknowledgment.Rejected);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="DefaultAsiBackboneAcknowledgmentChallengeService.HandleResponse"/> method fails when the handshake ID in the response does not match the expected handshake ID from the challenge, resulting in a failure with the appropriate reason code.
+    /// </summary>
     [Fact]
     public void HandleResponseFailsWhenHandshakeIdDoesNotMatch()
     {
@@ -189,6 +213,9 @@ public sealed class AsiBackboneAcknowledgmentChallengeServiceTests
         Assert.Contains("acknowledgment.challenge.mismatch", result.Result.ReasonCodes);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="DefaultAsiBackboneAcknowledgmentChallengeService.HandleResponse"/> method fails when the acknowledgment code in the response does not match the required acknowledgment code from the challenge, resulting in a failure with the appropriate reason code.
+    /// </summary>
     [Fact]
     public void HandleResponseFailsWhenAcknowledgmentCodeDoesNotMatch()
     {
@@ -210,6 +237,9 @@ public sealed class AsiBackboneAcknowledgmentChallengeServiceTests
         Assert.Contains("acknowledgment.challenge.code_mismatch", result.Result.ReasonCodes);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AsiBackboneAcknowledgmentChallengeOptions.Validate"/> method throws an <see cref="InvalidOperationException"/> when the required acknowledgment code is null, empty, or whitespace.
+    /// </summary>
     [Theory]
     [InlineData(null)]
     [InlineData("")]

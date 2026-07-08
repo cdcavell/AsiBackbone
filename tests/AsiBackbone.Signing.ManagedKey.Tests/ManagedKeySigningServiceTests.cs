@@ -23,7 +23,9 @@ public sealed class ManagedKeySigningServiceTests
             metadata: new Dictionary<string, string>
             {
                 ["artifact_type"] = CanonicalArtifactTypes.AuditLedgerRecord,
-                ["artifact_id"] = "record-1"
+                ["artifact_id"] = "record-1",
+                ["retry_attempts"] = "caller-spoof",
+                ["signing_status"] = "caller-spoof"
             });
 
         SigningResult result = await service.SignAsync(request, TestContext.Current.CancellationToken);
@@ -42,6 +44,12 @@ public sealed class ManagedKeySigningServiceTests
         Assert.Equal("false", result.Metadata.Metadata["raw_private_key_loaded"]);
         Assert.Equal("signed", result.Metadata.Metadata["signing_status"]);
         Assert.Equal("operation-1", result.Metadata.Metadata["provider_operation_id"]);
+        Assert.Equal("0", result.Metadata.Metadata["retry_attempts"]);
+        Assert.Equal("1", result.Metadata.Metadata["provider_attempts"]);
+        Assert.Equal("2", result.Metadata.Metadata["max_retry_attempts"]);
+        Assert.Equal("0", result.Metadata.Metadata["retry_delay_milliseconds"]);
+        Assert.Equal("false", result.Metadata.Metadata["retry_delay_configured"]);
+        Assert.Equal("false", result.Metadata.Metadata["retry_delay_applied"]);
         Assert.Equal(CanonicalArtifactTypes.AuditLedgerRecord, result.Metadata.Metadata["artifact_type"]);
         Assert.False(result.Metadata.Metadata.ContainsKey("access_token"));
     }
@@ -100,6 +108,8 @@ public sealed class ManagedKeySigningServiceTests
         Assert.Null(result.Metadata.Signature);
         Assert.Equal("failed", result.Metadata.Metadata["signing_status"]);
         Assert.Equal("managedkey.signing.hash-algorithm-unsupported", result.Metadata.Metadata["failure_code"]);
+        Assert.Equal("0", result.Metadata.Metadata["provider_attempts"]);
+        Assert.Equal("2", result.Metadata.Metadata["max_retry_attempts"]);
     }
 
     [Fact]
@@ -117,6 +127,7 @@ public sealed class ManagedKeySigningServiceTests
 
         Assert.False(result.IsSigned);
         Assert.Equal("managedkey.signing.key-version-missing", result.Metadata.Metadata["failure_code"]);
+        Assert.Equal("0", result.Metadata.Metadata["provider_attempts"]);
     }
 
     [Fact]
@@ -138,6 +149,10 @@ public sealed class ManagedKeySigningServiceTests
         Assert.Equal("failed", result.Metadata.Metadata["signing_status"]);
         Assert.Equal("managedkey.signing.provider-unavailable", result.Metadata.Metadata["failure_code"]);
         Assert.Equal("0", result.Metadata.Metadata["retry_attempts"]);
+        Assert.Equal("1", result.Metadata.Metadata["provider_attempts"]);
+        Assert.Equal("0", result.Metadata.Metadata["max_retry_attempts"]);
+        Assert.Equal("ManagedKeySigningException", result.Metadata.Metadata["failure_exception_type"]);
+        Assert.Equal("true", result.Metadata.Metadata["failure_retryable"]);
         Assert.Equal(1, client.CallCount);
     }
 
@@ -159,6 +174,34 @@ public sealed class ManagedKeySigningServiceTests
         Assert.True(result.IsSigned);
         Assert.Equal(2, client.CallCount);
         Assert.Equal("1", result.Metadata.Metadata["retry_attempts"]);
+        Assert.Equal("2", result.Metadata.Metadata["provider_attempts"]);
+        Assert.Equal("2", result.Metadata.Metadata["max_retry_attempts"]);
+        Assert.Equal("0", result.Metadata.Metadata["retry_delay_milliseconds"]);
+        Assert.Equal("false", result.Metadata.Metadata["retry_delay_configured"]);
+        Assert.Equal("false", result.Metadata.Metadata["retry_delay_applied"]);
+        Assert.Equal("managedkey.signing.provider-unavailable", result.Metadata.Metadata["last_retry_failure_code"]);
+        Assert.Equal("ManagedKeySigningException", result.Metadata.Metadata["last_retry_failure_exception_type"]);
+    }
+
+    [Fact]
+    public async Task SignAsyncRecordsAppliedRetryDelayWhenConfigured()
+    {
+        var client = new FakeManagedKeySigningClient(retryableFailuresBeforeSuccess: 1);
+        ManagedKeySigningOptions options = CreateOptions(retryDelay: TimeSpan.FromMilliseconds(1));
+        var service = new ManagedKeySigningService(options, client);
+        var request = new SigningRequest(
+            "abc123",
+            hashAlgorithm: "SHA-256",
+            purpose: CanonicalArtifactTypes.AuditLedgerRecord,
+            keyId: "managed-key-1",
+            keyVersion: "v1");
+
+        SigningResult result = await service.SignAsync(request, TestContext.Current.CancellationToken);
+
+        Assert.True(result.IsSigned);
+        Assert.Equal("1", result.Metadata.Metadata["retry_delay_milliseconds"]);
+        Assert.Equal("true", result.Metadata.Metadata["retry_delay_configured"]);
+        Assert.Equal("true", result.Metadata.Metadata["retry_delay_applied"]);
     }
 
     [Fact]
@@ -279,6 +322,9 @@ public sealed class ManagedKeySigningServiceTests
                 metadata: new Dictionary<string, string>
                 {
                     ["provider_region"] = "test-region",
+                    ["retry_attempts"] = "provider-spoof",
+                    ["signing_status"] = "provider-spoof",
+                    ["provider_operation_id"] = "provider-spoof",
                     ["access_token"] = "should-not-be-preserved"
                 }));
         }

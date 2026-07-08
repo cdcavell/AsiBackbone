@@ -17,7 +17,7 @@ public sealed class ManagedKeySigningOptions
     /// <summary>
     /// Gets the default provider-neutral signature algorithm descriptor.
     /// </summary>
-    public const string DefaultSignatureAlgorithm = "RSASSA-PKCS1-v1_5-SHA256-MANAGED-KEY";
+    public const string DefaultSignatureAlgorithm = "RSASSA-PSS-SHA256-MANAGED-KEY";
 
     /// <summary>
     /// Gets the default supported hash algorithm descriptor.

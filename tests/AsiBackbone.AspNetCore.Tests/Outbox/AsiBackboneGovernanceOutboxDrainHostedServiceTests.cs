@@ -17,7 +17,7 @@ namespace AsiBackbone.AspNetCore.Tests.Outbox;
 public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceTests
 {
     /// <summary>
-    /// Tests that the <see cref="AddAsiBackboneGovernanceOutboxDrainWorker"/> extension method registers the hosted worker and options correctly.
+    /// Tests that the <c>AddAsiBackboneGovernanceOutboxDrainWorker</c> extension method registers the hosted worker and options correctly.
     /// </summary>
     [Fact]
     public void AddAsiBackboneGovernanceOutboxDrainWorkerRegistersHostedWorkerAndOptions()
@@ -183,7 +183,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AddAsiBackboneGovernanceOutboxDrainWorker"/> extension method rejects invalid batch sizes (zero or negative) and throws an appropriate exception.
+    /// Tests that the <c>AddAsiBackboneGovernanceOutboxDrainWorker</c> extension method rejects invalid batch sizes (zero or negative) and throws an appropriate exception.
     /// </summary>
     /// <param name="batchSize">
     /// The batch size to test, which is expected to be invalid (zero or negative).

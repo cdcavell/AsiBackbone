@@ -13,7 +13,7 @@ namespace AsiBackbone.AspNetCore.Tests.Correlation;
 public sealed class AsiBackboneHttpRequestCorrelationAuditExtensionsTests
 {
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneHttpRequestCorrelation.CreateAuditResidue"/> method uses the request correlation ID and trace ID before falling back to the decision correlation ID and trace ID.
+    /// Tests that the <c>AsiBackboneHttpRequestCorrelation.CreateAuditResidue"</c> method uses the request correlation ID and trace ID before falling back to the decision correlation ID and trace ID.
     /// </summary>
     [Fact]
     public void CreateAuditResidueUsesRequestCorrelationBeforeDecisionCorrelation()
@@ -39,7 +39,7 @@ public sealed class AsiBackboneHttpRequestCorrelationAuditExtensionsTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneHttpRequestCorrelation.CreateAuditResidue"/> method falls back to the decision correlation ID and trace ID when the request correlation ID and trace ID are missing.
+    /// Tests that the <c>AsiBackboneHttpRequestCorrelation.CreateAuditResidue</c> method falls back to the decision correlation ID and trace ID when the request correlation ID and trace ID are missing.
     /// </summary>
     [Fact]
     public void CreateAuditResidueFallsBackToDecisionCorrelationWhenRequestCorrelationIsMissing()
@@ -59,7 +59,7 @@ public sealed class AsiBackboneHttpRequestCorrelationAuditExtensionsTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneHttpRequestCorrelation.CreateAuditResidue"/> method merges safe request metadata with host metadata.
+    /// Tests that the <c>AsiBackboneHttpRequestCorrelation.CreateAuditResidue</c> method merges safe request metadata with host metadata.
     /// </summary>
     [Fact]
     public void CreateAuditResidueMergesSafeRequestMetadataWithHostMetadata()

@@ -30,7 +30,7 @@ public sealed class AsiBackboneEndpointGovernanceRouteBuilderExtensionsTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneEndpointGovernanceRouteBuilderExtensions.RequireGovernancePolicy{TPolicy}(IEndpointConventionBuilder)"/> method adds the correct metadata to the endpoint and returns the same <see cref="IEndpointConventionBuilder"/> instance.
+    /// Tests that the <c>AsiBackboneEndpointGovernanceRouteBuilderExtensions.RequireGovernancePolicy{TPolicy}(IEndpointConventionBuilder)</c> method adds the correct metadata to the endpoint and returns the same <see cref="IEndpointConventionBuilder"/> instance.
     /// </summary>
     [Fact]
     public void RequireGovernancePolicy_EndpointConventionBuilder_AddsPolicyMetadataAndReturnsSameBuilder()
@@ -53,7 +53,7 @@ public sealed class AsiBackboneEndpointGovernanceRouteBuilderExtensionsTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneEndpointGovernanceRouteBuilderExtensions.RequireLiabilityHandshake(IEndpointConventionBuilder)"/> method adds the correct metadata to the endpoint and returns the same <see cref="IEndpointConventionBuilder"/> instance.
+    /// Tests that the <c>AsiBackboneEndpointGovernanceRouteBuilderExtensions.RequireLiabilityHandshake(IEndpointConventionBuilder)</c> method adds the correct metadata to the endpoint and returns the same <see cref="IEndpointConventionBuilder"/> instance.
     /// </summary>
     [Fact]
     public void RequireLiabilityHandshake_AddsMetadataAndReturnsSameBuilder()
@@ -72,7 +72,7 @@ public sealed class AsiBackboneEndpointGovernanceRouteBuilderExtensionsTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneEndpointGovernanceRouteBuilderExtensions.RequireCapabilityGrant(IEndpointConventionBuilder, string)"/> method adds the correct metadata to the endpoint and returns the same <see cref="IEndpointConventionBuilder"/> instance.
+    /// Tests that the <c>AsiBackboneEndpointGovernanceRouteBuilderExtensions.RequireCapabilityGrant(IEndpointConventionBuilder, string)</c> method adds the correct metadata to the endpoint and returns the same <see cref="IEndpointConventionBuilder"/> instance.
     /// </summary>
     [Fact]
     public void RequireCapabilityGrant_AddsMetadataAndReturnsSameBuilder()
@@ -94,7 +94,7 @@ public sealed class AsiBackboneEndpointGovernanceRouteBuilderExtensionsTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneEndpointGovernanceRouteBuilderExtensions.EmitGovernanceAudit(IEndpointConventionBuilder)"/> method adds the correct metadata to the endpoint and returns the same <see cref="IEndpointConventionBuilder"/> instance.
+    /// Tests that the <c>AsiBackboneEndpointGovernanceRouteBuilderExtensions.EmitGovernanceAudit(IEndpointConventionBuilder)</c> method adds the correct metadata to the endpoint and returns the same <see cref="IEndpointConventionBuilder"/> instance.
     /// </summary>
     [Fact]
     public void EmitGovernanceAudit_AddsMetadataAndReturnsSameBuilder()
@@ -113,7 +113,7 @@ public sealed class AsiBackboneEndpointGovernanceRouteBuilderExtensionsTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneEndpointGovernanceRouteBuilderExtensions.RequireGovernancePolicy{TPolicy}(IEndpointConventionBuilder)"/> method throws an <see cref="ArgumentNullException"/> when the policy type is null.
+    /// Tests that the <c>AsiBackboneEndpointGovernanceRouteBuilderExtensions.RequireGovernancePolicy{TPolicy}(IEndpointConventionBuilder)</c> method throws an <see cref="ArgumentNullException"/> when the policy type is null.
     /// </summary>
     [Fact]
     public void RequireGovernancePolicy_ThrowsWhenPolicyTypeIsNull()
@@ -127,7 +127,7 @@ public sealed class AsiBackboneEndpointGovernanceRouteBuilderExtensionsTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneEndpointGovernanceRouteBuilderExtensions.RequireLiabilityHandshake(IEndpointConventionBuilder)"/> method throws an <see cref="ArgumentNullException"/> when the builder is null.
+    /// Tests that the <c>AsiBackboneEndpointGovernanceRouteBuilderExtensions.RequireLiabilityHandshake(IEndpointConventionBuilder)</c> method throws an <see cref="ArgumentNullException"/> when the builder is null.
     /// </summary>
     [Fact]
     public void MetadataExtensions_ThrowWhenBuilderIsNull()
@@ -141,7 +141,7 @@ public sealed class AsiBackboneEndpointGovernanceRouteBuilderExtensionsTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneEndpointGovernanceRouteBuilderExtensions.AddEndpointMetadata{TBuilder}(TBuilder, object)"/> method throws an <see cref="ArgumentNullException"/> when the metadata is null.
+    /// Tests that the <c>AsiBackboneEndpointGovernanceRouteBuilderExtensions.AddEndpointMetadata{TBuilder}(TBuilder, object)</c> method throws an <see cref="ArgumentNullException"/> when the metadata is null.
     /// </summary>
     [Fact]
     public void AddEndpointMetadata_ThrowsWhenMetadataIsNull()
@@ -162,7 +162,7 @@ public sealed class AsiBackboneEndpointGovernanceRouteBuilderExtensionsTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneEndpointGovernanceRouteBuilderExtensions.AllowMissingGovernanceMetadata(IEndpointConventionBuilder)"/> method adds the correct metadata to the endpoint and returns the same <see cref="IEndpointConventionBuilder"/> instance.
+    /// Tests that the <c>AsiBackboneEndpointGovernanceRouteBuilderExtensions.AllowMissingGovernanceMetadata(IEndpointConventionBuilder)</c> method adds the correct metadata to the endpoint and returns the same <see cref="IEndpointConventionBuilder"/> instance.
     /// </summary>
     [Fact]
     public void AllowMissingGovernanceMetadata_AddsMetadataAndReturnsSameBuilder()

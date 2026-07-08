@@ -10,6 +10,14 @@ namespace AsiBackbone.Core.Tests.Audit;
 /// </summary>
 public sealed class AuditResidueBranchCoverageTests
 {
+    /// <summary>
+    /// Validates that the <see cref="AuditResidue.Create"/> method normalizes reason codes correctly across various input scenarios, including null, empty collections, collections with blank entries, and valid reason codes. This ensures that the resulting <see cref="AuditResidue"/> instance has the expected properties for reason codes.
+    /// </summary>
+    /// <param name="scenario">
+    /// The specific input scenario for reason codes, which can be one of the following:
+    /// </param>
+    /// <param name="expectedHasReasonCodes">The expected value for the <see cref="AuditResidue.HasReasonCodes"/> property.</param>
+    /// <param name="expectedReasonCodes">The expected array of reason codes.</param>
     [Theory]
     [InlineData("null", false, new string[0])]
     [InlineData("empty_collection", false, new string[0])]
@@ -34,6 +42,12 @@ public sealed class AuditResidueBranchCoverageTests
         Assert.Equal(expectedReasonCodes, residue.ReasonCodes);
     }
 
+    /// <summary>
+    /// Validates that the <see cref="AuditResidue.FromConstraint"/> method correctly maps constraint evaluation outcomes and reason codes to the resulting <see cref="AuditResidue"/> instance. This test covers various constraint scenarios, including not applicable, allowed, warning, and denied outcomes, ensuring that the resulting audit residue reflects the expected outcome and reason codes.
+    /// </summary>
+    /// <param name="scenario">The specific input scenario for constraint evaluation.</param>
+    /// <param name="expectedOutcome">The expected outcome for the audit residue.</param>
+    /// <param name="expectedReasonCodes">The expected array of reason codes.</param>
     [Theory]
     [InlineData("not_applicable", "NotApplicable", new string[0])]
     [InlineData("allowed", "Allowed", new string[0])]
@@ -73,6 +87,9 @@ public sealed class AuditResidueBranchCoverageTests
         }
     }
 
+    /// <summary>
+    /// Validates that the <see cref="AuditResidue.Create"/> method correctly normalizes optional fields and uses an explicitly provided audit residue ID. This test ensures that the resulting <see cref="AuditResidue"/> instance has the expected properties, including normalized actor ID, display name, operation name, outcome, reason codes, correlation ID, trace ID, span ID, parent span ID, decision latency, constraint set hash, constraint count, risk score, policy scope, tenant hash, organization hash, emitter status, emitter provider, outbox sequence, gateway execution ID, decision stage, policy version, policy hash, and occurred UTC offset.
+    /// </summary>
     [Fact]
     public void CreateNormalizesOptionalFieldsAndUsesExplicitAuditResidueId()
     {
@@ -132,6 +149,12 @@ public sealed class AuditResidueBranchCoverageTests
         Assert.Equal(TimeSpan.Zero, residue.OccurredUtc.Offset);
     }
 
+    /// <summary>
+    /// Validates that the <see cref="AuditResidue.Create"/> method rejects negative values for fields that are expected to be non-negative, such as decision latency, constraint count, and outbox sequence. This test ensures that an <see cref="ArgumentOutOfRangeException"/> is thrown with an appropriate message when negative values are provided for these fields.
+    /// </summary>
+    /// <param name="scenario">
+    /// The specific field scenario to test for negative value rejection, which can be one of the following: "decision_latency", "constraint_count", or "outbox_sequence".
+    /// </param>
     [Theory]
     [InlineData("decision_latency")]
     [InlineData("constraint_count")]
@@ -143,6 +166,12 @@ public sealed class AuditResidueBranchCoverageTests
         Assert.Contains("greater than or equal to zero", exception.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Validates that the <see cref="AuditResidue.Create"/> method rejects invalid risk score values, such as NaN, positive infinity, and negative values. This test ensures that an <see cref="ArgumentOutOfRangeException"/> is thrown with an appropriate message when invalid risk scores are provided.
+    /// </summary>
+    /// <param name="scenario">
+    /// The specific risk score scenario to test for invalid value rejection, which can be one of the following: "nan", "infinity", or "negative".
+    /// </param>
     [Theory]
     [InlineData("nan")]
     [InlineData("infinity")]
@@ -160,6 +189,9 @@ public sealed class AuditResidueBranchCoverageTests
         Assert.Contains("finite value", exception.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Validates that the <see cref="AuditResidue.Create"/> method correctly handles metadata dictionaries that contain only blank keys. This test ensures that the resulting <see cref="AuditResidue"/> instance has no metadata entries and that the shared empty metadata shape is returned, confirming that blank keys are ignored during normalization.
+    /// </summary>
     [Fact]
     public void CreateWithOnlyBlankMetadataKeysReturnsSharedEmptyMetadataShape()
     {

@@ -12,7 +12,7 @@ namespace AsiBackbone.AspNetCore.Tests.Handshakes;
 public sealed class AsiBackboneAcknowledgmentChallengeBranchTests
 {
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneAcknowledgmentChallengeResult.Success(LiabilityHandshakeAcknowledgment)"/> method throws an <see cref="ArgumentNullException"/> when a null acknowledgment is provided.
+    /// Tests that the <c>AsiBackboneAcknowledgmentChallengeResult.Success(LiabilityHandshakeAcknowledgment)</c> method throws an <see cref="ArgumentNullException"/> when a null acknowledgment is provided.
     /// </summary>
     [Fact]
     public void ChallengeResultSuccessRejectsNullAcknowledgment()
@@ -39,7 +39,7 @@ public sealed class AsiBackboneAcknowledgmentChallengeBranchTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="DefaultAsiBackboneAcknowledgmentChallengeService.CreateChallenge(IAsiBackboneActorContext, string, GovernanceDecision)"/> method throws an <see cref="ArgumentNullException"/> when a null actor is provided.
+    /// Tests that the <c>DefaultAsiBackboneAcknowledgmentChallengeService.CreateChallenge(IAsiBackboneActorContext, string, GovernanceDecision)</c> method throws an <see cref="ArgumentNullException"/> when a null actor is provided.
     /// </summary>
     [Fact]
     public void CreateChallengeRejectsNullActor()
@@ -51,7 +51,7 @@ public sealed class AsiBackboneAcknowledgmentChallengeBranchTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="DefaultAsiBackboneAcknowledgmentChallengeService.CreateChallenge(IAsiBackboneActorContext, string, GovernanceDecision)"/> method throws an <see cref="ArgumentNullException"/> when a null decision is provided.
+    /// Tests that the <c>DefaultAsiBackboneAcknowledgmentChallengeService.CreateChallenge(IAsiBackboneActorContext, string, GovernanceDecision)</c> method throws an <see cref="ArgumentNullException"/> when a null decision is provided.
     /// </summary>
     [Fact]
     public void CreateChallengeRejectsNullDecision()
@@ -63,7 +63,7 @@ public sealed class AsiBackboneAcknowledgmentChallengeBranchTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="DefaultAsiBackboneAcknowledgmentChallengeService.HandleResponse(AsiBackboneAcknowledgmentChallenge, IAsiBackboneActorContext, AsiBackboneAcknowledgmentChallengeRequest)"/> method throws an <see cref="ArgumentNullException"/> when a null challenge is provided.
+    /// Tests that the <c>DefaultAsiBackboneAcknowledgmentChallengeService.HandleResponse(AsiBackboneAcknowledgmentChallenge, IAsiBackboneActorContext, AsiBackboneAcknowledgmentChallengeRequest)</c> method throws an <see cref="ArgumentNullException"/> when a null challenge is provided.
     /// </summary>
     [Fact]
     public void HandleResponseRejectsNullChallenge()
@@ -76,7 +76,7 @@ public sealed class AsiBackboneAcknowledgmentChallengeBranchTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="DefaultAsiBackboneAcknowledgmentChallengeService.HandleResponse(AsiBackboneAcknowledgmentChallenge, IAsiBackboneActorContext, AsiBackboneAcknowledgmentChallengeRequest)"/> method throws an <see cref="ArgumentNullException"/> when a null actor is provided.
+    /// Tests that the <c>DefaultAsiBackboneAcknowledgmentChallengeService.HandleResponse(AsiBackboneAcknowledgmentChallenge, IAsiBackboneActorContext, AsiBackboneAcknowledgmentChallengeRequest)</c> method throws an <see cref="ArgumentNullException"/> when a null actor is provided.
     /// </summary>
     [Fact]
     public void HandleResponseRejectsNullActor()
@@ -90,7 +90,7 @@ public sealed class AsiBackboneAcknowledgmentChallengeBranchTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="DefaultAsiBackboneAcknowledgmentChallengeService.HandleResponse(AsiBackboneAcknowledgmentChallenge, IAsiBackboneActorContext, AsiBackboneAcknowledgmentChallengeRequest)"/> method throws an <see cref="ArgumentNullException"/> when a null response is provided.
+    /// Tests that the <c>DefaultAsiBackboneAcknowledgmentChallengeService.HandleResponse(AsiBackboneAcknowledgmentChallenge, IAsiBackboneActorContext, AsiBackboneAcknowledgmentChallengeRequest)</c> method throws an <see cref="ArgumentNullException"/> when a null response is provided.
     /// </summary>
     [Fact]
     public void HandleResponseRejectsNullResponse()
@@ -103,7 +103,7 @@ public sealed class AsiBackboneAcknowledgmentChallengeBranchTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="DefaultAsiBackboneAcknowledgmentChallengeService.HandleResponse(AsiBackboneAcknowledgmentChallenge, IAsiBackboneActorContext, AsiBackboneAcknowledgmentChallengeRequest)"/> method fails when the handshake ID is missing or blank in the response.
+    /// Tests that the <c>DefaultAsiBackboneAcknowledgmentChallengeService.HandleResponse(AsiBackboneAcknowledgmentChallenge, IAsiBackboneActorContext, AsiBackboneAcknowledgmentChallengeRequest)</c> method fails when the handshake ID is missing or blank in the response.
     /// </summary>
     /// <param name="handshakeId">
     /// The handshake ID to test, which can be null, empty, or whitespace.
@@ -131,7 +131,7 @@ public sealed class AsiBackboneAcknowledgmentChallengeBranchTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="DefaultAsiBackboneAcknowledgmentChallengeService.HandleResponse(AsiBackboneAcknowledgmentChallenge, IAsiBackboneActorContext, AsiBackboneAcknowledgmentChallengeRequest)"/> method fails when the acknowledgment code is missing or blank in the response.
+    /// Tests that the <c>DefaultAsiBackboneAcknowledgmentChallengeService.HandleResponse(AsiBackboneAcknowledgmentChallenge, IAsiBackboneActorContext, AsiBackboneAcknowledgmentChallengeRequest)</c> method fails when the acknowledgment code is missing or blank in the response.
     /// </summary>
     /// <param name="acknowledgmentCode">
     /// The acknowledgment code to test, which can be null, empty, or whitespace.

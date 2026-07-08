@@ -10,7 +10,7 @@ namespace AsiBackbone.AspNetCore.Tests.Endpoints;
 public sealed class AsiBackboneEndpointGovernanceDescriptorCacheTests
 {
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneEndpointGovernanceDescriptor.ToMetadata"/> method returns cached metadata for repeated calls, both for full and reduced metadata modes.
+    /// Tests that the <c>AsiBackboneEndpointGovernanceDescriptor.ToMetadata</c> method returns cached metadata for repeated calls, both for full and reduced metadata modes.
     /// </summary>
     [Fact]
     public void ToMetadataReturnsCachedMetadataForRepeatedHotPathUse()

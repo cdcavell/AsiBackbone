@@ -271,7 +271,7 @@ public sealed class ManagedKeySigningServiceTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="ServiceCollectionExtensions.AddAsiBackboneManagedKeySigning(IServiceCollection, Action{ManagedKeySigningOptions}, Func{IServiceProvider, IManagedKeySigningClient})"/> method registers a fail-closed signing service by default.
+    /// Tests that the <c>ServiceCollectionExtensions.AddAsiBackboneManagedKeySigning(IServiceCollection, Action{ManagedKeySigningOptions}, Func{IServiceProvider, IManagedKeySigningClient})</c> method registers a fail-closed signing service by default.
     /// </summary>
     [Fact]
     public void AddAsiBackboneManagedKeySigningRegistersFailClosedSigningServiceByDefault()
@@ -295,7 +295,7 @@ public sealed class ManagedKeySigningServiceTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="ServiceCollectionExtensions.AddAsiBackboneManagedKeySigningForLocalValidation(IServiceCollection, Action{ManagedKeySigningOptions}, Func{IServiceProvider, IManagedKeySigningClient})"/> method registers a fail-open signing service.
+    /// Tests that the <c>ServiceCollectionExtensions.AddAsiBackboneManagedKeySigningForLocalValidation(IServiceCollection, Action{ManagedKeySigningOptions}, Func{IServiceProvider, IManagedKeySigningClient})</c> method registers a fail-open signing service.
     /// </summary>
     [Fact]
     public void AddAsiBackboneManagedKeySigningForLocalValidationRegistersFailOpenSigningService()

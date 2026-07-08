@@ -166,6 +166,7 @@ Scenario pages describe applied patterns. They remain optional and do not imply 
 * [1.2.0 Release Readiness Record](release-readiness-120.md)
 * [Historical 1.1.0 Release Readiness Record](release-readiness-checklist.md)
 * [API Baseline and Boundary Checks](api-baseline-and-boundary-checks.md)
+* [Implicit Usings Posture](implicit-usings-posture.md)
 * [Developer Checklist](developer-checklist.md)
 * [2.3.0 Release Notes](release-notes-230.md)
 * [2.2.1 Release Notes](release-notes-221.md)

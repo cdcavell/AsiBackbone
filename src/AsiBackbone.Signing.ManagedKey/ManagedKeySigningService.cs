@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Runtime.ExceptionServices;
 using AsiBackbone.Core.Signing;
 
@@ -37,10 +38,11 @@ public sealed class ManagedKeySigningService : IAsiBackboneSigningService
         ArgumentNullException.ThrowIfNull(request);
         cancellationToken.ThrowIfCancellationRequested();
 
+        ManagedKeySigningAttemptDiagnostics diagnostics = CreateAttemptDiagnostics();
         string? validationFailure = ValidateSigningRequest(request);
         if (validationFailure is not null)
         {
-            return HandleValidationFailure(request, validationFailure);
+            return HandleValidationFailure(request, validationFailure, diagnostics);
         }
 
         int attempt = 0;
@@ -53,39 +55,43 @@ public sealed class ManagedKeySigningService : IAsiBackboneSigningService
                     .SignAsync(CreateManagedKeyRequest(request), cancellationToken)
                     .ConfigureAwait(false);
 
-                return CreateSignedResult(request, managedResult, attempt);
+                return CreateSignedResult(request, managedResult, attempt, diagnostics);
             }
             catch (ManagedKeySigningException exception) when (exception.IsRetryable && attempt < options.MaxRetryAttempts)
             {
+                diagnostics.RecordRetry(exception);
                 attempt++;
-                await DelayForRetryAsync(cancellationToken).ConfigureAwait(false);
+                await DelayForRetryAsync(diagnostics, cancellationToken).ConfigureAwait(false);
             }
             catch (ManagedKeySigningException exception)
             {
-                return HandleFailure(request, exception.FailureCode, exception.Message, attempt, exception);
+                return HandleFailure(request, exception.FailureCode, exception.Message, attempt, diagnostics, exception);
             }
             catch (TimeoutException exception)
             {
-                return HandleFailure(request, "managedkey.signing.provider-unavailable", exception.GetType().Name, attempt, exception);
+                return HandleFailure(request, "managedkey.signing.provider-unavailable", exception.GetType().Name, attempt, diagnostics, exception);
             }
             catch (InvalidOperationException exception)
             {
-                return HandleFailure(request, "managedkey.signing.failed", exception.GetType().Name, attempt, exception);
+                return HandleFailure(request, "managedkey.signing.failed", exception.GetType().Name, attempt, diagnostics, exception);
             }
             catch (NotSupportedException exception)
             {
-                return HandleFailure(request, "managedkey.signing.unsupported", exception.GetType().Name, attempt, exception);
+                return HandleFailure(request, "managedkey.signing.unsupported", exception.GetType().Name, attempt, diagnostics, exception);
             }
         }
     }
 
     private SigningResult HandleValidationFailure(
         SigningRequest request,
-        string failureCode)
+        string failureCode,
+        ManagedKeySigningAttemptDiagnostics diagnostics)
     {
+        diagnostics.RecordValidationFailure();
+
         return !options.ReturnUnsignedOnFailure
             ? throw new ManagedKeySigningException(failureCode, failureCode)
-            : CreateUnsignedFailureResult(request, failureCode, failureCode, retryAttempts: 0);
+            : CreateUnsignedFailureResult(request, failureCode, failureCode, retryAttempts: 0, diagnostics);
     }
 
     private SigningResult HandleFailure(
@@ -93,14 +99,17 @@ public sealed class ManagedKeySigningService : IAsiBackboneSigningService
         string failureCode,
         string failureMessage,
         int retryAttempts,
+        ManagedKeySigningAttemptDiagnostics diagnostics,
         Exception exception)
     {
+        diagnostics.RecordFailure(exception);
+
         if (!options.ReturnUnsignedOnFailure)
         {
             ExceptionDispatchInfo.Capture(exception).Throw();
         }
 
-        return CreateUnsignedFailureResult(request, failureCode, failureMessage, retryAttempts);
+        return CreateUnsignedFailureResult(request, failureCode, failureMessage, retryAttempts, diagnostics);
     }
 
     private ManagedKeySignRequest CreateManagedKeyRequest(SigningRequest request)
@@ -118,10 +127,11 @@ public sealed class ManagedKeySigningService : IAsiBackboneSigningService
     private SigningResult CreateSignedResult(
         SigningRequest request,
         ManagedKeySignResult managedResult,
-        int retryAttempts)
+        int retryAttempts,
+        ManagedKeySigningAttemptDiagnostics diagnostics)
     {
         string resolvedKeyVersion = managedResult.KeyVersion ?? ResolveKeyVersion(request) ?? string.Empty;
-        Dictionary<string, string> metadata = CreateBaseMetadata(request, retryAttempts);
+        Dictionary<string, string> metadata = CreateBaseMetadata(request, retryAttempts, providerAttempts: retryAttempts + 1, diagnostics);
         metadata["signing_status"] = "signed";
 
         if (managedResult.ProviderOperationId is not null)
@@ -131,7 +141,7 @@ public sealed class ManagedKeySigningService : IAsiBackboneSigningService
 
         foreach (KeyValuePair<string, string> item in managedResult.Metadata)
         {
-            if (!IsSafeProviderMetadataKey(item.Key))
+            if (!IsSafeProviderMetadataKey(item.Key) || IsReservedDiagnosticMetadataKey(item.Key))
             {
                 continue;
             }
@@ -157,9 +167,11 @@ public sealed class ManagedKeySigningService : IAsiBackboneSigningService
         SigningRequest request,
         string failureCode,
         string failureMessage,
-        int retryAttempts)
+        int retryAttempts,
+        ManagedKeySigningAttemptDiagnostics diagnostics)
     {
-        Dictionary<string, string> metadata = CreateBaseMetadata(request, retryAttempts);
+        int providerAttempts = diagnostics.HasValidationFailure ? 0 : retryAttempts + 1;
+        Dictionary<string, string> metadata = CreateBaseMetadata(request, retryAttempts, providerAttempts, diagnostics);
         metadata["signing_status"] = "failed";
         metadata["failure_code"] = failureCode;
         metadata["failure_message"] = failureMessage;
@@ -175,30 +187,58 @@ public sealed class ManagedKeySigningService : IAsiBackboneSigningService
         return SigningResult.FromMetadata(signingMetadata);
     }
 
-    private Dictionary<string, string> CreateBaseMetadata(SigningRequest request, int retryAttempts)
+    private Dictionary<string, string> CreateBaseMetadata(
+        SigningRequest request,
+        int retryAttempts,
+        int providerAttempts,
+        ManagedKeySigningAttemptDiagnostics diagnostics)
     {
-        Dictionary<string, string> metadata = new(StringComparer.Ordinal)
-        {
-            ["provider_kind"] = ProviderKind,
-            ["remote_key_material"] = "true",
-            ["raw_private_key_loaded"] = "false",
-            ["retry_attempts"] = retryAttempts.ToString(System.Globalization.CultureInfo.InvariantCulture),
-            ["signature_algorithm"] = NormalizeRequired(options.SignatureAlgorithm, ManagedKeySigningOptions.DefaultSignatureAlgorithm)
-        };
-
-        if (request.Purpose is not null)
-        {
-            metadata["purpose"] = request.Purpose;
-        }
+        Dictionary<string, string> metadata = new(StringComparer.Ordinal);
 
         foreach (KeyValuePair<string, string> item in request.Metadata)
         {
-            if (string.IsNullOrWhiteSpace(item.Key))
+            if (string.IsNullOrWhiteSpace(item.Key) || IsReservedDiagnosticMetadataKey(item.Key))
             {
                 continue;
             }
 
             metadata[item.Key.Trim()] = item.Value?.Trim() ?? string.Empty;
+        }
+
+        metadata["provider_kind"] = ProviderKind;
+        metadata["remote_key_material"] = "true";
+        metadata["raw_private_key_loaded"] = "false";
+        metadata["retry_attempts"] = retryAttempts.ToString(CultureInfo.InvariantCulture);
+        metadata["provider_attempts"] = providerAttempts.ToString(CultureInfo.InvariantCulture);
+        metadata["max_retry_attempts"] = diagnostics.MaxRetryAttempts.ToString(CultureInfo.InvariantCulture);
+        metadata["retry_delay_milliseconds"] = diagnostics.RetryDelay.TotalMilliseconds.ToString("0.###", CultureInfo.InvariantCulture);
+        metadata["retry_delay_configured"] = ToMetadataBoolean(diagnostics.RetryDelay > TimeSpan.Zero);
+        metadata["retry_delay_applied"] = ToMetadataBoolean(diagnostics.RetryDelayApplied);
+        metadata["signature_algorithm"] = NormalizeRequired(options.SignatureAlgorithm, ManagedKeySigningOptions.DefaultSignatureAlgorithm);
+
+        if (diagnostics.LastRetryFailureCode is not null)
+        {
+            metadata["last_retry_failure_code"] = diagnostics.LastRetryFailureCode;
+        }
+
+        if (diagnostics.LastRetryFailureExceptionType is not null)
+        {
+            metadata["last_retry_failure_exception_type"] = diagnostics.LastRetryFailureExceptionType;
+        }
+
+        if (diagnostics.FailureExceptionType is not null)
+        {
+            metadata["failure_exception_type"] = diagnostics.FailureExceptionType;
+        }
+
+        if (diagnostics.FailureRetryable is not null)
+        {
+            metadata["failure_retryable"] = ToMetadataBoolean(diagnostics.FailureRetryable.Value);
+        }
+
+        if (request.Purpose is not null)
+        {
+            metadata["purpose"] = request.Purpose;
         }
 
         return metadata;
@@ -257,12 +297,20 @@ public sealed class ManagedKeySigningService : IAsiBackboneSigningService
             StringComparison.OrdinalIgnoreCase);
     }
 
-    private async ValueTask DelayForRetryAsync(CancellationToken cancellationToken)
+    private async ValueTask DelayForRetryAsync(
+        ManagedKeySigningAttemptDiagnostics diagnostics,
+        CancellationToken cancellationToken)
     {
         if (options.RetryDelay > TimeSpan.Zero)
         {
+            diagnostics.RecordRetryDelayApplied();
             await Task.Delay(options.RetryDelay, cancellationToken).ConfigureAwait(false);
         }
+    }
+
+    private ManagedKeySigningAttemptDiagnostics CreateAttemptDiagnostics()
+    {
+        return new ManagedKeySigningAttemptDiagnostics(options.MaxRetryAttempts, options.RetryDelay);
     }
 
     private static bool IsSafeProviderMetadataKey(string key)
@@ -275,6 +323,37 @@ public sealed class ManagedKeySigningService : IAsiBackboneSigningService
             && !key.Contains("connection", StringComparison.OrdinalIgnoreCase);
     }
 
+    private static bool IsReservedDiagnosticMetadataKey(string key)
+    {
+        if (string.IsNullOrWhiteSpace(key))
+        {
+            return false;
+        }
+
+        return key.Trim() switch
+        {
+            "failure_code" => true,
+            "failure_exception_type" => true,
+            "failure_message" => true,
+            "failure_retryable" => true,
+            "last_retry_failure_code" => true,
+            "last_retry_failure_exception_type" => true,
+            "max_retry_attempts" => true,
+            "provider_attempts" => true,
+            "provider_kind" => true,
+            "provider_operation_id" => true,
+            "raw_private_key_loaded" => true,
+            "remote_key_material" => true,
+            "retry_attempts" => true,
+            "retry_delay_applied" => true,
+            "retry_delay_configured" => true,
+            "retry_delay_milliseconds" => true,
+            "signature_algorithm" => true,
+            "signing_status" => true,
+            _ => false
+        };
+    }
+
     private static string NormalizeRequired(string? value, string fallback)
     {
         return string.IsNullOrWhiteSpace(value) ? fallback : value.Trim();
@@ -283,5 +362,51 @@ public sealed class ManagedKeySigningService : IAsiBackboneSigningService
     private static string? NormalizeOptional(string? value)
     {
         return string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+    }
+
+    private static string ToMetadataBoolean(bool value)
+    {
+        return value ? "true" : "false";
+    }
+
+    private sealed class ManagedKeySigningAttemptDiagnostics(int maxRetryAttempts, TimeSpan retryDelay)
+    {
+        public int MaxRetryAttempts { get; } = maxRetryAttempts;
+
+        public TimeSpan RetryDelay { get; } = retryDelay;
+
+        public bool RetryDelayApplied { get; private set; }
+
+        public bool HasValidationFailure { get; private set; }
+
+        public string? LastRetryFailureCode { get; private set; }
+
+        public string? LastRetryFailureExceptionType { get; private set; }
+
+        public string? FailureExceptionType { get; private set; }
+
+        public bool? FailureRetryable { get; private set; }
+
+        public void RecordValidationFailure()
+        {
+            HasValidationFailure = true;
+        }
+
+        public void RecordRetry(ManagedKeySigningException exception)
+        {
+            LastRetryFailureCode = exception.FailureCode;
+            LastRetryFailureExceptionType = exception.GetType().Name;
+        }
+
+        public void RecordRetryDelayApplied()
+        {
+            RetryDelayApplied = true;
+        }
+
+        public void RecordFailure(Exception exception)
+        {
+            FailureExceptionType = exception.GetType().Name;
+            FailureRetryable = exception is ManagedKeySigningException managedKeyException && managedKeyException.IsRetryable;
+        }
     }
 }

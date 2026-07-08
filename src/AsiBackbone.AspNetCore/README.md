@@ -2,6 +2,8 @@
 
 ASP.NET Core host adapters for Accountable Systems Infrastructure governance primitives.
 
+Stable `3.0.x` package family. `3.0.0` is the current major-line release for this package.
+
 This package acts as a thin web-host adapter around `AsiBackbone.Core`.
 
 > **New to AsiBackbone?** Start with the concept, not this package: [Intent to Execution: An Accountability Pattern](https://cdcavell.github.io/AsiBackbone/articles/intent-to-execution-pattern.html) and the [documentation site](https://cdcavell.github.io/AsiBackbone/). This README covers one package in the family.
@@ -158,86 +160,3 @@ Default operation-result mapping:
 | Failure | `400 Bad Request` Problem Details response. |
 
 Reason codes and correlation identifiers are preserved by default when available. Reason messages, trace identifiers, policy versions, and policy hashes are not exposed by default because those values may reveal sensitive policy internals or diagnostic details.
-
-Hosts can opt into broader detail only when appropriate:
-
-```csharp
-using AsiBackbone.AspNetCore.Results;
-
-AsiBackboneHttpResultMappingOptions mappingOptions = new()
-{
-    IncludeReasonMessages = true,
-    IncludeTraceId = true,
-    IncludePolicyMetadata = true,
-};
-
-return decision.ToHttpResult(mappingOptions);
-```
-
-Status-code policy remains host-overridable through `AsiBackboneHttpResultMappingOptions`. Hosts that intentionally mask denial or scanner traffic with alternate status codes should configure their own mapping rather than relying on the defaults.
-
-## Acknowledgment challenge flow
-
-`IAsiBackboneAcknowledgmentChallengeService` provides a host-friendly bridge for Core `AcknowledgmentRequired` decisions. It builds an `AsiBackboneAcknowledgmentChallenge` that MVC, Razor Pages, Minimal APIs, a SPA, or another UI layer can render without the package taking a dependency on that stack.
-
-```csharp
-using AsiBackbone.AspNetCore.Handshakes;
-using AsiBackbone.Core.Decisions;
-
-GovernanceDecision decision = GovernanceDecision.RequireAcknowledgment(
-    "risk.high",
-    "Manual acknowledgment is required before execution.",
-    correlationId: "request-123");
-
-AsiBackboneAcknowledgmentChallenge challenge = acknowledgmentChallengeService.CreateChallenge(
-    actor,
-    "PublishEpisode",
-    decision);
-```
-
-The challenge preserves safe round-trip fields such as handshake identifier, operation name, reason code, required acknowledgment code/text, risk level, risk category, and correlation identifier. Trace identifiers and policy metadata are hidden by default and can be enabled through `AsiBackboneAcknowledgmentChallengeOptions` only when the host intentionally wants to expose those diagnostics.
-
-Hosts can round-trip a submitted acknowledgment response back into Core handshake models:
-
-```csharp
-AsiBackboneAcknowledgmentChallengeResult result = acknowledgmentChallengeService.HandleResponse(
-    challenge,
-    actor,
-    new AsiBackboneAcknowledgmentChallengeRequest
-    {
-        HandshakeId = challenge.HandshakeId,
-        AcknowledgmentCode = challenge.RequiredAcknowledgmentCode,
-        Acknowledged = true,
-    });
-```
-
-A successful challenge result contains a Core `LiabilityHandshakeAcknowledgment`. Failed responses return an `OperationResult` with a reason code, such as a handshake mismatch or acknowledgment-code mismatch. The package does not persist challenge state; hosts decide whether to store the Core handshake request, serialize it into protected state, or associate it with an existing workflow.
-
-## Stable boundary
-
-This package provides:
-
-- ASP.NET Core service registration extensions;
-- configurable HTTP integration options;
-- request correlation resolution;
-- safe request metadata capture;
-- request correlation to Core evaluation context mapping;
-- audit enrichment helpers;
-- HTTP and Problem Details result mapping helpers;
-- acknowledgment challenge creation and response handling helpers;
-- optional endpoint-governance middleware and metadata helpers;
-- hosted governance outbox drain registration and scheduling options.
-
-This package avoids:
-
-- Entity Framework Core persistence;
-- database provider assumptions;
-- direct dependencies on NetCoreApplicationTemplate;
-- authentication-provider assumptions;
-- provider exporter dependencies;
-- automatic transaction safety;
-- durable persistence guarantees from attributes or endpoint metadata alone;
-- robotics or physical execution dependencies;
-- AI model hosting, training, inference, or orchestration.
-
-See `docs/articles/aspnetcore-integration-boundary.md`, `docs/articles/aspnetcore-endpoint-governance.md`, and `docs/articles/hosted-governance-outbox-drain.md` for the implemented design boundary.

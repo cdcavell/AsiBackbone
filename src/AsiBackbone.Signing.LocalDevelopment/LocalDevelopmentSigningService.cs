@@ -58,7 +58,7 @@ public sealed class LocalDevelopmentSigningService : IAsiBackboneSigningService,
             ThrowIfDisposed();
 
             byte[] data = SigningEncoding.GetBytes(request.SigningHash);
-            byte[] signature = rsa.SignData(data, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+            byte[] signature = rsa.SignData(data, HashAlgorithmName.SHA256, RSASignaturePadding.Pss);
 
             Dictionary<string, string> metadata = CreateBaseMetadata(request);
             metadata["signing_status"] = "signed";
@@ -129,7 +129,7 @@ public sealed class LocalDevelopmentSigningService : IAsiBackboneSigningService,
 
             byte[] signature = Convert.FromBase64String(metadata.Signature!);
             byte[] data = SigningEncoding.GetBytes(request.SigningHash);
-            bool verified = rsa.VerifyData(data, signature, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+            bool verified = rsa.VerifyData(data, signature, HashAlgorithmName.SHA256, RSASignaturePadding.Pss);
 
             return ValueTask.FromResult(verified
                 ? SignatureVerificationResult.Verified()

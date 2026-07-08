@@ -14,21 +14,21 @@ That pace is reasonable for a young package family, but governance/security-adja
 
 | Stream | Use when | Examples | Should not include |
 | --- | --- | --- | --- |
-| Patch (`x.y.Z`) | The existing public contract remains compatible and the change fixes, clarifies, or hardens the release. | Bug fixes, documentation corrections, package icon fixes, README packaging fixes, NuGet metadata fixes, Source Link metadata fixes, package SBOM/provenance workflow fixes, validation-script corrections, test hardening. | New stable public API, new stable package identity, namespace changes, breaking behavior changes. |
+| Patch (`x.y.Z`) | The existing public contract remains compatible and the change fixes, clarifies, or hardens the release. | Bug fixes, security fixes, documentation corrections, packaging fixes, NuGet metadata fixes, README/package icon corrections, Source Link metadata fixes, SBOM/provenance workflow fixes, and validation hardening. | New stable public API, new stable package identity, namespace changes, breaking behavior changes. |
 | Minor (`x.Y.0`) | The change is backward-compatible but expands the stable package surface or adoption surface. | New optional APIs, new optional providers, compatible options, additional templates, compatible durable-artifact additions, provider improvements. | Package/namespace identity changes, public API breaks, incompatible durable-artifact shape changes. |
-| Major (`X.0.0`) | The change intentionally breaks or replaces part of the stable contract and cannot be shipped compatibly. | Package ID changes, namespace changes, removed/renamed public APIs, dependency-direction breaks, incompatible durable-artifact changes, public default behavior changes that alter consumer outcomes. | Routine package metadata corrections, documentation-only fixes, or compatible additions that can be handled in patch/minor releases. |
+| Major (`X.0.0`) | The change intentionally breaks or replaces part of the stable contract and cannot be shipped compatibly. | Package ID changes, namespace changes, removed/renamed public APIs, binary assembly identity changes, dependency-direction breaks, incompatible durable-artifact changes, public default behavior changes that alter consumer outcomes. | Routine package metadata corrections, documentation-only fixes, or compatible additions that can be handled in patch/minor releases. |
 
 Patch releases may happen quickly when fixing package-facing mistakes that are visible to consumers and cannot be overwritten on NuGet. They should still say plainly why a patch is appropriate and confirm that the public API and package identity remain compatible.
 
 Minor releases should be paced enough to let additive surfaces be reviewed, documented, and validated through consumer smoke paths before publication.
 
-Major releases should be rare. They should be reserved for identity, namespace, public API, durable artifact, or package-boundary breaks that are strongly justified and documented in advance.
+Major releases should be rare. They should be reserved for identity, namespace, public API, durable artifact, binary identity, or package-boundary breaks that are strongly justified and documented in advance.
 
-## Current `2.x` stabilization posture
+## Current `3.x` stabilization posture
 
-`2.x` is the canonical package identity line for the simplified `AsiBackbone.*` package IDs and namespaces. The `2.0.0` release established that package/namespace boundary after the public rename from `CDCavell.AsiBackbone.*`.
+`3.x` is the current stable package line. The `3.0.0` release establishes the current major-line binary identity while preserving the existing `AsiBackbone.*` package IDs and namespaces.
 
-Future `2.x` releases should prioritize compatibility, documentation clarity, patch-level release correction, and carefully scoped additive improvements. Additional breaking changes should be avoided unless strongly justified by consumer safety, correctness, maintainability, or a documented architectural boundary that cannot be preserved compatibly.
+Future `3.x` releases should prioritize compatibility, documentation clarity, patch-level release correction, and carefully scoped additive improvements. Additional breaking changes should be avoided unless strongly justified by consumer safety, correctness, maintainability, or a documented architectural boundary that cannot be preserved compatibly.
 
 For cautious consumers, a young major line should be interpreted as canonical but still settling. The project should let that line stabilize through release validation, documentation currency, package metadata correction, consumer smoke testing, and real issue triage before introducing another broad breaking change.
 
@@ -110,6 +110,8 @@ Avoid:
 
 - [Governance](../../GOVERNANCE.md)
 - [Release Validation](release-validation.md)
+- [3.0.0 Release Readiness Record](release-readiness-300.md)
+- [3.0.0 Release Notes](release-notes-300.md)
 - [API Compatibility and SemVer](api-compatibility-and-semver.md)
 - [Supply-Chain Provenance and Package SBOMs](supply-chain-provenance.md)
 - [Historical Stable API Review](stable-api-review.md)

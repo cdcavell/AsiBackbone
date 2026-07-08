@@ -30,7 +30,12 @@ public sealed class GovernanceOutboxEntry
         string? providerName,
         string? providerRecordId,
         string? deadLetterReason,
-        IReadOnlyDictionary<string, string> metadata)
+        IReadOnlyDictionary<string, string> metadata,
+        string? claimOwner,
+        string? claimToken,
+        DateTimeOffset? claimedUtc,
+        DateTimeOffset? claimExpiresUtc,
+        int claimAttemptCount)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(outboxEntryId);
         ArgumentNullException.ThrowIfNull(envelope);
@@ -50,6 +55,11 @@ public sealed class GovernanceOutboxEntry
             throw new ArgumentOutOfRangeException(nameof(maxRetryCount), maxRetryCount, "Maximum retry count must be greater than or equal to zero.");
         }
 
+        if (claimAttemptCount < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(claimAttemptCount), claimAttemptCount, "Claim attempt count must be greater than or equal to zero.");
+        }
+
         OutboxEntryId = outboxEntryId.Trim();
         Envelope = envelope;
         Status = status;
@@ -63,6 +73,11 @@ public sealed class GovernanceOutboxEntry
         ProviderRecordId = NormalizeOptional(providerRecordId);
         DeadLetterReason = NormalizeOptional(deadLetterReason);
         Metadata = metadata;
+        ClaimOwner = NormalizeOptional(claimOwner);
+        ClaimToken = NormalizeOptional(claimToken);
+        ClaimedUtc = claimedUtc?.ToUniversalTime();
+        ClaimExpiresUtc = claimExpiresUtc?.ToUniversalTime();
+        ClaimAttemptCount = claimAttemptCount;
     }
 
     /// <summary>
@@ -131,6 +146,31 @@ public sealed class GovernanceOutboxEntry
     public IReadOnlyDictionary<string, string> Metadata { get; }
 
     /// <summary>
+    /// Gets the current claim owner, when this row is leased by a worker.
+    /// </summary>
+    public string? ClaimOwner { get; }
+
+    /// <summary>
+    /// Gets the opaque token for the current claim lease.
+    /// </summary>
+    public string? ClaimToken { get; }
+
+    /// <summary>
+    /// Gets the UTC timestamp when the current claim was acquired.
+    /// </summary>
+    public DateTimeOffset? ClaimedUtc { get; }
+
+    /// <summary>
+    /// Gets the UTC timestamp when the current claim lease expires.
+    /// </summary>
+    public DateTimeOffset? ClaimExpiresUtc { get; }
+
+    /// <summary>
+    /// Gets the number of claim or reclaim attempts recorded for this entry.
+    /// </summary>
+    public int ClaimAttemptCount { get; }
+
+    /// <summary>
     /// Gets a value indicating whether this entry was delivered successfully.
     /// </summary>
     public bool IsDelivered => Status is GovernanceEmissionStatus.Delivered;
@@ -144,6 +184,11 @@ public sealed class GovernanceOutboxEntry
     /// Gets a value indicating whether metadata is present.
     /// </summary>
     public bool HasMetadata => Metadata.Count > 0;
+
+    /// <summary>
+    /// Gets a value indicating whether claim metadata is present.
+    /// </summary>
+    public bool HasClaim => ClaimOwner is not null && ClaimToken is not null && ClaimedUtc.HasValue && ClaimExpiresUtc.HasValue;
 
     /// <summary>
     /// Creates a pending durable governance outbox entry.
@@ -170,7 +215,12 @@ public sealed class GovernanceOutboxEntry
             providerName: null,
             providerRecordId: null,
             deadLetterReason: null,
-            NormalizeMetadata(metadata));
+            NormalizeMetadata(metadata),
+            claimOwner: null,
+            claimToken: null,
+            claimedUtc: null,
+            claimExpiresUtc: null,
+            claimAttemptCount: 0);
     }
 
     /// <summary>
@@ -192,7 +242,12 @@ public sealed class GovernanceOutboxEntry
         string? providerName = null,
         string? providerRecordId = null,
         string? deadLetterReason = null,
-        IReadOnlyDictionary<string, string>? metadata = null)
+        IReadOnlyDictionary<string, string>? metadata = null,
+        string? claimOwner = null,
+        string? claimToken = null,
+        DateTimeOffset? claimedUtc = null,
+        DateTimeOffset? claimExpiresUtc = null,
+        int claimAttemptCount = 0)
     {
         return new GovernanceOutboxEntry(
             outboxEntryId,
@@ -207,7 +262,12 @@ public sealed class GovernanceOutboxEntry
             providerName,
             providerRecordId,
             deadLetterReason,
-            NormalizeMetadata(metadata));
+            NormalizeMetadata(metadata),
+            claimOwner,
+            claimToken,
+            claimedUtc,
+            claimExpiresUtc,
+            claimAttemptCount);
     }
 
     /// <summary>
@@ -216,6 +276,92 @@ public sealed class GovernanceOutboxEntry
     public bool IsRetryReady(DateTimeOffset utcNow)
     {
         return !IsDelivered && !IsDeadLettered && RetryCount < MaxRetryCount && Status is GovernanceEmissionStatus.Deferred or GovernanceEmissionStatus.Failed or GovernanceEmissionStatus.RetryableFailure && (NextRetryUtc is null || NextRetryUtc <= utcNow.ToUniversalTime());
+    }
+
+    /// <summary>
+    /// Determines whether the entry has an active claim lease at the supplied UTC timestamp.
+    /// </summary>
+    public bool HasActiveClaim(DateTimeOffset utcNow)
+    {
+        return HasClaim && ClaimExpiresUtc > utcNow.ToUniversalTime();
+    }
+
+    /// <summary>
+    /// Determines whether the entry may be claimed by a cooperating worker at the supplied UTC timestamp.
+    /// </summary>
+    public bool CanBeClaimed(DateTimeOffset utcNow)
+    {
+        return !IsDelivered && !IsDeadLettered && !HasActiveClaim(utcNow);
+    }
+
+    /// <summary>
+    /// Determines whether the entry is still owned by the supplied claim token.
+    /// </summary>
+    public bool IsClaimedBy(GovernanceOutboxClaim claim)
+    {
+        ArgumentNullException.ThrowIfNull(claim);
+
+        return string.Equals(OutboxEntryId, claim.OutboxEntryId, StringComparison.Ordinal)
+            && string.Equals(ClaimOwner, claim.WorkerId, StringComparison.Ordinal)
+            && string.Equals(ClaimToken, claim.ClaimToken, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Returns a claimed copy of this entry.
+    /// </summary>
+    public GovernanceOutboxEntry MarkClaimed(
+        string claimOwner,
+        string? claimToken = null,
+        DateTimeOffset? claimedUtc = null,
+        TimeSpan? leaseDuration = null)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(claimOwner);
+
+        DateTimeOffset normalizedClaimedUtc = (claimedUtc ?? DateTimeOffset.UtcNow).ToUniversalTime();
+        TimeSpan normalizedLeaseDuration = leaseDuration ?? GovernanceOutboxClaimRequest.DefaultLeaseDuration;
+
+        if (normalizedLeaseDuration <= TimeSpan.Zero)
+        {
+            throw new ArgumentOutOfRangeException(nameof(leaseDuration), leaseDuration, "Lease duration must be greater than TimeSpan.Zero.");
+        }
+
+        return Copy(
+            Status,
+            normalizedClaimedUtc,
+            RetryCount,
+            NextRetryUtc,
+            LastError,
+            ProviderName,
+            ProviderRecordId,
+            DeadLetterReason,
+            Metadata,
+            claimOwner.Trim(),
+            string.IsNullOrWhiteSpace(claimToken) ? Guid.NewGuid().ToString("N") : claimToken.Trim(),
+            normalizedClaimedUtc,
+            normalizedClaimedUtc.Add(normalizedLeaseDuration),
+            ClaimAttemptCount + 1);
+    }
+
+    /// <summary>
+    /// Returns a copy with claim lease fields cleared.
+    /// </summary>
+    public GovernanceOutboxEntry ReleaseClaim(DateTimeOffset? updatedUtc = null)
+    {
+        return Copy(
+            Status,
+            updatedUtc,
+            RetryCount,
+            NextRetryUtc,
+            LastError,
+            ProviderName,
+            ProviderRecordId,
+            DeadLetterReason,
+            Metadata,
+            claimOwner: null,
+            claimToken: null,
+            claimedUtc: null,
+            claimExpiresUtc: null,
+            ClaimAttemptCount);
     }
 
     /// <summary>
@@ -238,7 +384,12 @@ public sealed class GovernanceOutboxEntry
             providerName: result.ProviderName,
             providerRecordId: result.ProviderRecordId,
             deadLetterReason: null,
-            metadata: MergeMetadata(Metadata, result.Metadata));
+            metadata: MergeMetadata(Metadata, result.Metadata),
+            claimOwner: null,
+            claimToken: null,
+            claimedUtc: null,
+            claimExpiresUtc: null,
+            ClaimAttemptCount);
     }
 
     /// <summary>
@@ -267,7 +418,12 @@ public sealed class GovernanceOutboxEntry
             governanceEmissionError.ProviderName,
             providerRecordId: null,
             nextStatus is GovernanceEmissionStatus.DeadLettered ? governanceEmissionError.Message : null,
-            Metadata);
+            Metadata,
+            claimOwner: null,
+            claimToken: null,
+            claimedUtc: null,
+            claimExpiresUtc: null,
+            ClaimAttemptCount);
     }
 
     /// <summary>
@@ -287,7 +443,12 @@ public sealed class GovernanceOutboxEntry
             governanceEmissionError?.ProviderName,
             providerRecordId: null,
             deadLetterReason: null,
-            metadata: Metadata);
+            metadata: Metadata,
+            claimOwner: null,
+            claimToken: null,
+            claimedUtc: null,
+            claimExpiresUtc: null,
+            ClaimAttemptCount);
     }
 
     /// <summary>
@@ -309,7 +470,12 @@ public sealed class GovernanceOutboxEntry
             providerName: governanceEmissionError.ProviderName,
             providerRecordId: null,
             deadLetterReason: deadLetterReason ?? governanceEmissionError.Message,
-            metadata: Metadata);
+            metadata: Metadata,
+            claimOwner: null,
+            claimToken: null,
+            claimedUtc: null,
+            claimExpiresUtc: null,
+            ClaimAttemptCount);
     }
 
     private GovernanceOutboxEntry Copy(
@@ -321,7 +487,12 @@ public sealed class GovernanceOutboxEntry
         string? providerName,
         string? providerRecordId,
         string? deadLetterReason,
-        IReadOnlyDictionary<string, string> metadata)
+        IReadOnlyDictionary<string, string> metadata,
+        string? claimOwner,
+        string? claimToken,
+        DateTimeOffset? claimedUtc,
+        DateTimeOffset? claimExpiresUtc,
+        int claimAttemptCount)
     {
         return new GovernanceOutboxEntry(
             OutboxEntryId,
@@ -336,7 +507,12 @@ public sealed class GovernanceOutboxEntry
             providerName,
             providerRecordId,
             deadLetterReason,
-            metadata);
+            metadata,
+            claimOwner,
+            claimToken,
+            claimedUtc,
+            claimExpiresUtc,
+            claimAttemptCount);
     }
 
     private static string NormalizeIdentifier(string? identifier)

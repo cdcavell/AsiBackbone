@@ -88,7 +88,7 @@ public sealed class AsiBackboneGovernanceOutboxDrain(
         }
 
         string workerId = retryOptions.ClaimWorkerId ?? throw new InvalidOperationException("ClaimWorkerId is required when claim leases are enabled.");
-        GovernanceOutboxClaimRequest pendingRequest = GovernanceOutboxClaimRequest.Create(
+        var pendingRequest = GovernanceOutboxClaimRequest.Create(
             workerId,
             drainUtc,
             retryOptions.ClaimLeaseDuration,
@@ -102,7 +102,7 @@ public sealed class AsiBackboneGovernanceOutboxDrain(
             return await DrainClaimsAsync(claimStore, pendingClaims, drainUtc, cancellationToken).ConfigureAwait(false);
         }
 
-        GovernanceOutboxClaimRequest retryRequest = GovernanceOutboxClaimRequest.Create(
+        var retryRequest = GovernanceOutboxClaimRequest.Create(
             workerId,
             drainUtc,
             retryOptions.ClaimLeaseDuration,

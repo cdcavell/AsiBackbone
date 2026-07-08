@@ -291,12 +291,9 @@ public sealed class EfCoreGovernanceOutboxStore : IAsiBackboneGovernanceOutboxCl
         ArgumentNullException.ThrowIfNull(claim);
         ArgumentNullException.ThrowIfNull(entry);
 
-        if (!string.Equals(claim.OutboxEntryId, entry.OutboxEntryId, StringComparison.Ordinal))
-        {
-            throw new ArgumentException("Claim and entry must reference the same outbox entry ID.", nameof(entry));
-        }
-
-        return await UpdateClaimedEntryAsync(claim, _ => entry, cancellationToken).ConfigureAwait(false);
+        return !string.Equals(claim.OutboxEntryId, entry.OutboxEntryId, StringComparison.Ordinal)
+            ? throw new ArgumentException("Claim and entry must reference the same outbox entry ID.", nameof(entry))
+            : await UpdateClaimedEntryAsync(claim, _ => entry, cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc />

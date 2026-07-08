@@ -320,12 +320,9 @@ public sealed class GovernanceOutboxEntry
         DateTimeOffset normalizedClaimedUtc = (claimedUtc ?? DateTimeOffset.UtcNow).ToUniversalTime();
         TimeSpan normalizedLeaseDuration = leaseDuration ?? GovernanceOutboxClaimRequest.DefaultLeaseDuration;
 
-        if (normalizedLeaseDuration <= TimeSpan.Zero)
-        {
-            throw new ArgumentOutOfRangeException(nameof(leaseDuration), leaseDuration, "Lease duration must be greater than TimeSpan.Zero.");
-        }
-
-        return Copy(
+        return normalizedLeaseDuration <= TimeSpan.Zero
+            ? throw new ArgumentOutOfRangeException(nameof(leaseDuration), leaseDuration, "Lease duration must be greater than TimeSpan.Zero.")
+            : Copy(
             Status,
             normalizedClaimedUtc,
             RetryCount,

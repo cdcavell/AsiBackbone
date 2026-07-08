@@ -314,6 +314,93 @@ public sealed class GovernanceOutboxStoreTests
         Assert.DoesNotContain(retryReadyEntries, retryReadyEntry => retryReadyEntry.OutboxEntryId == entry.OutboxEntryId);
     }
 
+    [Fact]
+    public void GovernanceEmissionResultBranchSemanticsAreCoveredInCompiledOutboxTests()
+    {
+        var normalizedDelivered = GovernanceEmissionResult.Delivered(
+            " provider ",
+            " record-1 ",
+            new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                [" "] = "ignored",
+                [" key "] = " value "
+            });
+        var pending = GovernanceEmissionResult.Pending(" ", new Dictionary<string, string>(StringComparer.Ordinal) { [" "] = "ignored" });
+        var retryableError = GovernanceEmissionError.Create(" retry ", " retry message ", isRetryable: true, providerName: " provider ", providerErrorCode: " code ");
+        var deferred = GovernanceEmissionResult.Deferred(retryableError, new DateTimeOffset(2026, 7, 8, 8, 30, 0, TimeSpan.FromHours(-4)));
+        var failedRetryable = GovernanceEmissionResult.Failed(retryableError);
+        var deadLettered = GovernanceEmissionResult.DeadLettered(GovernanceEmissionError.Create("dead", "dead message"));
+
+        Assert.True(normalizedDelivered.IsSuccess);
+        Assert.True(normalizedDelivered.IsTerminal);
+        Assert.False(normalizedDelivered.ShouldRetry);
+        Assert.True(normalizedDelivered.HasMetadata);
+        Assert.Equal("provider", normalizedDelivered.ProviderName);
+        Assert.Equal("record-1", normalizedDelivered.ProviderRecordId);
+        Assert.Equal("value", normalizedDelivered.Metadata["key"]);
+        Assert.False(pending.HasMetadata);
+        Assert.Null(pending.ProviderName);
+        Assert.True(deferred.ShouldRetry);
+        Assert.Equal("provider", deferred.ProviderName);
+        Assert.Equal(new DateTimeOffset(2026, 7, 8, 12, 30, 0, TimeSpan.Zero), deferred.RetryAfterUtc);
+        Assert.True(failedRetryable.ShouldRetry);
+        Assert.False(deadLettered.ShouldRetry);
+        Assert.True(deadLettered.IsTerminal);
+        Assert.Equal("retry", retryableError.Code);
+        Assert.Equal("retry message", retryableError.Message);
+        Assert.Equal("code", retryableError.ProviderErrorCode);
+        _ = Assert.Throws<ArgumentException>(() => GovernanceEmissionError.Create(" ", "message"));
+        _ = Assert.Throws<ArgumentException>(() => GovernanceEmissionError.Create("code", " "));
+        _ = Assert.Throws<ArgumentNullException>(() => GovernanceEmissionResult.Failed(null!));
+        _ = Assert.Throws<ArgumentNullException>(() => GovernanceEmissionResult.RetryableFailure(null!));
+        _ = Assert.Throws<ArgumentNullException>(() => GovernanceEmissionResult.DeadLettered(null!));
+    }
+
+    [Fact]
+    public async Task ClaimLeaseBranchesAreCoveredInCompiledOutboxTests()
+    {
+        var outboxStore = new InMemoryGovernanceOutboxStore();
+        GovernanceOutboxEntry entry = await outboxStore.EnqueueAsync(
+            CreateEnvelope("event-claim", "correlation-claim"),
+            TestContext.Current.CancellationToken);
+        DateTimeOffset claimedUtc = new(2026, 7, 8, 12, 0, 0, TimeSpan.Zero);
+
+        IReadOnlyList<GovernanceOutboxClaim> claims = await outboxStore.ClaimPendingAsync(
+            GovernanceOutboxClaimRequest.Create(" worker-a ", claimedUtc, TimeSpan.FromMinutes(5), maxCount: 1),
+            TestContext.Current.CancellationToken);
+        IReadOnlyList<GovernanceOutboxClaim> blockedClaims = await outboxStore.ClaimPendingAsync(
+            GovernanceOutboxClaimRequest.Create("worker-b", claimedUtc.AddMinutes(1), TimeSpan.FromMinutes(5), maxCount: 1),
+            TestContext.Current.CancellationToken);
+        GovernanceOutboxClaim claim = Assert.Single(claims);
+        GovernanceOutboxClaim mismatchedClaim = GovernanceOutboxClaim.Create(
+            claim.Entry,
+            claim.WorkerId,
+            "mismatched-token",
+            claimedUtc,
+            claimedUtc.AddMinutes(5));
+
+        GovernanceOutboxEntry mismatchedResult = await outboxStore.MarkClaimDeliveredAsync(
+            mismatchedClaim,
+            GovernanceEmissionResult.Delivered("provider", "wrong-record"),
+            TestContext.Current.CancellationToken);
+        GovernanceOutboxEntry deliveredResult = await outboxStore.MarkClaimDeliveredAsync(
+            claim,
+            GovernanceEmissionResult.Delivered("provider", "record-1"),
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal("worker-a", claim.WorkerId);
+        Assert.False(claim.IsExpired(claimedUtc.AddMinutes(4)));
+        Assert.True(claim.IsExpired(claimedUtc.AddMinutes(5)));
+        Assert.Empty(blockedClaims);
+        Assert.False(mismatchedResult.IsDelivered);
+        Assert.True(deliveredResult.IsDelivered);
+        Assert.False(deliveredResult.HasClaim);
+        _ = Assert.Throws<ArgumentOutOfRangeException>(() => GovernanceOutboxClaimRequest.Create("worker-a", leaseDuration: TimeSpan.Zero));
+        _ = Assert.Throws<ArgumentOutOfRangeException>(() => GovernanceOutboxClaimRequest.Create("worker-a", maxCount: 0));
+        _ = Assert.Throws<ArgumentOutOfRangeException>(() => GovernanceOutboxClaim.Create(entry, "worker-a", "token", claimedUtc, claimedUtc));
+        _ = Assert.Throws<ArgumentOutOfRangeException>(() => entry.MarkClaimed("worker-a", leaseDuration: TimeSpan.Zero));
+    }
+
     private static GovernanceEmissionEnvelope CreateEnvelope(string eventId, string correlationId)
     {
         return GovernanceEmissionEnvelope.Create(

@@ -401,6 +401,88 @@ public sealed class GovernanceOutboxStoreTests
         _ = Assert.Throws<ArgumentOutOfRangeException>(() => entry.MarkClaimed("worker-a", leaseDuration: TimeSpan.Zero));
     }
 
+    [Fact]
+    public void GovernanceOutboxEntryValidationAndTransitionBranchesAreCovered()
+    {
+        GovernanceEmissionEnvelope envelope = CreateEnvelope("event-validation", "correlation-validation");
+        DateTimeOffset now = new(2026, 7, 8, 12, 0, 0, TimeSpan.Zero);
+        var nonRetryableError = GovernanceEmissionError.Create("provider.failed", "Provider failed.", isRetryable: false, providerName: " provider ");
+
+        _ = Assert.Throws<ArgumentException>(() => GovernanceOutboxEntry.Restore(envelope, GovernanceEmissionStatus.Pending, " ", now, now));
+        _ = Assert.Throws<ArgumentNullException>(() => GovernanceOutboxEntry.Restore(null!, GovernanceEmissionStatus.Pending, "entry-1", now, now));
+        _ = Assert.Throws<ArgumentOutOfRangeException>(() => GovernanceOutboxEntry.Restore(envelope, (GovernanceEmissionStatus)999, "entry-1", now, now));
+        _ = Assert.Throws<ArgumentOutOfRangeException>(() => GovernanceOutboxEntry.Restore(envelope, GovernanceEmissionStatus.Pending, "entry-1", now, now, retryCount: -1));
+        _ = Assert.Throws<ArgumentOutOfRangeException>(() => GovernanceOutboxEntry.Restore(envelope, GovernanceEmissionStatus.Pending, "entry-1", now, now, maxRetryCount: -1));
+        _ = Assert.Throws<ArgumentOutOfRangeException>(() => GovernanceOutboxEntry.Restore(envelope, GovernanceEmissionStatus.Pending, "entry-1", now, now, claimAttemptCount: -1));
+
+        GovernanceOutboxEntry entry = GovernanceOutboxEntry.Create(
+            envelope,
+            " entry-1 ",
+            now,
+            metadata: new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                [" "] = "ignored",
+                [" key "] = " value "
+            });
+        GovernanceOutboxEntry failedEntry = entry.MarkFailed(nonRetryableError, now.AddMinutes(1), now.AddSeconds(1));
+        GovernanceOutboxEntry maxRetryEntry = GovernanceOutboxEntry.Create(envelope, "entry-2", now, maxRetryCount: 1)
+            .MarkFailed(nonRetryableError, now.AddMinutes(1), now.AddSeconds(1));
+        GovernanceOutboxEntry restoredWithoutFullClaim = GovernanceOutboxEntry.Restore(
+            envelope,
+            GovernanceEmissionStatus.Pending,
+            "entry-3",
+            now,
+            now,
+            claimOwner: " ",
+            claimToken: "token",
+            claimedUtc: now,
+            claimExpiresUtc: now.AddMinutes(5));
+
+        Assert.Equal("entry-1", entry.OutboxEntryId);
+        Assert.True(entry.HasMetadata);
+        Assert.Equal("value", entry.Metadata["key"]);
+        Assert.Equal(GovernanceEmissionStatus.Failed, failedEntry.Status);
+        Assert.Equal(now.AddMinutes(1), failedEntry.NextRetryUtc);
+        Assert.Equal("provider", failedEntry.ProviderName);
+        Assert.Equal(GovernanceEmissionStatus.DeadLettered, maxRetryEntry.Status);
+        Assert.Null(maxRetryEntry.NextRetryUtc);
+        Assert.Equal("Provider failed.", maxRetryEntry.DeadLetterReason);
+        Assert.False(restoredWithoutFullClaim.HasClaim);
+        Assert.True(restoredWithoutFullClaim.CanBeClaimed(now));
+        _ = Assert.Throws<ArgumentException>(() => entry.MarkDelivered(GovernanceEmissionResult.Failed(nonRetryableError)));
+    }
+
+    [Fact]
+    public void OutboxOptionValidationBranchesAreCoveredInCompiledOutboxTests()
+    {
+        new AsiBackboneGovernanceOutboxOptions().Validate();
+
+        new AsiBackboneGovernanceOutboxOptions
+        {
+            UseClaimLeases = true,
+            ClaimWorkerId = "worker-1",
+            ClaimLeaseDuration = TimeSpan.FromMinutes(2)
+        }.Validate();
+
+        _ = Assert.Throws<InvalidOperationException>(() => new AsiBackboneGovernanceOutboxOptions
+        {
+            RetryDelay = TimeSpan.FromTicks(-1)
+        }.Validate());
+        _ = Assert.Throws<InvalidOperationException>(() => new AsiBackboneGovernanceOutboxOptions
+        {
+            DeferredDelay = TimeSpan.FromTicks(-1)
+        }.Validate());
+        _ = Assert.Throws<InvalidOperationException>(() => new AsiBackboneGovernanceOutboxOptions
+        {
+            ClaimLeaseDuration = TimeSpan.Zero
+        }.Validate());
+        _ = Assert.Throws<InvalidOperationException>(() => new AsiBackboneGovernanceOutboxOptions
+        {
+            UseClaimLeases = true,
+            ClaimWorkerId = " "
+        }.Validate());
+    }
+
     private static GovernanceEmissionEnvelope CreateEnvelope(string eventId, string correlationId)
     {
         return GovernanceEmissionEnvelope.Create(

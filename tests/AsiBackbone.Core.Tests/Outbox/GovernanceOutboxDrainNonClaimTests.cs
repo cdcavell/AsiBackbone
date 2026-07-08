@@ -12,7 +12,7 @@ public sealed class GovernanceOutboxDrainNonClaimTests
     public async Task DrainAsyncReturnsEmptyWhenNoEntriesAreEligible()
     {
         var outboxStore = new InMemoryGovernanceOutboxStore();
-        var drain = CreateDrain(outboxStore, new ResultEmitter(GovernanceEmissionResult.Delivered("provider", "record-empty")));
+        AsiBackboneGovernanceOutboxDrain drain = CreateDrain(outboxStore, new ResultEmitter(GovernanceEmissionResult.Delivered("provider", "record-empty")));
 
         IReadOnlyList<GovernanceOutboxEntry> drainedEntries = await drain.DrainAsync(
             new DateTimeOffset(2026, 7, 8, 12, 0, 0, TimeSpan.Zero),
@@ -37,7 +37,7 @@ public sealed class GovernanceOutboxDrainNonClaimTests
             GovernanceEmissionError.Create("provider.transient", "Transient failure.", isRetryable: true),
             drainUtc.AddMinutes(-1),
             TestContext.Current.CancellationToken);
-        var drain = CreateDrain(outboxStore, new PerEnvelopeDeliveredEmitter());
+        AsiBackboneGovernanceOutboxDrain drain = CreateDrain(outboxStore, new PerEnvelopeDeliveredEmitter());
 
         IReadOnlyList<GovernanceOutboxEntry> drainedEntries = await drain.DrainAsync(
             drainUtc,
@@ -63,7 +63,7 @@ public sealed class GovernanceOutboxDrainNonClaimTests
             GovernanceEmissionError.Create("provider.transient", "Transient failure.", isRetryable: true),
             drainUtc.AddMinutes(-1),
             TestContext.Current.CancellationToken);
-        var drain = CreateDrain(outboxStore, new PerEnvelopeDeliveredEmitter());
+        AsiBackboneGovernanceOutboxDrain drain = CreateDrain(outboxStore, new PerEnvelopeDeliveredEmitter());
 
         IReadOnlyList<GovernanceOutboxEntry> drainedEntries = await drain.DrainAsync(
             drainUtc,
@@ -123,7 +123,7 @@ public sealed class GovernanceOutboxDrainNonClaimTests
         var outboxStore = new InMemoryGovernanceOutboxStore();
         DateTimeOffset drainUtc = new(2026, 7, 8, 12, 0, 0, TimeSpan.Zero);
         _ = await outboxStore.EnqueueAsync(CreateEnvelope("event-throw", "correlation-throw"), TestContext.Current.CancellationToken);
-        var drain = CreateDrain(outboxStore, new ThrowingEmitter());
+        AsiBackboneGovernanceOutboxDrain drain = CreateDrain(outboxStore, new ThrowingEmitter());
 
         GovernanceOutboxEntry thrownEntry = Assert.Single(await drain.DrainAsync(
             drainUtc,
@@ -143,7 +143,7 @@ public sealed class GovernanceOutboxDrainNonClaimTests
         _ = await outboxStore.EnqueueAsync(
             CreateEnvelope($"event-{suffix}", $"correlation-{suffix}"),
             TestContext.Current.CancellationToken);
-        var drain = CreateDrain(outboxStore, new ResultEmitter(result));
+        AsiBackboneGovernanceOutboxDrain drain = CreateDrain(outboxStore, new ResultEmitter(result));
 
         return Assert.Single(await drain.DrainAsync(
             drainUtc,

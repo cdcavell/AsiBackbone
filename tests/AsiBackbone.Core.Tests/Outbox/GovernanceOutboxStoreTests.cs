@@ -416,7 +416,7 @@ public sealed class GovernanceOutboxStoreTests
         _ = Assert.Throws<ArgumentOutOfRangeException>(() => GovernanceOutboxEntry.Restore(envelope, GovernanceEmissionStatus.Pending, "entry-1", now, now, maxRetryCount: -1));
         _ = Assert.Throws<ArgumentOutOfRangeException>(() => GovernanceOutboxEntry.Restore(envelope, GovernanceEmissionStatus.Pending, "entry-1", now, now, claimAttemptCount: -1));
 
-        GovernanceOutboxEntry entry = GovernanceOutboxEntry.Create(
+        var entry = GovernanceOutboxEntry.Create(
             envelope,
             " entry-1 ",
             now,
@@ -428,7 +428,7 @@ public sealed class GovernanceOutboxStoreTests
         GovernanceOutboxEntry failedEntry = entry.MarkFailed(nonRetryableError, now.AddMinutes(1), now.AddSeconds(1));
         GovernanceOutboxEntry maxRetryEntry = GovernanceOutboxEntry.Create(envelope, "entry-2", now, maxRetryCount: 1)
             .MarkFailed(nonRetryableError, now.AddMinutes(1), now.AddSeconds(1));
-        GovernanceOutboxEntry restoredWithoutFullClaim = GovernanceOutboxEntry.Restore(
+        var restoredWithoutFullClaim = GovernanceOutboxEntry.Restore(
             envelope,
             GovernanceEmissionStatus.Pending,
             "entry-3",
@@ -496,7 +496,7 @@ public sealed class GovernanceOutboxStoreTests
                 UseClaimLeases = true,
                 ClaimWorkerId = "worker-1"
             }));
-        await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        _ = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             await selectionOnlyDrain.DrainAsync(drainUtc, cancellationToken: TestContext.Current.CancellationToken));
 
         var emptyStore = new InMemoryGovernanceOutboxStore();
@@ -648,28 +648,44 @@ public sealed class GovernanceOutboxStoreTests
 
     private sealed class SelectionOnlyOutboxStore : IAsiBackboneGovernanceOutboxStore
     {
-        public ValueTask<GovernanceOutboxEntry> EnqueueAsync(GovernanceEmissionEnvelope envelope, CancellationToken cancellationToken = default) =>
-            ValueTask.FromResult(GovernanceOutboxEntry.Create(envelope));
+        public ValueTask<GovernanceOutboxEntry> EnqueueAsync(GovernanceEmissionEnvelope envelope, CancellationToken cancellationToken = default)
+        {
+            return ValueTask.FromResult(GovernanceOutboxEntry.Create(envelope));
+        }
 
-        public ValueTask<GovernanceOutboxEntry> SaveAsync(GovernanceOutboxEntry entry, CancellationToken cancellationToken = default) =>
-            ValueTask.FromResult(entry);
+        public ValueTask<GovernanceOutboxEntry> SaveAsync(GovernanceOutboxEntry entry, CancellationToken cancellationToken = default)
+        {
+            return ValueTask.FromResult(entry);
+        }
 
-        public ValueTask<GovernanceOutboxEntry?> FindByOutboxEntryIdAsync(string outboxEntryId, CancellationToken cancellationToken = default) =>
-            ValueTask.FromResult<GovernanceOutboxEntry?>(null);
+        public ValueTask<GovernanceOutboxEntry?> FindByOutboxEntryIdAsync(string outboxEntryId, CancellationToken cancellationToken = default)
+        {
+            return ValueTask.FromResult<GovernanceOutboxEntry?>(null);
+        }
 
-        public ValueTask<IReadOnlyList<GovernanceOutboxEntry>> FindPendingAsync(int maxCount = 100, CancellationToken cancellationToken = default) =>
-            ValueTask.FromResult<IReadOnlyList<GovernanceOutboxEntry>>(Array.Empty<GovernanceOutboxEntry>());
+        public ValueTask<IReadOnlyList<GovernanceOutboxEntry>> FindPendingAsync(int maxCount = 100, CancellationToken cancellationToken = default)
+        {
+            return ValueTask.FromResult<IReadOnlyList<GovernanceOutboxEntry>>(Array.Empty<GovernanceOutboxEntry>());
+        }
 
-        public ValueTask<IReadOnlyList<GovernanceOutboxEntry>> FindRetryReadyAsync(DateTimeOffset utcNow, int maxCount = 100, CancellationToken cancellationToken = default) =>
-            ValueTask.FromResult<IReadOnlyList<GovernanceOutboxEntry>>(Array.Empty<GovernanceOutboxEntry>());
+        public ValueTask<IReadOnlyList<GovernanceOutboxEntry>> FindRetryReadyAsync(DateTimeOffset utcNow, int maxCount = 100, CancellationToken cancellationToken = default)
+        {
+            return ValueTask.FromResult<IReadOnlyList<GovernanceOutboxEntry>>(Array.Empty<GovernanceOutboxEntry>());
+        }
 
-        public ValueTask<GovernanceOutboxEntry> MarkDeliveredAsync(string outboxEntryId, GovernanceEmissionResult result, CancellationToken cancellationToken = default) =>
+        public ValueTask<GovernanceOutboxEntry> MarkDeliveredAsync(string outboxEntryId, GovernanceEmissionResult result, CancellationToken cancellationToken = default)
+        {
             throw new NotSupportedException();
+        }
 
-        public ValueTask<GovernanceOutboxEntry> MarkFailedAsync(string outboxEntryId, GovernanceEmissionError governanceEmissionError, DateTimeOffset? nextRetryUtc = null, CancellationToken cancellationToken = default) =>
+        public ValueTask<GovernanceOutboxEntry> MarkFailedAsync(string outboxEntryId, GovernanceEmissionError governanceEmissionError, DateTimeOffset? nextRetryUtc = null, CancellationToken cancellationToken = default)
+        {
             throw new NotSupportedException();
+        }
 
-        public ValueTask<GovernanceOutboxEntry> MarkDeadLetteredAsync(string outboxEntryId, GovernanceEmissionError governanceEmissionError, string? deadLetterReason = null, CancellationToken cancellationToken = default) =>
+        public ValueTask<GovernanceOutboxEntry> MarkDeadLetteredAsync(string outboxEntryId, GovernanceEmissionError governanceEmissionError, string? deadLetterReason = null, CancellationToken cancellationToken = default)
+        {
             throw new NotSupportedException();
+        }
     }
 }

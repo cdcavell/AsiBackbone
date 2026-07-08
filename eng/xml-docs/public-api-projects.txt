@@ -1,0 +1,13 @@
+# Public package projects included in CS1591 XML documentation inventory.
+# Keep this list aligned with package projects under ./src, excluding template content projects.
+src/AsiBackbone.Analyzers/AsiBackbone.Analyzers.csproj
+src/AsiBackbone.AspNetCore/AsiBackbone.AspNetCore.csproj
+src/AsiBackbone.Core/AsiBackbone.Core.csproj
+src/AsiBackbone.DependencyInjection/AsiBackbone.DependencyInjection.csproj
+src/AsiBackbone.EntityFrameworkCore/AsiBackbone.EntityFrameworkCore.csproj
+src/AsiBackbone.OpenTelemetry/AsiBackbone.OpenTelemetry.csproj
+src/AsiBackbone.Signing.LocalDevelopment/AsiBackbone.Signing.LocalDevelopment.csproj
+src/AsiBackbone.Signing.ManagedKey/AsiBackbone.Signing.ManagedKey.csproj
+src/AsiBackbone.Storage.InMemory/AsiBackbone.Storage.InMemory.csproj
+src/AsiBackbone.Templates/AsiBackbone.Templates.csproj
+src/AsiBackbone.Testing/AsiBackbone.Testing.csproj

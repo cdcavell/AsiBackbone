@@ -24,6 +24,9 @@ public sealed class ConstraintEvaluationResultTests
         Assert.Empty(result.ReasonCodes);
     }
 
+    /// <summary>
+    /// Verifies that the Allow factory method reuses a shared instance for allowed results, ensuring that multiple calls to Allow return the same object reference.
+    /// </summary>
     [Fact]
     public void AllowReusesSharedPassThroughResult()
     {

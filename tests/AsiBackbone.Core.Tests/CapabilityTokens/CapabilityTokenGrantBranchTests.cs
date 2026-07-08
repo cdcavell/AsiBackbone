@@ -3,11 +3,17 @@ using Xunit;
 
 namespace AsiBackbone.Core.Tests.CapabilityTokens;
 
+/// <summary>
+/// Tests for the <see cref="CapabilityTokenGrant"/> class, focusing on the branch of the code that creates and validates capability token grants.
+/// </summary>
 public sealed class CapabilityTokenGrantBranchTests
 {
     private static readonly DateTimeOffset IssuedUtc = new(2026, 6, 16, 12, 0, 0, TimeSpan.Zero);
     private static readonly DateTimeOffset ExpiresUtc = new(2026, 6, 16, 12, 30, 0, TimeSpan.Zero);
 
+    /// <summary>
+    /// Tests that the <see cref="CapabilityTokenGrant.Create"/> method correctly normalizes scopes, metadata, and optional bindings, and that the resulting grant has the expected properties.
+    /// </summary>
     [Fact]
     public void CreateNormalizesScopesMetadataAndOptionalBindings()
     {
@@ -59,6 +65,9 @@ public sealed class CapabilityTokenGrantBranchTests
         Assert.False(grant.Metadata.ContainsKey(string.Empty));
     }
 
+    /// <summary>
+    /// Tests that the <see cref="CapabilityTokenGrant.Create"/> method allows creating a grant with minimal required parameters and correctly reports missing optional references and metadata.
+    /// </summary>
     [Fact]
     public void CreateAllowsMinimalGrantAndReportsMissingOptionalReferences()
     {
@@ -86,6 +95,9 @@ public sealed class CapabilityTokenGrantBranchTests
         Assert.Null(grant.ResourceBinding);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="CapabilityTokenGrant.Create"/> method throws an <see cref="ArgumentNullException"/> when provided with null scopes, ensuring that scopes are required for creating a valid grant.
+    /// </summary>
     [Fact]
     public void CreateRejectsNullScopes()
     {
@@ -99,6 +111,9 @@ public sealed class CapabilityTokenGrantBranchTests
                 expiresUtc: ExpiresUtc));
     }
 
+    /// <summary>
+    /// Tests that the <see cref="CapabilityTokenGrant.Create"/> method throws an <see cref="ArgumentException"/> when provided with empty or whitespace-only scopes, ensuring that valid scopes are required for creating a grant.
+    /// </summary>
     [Fact]
     public void CreateRejectsEmptyNormalizedScopes()
     {
@@ -112,6 +127,9 @@ public sealed class CapabilityTokenGrantBranchTests
                 expiresUtc: ExpiresUtc));
     }
 
+    /// <summary>
+    /// Tests that the <see cref="CapabilityTokenGrant.Create"/> method throws an <see cref="ArgumentOutOfRangeException"/> when the not-before timestamp is after the expiration timestamp.
+    /// </summary>
     [Fact]
     public void CreateRejectsNotBeforeAfterExpiration()
     {
@@ -126,6 +144,9 @@ public sealed class CapabilityTokenGrantBranchTests
                 notBeforeUtc: ExpiresUtc.AddTicks(1)));
     }
 
+    /// <summary>
+    /// Tests that the <see cref="CapabilityTokenGrant.Create"/> method throws an <see cref="ArgumentOutOfRangeException"/> when the issued timestamp is after the expiration timestamp.
+    /// </summary>
     [Fact]
     public void CreateRejectsIssuedAfterExpiration()
     {

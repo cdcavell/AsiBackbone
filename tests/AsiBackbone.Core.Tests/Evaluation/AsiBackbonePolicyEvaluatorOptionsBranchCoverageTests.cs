@@ -8,6 +8,9 @@ namespace AsiBackbone.Core.Tests.Evaluation;
 /// </summary>
 public sealed class AsiBackbonePolicyEvaluatorOptionsBranchCoverageTests
 {
+    /// <summary>
+    /// Validates that the default options pass validation.
+    /// </summary>
     [Fact]
     public void ValidateDefaultOptionsSucceeds()
     {
@@ -16,6 +19,9 @@ public sealed class AsiBackbonePolicyEvaluatorOptionsBranchCoverageTests
         options.Validate();
     }
 
+    /// <summary>
+    /// Validates that blank reason codes and messages are rejected by validation.
+    /// </summary>
     [Fact]
     public void ValidateRejectsBlankNoConstraintsReasonCode()
     {
@@ -27,6 +33,9 @@ public sealed class AsiBackbonePolicyEvaluatorOptionsBranchCoverageTests
         _ = Assert.Throws<InvalidOperationException>(options.Validate);
     }
 
+    /// <summary>
+    /// Validates that blank reason messages are rejected by validation.
+    /// </summary>
     [Fact]
     public void ValidateRejectsBlankNoConstraintsReasonMessage()
     {
@@ -38,6 +47,9 @@ public sealed class AsiBackbonePolicyEvaluatorOptionsBranchCoverageTests
         _ = Assert.Throws<InvalidOperationException>(options.Validate);
     }
 
+    /// <summary>
+    /// Validates that blank constraint exception reason codes are rejected by validation.
+    /// </summary>
     [Fact]
     public void ValidateRejectsBlankConstraintExceptionReasonCode()
     {
@@ -48,7 +60,10 @@ public sealed class AsiBackbonePolicyEvaluatorOptionsBranchCoverageTests
 
         _ = Assert.Throws<InvalidOperationException>(options.Validate);
     }
-
+    
+    /// <summary>
+    /// Validates that blank constraint exception reason messages are rejected by validation.
+    /// </summary>  
     [Fact]
     public void ValidateRejectsBlankConstraintExceptionReasonMessage()
     {
@@ -60,6 +75,9 @@ public sealed class AsiBackbonePolicyEvaluatorOptionsBranchCoverageTests
         _ = Assert.Throws<InvalidOperationException>(options.Validate);
     }
 
+    /// <summary>
+    /// Validates that blank threat contributor exception reason codes are rejected by validation.
+    /// </summary>
     [Fact]
     public void ValidateRejectsBlankThreatContributorExceptionReasonCode()
     {
@@ -71,6 +89,9 @@ public sealed class AsiBackbonePolicyEvaluatorOptionsBranchCoverageTests
         _ = Assert.Throws<InvalidOperationException>(options.Validate);
     }
 
+    /// <summary>
+    /// Validates that blank threat contributor exception reason messages are rejected by validation.
+    /// </summary>
     [Fact]
     public void ValidateRejectsBlankThreatContributorExceptionReasonMessage()
     {

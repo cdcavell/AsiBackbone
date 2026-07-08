@@ -10,6 +10,12 @@ namespace AsiBackbone.Core.Tests.Audit;
 /// </summary>
 public sealed class AuditResidueHotPathTests
 {
+    /// <summary>
+    /// Validates that the <see cref="AuditResidue.FromDecision"/> method correctly copies the decision outcome, trace, and reason codes into the resulting audit residue.
+    /// </summary>
+    /// <param name="scenario">The scenario under test.</param>
+    /// <param name="expectedOutcome">The expected outcome of the audit residue.</param>
+    /// <param name="expectedReasonCode">The expected reason code for the audit residue.</param>
     [Theory]
     [InlineData("allow", "Allowed", null)]
     [InlineData("warning", "Warning", "policy.warning")]

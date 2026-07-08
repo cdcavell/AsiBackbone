@@ -36,6 +36,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
         nameof(InvalidProgramException)
     ];
 
+    /// <summary>
+    /// Verifies that a normal constraint exception is converted to a denial when the evaluator is configured to treat constraint exceptions as denials.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task ConstraintExceptionAsDenialStillConvertsNormalConstraintException()
     {
@@ -56,6 +60,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
             Assert.Single(decision.ReasonCodes));
     }
 
+    /// <summary>
+    /// Verifies that a wrapped non-critical constraint exception is converted to a denial when the evaluator is configured to treat constraint exceptions as denials.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task ConstraintExceptionAsDenialStillConvertsWrappedNonCriticalConstraintException()
     {
@@ -78,6 +86,11 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
             Assert.Single(decision.ReasonCodes));
     }
 
+    /// <summary>
+    /// Verifies that a critical runtime exception thrown by a constraint is propagated and not converted to a denial, even when the evaluator is configured to treat constraint exceptions as denials.
+    /// </summary>
+    /// <param name="criticalExceptionType">The type of the critical runtime exception to test.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Theory]
     [MemberData(nameof(CriticalRuntimeExceptionTypes))]
     public async Task ConstraintExceptionAsDenialPropagatesCriticalRuntimeExceptions(string criticalExceptionType)
@@ -98,6 +111,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
         Assert.Same(expectedException, exception);
     }
 
+    /// <summary>
+    /// Verifies that a critical runtime exception wrapped in a non-critical exception thrown by a constraint is propagated and not converted to a denial, even when the evaluator is configured to treat constraint exceptions as denials.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task ConstraintExceptionAsDenialPropagatesWrappedCriticalRuntimeException()
     {
@@ -119,6 +136,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
         Assert.Same(criticalException, exception.InnerException);
     }
 
+    /// <summary>
+    /// Verifies that a normal threat contributor exception is converted to a denial when the evaluator is configured to treat threat contributor exceptions as denials.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task ThreatContributorExceptionAsDenialStillConvertsNormalContributorException()
     {
@@ -135,6 +156,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
             Assert.Single(decision.ReasonCodes));
     }
 
+    /// <summary>
+    /// Verifies that a wrapped non-critical threat contributor exception is converted to a denial when the evaluator is configured to treat threat contributor exceptions as denials.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task ThreatContributorExceptionAsDenialStillConvertsWrappedNonCriticalContributorException()
     {
@@ -153,6 +178,13 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
             Assert.Single(decision.ReasonCodes));
     }
 
+    /// <summary>
+    /// Verifies that a critical runtime exception thrown by a threat contributor is propagated and not converted to a denial, even when the evaluator is configured to treat threat contributor exceptions as denials.
+    /// </summary>
+    /// <param name="criticalExceptionType">
+    /// The type of the critical runtime exception to test.
+    /// </param>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Theory]
     [MemberData(nameof(CriticalRuntimeExceptionTypes))]
     public async Task ThreatContributorExceptionAsDenialPropagatesCriticalRuntimeExceptions(string criticalExceptionType)
@@ -169,6 +201,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorCriticalExceptionTests
         Assert.Same(expectedException, exception);
     }
 
+    /// <summary>
+    /// Verifies that an <see cref="OperationCanceledException"/> thrown by a threat contributor is propagated and not converted to a denial, even when the evaluator is configured to treat threat contributor exceptions as denials.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task ThreatContributorExceptionAsDenialStillPropagatesOperationCanceledException()
     {

@@ -12,6 +12,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorFastAbortTests
 {
     private static readonly string[] ExpectedDefaultEvaluationOrder = ["first", "second", "third"];
 
+    /// <summary>
+    /// Tests that the default evaluation behavior of the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}"/> runs all constraints even after the first denied result is encountered.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task DefaultEvaluationRunsAllConstraintsAfterFirstDeniedResult()
     {
@@ -55,6 +59,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorFastAbortTests
         Assert.DoesNotContain("constraint.third_warning", decision.ReasonCodes);
     }
 
+    /// <summary>
+    /// Tests that when the <see cref="AsiBackbonePolicyEvaluatorOptions.ShortCircuitOnFirstDenial"/> option is enabled, the evaluation stops after the first denied result is encountered.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task ShortCircuitOnFirstDenialStopsAfterFirstDeniedResult()
     {
@@ -89,6 +97,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorFastAbortTests
         Assert.Equal("constraint.first_denied", Assert.Single(decision.ReasonCodes));
     }
 
+    /// <summary>
+    /// Tests that when the <see cref="AsiBackbonePolicyEvaluatorOptions.ShortCircuitOnFirstDenial"/> option is enabled, any warnings produced before the first denied result are preserved in the final decision.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task ShortCircuitOnFirstDenialPreservesWarningsProducedBeforeDeniedResult()
     {
@@ -129,6 +141,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorFastAbortTests
         Assert.DoesNotContain("constraint.skipped_warning", decision.ReasonCodes);
     }
 
+    /// <summary>
+    /// Tests that when the <see cref="AsiBackbonePolicyEvaluatorOptions.ShortCircuitOnFirstDenial"/> option is enabled, only the evaluated constraint results are passed to the decision policy, and any skipped constraints are not included in the results.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task ShortCircuitOnFirstDenialPassesOnlyEvaluatedConstraintResultsToDecisionPolicy()
     {

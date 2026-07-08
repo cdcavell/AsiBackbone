@@ -3,6 +3,9 @@ using Xunit;
 
 namespace AsiBackbone.Core.Tests.Entities;
 
+/// <summary>
+/// Contains unit tests for the AsiBackboneEntity class, ensuring that its properties and methods behave as expected, including initialization of Id and ConcurrencyStamp, implementation of core interfaces, and generation of unique concurrency stamps.
+/// </summary>
 public sealed class AsiBackboneEntityTests
 {
     /// <summary>

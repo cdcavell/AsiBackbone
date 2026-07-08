@@ -11,6 +11,9 @@ namespace AsiBackbone.Core.Tests.Audit;
 /// </summary>
 public sealed class AuditResidueMutationTests
 {
+    /// <summary>
+    /// Tests that the <see cref="AuditResidue.FromDecision"/> method correctly copies decision trace and policy metadata, and ensures that the metadata dictionary is not aliased (i.e., changes to the original dictionary after creation do not affect the residue's metadata).
+    /// </summary>
     [Fact]
     public void FromDecisionCopiesDecisionTracePolicyMetadataAndDoesNotAliasMetadata()
     {
@@ -56,6 +59,9 @@ public sealed class AuditResidueMutationTests
         Assert.False(residue.Metadata.ContainsKey("added"));
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AuditResidue.FromConstraint"/> method correctly copies constraint evaluation trace and policy metadata, ensuring that the metadata dictionary is not aliased (i.e., changes to the original dictionary after creation do not affect the residue's metadata).
+    /// </summary>
     [Fact]
     public void FromConstraintCopiesFullTracePolicyDataAndMetadata()
     {
@@ -92,6 +98,9 @@ public sealed class AuditResidueMutationTests
         Assert.Equal("constraint-test", residue.Metadata["source"]);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AuditResidue.Create"/> method generates identifiers and initializes empty collections when optional inputs are missing, ensuring that the residue is still valid and usable even with minimal input.
+    /// </summary>
     [Fact]
     public void CreateUsesGeneratedIdentifiersAndEmptyCollectionsWhenOptionalInputsAreMissing()
     {
@@ -112,6 +121,9 @@ public sealed class AuditResidueMutationTests
         Assert.Null(residue.PolicyHash);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AuditResidue.Create"/> method normalizes reason codes, telemetry identifiers, and metadata keys/values by trimming whitespace and handling nulls appropriately, ensuring that the resulting residue contains clean and consistent data.
+    /// </summary>
     [Fact]
     public void CreateNormalizesReasonCodesTelemetryAndMetadataBranches()
     {
@@ -181,6 +193,9 @@ public sealed class AuditResidueMutationTests
         Assert.False(residue.Metadata.ContainsKey(string.Empty));
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AuditResidue.Create"/> method throws an <see cref="ArgumentOutOfRangeException"/> when a negative decision latency is provided, ensuring that invalid input is properly rejected.
+    /// </summary>
     [Fact]
     public void CreateRejectsNegativeDecisionLatency()
     {
@@ -194,6 +209,9 @@ public sealed class AuditResidueMutationTests
                 decisionLatencyMs: -1));
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AuditResidue.Create"/> method throws an <see cref="ArgumentOutOfRangeException"/> when a negative constraint count is provided, ensuring that invalid input is properly rejected.
+    /// </summary>
     [Fact]
     public void CreateRejectsNegativeConstraintCount()
     {
@@ -207,6 +225,9 @@ public sealed class AuditResidueMutationTests
                 constraintCount: -1));
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AuditResidue.Create"/> method throws an <see cref="ArgumentOutOfRangeException"/> when a negative outbox sequence is provided, ensuring that invalid input is properly rejected.
+    /// </summary>
     [Fact]
     public void CreateRejectsNegativeOutboxSequence()
     {
@@ -220,6 +241,10 @@ public sealed class AuditResidueMutationTests
                 outboxSequence: -1));
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AuditResidue.Create"/> method throws an <see cref="ArgumentOutOfRangeException"/> when an invalid risk score is provided (negative, NaN, or positive infinity), ensuring that invalid input is properly rejected.
+    /// </summary>
+    /// <param name="riskScore">The risk score to test.</param>
     [Theory]
     [InlineData(-0.01)]
     [InlineData(double.NaN)]

@@ -12,6 +12,9 @@ namespace AsiBackbone.Core.Tests.Audit;
 /// </summary>
 public sealed class AuditResidueBuilderTests
 {
+    /// <summary>
+    /// Verifies that the fluent builder produces an <see cref="AuditResidue" /> equivalent to the direct creation method.
+    /// </summary>
     [Fact]
     public void BuilderCreateMatchesDirectCreateSemantics()
     {

@@ -6,10 +6,16 @@ using Xunit;
 
 namespace AsiBackbone.Core.Tests.CapabilityTokens;
 
+/// <summary>
+/// Unit tests for the <see cref="CapabilityGrantValidator"/> class, which validates capability token grants against specified validation options, including proof verification and use tracking.
+/// </summary>
 public sealed class CapabilityGrantValidatorTests
 {
     private static readonly DateTimeOffset Now = new(2026, 6, 16, 12, 0, 0, TimeSpan.Zero);
 
+    /// <summary>
+    /// Provides test data for various metadata failure scenarios, including the expected validation category, action, and failure code for each case.
+    /// </summary>
     public static TheoryData<string, CapabilityTokenValidationCategory, VerificationPolicyAction, string> MetadataFailureCases => new()
     {
         { "wrong-issuer", CapabilityTokenValidationCategory.WrongIssuer, VerificationPolicyAction.Deny, "capability.issuer-mismatch" },
@@ -22,6 +28,9 @@ public sealed class CapabilityGrantValidatorTests
         { "resource-mismatch", CapabilityTokenValidationCategory.ResourceMismatch, VerificationPolicyAction.Deny, "capability.resource-mismatch" }
     };
 
+    /// <summary>
+    /// Provides test data for various proof failure scenarios, including the expected validation category, action, and failure code for each case.
+    /// </summary>
     public static TheoryData<string, CapabilityTokenValidationCategory, VerificationPolicyAction, string> ProofFailureCases => new()
     {
         { "missing-signature", CapabilityTokenValidationCategory.MissingProof, VerificationPolicyAction.RequireAcknowledgment, "signature.missing" },
@@ -35,6 +44,12 @@ public sealed class CapabilityGrantValidatorTests
         { "failed", CapabilityTokenValidationCategory.Failed, VerificationPolicyAction.Escalate, "verification.failure" }
     };
 
+    /// <summary>
+    /// Validates that a valid signed capability token grant is allowed and that its use is consumed correctly when proof verification and use checking are required.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation of validating the signed grant and asserting the expected results.
+    /// </returns>
     [Fact]
     public async Task ValidateAsyncAllowsValidSignedGrantAndConsumesUse()
     {
@@ -57,6 +72,12 @@ public sealed class CapabilityGrantValidatorTests
         Assert.Equal(1, useStore.GetUseCount("grant-1"));
     }
 
+    /// <summary>
+    /// Validates that an expired capability token grant is denied with the appropriate validation category and action.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation of validating the expired grant and asserting the expected results.
+    /// </returns>
     [Fact]
     public async Task ValidateAsyncDeniesExpiredGrant()
     {
@@ -74,6 +95,12 @@ public sealed class CapabilityGrantValidatorTests
             "capability.expired");
     }
 
+    /// <summary>
+    /// Validates that a capability token grant with an incorrect audience is denied with the appropriate validation category and action.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation of validating the grant and asserting the expected results.
+    /// </returns>
     [Fact]
     public async Task ValidateAsyncDeniesWrongAudience()
     {
@@ -91,6 +118,12 @@ public sealed class CapabilityGrantValidatorTests
             "capability.audience-mismatch");
     }
 
+    /// <summary>
+    /// Validates that a capability token grant with an incorrect scope is denied with the appropriate validation category and action.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation of validating the grant and asserting the expected results.
+    /// </returns>
     [Fact]
     public async Task ValidateAsyncDeniesWrongScope()
     {
@@ -108,6 +141,14 @@ public sealed class CapabilityGrantValidatorTests
             "capability.scope-missing");
     }
 
+    /// <summary>
+    /// Validates that various metadata failure scenarios are correctly mapped to the expected validation category, action, and failure code.
+    /// </summary>
+    /// <param name="scenario">The scenario to test.</param>
+    /// <param name="expectedCategory">The expected validation category.</param>
+    /// <param name="expectedAction">The expected verification policy action.</param>
+    /// <param name="expectedFailureCode">The expected failure code.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Theory]
     [MemberData(nameof(MetadataFailureCases))]
     public async Task ValidateAsyncReturnsExpectedMetadataFailures(
@@ -126,6 +167,12 @@ public sealed class CapabilityGrantValidatorTests
         AssertFailure(result, expectedCategory, expectedAction, expectedFailureCode);
     }
 
+    /// <summary>
+    /// Validates that a capability token grant is denied when any required scope is missing from the provided scopes, even if other required scopes are present.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation of validating the grant and asserting the expected results.
+    /// </returns>
     [Fact]
     public async Task ValidateAsyncDeniesWhenAnyRequiredScopeIsMissingFromMultipleRequiredScopes()
     {
@@ -143,6 +190,12 @@ public sealed class CapabilityGrantValidatorTests
             "capability.scope-missing");
     }
 
+    /// <summary>
+    /// Validates that a capability token grant is allowed when all required scopes are present in the provided scopes, even if additional scopes are included.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation of validating the grant and asserting the expected results.
+    /// </returns>
     [Fact]
     public async Task ValidateAsyncAllowsWhenAllRequiredScopesArePresent()
     {
@@ -159,6 +212,12 @@ public sealed class CapabilityGrantValidatorTests
         Assert.Equal(VerificationPolicyAction.Allow, result.Action);
     }
 
+    /// <summary>
+    /// Validates that a capability token grant is denied when the acknowledgment reference is missing, and the validation options require an acknowledgment reference.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation of validating the grant and asserting the expected results.
+    /// </returns>
     [Fact]
     public async Task ValidateAsyncRequiresMissingAcknowledgmentReference()
     {
@@ -176,6 +235,12 @@ public sealed class CapabilityGrantValidatorTests
             "capability.acknowledgment-missing");
     }
 
+    /// <summary>
+    /// Validates that a capability token grant is denied when proof verification is required, but no verifier is provided to perform the proof verification.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation of validating the grant and asserting the expected results.
+    /// </returns>
     [Fact]
     public async Task ValidateAsyncDeniesProofRequiredWithoutVerifier()
     {
@@ -193,6 +258,14 @@ public sealed class CapabilityGrantValidatorTests
             "capability.proof-verifier-missing");
     }
 
+    /// <summary>
+    /// Validates that various proof failure scenarios are correctly mapped to the expected validation category, action, and failure code when proof verification is required.
+    /// </summary>
+    /// <param name="scenario">The proof failure scenario to test.</param>
+    /// <param name="expectedCategory">The expected validation category.</param>
+    /// <param name="expectedAction">The expected verification policy action.</param>
+    /// <param name="expectedFailureCode">The expected failure code.</param>
+    /// <returns>A task representing the asynchronous operation of validating the grant and asserting the expected results.</returns>
     [Theory]
     [MemberData(nameof(ProofFailureCases))]
     public async Task ValidateAsyncMapsProofFailureCategories(
@@ -214,6 +287,10 @@ public sealed class CapabilityGrantValidatorTests
         AssertFailure(result, expectedCategory, expectedAction, expectedFailureCode);
     }
 
+    /// <summary>
+    /// Validates that a capability token grant defers validation when use checking is required, but no use store is provided to perform the use check.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation of validating the grant and asserting the expected results.</returns>
     [Fact]
     public async Task ValidateAsyncDefersWhenUseCheckIsRequiredWithoutUseStore()
     {
@@ -231,6 +308,12 @@ public sealed class CapabilityGrantValidatorTests
             "capability.use-store-missing");
     }
 
+    /// <summary>
+    /// Validates that a capability token grant defers validation when the use store returns an unavailable state, and verifies that the expected failure code is returned based on whether a custom failure code is provided.
+    /// </summary>
+    /// <param name="customFailureCode">The custom failure code to test.</param>
+    /// <param name="expectedFailureCode">The expected failure code.</param>
+    /// <returns>A task representing the asynchronous operation of validating the grant and asserting the expected results.</returns>
     [Theory]
     [InlineData(null, "capability.use-store-unavailable")]
     [InlineData("capability.custom-use-store-unavailable", "capability.custom-use-store-unavailable")]
@@ -256,6 +339,10 @@ public sealed class CapabilityGrantValidatorTests
         Assert.Equal("Use store offline.", result.FailureMessage);
     }
 
+    /// <summary>
+    /// Validates that a capability token grant escalates validation when the use store returns an unknown state, and verifies that the expected failure code is returned.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation of validating the grant and asserting the expected results.</returns>
     [Fact]
     public async Task ValidateAsyncEscalatesUnknownUseStoreState()
     {
@@ -275,6 +362,10 @@ public sealed class CapabilityGrantValidatorTests
             "capability.validation-failed");
     }
 
+    /// <summary>
+    /// Validates that a capability token grant is denied when it is used more than once, and the validation options are configured to require use checking with a maximum use count of 1.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation of validating the grant and asserting the expected results.</returns>
     [Fact]
     public async Task ValidateAsyncDeniesRepeatedUseWhenSingleUseIsConfigured()
     {
@@ -299,6 +390,10 @@ public sealed class CapabilityGrantValidatorTests
         Assert.Equal(VerificationPolicyAction.Deny, second.Action);
     }
 
+    /// <summary>
+    /// Validates that a capability token grant is denied when it has been stopped, and the validation options are configured to require use checking.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation of validating the grant and asserting the expected results.</returns>
     [Fact]
     public async Task ValidateAsyncDeniesStoppedGrantAsRevoked()
     {
@@ -316,6 +411,10 @@ public sealed class CapabilityGrantValidatorTests
         Assert.Equal(VerificationPolicyAction.Deny, result.Action);
     }
 
+    /// <summary>
+    /// Validates that a capability token grant is denied when it has been cancelled, and the validation options are configured to require use checking.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation of validating the grant and asserting the expected results.</returns>
     [Fact]
     public async Task ValidateAsyncDeniesCancelledGrant()
     {
@@ -333,6 +432,10 @@ public sealed class CapabilityGrantValidatorTests
         Assert.Equal(VerificationPolicyAction.Deny, result.Action);
     }
 
+    /// <summary>
+    /// Validates that a capability token grant throws an exception when the token is already canceled.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation of validating the grant and asserting the expected results.</returns>
     [Fact]
     public async Task ValidateAsyncThrowsWhenTokenIsAlreadyCanceled()
     {
@@ -346,6 +449,10 @@ public sealed class CapabilityGrantValidatorTests
                 cancellationToken: cancellationToken));
     }
 
+    /// <summary>
+    /// Validates that a capability token grant throws an exception when the signed grant is null, ensuring that the validation method correctly handles null input.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation of validating the grant and asserting the expected results.</returns>
     [Fact]
     public async Task ValidateAsyncThrowsWhenSignedGrantIsNull()
     {

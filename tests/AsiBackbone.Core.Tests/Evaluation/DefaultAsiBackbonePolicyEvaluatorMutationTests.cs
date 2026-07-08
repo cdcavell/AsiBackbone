@@ -10,6 +10,10 @@ namespace AsiBackbone.Core.Tests.Evaluation;
 /// </summary>
 public sealed class DefaultAsiBackbonePolicyEvaluatorMutationTests
 {
+    /// <summary>
+    /// Tests that the evaluator aggregates all denial reasons and suppresses warning reasons when at least one constraint denies the operation.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task EvaluateAggregatesAllDenialReasonsAndSuppressesWarningReasons()
     {
@@ -45,6 +49,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorMutationTests
         Assert.Equal(context.PolicyHash, decision.PolicyHash);
     }
 
+    /// <summary>
+    /// Tests that the evaluator aggregates all warning reasons when no constraints deny the operation, and that the decision is marked as a warning but still allows proceeding.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task EvaluateAggregatesWarningReasonsWhenNoDenialsExist()
     {
@@ -76,6 +84,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorMutationTests
         Assert.Equal(context.PolicyHash, decision.PolicyHash);
     }
 
+    /// <summary>
+    /// Tests that the evaluator runs all constraints and passes all results to the decision policy after a denial.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task EvaluateRunsAllConstraintsAndPassesAllResultsToDecisionPolicyAfterDenial()
     {
@@ -129,6 +141,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorMutationTests
             policy.ConstraintResults.Select(result => result.Outcome));
     }
 
+    /// <summary>
+    /// Tests that the evaluator honors cancellation requests between constraint evaluations, ensuring that subsequent constraints are not evaluated after cancellation.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task EvaluateHonorsCancellationBetweenConstraints()
     {

@@ -133,6 +133,22 @@ Do not use these numbers to promise consumer latency. Host applications should r
 
 Outbox drain benchmarks are especially sensitive to host-owned infrastructure. Real durable stores, provider SDKs, exporters, retry policies, batch sizes, row claiming, and network conditions can dominate drain runtime even if the provider-neutral drain path is lightweight.
 
+## Threat-contributor exception metadata allocation
+
+Issue #486 reviewed the metadata dictionary allocated when a threat model contributor throws and `TreatThreatContributorExceptionAsDenial` converts that failure into a denied governance decision. This remains a profiling-gated failure path, not a routine evaluator hot path.
+
+No code optimization is warranted without evidence that threat-contributor exceptions are frequent enough to dominate incident traffic. The current allocation is intentionally local to the single denied decision so the evaluator does not introduce shared mutable metadata, pooling complexity, or public API churn for an exceptional path.
+
+Preserve the current safety boundary when revisiting this area:
+
+- keep the public reason code and message configured by evaluator options;
+- include only bounded diagnostic metadata such as contributor identity and exception type;
+- do not copy exception messages, stack traces, secrets, raw payloads, prompts, protected content, or user input into decisions;
+- preserve logger behavior for operational diagnostics, where the exception object is available to the logging pipeline;
+- prefer fixing, disabling, circuit-breaking, or isolating unstable host-owned contributors before optimizing framework metadata construction.
+
+Reopen optimization work only after BenchmarkDotNet output, `dotnet-trace`, `dotnet-counters`, `dotnet-gcdump`, or production-equivalent host profiling shows this exception path is materially hot for a target workload. If that happens, add a focused benchmark or trace evidence first, then consider a low-allocation representation only if `OperationReason` and the decision model can support it without public API churn.
+
 ## Allocation profiling plan
 
 Start with BenchmarkDotNet `MemoryDiagnoser` output. If `Allocated`, `Gen0`, or run-to-run variance points to a hot scenario, move to process-level profiling.
@@ -196,6 +212,7 @@ This keeps optimization work evidence-driven and avoids adding complexity before
 - Issue #383 extended the baseline to endpoint governance and outbox drain paths.
 - Issue #394 added BenchmarkDotNet allocation baselines and this profiling plan.
 - Issue #456 extended BenchmarkDotNet coverage for decision/result normalization, audit residue builder metadata paths, and exception-as-denial evaluation.
+- Issue #486 documented the profiling-gated decision to leave threat-contributor exception metadata allocation local to the exceptional denial path.
 
 ## Related documentation
 

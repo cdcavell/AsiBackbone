@@ -59,7 +59,7 @@ The workflows do not attest broad repository outputs, coverage reports, document
 
 ## NuGet package signing posture
 
-NuGet package signing is intentionally deferred in this pass.
+NuGet package signing is intentionally deferred in this pass and remains tracked as an open supply-chain readiness item.
 
 Rationale:
 
@@ -70,6 +70,8 @@ Rationale:
 - stable-release-only signing policy should be decided before signed and unsigned packages coexist.
 
 Current packages should therefore be described as having workflow-generated SBOMs and GitHub artifact provenance where supported, not as maintainer-signed NuGet packages.
+
+When signing is adopted, update `SECURITY.md`, stable release validation guidance, the active release-readiness record, release notes, and consumer verification guidance before publishing public claims that package artifacts are maintainer-signed, repository-signed, or Authenticode-signed.
 
 ## Consumer guidance
 

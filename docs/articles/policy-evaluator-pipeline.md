@@ -41,7 +41,8 @@ Composition rules are intentionally conservative:
 5. An optional `IAsiBackboneDecisionPolicy<TContext>` can raise the composed decision to deferred, acknowledgment-required, or escalation-recommended.
 6. When `AsiBackbonePolicyEvaluatorOptions.DenyWhenNoConstraints` is enabled and the supplied constraint collection is empty, the evaluator returns a denied decision with reason code `asibackbone.policy.no_constraints`.
 7. When `AsiBackbonePolicyEvaluatorOptions.ShortCircuitOnFirstDenial` is enabled, the evaluator stops after the first blocked constraint result and preserves reasons produced up to that point.
-8. When `AsiBackbonePolicyEvaluatorOptions.TreatConstraintExceptionAsDenial` is enabled, a non-cancellation exception thrown by a constraint becomes a denied decision with reason code `asibackbone.policy.constraint_exception`.
+8. When full evaluation finds a denial, warning-only reasons are not copied into the final denied decision; the denied decision remains focused on blocking rationale.
+9. When `AsiBackbonePolicyEvaluatorOptions.TreatConstraintExceptionAsDenial` is enabled, a non-cancellation exception thrown by a constraint becomes a denied decision with reason code `asibackbone.policy.constraint_exception`.
 
 The evaluator propagates correlation, policy version, and policy hash metadata from the evaluation context into the composed governance decision.
 
@@ -173,6 +174,14 @@ Public reason messages intentionally do not include exception messages, stack tr
 `OperationCanceledException` is not converted into a denial; cancellation continues to propagate.
 
 See [Constraint Exception Policy](constraint-exception-policy.md) for the design note and recommended host posture.
+
+## Warning-only reason handling when denial occurs
+
+`DefaultAsiBackbonePolicyEvaluator<TContext>` treats warning-only reasons as advisory audit context and denial reasons as the blocking rationale. When `ShortCircuitOnFirstDenial` is `false`, the evaluator keeps running after a denied constraint so it can aggregate every denial reason produced by the full active constraint structure. As soon as a denial appears in this full-evaluation mode, accumulated warning-only reasons are cleared from the composed decision and later warnings are ignored. This is intentional: the final denied `GovernanceDecision` remains focused on the reasons that blocked the operation instead of mixing advisory warnings with blocking rationale.
+
+This differs from `ShortCircuitOnFirstDenial = true`. In fast-abort mode, the evaluator stops as soon as the first denial is seen. Warnings produced before that abort point remain in the denied decision because they are part of the evaluated path, while later constraints are intentionally skipped and cannot add denial or warning reasons.
+
+Threat model warnings follow the same distinction. An actionable threat warning is protected from being downgraded to `Allowed` when the composed decision can proceed, including the empty-policy or all-allowed constraint path. When a later constraint denial is composed during full evaluation, the result is already a blocking decision, so threat warning reasons are not duplicated into the final denial reason set. Blocking threat outcomes such as denied, deferred, acknowledgment-required, or escalation-recommended still short-circuit before constraint evaluation and remain protected as their own governance decisions.
 
 ## Future-major compatibility note
 

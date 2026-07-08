@@ -56,6 +56,8 @@
       href: strict-governance-profile.md
     - name: "Production Hardening: Evaluator and Outbox"
       href: production-hardening-evaluator-and-outbox.md
+    - name: Policy Evaluator Allocation Review
+      href: policy-evaluator-allocation-review.md
     - name: Custom Decision Policy Examples
       href: custom-decision-policy-examples.md
     - name: Host-Owned Execution Enforcement
@@ -234,8 +236,6 @@
       href: release-notes-200.md
     - name: 1.2.1 Release Notes
       href: release-notes-121.md
-    - name: 1.2.0 Release Notes
-      href: release-notes-120.md
     - name: 1.1.x Release Notes
       href: release-notes-110.md
 

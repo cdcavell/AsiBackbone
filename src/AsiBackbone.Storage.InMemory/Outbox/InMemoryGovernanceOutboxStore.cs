@@ -106,7 +106,7 @@ public sealed class InMemoryGovernanceOutboxStore : IAsiBackboneGovernanceOutbox
             .OrderBy(entry => entry.CreatedUtc)
             .ThenBy(entry => entry.OutboxEntryId)];
 
-        return ValueTask.FromResult(ClaimEntries(candidates, request, cancellationToken));
+        return ValueTask.FromResult<IReadOnlyList<GovernanceOutboxClaim>>(ClaimEntries(candidates, request, cancellationToken));
     }
 
     /// <inheritdoc />
@@ -123,7 +123,7 @@ public sealed class InMemoryGovernanceOutboxStore : IAsiBackboneGovernanceOutbox
             .OrderBy(entry => entry.NextRetryUtc ?? entry.UpdatedUtc)
             .ThenBy(entry => entry.OutboxEntryId)];
 
-        return ValueTask.FromResult(ClaimEntries(candidates, request, cancellationToken));
+        return ValueTask.FromResult<IReadOnlyList<GovernanceOutboxClaim>>(ClaimEntries(candidates, request, cancellationToken));
     }
 
     /// <inheritdoc />
@@ -275,7 +275,7 @@ public sealed class InMemoryGovernanceOutboxStore : IAsiBackboneGovernanceOutbox
         return ValueTask.FromResult(releasedEntry);
     }
 
-    private IReadOnlyList<GovernanceOutboxClaim> ClaimEntries(
+    private List<GovernanceOutboxClaim> ClaimEntries(
         IReadOnlyList<GovernanceOutboxEntry> candidates,
         GovernanceOutboxClaimRequest request,
         CancellationToken cancellationToken)

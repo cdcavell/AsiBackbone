@@ -16,6 +16,8 @@ This package implements:
 
 It signs the `SigningRequest.SigningHash` value using an in-process RSA key generated for the service instance and returns provider-neutral `SigningMetadata`.
 
+The default local-development signature descriptor is `RSASSA-PSS-SHA256-LOCAL-DEV`, and the in-process RSA signer uses RSA-PSS with SHA-256. Existing local-development fixtures that assumed the earlier PKCS#1 v1.5 descriptor should be regenerated or configured explicitly for their test-only compatibility path.
+
 Core remains provider-neutral. `AsiBackbone.Core` does not reference this package.
 
 ## Metadata returned

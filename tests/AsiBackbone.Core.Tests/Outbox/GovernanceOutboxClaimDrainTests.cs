@@ -20,7 +20,7 @@ public sealed class GovernanceOutboxClaimDrainTests
                 ClaimWorkerId = "worker-1"
             }));
 
-        await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        _ = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             await drain.DrainAsync(cancellationToken: TestContext.Current.CancellationToken));
     }
 
@@ -31,7 +31,7 @@ public sealed class GovernanceOutboxClaimDrainTests
         GovernanceOutboxEntry entry = await outboxStore.EnqueueAsync(
             CreateEnvelope("event-1"),
             TestContext.Current.CancellationToken);
-        var drain = CreateClaimDrain(outboxStore, new DeliveredEmitter());
+        AsiBackboneGovernanceOutboxDrain drain = CreateClaimDrain(outboxStore, new DeliveredEmitter());
 
         IReadOnlyList<GovernanceOutboxEntry> drainedEntries = await drain.DrainAsync(
             new DateTimeOffset(2026, 7, 8, 12, 0, 0, TimeSpan.Zero),
@@ -53,7 +53,7 @@ public sealed class GovernanceOutboxClaimDrainTests
     public async Task DrainAsyncReturnsEmptyWhenClaimStoreHasNoEligibleEntries()
     {
         var outboxStore = new InMemoryGovernanceOutboxStore();
-        var drain = CreateClaimDrain(outboxStore, new DeliveredEmitter());
+        AsiBackboneGovernanceOutboxDrain drain = CreateClaimDrain(outboxStore, new DeliveredEmitter());
 
         IReadOnlyList<GovernanceOutboxEntry> drainedEntries = await drain.DrainAsync(
             new DateTimeOffset(2026, 7, 8, 12, 0, 0, TimeSpan.Zero),
@@ -75,7 +75,7 @@ public sealed class GovernanceOutboxClaimDrainTests
             GovernanceEmissionError.Create("provider.transient", "Transient provider failure.", isRetryable: true),
             drainUtc.AddMinutes(-1),
             TestContext.Current.CancellationToken);
-        var drain = CreateClaimDrain(outboxStore, new DeliveredEmitter());
+        AsiBackboneGovernanceOutboxDrain drain = CreateClaimDrain(outboxStore, new DeliveredEmitter());
 
         IReadOnlyList<GovernanceOutboxEntry> drainedEntries = await drain.DrainAsync(
             drainUtc,
@@ -93,7 +93,7 @@ public sealed class GovernanceOutboxClaimDrainTests
         var outboxStore = new InMemoryGovernanceOutboxStore();
         _ = await outboxStore.EnqueueAsync(CreateEnvelope("event-1"), TestContext.Current.CancellationToken);
         _ = await outboxStore.EnqueueAsync(CreateEnvelope("event-2"), TestContext.Current.CancellationToken);
-        var drain = CreateClaimDrain(outboxStore, new DeliveredEmitter());
+        AsiBackboneGovernanceOutboxDrain drain = CreateClaimDrain(outboxStore, new DeliveredEmitter());
 
         IReadOnlyList<GovernanceOutboxEntry> drainedEntries = await drain.DrainAsync(
             new DateTimeOffset(2026, 7, 8, 12, 0, 0, TimeSpan.Zero),
@@ -112,7 +112,7 @@ public sealed class GovernanceOutboxClaimDrainTests
             CreateEnvelope("event-1"),
             TestContext.Current.CancellationToken);
         DateTimeOffset retryAfterUtc = new(2026, 7, 8, 12, 10, 0, TimeSpan.Zero);
-        var drain = CreateClaimDrain(outboxStore, new ResultEmitter(GovernanceEmissionResult.Deferred(
+        AsiBackboneGovernanceOutboxDrain drain = CreateClaimDrain(outboxStore, new ResultEmitter(GovernanceEmissionResult.Deferred(
             GovernanceEmissionError.Create("provider.deferred", "Provider deferred the emission.", isRetryable: true),
             retryAfterUtc,
             "test-provider")));
@@ -138,7 +138,7 @@ public sealed class GovernanceOutboxClaimDrainTests
         var outboxStore = new InMemoryGovernanceOutboxStore();
         _ = await outboxStore.EnqueueAsync(CreateEnvelope("event-1"), TestContext.Current.CancellationToken);
         DateTimeOffset drainUtc = new(2026, 7, 8, 12, 0, 0, TimeSpan.Zero);
-        var drain = CreateClaimDrain(outboxStore, new ResultEmitter(GovernanceEmissionResult.Pending("test-provider")));
+        AsiBackboneGovernanceOutboxDrain drain = CreateClaimDrain(outboxStore, new ResultEmitter(GovernanceEmissionResult.Pending("test-provider")));
 
         IReadOnlyList<GovernanceOutboxEntry> drainedEntries = await drain.DrainAsync(
             drainUtc,
@@ -156,8 +156,8 @@ public sealed class GovernanceOutboxClaimDrainTests
     {
         var outboxStore = new InMemoryGovernanceOutboxStore();
         _ = await outboxStore.EnqueueAsync(CreateEnvelope("event-1"), TestContext.Current.CancellationToken);
-        GovernanceEmissionError error = GovernanceEmissionError.Create("provider.deadletter", "Provider rejected the emission.", providerName: "test-provider");
-        var drain = CreateClaimDrain(outboxStore, new ResultEmitter(GovernanceEmissionResult.DeadLettered(error)));
+        var error = GovernanceEmissionError.Create("provider.deadletter", "Provider rejected the emission.", providerName: "test-provider");
+        AsiBackboneGovernanceOutboxDrain drain = CreateClaimDrain(outboxStore, new ResultEmitter(GovernanceEmissionResult.DeadLettered(error)));
 
         IReadOnlyList<GovernanceOutboxEntry> drainedEntries = await drain.DrainAsync(
             new DateTimeOffset(2026, 7, 8, 12, 0, 0, TimeSpan.Zero),
@@ -174,8 +174,8 @@ public sealed class GovernanceOutboxClaimDrainTests
     {
         var outboxStore = new InMemoryGovernanceOutboxStore();
         _ = await outboxStore.EnqueueAsync(CreateEnvelope("event-1"), TestContext.Current.CancellationToken);
-        GovernanceEmissionError error = GovernanceEmissionError.Create("provider.failed", "Provider failed the emission.", isRetryable: false, providerName: "test-provider");
-        var drain = CreateClaimDrain(outboxStore, new ResultEmitter(GovernanceEmissionResult.Failed(error)));
+        var error = GovernanceEmissionError.Create("provider.failed", "Provider failed the emission.", isRetryable: false, providerName: "test-provider");
+        AsiBackboneGovernanceOutboxDrain drain = CreateClaimDrain(outboxStore, new ResultEmitter(GovernanceEmissionResult.Failed(error)));
 
         IReadOnlyList<GovernanceOutboxEntry> drainedEntries = await drain.DrainAsync(
             new DateTimeOffset(2026, 7, 8, 12, 0, 0, TimeSpan.Zero),
@@ -193,7 +193,7 @@ public sealed class GovernanceOutboxClaimDrainTests
         var outboxStore = new InMemoryGovernanceOutboxStore();
         _ = await outboxStore.EnqueueAsync(CreateEnvelope("event-1"), TestContext.Current.CancellationToken);
         DateTimeOffset drainUtc = new(2026, 7, 8, 12, 0, 0, TimeSpan.Zero);
-        var drain = CreateClaimDrain(outboxStore, new ThrowingEmitter());
+        AsiBackboneGovernanceOutboxDrain drain = CreateClaimDrain(outboxStore, new ThrowingEmitter());
 
         IReadOnlyList<GovernanceOutboxEntry> drainedEntries = await drain.DrainAsync(
             drainUtc,
@@ -262,28 +262,44 @@ public sealed class GovernanceOutboxClaimDrainTests
 
     private sealed class SelectionOnlyOutboxStore : IAsiBackboneGovernanceOutboxStore
     {
-        public ValueTask<GovernanceOutboxEntry> EnqueueAsync(GovernanceEmissionEnvelope envelope, CancellationToken cancellationToken = default) =>
-            ValueTask.FromResult(GovernanceOutboxEntry.Create(envelope));
+        public ValueTask<GovernanceOutboxEntry> EnqueueAsync(GovernanceEmissionEnvelope envelope, CancellationToken cancellationToken = default)
+        {
+            return ValueTask.FromResult(GovernanceOutboxEntry.Create(envelope));
+        }
 
-        public ValueTask<GovernanceOutboxEntry> SaveAsync(GovernanceOutboxEntry entry, CancellationToken cancellationToken = default) =>
-            ValueTask.FromResult(entry);
+        public ValueTask<GovernanceOutboxEntry> SaveAsync(GovernanceOutboxEntry entry, CancellationToken cancellationToken = default)
+        {
+            return ValueTask.FromResult(entry);
+        }
 
-        public ValueTask<GovernanceOutboxEntry?> FindByOutboxEntryIdAsync(string outboxEntryId, CancellationToken cancellationToken = default) =>
-            ValueTask.FromResult<GovernanceOutboxEntry?>(null);
+        public ValueTask<GovernanceOutboxEntry?> FindByOutboxEntryIdAsync(string outboxEntryId, CancellationToken cancellationToken = default)
+        {
+            return ValueTask.FromResult<GovernanceOutboxEntry?>(null);
+        }
 
-        public ValueTask<IReadOnlyList<GovernanceOutboxEntry>> FindPendingAsync(int maxCount = 100, CancellationToken cancellationToken = default) =>
-            ValueTask.FromResult<IReadOnlyList<GovernanceOutboxEntry>>(Array.Empty<GovernanceOutboxEntry>());
+        public ValueTask<IReadOnlyList<GovernanceOutboxEntry>> FindPendingAsync(int maxCount = 100, CancellationToken cancellationToken = default)
+        {
+            return ValueTask.FromResult<IReadOnlyList<GovernanceOutboxEntry>>(Array.Empty<GovernanceOutboxEntry>());
+        }
 
-        public ValueTask<IReadOnlyList<GovernanceOutboxEntry>> FindRetryReadyAsync(DateTimeOffset utcNow, int maxCount = 100, CancellationToken cancellationToken = default) =>
-            ValueTask.FromResult<IReadOnlyList<GovernanceOutboxEntry>>(Array.Empty<GovernanceOutboxEntry>());
+        public ValueTask<IReadOnlyList<GovernanceOutboxEntry>> FindRetryReadyAsync(DateTimeOffset utcNow, int maxCount = 100, CancellationToken cancellationToken = default)
+        {
+            return ValueTask.FromResult<IReadOnlyList<GovernanceOutboxEntry>>(Array.Empty<GovernanceOutboxEntry>());
+        }
 
-        public ValueTask<GovernanceOutboxEntry> MarkDeliveredAsync(string outboxEntryId, GovernanceEmissionResult result, CancellationToken cancellationToken = default) =>
+        public ValueTask<GovernanceOutboxEntry> MarkDeliveredAsync(string outboxEntryId, GovernanceEmissionResult result, CancellationToken cancellationToken = default)
+        {
             throw new NotSupportedException();
+        }
 
-        public ValueTask<GovernanceOutboxEntry> MarkFailedAsync(string outboxEntryId, GovernanceEmissionError governanceEmissionError, DateTimeOffset? nextRetryUtc = null, CancellationToken cancellationToken = default) =>
+        public ValueTask<GovernanceOutboxEntry> MarkFailedAsync(string outboxEntryId, GovernanceEmissionError governanceEmissionError, DateTimeOffset? nextRetryUtc = null, CancellationToken cancellationToken = default)
+        {
             throw new NotSupportedException();
+        }
 
-        public ValueTask<GovernanceOutboxEntry> MarkDeadLetteredAsync(string outboxEntryId, GovernanceEmissionError governanceEmissionError, string? deadLetterReason = null, CancellationToken cancellationToken = default) =>
+        public ValueTask<GovernanceOutboxEntry> MarkDeadLetteredAsync(string outboxEntryId, GovernanceEmissionError governanceEmissionError, string? deadLetterReason = null, CancellationToken cancellationToken = default)
+        {
             throw new NotSupportedException();
+        }
     }
 }

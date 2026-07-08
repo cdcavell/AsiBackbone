@@ -102,7 +102,7 @@ public sealed class LocalDevelopmentSigningService : IAsiBackboneSigningService,
             return ValueTask.FromResult(SignatureVerificationResult.MissingSignature("The local-development verifier received no signature value."));
         }
 
-        if (!string.Equals(request.SigningHash, metadata.SigningHash, StringComparison.Ordinal))
+        if (!FixedTimeHashEquals(request.SigningHash, metadata.SigningHash))
         {
             return ValueTask.FromResult(SignatureVerificationResult.Failed("localdev.signature.hash-mismatch", "The verification hash does not match the hash recorded in signing metadata."));
         }
@@ -185,6 +185,19 @@ public sealed class LocalDevelopmentSigningService : IAsiBackboneSigningService,
         string normalized = NormalizeHashAlgorithm(hashAlgorithm);
 
         return normalized.Equals(SupportedHashAlgorithm, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool FixedTimeHashEquals(string? expectedHash, string? actualHash)
+    {
+        if (expectedHash is null || actualHash is null)
+        {
+            return expectedHash is null && actualHash is null;
+        }
+
+        byte[] expectedBytes = SigningEncoding.GetBytes(expectedHash);
+        byte[] actualBytes = SigningEncoding.GetBytes(actualHash);
+
+        return CryptographicOperations.FixedTimeEquals(expectedBytes, actualBytes);
     }
 
     private string? ValidateSigningRequest(SigningRequest request)

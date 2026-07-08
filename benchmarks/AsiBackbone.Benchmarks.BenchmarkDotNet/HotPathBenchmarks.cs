@@ -334,7 +334,7 @@ public class AsiBackboneHotPathBenchmarks
     public int EndpointGovernancePolicyAllow() => endpointAllow.Evaluate();
 
     /// <summary>
-    /// 
+    /// Benchmarks endpoint governance evaluation when the endpoint policy returns a warning decision.
     /// </summary>
     /// <returns>
     /// An integer checksum representing the policy evaluation outcome, used for validation in benchmarks.
@@ -343,14 +343,14 @@ public class AsiBackboneHotPathBenchmarks
     public int EndpointGovernancePolicyWarning() => endpointWarning.Evaluate();
 
     /// <summary>
-    /// 
+    /// Benchmarks endpoint governance evaluation when the endpoint policy denies execution.
     /// </summary>
     /// <returns>An integer checksum representing the policy evaluation outcome, used for validation in benchmarks.</returns>
     [Benchmark(Description = "endpoint_governance.policy_deny")]
     public int EndpointGovernancePolicyDeny() => endpointDeny.Evaluate();
 
     /// <summary>
-    /// 
+    /// Benchmarks draining a small batch of pending governance outbox entries.
     /// </summary>
     /// <returns>An integer checksum representing the policy evaluation outcome, used for validation in benchmarks.</returns>
     [Benchmark(Description = "outbox_drain.small_batch_25")]
@@ -361,7 +361,7 @@ public class AsiBackboneHotPathBenchmarks
     }
 
     /// <summary>
-    /// 
+    /// Benchmarks draining a medium batch of pending governance outbox entries.
     /// </summary>
     /// <returns>An integer checksum representing the policy evaluation outcome, used for validation in benchmarks.</returns>
     [Benchmark(Description = "outbox_drain.medium_batch_100")]
@@ -372,14 +372,14 @@ public class AsiBackboneHotPathBenchmarks
     }
 
     /// <summary>
-    /// 
+    /// Benchmarks resolving a scoped outbox drain service and draining a medium batch of pending entries.
     /// </summary>
     /// <returns>An integer checksum representing the policy evaluation outcome, used for validation in benchmarks.</returns>
     [Benchmark(Description = "outbox_drain.scoped_medium_batch_100")]
     public int OutboxDrainScopedMediumBatch100() => scopedOutbox100.Drain(BenchmarkDrainUtc);
 
     /// <summary>
-    /// 
+    /// Benchmarks creating an audit residue directly from a governance decision and metadata.
     /// </summary>
     /// <returns>An integer checksum representing the policy evaluation outcome, used for validation in benchmarks.</returns>
     [Benchmark(Description = "audit_residue.from_decision")]
@@ -403,7 +403,7 @@ public class AsiBackboneHotPathBenchmarks
     }
 
     /// <summary>
-    /// 
+    /// Benchmarks creating an audit residue through the builder without metadata.
     /// </summary>
     /// <returns>An integer checksum representing the policy evaluation outcome, used for validation in benchmarks.</returns>
     [Benchmark(Description = "audit_residue.builder_no_metadata")]
@@ -422,7 +422,7 @@ public class AsiBackboneHotPathBenchmarks
     }
 
     /// <summary>
-    /// 
+    /// Benchmarks creating an audit residue through the builder with one metadata entry.
     /// </summary>
     /// <returns>An integer checksum representing the policy evaluation outcome, used for validation in benchmarks.</returns>
     [Benchmark(Description = "audit_residue.builder_one_metadata")]
@@ -442,7 +442,7 @@ public class AsiBackboneHotPathBenchmarks
     }
 
     /// <summary>
-    /// 
+    /// Benchmarks creating an audit residue through the builder with multiple metadata entries.
     /// </summary>
     /// <returns>An integer checksum representing the policy evaluation outcome, used for validation in benchmarks.</returns>
     [Benchmark(Description = "audit_residue.builder_many_metadata")]

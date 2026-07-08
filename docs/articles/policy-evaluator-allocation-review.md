@@ -1,0 +1,57 @@
+# Policy Evaluator Allocation Review
+
+This note documents the allocation-review outcome for `DefaultAsiBackbonePolicyEvaluator<TContext>` hot paths.
+
+## Review scope
+
+The review focused on three allocation-sensitive areas:
+
+- constraint-result collection when an `IAsiBackboneDecisionPolicy<TContext>` is present;
+- read-only constraint-result views passed to decision policies;
+- warning-plus-denial reason composition when fast-abort mode preserves warnings already evaluated before the first denial.
+
+## Current behavior to preserve
+
+The evaluator must preserve decision-policy visibility. When a decision policy is registered, the policy receives the evaluated constraint results that led to the composed decision. This matters even when `ShortCircuitOnFirstDenial = true`: the policy should see only the constraints actually evaluated before the short-circuit point, not skipped constraints.
+
+The constraint-result view must remain read-only from the policy consumer's perspective. A host policy should not be able to mutate the evaluator's internal result collection and thereby alter decision composition after evaluation.
+
+Warning and denial reason ordering must also remain stable. In fast-abort mode, warnings produced before the first denial remain part of the denied decision because they are part of the evaluated path. Later constraints are intentionally skipped and cannot add reasons.
+
+## Benchmark coverage
+
+`PolicyEvaluatorAllocationBenchmarks` adds focused BenchmarkDotNet scenarios for:
+
+- `policy_evaluator.all_allow_with_decision_policy_8`;
+- `policy_evaluator.warning_and_denial_full_with_decision_policy`;
+- `policy_evaluator.first_denial_with_decision_policy`;
+- `policy_evaluator.first_denial_reason_composition`.
+
+These scenarios complement the broader `AsiBackboneHotPathBenchmarks` suite by isolating the issue #484 review paths.
+
+Run them from the repository root with:
+
+```bash
+dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks.BenchmarkDotNet --filter '*PolicyEvaluatorAllocationBenchmarks*'
+```
+
+## Code-change posture
+
+This issue is an incremental performance review, not a correctness bug. The first pass intentionally avoids changing public API and pins the sensitive behavior with regression tests before any deeper evaluator refactor.
+
+The current implementation already avoids constraint-result list allocation when no decision policy is registered. When a decision policy is registered, at least one evaluated result normally has to be retained for policy visibility, so a broad "remove the list" change would risk hiding information from the policy layer.
+
+Future optimization work should compare benchmark results before and after any implementation change and should only proceed if it preserves:
+
+- decision-policy semantics;
+- evaluated constraint-result visibility;
+- read-only result surfaces for policy consumers;
+- warning/denial reason ordering;
+- no public API changes unless a separate issue justifies them.
+
+## Regression coverage
+
+`DefaultAsiBackbonePolicyEvaluatorAllocationReviewTests` pins the two behavior points most likely to be affected by allocation-focused refactors:
+
+- decision policies receive only evaluated constraint results when first-denial short-circuiting occurs;
+- decision-policy constraint results remain read-only for policy consumers.

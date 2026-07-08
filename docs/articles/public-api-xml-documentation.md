@@ -67,6 +67,7 @@ Do not add the property to new projects unless the exception is documented with:
 ## Related files
 
 - `Directory.Build.props`
+- `Directory.Build.targets`
 - `eng/xml-docs/public-api-projects.txt`
 - `eng/xml-docs/staged-enforcement-projects.txt`
 - `scripts/Validate-XmlDocumentation.ps1`

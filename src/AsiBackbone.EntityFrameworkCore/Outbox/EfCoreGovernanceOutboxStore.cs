@@ -328,7 +328,7 @@ public sealed class EfCoreGovernanceOutboxStore : IAsiBackboneGovernanceOutboxCl
     }
 
     private async ValueTask<IReadOnlyList<GovernanceOutboxClaim>> ClaimEntriesAsync(
-        IReadOnlyList<string> candidateIds,
+        List<string> candidateIds,
         GovernanceOutboxClaimRequest request,
         Func<AsiBackboneGovernanceOutboxEntryEntity, DateTimeOffset, bool> isEligible,
         CancellationToken cancellationToken)

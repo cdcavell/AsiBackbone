@@ -52,6 +52,8 @@
       href: threat-model-contributors.md
     - name: Constraint Exception Policy
       href: constraint-exception-policy.md
+    - name: Strict Governance Profile
+      href: strict-governance-profile.md
     - name: "Production Hardening: Evaluator and Outbox"
       href: production-hardening-evaluator-and-outbox.md
     - name: Custom Decision Policy Examples
@@ -100,6 +102,8 @@
       href: aspnetcore-integration-boundary.md
     - name: ASP.NET Core Endpoint Governance
       href: aspnetcore-endpoint-governance.md
+    - name: Strict Governance Profile
+      href: strict-governance-profile.md
     - name: Endpoint Governance Diagnostics
       href: endpoint-governance-development-diagnostics.md
     - name: Testing Harness

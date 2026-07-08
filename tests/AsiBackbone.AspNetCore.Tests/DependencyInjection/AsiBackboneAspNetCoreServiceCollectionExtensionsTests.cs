@@ -1,8 +1,13 @@
 using AsiBackbone.AspNetCore.Actors;
 using AsiBackbone.AspNetCore.Correlation;
 using AsiBackbone.AspNetCore.DependencyInjection;
+using AsiBackbone.AspNetCore.Endpoints;
 using AsiBackbone.AspNetCore.Handshakes;
 using AsiBackbone.AspNetCore.Results;
+using AsiBackbone.Core.Constraints;
+using AsiBackbone.Core.Decisions;
+using AsiBackbone.Core.Evaluation;
+using AsiBackbone.DependencyInjection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -130,6 +135,82 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
     }
 
     [Fact]
+    public void AddAsiBackboneStrictGovernanceConfiguresFailClosedOptions()
+    {
+        ServiceCollection services = new();
+
+        _ = services.AddAsiBackboneStrictGovernance();
+
+        AsiBackbonePolicyEvaluatorOptions evaluatorOptions = ResolveOptions<AsiBackbonePolicyEvaluatorOptions>(services);
+        AsiBackboneEndpointGovernanceOptions endpointOptions = ResolveOptions<AsiBackboneEndpointGovernanceOptions>(services);
+
+        Assert.True(evaluatorOptions.DenyWhenNoConstraints);
+        Assert.True(evaluatorOptions.TreatConstraintExceptionAsDenial);
+        Assert.True(evaluatorOptions.TreatThreatContributorExceptionAsDenial);
+        Assert.True(evaluatorOptions.PreventThreatAssessmentAllowDowngrade);
+        Assert.True(endpointOptions.FailClosedWhenPolicyEvaluatorMissing);
+        Assert.True(endpointOptions.FailClosedWhenCapabilityValidatorMissing);
+        Assert.True(endpointOptions.FailClosedWhenAuditSinkMissing);
+        Assert.True(endpointOptions.RequireGovernanceMetadata);
+    }
+
+    [Fact]
+    public void UseStrictGovernanceProfileConfiguresFailClosedOptionsThroughBuilderFacade()
+    {
+        ServiceCollection services = new();
+
+        _ = services.AddAsiBackbone(backbone => backbone.UseStrictGovernanceProfile());
+
+        AsiBackbonePolicyEvaluatorOptions evaluatorOptions = ResolveOptions<AsiBackbonePolicyEvaluatorOptions>(services);
+        AsiBackboneEndpointGovernanceOptions endpointOptions = ResolveOptions<AsiBackboneEndpointGovernanceOptions>(services);
+
+        Assert.True(evaluatorOptions.DenyWhenNoConstraints);
+        Assert.True(evaluatorOptions.TreatConstraintExceptionAsDenial);
+        Assert.True(endpointOptions.RequireGovernanceMetadata);
+    }
+
+    [Fact]
+    public async Task AddAsiBackboneStrictGovernanceOptionsDenyEmptyPolicyEvaluation()
+    {
+        ServiceCollection services = new();
+        _ = services.AddAsiBackboneStrictGovernance();
+        AsiBackbonePolicyEvaluatorOptions options = ResolveOptions<AsiBackbonePolicyEvaluatorOptions>(services);
+        var evaluator = new DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>(
+            [],
+            decisionPolicy: null,
+            options);
+
+        GovernanceDecision decision = await evaluator.EvaluateAsync(CreateContext(), TestContext.Current.CancellationToken);
+
+        Assert.True(decision.IsDenied);
+        Assert.False(decision.CanProceed);
+        Assert.Equal(
+            AsiBackbonePolicyEvaluatorOptions.DefaultNoConstraintsReasonCode,
+            Assert.Single(decision.ReasonCodes));
+    }
+
+    [Fact]
+    public async Task AddAsiBackboneStrictGovernanceOptionsConvertConstraintExceptionToDeniedDecision()
+    {
+        ServiceCollection services = new();
+        _ = services.AddAsiBackboneStrictGovernance();
+        AsiBackbonePolicyEvaluatorOptions options = ResolveOptions<AsiBackbonePolicyEvaluatorOptions>(services);
+        var evaluator = new DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>(
+            [new ThrowingConstraint(new InvalidOperationException("sensitive host failure detail"))],
+            decisionPolicy: null,
+            options);
+
+        GovernanceDecision decision = await evaluator.EvaluateAsync(CreateContext(), TestContext.Current.CancellationToken);
+
+        Assert.True(decision.IsDenied);
+        Assert.False(decision.CanProceed);
+        Assert.Equal(
+            AsiBackbonePolicyEvaluatorOptions.DefaultConstraintExceptionReasonCode,
+            Assert.Single(decision.ReasonCodes));
+        Assert.DoesNotContain("sensitive", Assert.Single(decision.Reasons).Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
     public void AddAsiBackboneAspNetCoreRejectsNullServices()
     {
         IServiceCollection? services = null;
@@ -198,11 +279,31 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
         Assert.Contains("Acknowledgment challenge options", exception.Message, StringComparison.Ordinal);
     }
 
+    private static AsiBackboneConstraintEvaluationContext CreateContext()
+    {
+        return new AsiBackboneConstraintEvaluationContext(
+            correlationId: "strict-governance-correlation",
+            policyVersion: "strict-governance-v1",
+            policyHash: "strict-governance-hash");
+    }
+
     private static TOptions ResolveOptions<TOptions>(IServiceCollection services)
         where TOptions : class
     {
         using ServiceProvider provider = services.BuildServiceProvider();
 
         return provider.GetRequiredService<IOptions<TOptions>>().Value;
+    }
+
+    private sealed class ThrowingConstraint(Exception exception) : IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>
+    {
+        public string Name => "strict-governance.throwing";
+
+        public ValueTask<ConstraintEvaluationResult> EvaluateAsync(
+            AsiBackboneConstraintEvaluationContext context,
+            CancellationToken cancellationToken = default)
+        {
+            throw exception;
+        }
     }
 }

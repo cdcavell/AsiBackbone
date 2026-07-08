@@ -39,6 +39,8 @@ dotnet build AsiBackbone.slnx --configuration Release
 dotnet test AsiBackbone.slnx --configuration Release --no-build --no-restore
 ```
 
+These commands intentionally use `Release`. The repository CI and stable release validation workflows also use the `Release` solution configuration for restore, build, test, formatting, package, documentation, and smoke-test validation. A `Debug` solution build is a local inner-loop or IDE convenience build only and is not evidence that the complete source/test surface was validated. The reviewed `Debug|*` solution exclusions and their rationale are documented in the [Developer Checklist](docs/articles/developer-checklist.md#solution-build-configurations).
+
 When package-consumer behavior changes, also run the smoke tests when possible:
 
 ```bash
@@ -140,4 +142,3 @@ By submitting a contribution (including but not limited to code, documentation, 
 If AsiBackbone is accepted into the .NET Foundation, contribution licensing may transition to the .NET Foundation's CLA and automated CLA bot process as part of onboarding.
 
 Questions about this agreement may be directed to [cdcavell@gmail.com](mailto:cdcavell@gmail.com).
-

@@ -7,8 +7,17 @@ using Xunit;
 
 namespace AsiBackbone.AspNetCore.Tests.Results;
 
+/// <summary>
+/// Unit tests for the <see cref="AsiBackboneHttpResultMappingExtensions"/> class, verifying the mapping of governance decisions and operation results to HTTP responses in an ASP.NET Core context.
+/// </summary>
 public sealed class AsiBackboneHttpResultMappingExtensionsTests
 {
+    /// <summary>
+    /// Verifies that a governance decision of type "Allow" is correctly mapped to an HTTP 200 OK response, including the expected content in the response body.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation of executing the HTTP result and capturing the response for assertion.
+    /// </returns>
     [Fact]
     public async Task ToHttpResultMapsAllowedDecisionToSuccessResponse()
     {
@@ -22,6 +31,12 @@ public sealed class AsiBackboneHttpResultMappingExtensionsTests
         Assert.Contains("correlation-123", capture.Body, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Verifies that a governance decision of type "Warning" is correctly mapped to an HTTP response with a configurable warning status code, and that the response body contains the expected warning details.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation of executing the HTTP result and capturing the response for assertion.
+    /// </returns>
     [Fact]
     public async Task ToHttpResultMapsWarningDecisionToConfiguredWarningStatusCode()
     {
@@ -35,6 +50,12 @@ public sealed class AsiBackboneHttpResultMappingExtensionsTests
         Assert.Contains("policy.warning", capture.Body, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Verifies that a governance decision of type "Deny" is correctly mapped to an HTTP 403 Forbidden response, and that the response body contains the expected denial details while omitting sensitive information by default.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation of executing the HTTP result and capturing the response for assertion.
+    /// </returns>
     [Fact]
     public async Task ToHttpResultMapsDeniedDecisionToProblemDetails()
     {
@@ -57,6 +78,12 @@ public sealed class AsiBackboneHttpResultMappingExtensionsTests
         Assert.DoesNotContain("hash-value", capture.Body, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Verifies that a governance decision of type "Defer" is correctly mapped to an HTTP 202 Accepted response, and that the response body contains the expected deferred execution details.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation of executing the HTTP result and capturing the response for assertion.
+    /// </returns>
     [Fact]
     public async Task ToHttpResultMapsDeferredDecisionToAcceptedProblemDetails()
     {
@@ -69,6 +96,12 @@ public sealed class AsiBackboneHttpResultMappingExtensionsTests
         Assert.Contains("policy.deferred", capture.Body, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Verifies that a governance decision of type "RequireAcknowledgment" is correctly mapped to an HTTP 428 Precondition Required response, and that the response body contains the expected acknowledgment details.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation of executing the HTTP result and capturing the response for assertion.
+    /// </returns>
     [Fact]
     public async Task ToHttpResultMapsAcknowledgmentRequiredDecisionToPreconditionProblemDetails()
     {
@@ -81,6 +114,12 @@ public sealed class AsiBackboneHttpResultMappingExtensionsTests
         Assert.Contains("ack.required", capture.Body, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Verifies that a governance decision of type "Escalate" is correctly mapped to an HTTP 409 Conflict response, and that the response body contains the expected escalation details.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation of executing the HTTP result and capturing the response for assertion.
+    /// </returns>
     [Fact]
     public async Task ToHttpResultMapsEscalationRecommendedDecisionToConflictProblemDetails()
     {
@@ -93,6 +132,12 @@ public sealed class AsiBackboneHttpResultMappingExtensionsTests
         Assert.Contains("escalation.required", capture.Body, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Verifies that the HTTP result mapping can expose reason messages and diagnostic metadata when configured.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation of executing the HTTP result and capturing the response for assertion.
+    /// </returns>
     [Fact]
     public async Task ToHttpResultCanExposeReasonMessagesAndDiagnosticMetadataWhenConfigured()
     {
@@ -118,6 +163,12 @@ public sealed class AsiBackboneHttpResultMappingExtensionsTests
         Assert.Contains("hash-public", capture.Body, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Verifies that when diagnostics are enabled, missing optional decision metadata is omitted from the HTTP result, ensuring that the response does not include null or empty fields for reason codes, reason messages, correlation ID, trace ID, policy
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation of executing the HTTP result and capturing the response for assertion.
+    /// </returns>
     [Fact]
     public async Task ToHttpResultOmitsMissingOptionalDecisionMetadataWhenDiagnosticsAreEnabled()
     {
@@ -140,6 +191,12 @@ public sealed class AsiBackboneHttpResultMappingExtensionsTests
         Assert.DoesNotContain("policyHash", capture.Body, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Verifies that a successful operation result is correctly mapped to an HTTP 200 OK response, and that the response body contains the expected success details along with any warning messages provided.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation of executing the HTTP result and capturing the response for assertion.
+    /// </returns>
     [Fact]
     public async Task ToHttpResultMapsSuccessfulOperationResultToSuccessResponse()
     {
@@ -152,6 +209,12 @@ public sealed class AsiBackboneHttpResultMappingExtensionsTests
         Assert.Contains("Completed with warning.", capture.Body, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Verifies that a successful operation result without any warnings is correctly mapped to an HTTP 200 OK response, and that the response body contains the expected success details without any warning messages.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation of executing the HTTP result and capturing the response for assertion.
+    /// </returns>
     [Fact]
     public async Task ToHttpResultMapsSuccessfulOperationResultWithoutWarnings()
     {
@@ -164,6 +227,12 @@ public sealed class AsiBackboneHttpResultMappingExtensionsTests
         Assert.DoesNotContain("warnings", capture.Body, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Verifies that a failed operation result is correctly mapped to an HTTP 400 Bad Request response, and that the response body contains the expected failure details while omitting sensitive reason messages by default.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation of executing the HTTP result and capturing the response for assertion.
+    /// </returns>
     [Fact]
     public async Task ToHttpResultMapsFailedOperationResultToProblemDetailsWithoutReasonMessagesByDefault()
     {
@@ -177,6 +246,12 @@ public sealed class AsiBackboneHttpResultMappingExtensionsTests
         Assert.DoesNotContain("Failure detail", capture.Body, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Verifies that a failed operation result can expose reason messages when the corresponding option is configured.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation of executing the HTTP result and capturing the response for assertion.
+    /// </returns>
     [Fact]
     public async Task ToHttpResultCanExposeFailedOperationReasonMessagesWhenConfigured()
     {
@@ -195,6 +270,9 @@ public sealed class AsiBackboneHttpResultMappingExtensionsTests
         Assert.Contains("Public operation detail.", capture.Body, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Verifies that the ToHttpResult extension method throws an ArgumentNullException when a null GovernanceDecision is passed, ensuring that the method enforces non-null input for proper HTTP result mapping.
+    /// </summary>
     [Fact]
     public void ToHttpResultRejectsNullDecision()
     {
@@ -203,6 +281,9 @@ public sealed class AsiBackboneHttpResultMappingExtensionsTests
         _ = Assert.Throws<ArgumentNullException>(() => decision!.ToHttpResult());
     }
 
+    /// <summary>
+    /// Verifies that the ToHttpResult extension method throws an ArgumentNullException when a null AsiBackboneHttpResultMappingOptions is passed, ensuring that the method enforces non-null options for proper HTTP result mapping.
+    /// </summary>
     [Fact]
     public void ToHttpResultRejectsNullDecisionOptions()
     {
@@ -212,6 +293,9 @@ public sealed class AsiBackboneHttpResultMappingExtensionsTests
         _ = Assert.Throws<ArgumentNullException>(() => decision.ToHttpResult(options!));
     }
 
+    /// <summary>
+    /// Verifies that the ToHttpResult extension method throws an ArgumentNullException when a null OperationResult is passed, ensuring that the method enforces non-null input for proper HTTP result mapping.
+    /// </summary>
     [Fact]
     public void ToHttpResultRejectsNullOperationResult()
     {
@@ -220,6 +304,9 @@ public sealed class AsiBackboneHttpResultMappingExtensionsTests
         _ = Assert.Throws<ArgumentNullException>(() => result!.ToHttpResult());
     }
 
+    /// <summary>
+    /// Verifies that the ToHttpResult extension method throws an ArgumentNullException when a null AsiBackboneHttpResultMappingOptions is passed for an OperationResult, ensuring that the method enforces non-null options for proper HTTP result mapping.
+    /// </summary>
     [Fact]
     public void ToHttpResultRejectsNullOperationResultOptions()
     {
@@ -229,6 +316,12 @@ public sealed class AsiBackboneHttpResultMappingExtensionsTests
         _ = Assert.Throws<ArgumentNullException>(() => result.ToHttpResult(options!));
     }
 
+    /// <summary>
+    /// Verifies that the AsiBackboneHttpResultMappingOptions class rejects invalid HTTP status codes for its properties, ensuring that only valid status codes are accepted and that an InvalidOperationException is thrown when an invalid code is set.
+    /// </summary>
+    /// <param name="propertyName">
+    /// The name of the property in AsiBackboneHttpResultMappingOptions to test for invalid status code assignment.
+    /// </param>
     [Theory]
     [InlineData(nameof(AsiBackboneHttpResultMappingOptions.SuccessStatusCode))]
     [InlineData(nameof(AsiBackboneHttpResultMappingOptions.WarningStatusCode))]
@@ -247,6 +340,12 @@ public sealed class AsiBackboneHttpResultMappingExtensionsTests
         Assert.Contains(propertyName, exception.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Verifies that the AsiBackboneHttpResultMappingOptions class rejects blank or whitespace-only safe messages for its properties, ensuring that meaningful messages are provided and that an InvalidOperationException is thrown when a blank message is set.
+    /// </summary>
+    /// <param name="propertyName">
+    /// The name of the property in AsiBackboneHttpResultMappingOptions to test for blank safe message assignment.
+    /// </param>
     [Theory]
     [InlineData(nameof(AsiBackboneHttpResultMappingOptions.GovernanceDecisionNotAllowedMessage))]
     [InlineData(nameof(AsiBackboneHttpResultMappingOptions.OperationFailureMessage))]

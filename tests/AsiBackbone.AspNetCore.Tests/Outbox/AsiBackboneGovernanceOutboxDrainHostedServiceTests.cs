@@ -11,8 +11,14 @@ using Xunit;
 
 namespace AsiBackbone.AspNetCore.Tests.Outbox;
 
+/// <summary>
+/// Unit tests for <see cref="AsiBackboneGovernanceOutboxDrainHostedService"/> and related extension methods.
+/// </summary>
 public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceTests
 {
+    /// <summary>
+    /// Tests that the <see cref="AddAsiBackboneGovernanceOutboxDrainWorker"/> extension method registers the hosted worker and options correctly.
+    /// </summary>
     [Fact]
     public void AddAsiBackboneGovernanceOutboxDrainWorkerRegistersHostedWorkerAndOptions()
     {
@@ -39,6 +45,12 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceTests
         Assert.Equal(new DateTimeOffset(2026, 6, 15, 18, 0, 0, TimeSpan.Zero), options.RetryClock());
     }
 
+    /// <summary>
+    /// Tests that when the worker is disabled, it does not attempt to drain any entries from the outbox store.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation of testing the disabled worker behavior.
+    /// </returns>
     [Fact]
     public async Task DisabledWorkerDoesNotDrainEntries()
     {
@@ -60,6 +72,12 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceTests
         Assert.Equal(0, emitter.EmitCallCount);
     }
 
+    /// <summary>
+    /// Tests that the worker honors the configured batch size when draining entries from the outbox store.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation of testing the worker's batch size behavior.
+    /// </returns>
     [Fact]
     public async Task WorkerHonorsConfiguredBatchSize()
     {
@@ -96,6 +114,12 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceTests
         Assert.Equal(GovernanceEmissionStatus.Pending, secondStoredEntry.Status);
     }
 
+    /// <summary>
+    /// Tests that when the worker encounters a provider failure during emission, it preserves the failure state for retrying later.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation of testing the worker's behavior on provider failure.
+    /// </returns>
     [Fact]
     public async Task WorkerPreservesProviderFailureStateForRetry()
     {
@@ -126,6 +150,12 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceTests
         Assert.Equal(retryClock.AddMinutes(1), storedEntry.NextRetryUtc);
     }
 
+    /// <summary>
+    /// Tests that when the worker is configured to drain on shutdown, it successfully processes any pending entries before stopping.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation of testing the worker's shutdown drain behavior.
+    /// </returns>
     [Fact]
     public async Task StopAsyncCanRunOptionalShutdownDrain()
     {
@@ -152,6 +182,12 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceTests
         Assert.Equal(GovernanceEmissionStatus.Delivered, storedEntry.Status);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AddAsiBackboneGovernanceOutboxDrainWorker"/> extension method rejects invalid batch sizes (zero or negative) and throws an appropriate exception.
+    /// </summary>
+    /// <param name="batchSize">
+    /// The batch size to test, which is expected to be invalid (zero or negative).
+    /// </param>
     [Theory]
     [InlineData(0)]
     [InlineData(-1)]

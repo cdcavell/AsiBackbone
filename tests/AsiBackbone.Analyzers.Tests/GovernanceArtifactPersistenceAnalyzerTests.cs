@@ -178,7 +178,7 @@ public sealed class GovernanceArtifactPersistenceAnalyzerTests
     }
 
     /// <summary>
-    /// Tests that a method or class marked with the <see cref="AsiBackbonePersistenceHandledAttribute"/> suppresses the ASIB001 diagnostic.
+    /// Tests that a method or class marked with the <c>AsiBackbonePersistenceHandledAttribute</c> suppresses the ASIB001 diagnostic.
     /// </summary>
     /// <returns>
     /// A task representing the asynchronous operation.

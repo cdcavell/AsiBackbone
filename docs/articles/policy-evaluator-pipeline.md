@@ -47,6 +47,44 @@ The evaluator propagates correlation, policy version, and policy hash metadata f
 
 When an optional `ILogger<DefaultAsiBackbonePolicyEvaluator<TContext>>` is supplied and evaluation runs with zero constraints while `DenyWhenNoConstraints` is `false`, the evaluator emits a warning. This preserves backward compatibility while making the permissive empty-policy path visible in operational logs.
 
+## Constructor overload selection
+
+`DefaultAsiBackbonePolicyEvaluator<TContext>` keeps several constructor overloads so simple hosts, compatibility callers, and fully wired dependency-injection hosts can all create the evaluator. Pick the smallest overload that honestly represents the host posture, but do not drop configured options or diagnostics just to make registration shorter.
+
+| Overload group | Use when | Guidance |
+| --- | --- | --- |
+| Constraints only | The host wants the default 2.x composition behavior and has no custom decision policy, explicit evaluator options, threat contributors, or logger. | This is the simplest compatibility path. It preserves permissive empty-policy behavior unless the host supplies options through another overload. |
+| Constraints plus decision policy | The host wants normal constraint composition followed by a custom `IAsiBackboneDecisionPolicy<TContext>` that can raise or reshape the composed decision. | Use this when the policy needs outcomes such as defer, acknowledgment-required, or escalation-recommended after base composition. |
+| Constraints plus evaluator options | The host needs explicit settings for empty-policy denial, constraint-exception denial, fast-abort behavior, or threat-assessment downgrade protection. | Strict and fail-closed hosts should pass the configured `AsiBackbonePolicyEvaluatorOptions` instance that represents the host posture. |
+| Constraints plus threat model contributors | The host wants pre-constraint threat contributors to inspect the context and emit actionable warnings or blocking decisions. | Use one of the overloads that accepts `IEnumerable<IThreatModelContributor<TContext>>`; include evaluator options when contributor exception behavior matters. |
+| Logger overloads | The host wants operational diagnostics for permissive empty policies, converted constraint exceptions, or converted threat-contributor exceptions. | Prefer the logger overload in production-style DI wiring so warnings and fail-closed conversions become visible in normal logging. |
+| Full overload | The host has constraints, threat contributors, an optional decision policy, configured options, and a logger. | This is the most explicit DI path and is usually the clearest choice for strict production registrations. |
+
+Strict or fail-closed hosts should pass configured options into the evaluator rather than constructing an unrelated default `new AsiBackbonePolicyEvaluatorOptions()` at the call site. This is especially important with `AddAsiBackboneStrictGovernance()` or `UseStrictGovernanceProfile()`: those helpers configure `IOptions<AsiBackbonePolicyEvaluatorOptions>`, but they cannot rewrite a manually constructed options object that the host passes directly to the evaluator.
+
+A DI registration that preserves the strict profile and operational diagnostics should resolve the configured options and logger from the service provider:
+
+```csharp
+builder.Services.AddSingleton<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>>(serviceProvider =>
+{
+    var options = serviceProvider
+        .GetRequiredService<IOptions<AsiBackbonePolicyEvaluatorOptions>>()
+        .Value;
+
+    var logger = serviceProvider
+        .GetService<ILogger<DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>>>();
+
+    return new DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>(
+        serviceProvider.GetServices<IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>>(),
+        serviceProvider.GetServices<IThreatModelContributor<AsiBackboneConstraintEvaluationContext>>(),
+        decisionPolicy: serviceProvider.GetService<IAsiBackboneDecisionPolicy<AsiBackboneConstraintEvaluationContext>>(),
+        options: options,
+        logger: logger);
+});
+```
+
+For intentionally permissive local samples, tests, or migration flows, using the shorter overloads is acceptable as long as the host clearly intends default 2.x behavior. For governed production surfaces, prefer the explicit overload that carries the host's configured options, threat contributors, decision policy, and logger.
+
 ## Minimal usage example
 
 ```csharp

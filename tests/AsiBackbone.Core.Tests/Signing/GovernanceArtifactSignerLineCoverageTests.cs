@@ -18,7 +18,7 @@ public sealed class GovernanceArtifactSignerLineCoverageTests
     [Fact]
     public async Task AuditResidueHelpersCoverUnsignedSigningReadyAndSignedPaths()
     {
-        IAsiBackboneAuditResidue residue = CreateAuditResidue();
+        AuditResidue residue = CreateAuditResidue();
 
         SignedGovernanceArtifact<IAsiBackboneAuditResidue> unsigned = GovernanceArtifactSigner.CreateUnsignedAuditResidue(residue);
         SignedGovernanceArtifact<IAsiBackboneAuditResidue> signingReady = GovernanceArtifactSigner.CreateSigningReadyAuditResidue(
@@ -195,7 +195,7 @@ public sealed class GovernanceArtifactSignerLineCoverageTests
         Assert.False(request.Metadata.ContainsKey(string.Empty));
     }
 
-    private static IAsiBackboneAuditResidue CreateAuditResidue()
+    private static AuditResidue CreateAuditResidue()
     {
         IAsiBackboneActorContext actor = AsiBackboneActorContext.Service("system-1", "System");
 

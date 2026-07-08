@@ -44,7 +44,7 @@ public sealed class GovernanceOutboxClaimDrainTests
         IReadOnlyList<GovernanceOutboxEntry> drainedEntries = await drain.DrainAsync(
             new DateTimeOffset(2026, 7, 8, 12, 0, 0, TimeSpan.Zero),
             maxCount: 10,
-            TestContext.Current.CancellationToken);
+            cancellationToken: TestContext.Current.CancellationToken);
         GovernanceOutboxEntry? storedEntry = await outboxStore.FindByOutboxEntryIdAsync(
             entry.OutboxEntryId,
             TestContext.Current.CancellationToken);

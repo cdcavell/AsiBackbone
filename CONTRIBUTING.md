@@ -13,6 +13,7 @@ Contributions should preserve the stable package direction:
 - keep package boundaries clear;
 - avoid hidden infrastructure assumptions;
 - document public behavior before presenting it as stable;
+- preserve the documented implicit-usings posture unless a project-specific change improves package-boundary reviewability;
 - avoid overclaiming around signing, tamper-evidence, privacy, compliance, AI, or physical execution.
 
 ## Local setup
@@ -129,7 +130,7 @@ Use synthetic examples and opaque identifiers in documentation and tests.
 
 ## Contributor License Agreement
 
-By submitting a contribution (including but not limited to code, documentation, tests, or configuration files) to AsiBackbone via pull request, patch, or any other means, you ("Contributor") agree to the following terms:
+By submitting a contribution (including but not limited to code, documentation, tests, or configuration files) to AsiBackbone via pull request, patch, or any other means to AsiBackbone via pull request, patch, or any other means, you ("Contributor") agree to the following terms:
 
 1. **Grant of copyright license.** You grant Christopher D. Cavell, as current project steward for AsiBackbone, and all recipients of software distributed by the project a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable copyright license to reproduce, prepare derivative works of, publicly display, publicly perform, sublicense, and distribute your contribution and such derivative works under the terms of the license identified in the project's LICENSE file.
 

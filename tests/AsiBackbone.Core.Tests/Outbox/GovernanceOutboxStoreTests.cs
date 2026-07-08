@@ -372,7 +372,7 @@ public sealed class GovernanceOutboxStoreTests
             GovernanceOutboxClaimRequest.Create("worker-b", claimedUtc.AddMinutes(1), TimeSpan.FromMinutes(5), maxCount: 1),
             TestContext.Current.CancellationToken);
         GovernanceOutboxClaim claim = Assert.Single(claims);
-        GovernanceOutboxClaim mismatchedClaim = GovernanceOutboxClaim.Create(
+        var mismatchedClaim = GovernanceOutboxClaim.Create(
             claim.Entry,
             claim.WorkerId,
             "mismatched-token",

@@ -5,10 +5,19 @@ using Xunit;
 
 namespace AsiBackbone.Signing.ManagedKey.Tests;
 
+/// <summary>
+/// Unit tests for the <see cref="ManagedKeySigningService"/> class.
+/// </summary>
 public sealed class ManagedKeySigningServiceTests
 {
     private static readonly DateTimeOffset SignedUtc = new(2026, 6, 16, 12, 0, 0, TimeSpan.Zero);
 
+    /// <summary>
+    /// Tests that the <see cref="ManagedKeySigningService.SignAsync(SigningRequest, CancellationToken)"/> method returns a <see cref="SigningResult"/> with provider-neutral managed key metadata when signing is successful.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task SignAsyncReturnsProviderNeutralManagedKeyMetadata()
     {
@@ -54,6 +63,12 @@ public sealed class ManagedKeySigningServiceTests
         Assert.False(result.Metadata.Metadata.ContainsKey("access_token"));
     }
 
+    /// <summary>
+    /// Tests that the <see cref="ManagedKeySigningService.SignAsync(SigningRequest, CancellationToken)"/> method throws a <see cref="ManagedKeySigningException"/> with the expected failure code when an unsupported hash algorithm is provided and the service is configured to fail closed.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task SignAsyncThrowsForUnsupportedHashAlgorithmByDefault()
     {
@@ -71,6 +86,12 @@ public sealed class ManagedKeySigningServiceTests
         Assert.Equal("managedkey.signing.hash-algorithm-unsupported", exception.FailureCode);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="ManagedKeySigningService.SignAsync(SigningRequest, CancellationToken)"/> method throws a <see cref="ManagedKeySigningException"/> with the expected failure code when the managed key provider fails and the service is configured to fail closed.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task SignAsyncThrowsForProviderFailureByDefault()
     {
@@ -91,6 +112,12 @@ public sealed class ManagedKeySigningServiceTests
         Assert.Equal(1, client.CallCount);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="ManagedKeySigningService.SignAsync(SigningRequest, CancellationToken)"/> method returns an unsigned <see cref="SigningResult"/> with the expected failure code when an unsupported hash algorithm is provided and the service is configured to fail open.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task SignAsyncReturnsUnsignedFailureForUnsupportedHashAlgorithmInLocalValidationMode()
     {
@@ -112,6 +139,12 @@ public sealed class ManagedKeySigningServiceTests
         Assert.Equal("2", result.Metadata.Metadata["max_retry_attempts"]);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="ManagedKeySigningService.SignAsync(SigningRequest, CancellationToken)"/> method returns an unsigned <see cref="SigningResult"/> with the expected failure code when the key version is missing and required in local validation mode.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task SignAsyncReturnsUnsignedFailureForMissingKeyVersionWhenRequiredInLocalValidationMode()
     {
@@ -130,6 +163,12 @@ public sealed class ManagedKeySigningServiceTests
         Assert.Equal("0", result.Metadata.Metadata["provider_attempts"]);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="ManagedKeySigningService.SignAsync(SigningRequest, CancellationToken)"/> method returns an unsigned <see cref="SigningResult"/> with the expected failure code when the managed key provider fails and the service is configured to fail open.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task SignAsyncReturnsUnsignedFailureForProviderFailureInLocalValidationMode()
     {
@@ -156,6 +195,12 @@ public sealed class ManagedKeySigningServiceTests
         Assert.Equal(1, client.CallCount);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="ManagedKeySigningService.SignAsync(SigningRequest, CancellationToken)"/> method retries on retryable failures and eventually succeeds.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task SignAsyncRetriesRetryableClientFailureThenSigns()
     {
@@ -183,6 +228,12 @@ public sealed class ManagedKeySigningServiceTests
         Assert.Equal("ManagedKeySigningException", result.Metadata.Metadata["last_retry_failure_exception_type"]);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="ManagedKeySigningService.SignAsync(SigningRequest, CancellationToken)"/> method records the applied retry delay in the signing result metadata when a retry delay is configured.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task SignAsyncRecordsAppliedRetryDelayWhenConfigured()
     {
@@ -204,6 +255,9 @@ public sealed class ManagedKeySigningServiceTests
         Assert.Equal("true", result.Metadata.Metadata["retry_delay_applied"]);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="ManagedKeySigningOptions"/> class defaults to fail-closed behavior when the <see cref="ManagedKeySigningOptions.ReturnUnsignedOnFailure"/> property is not explicitly set.
+    /// </summary>
     [Fact]
     public void ManagedKeySigningOptionsDefaultToFailClosed()
     {
@@ -216,6 +270,9 @@ public sealed class ManagedKeySigningServiceTests
         Assert.False(options.ReturnUnsignedOnFailure);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="ServiceCollectionExtensions.AddAsiBackboneManagedKeySigning(IServiceCollection, Action{ManagedKeySigningOptions}, Func{IServiceProvider, IManagedKeySigningClient})"/> method registers a fail-closed signing service by default.
+    /// </summary>
     [Fact]
     public void AddAsiBackboneManagedKeySigningRegistersFailClosedSigningServiceByDefault()
     {
@@ -237,6 +294,9 @@ public sealed class ManagedKeySigningServiceTests
         Assert.False(serviceProvider.GetRequiredService<ManagedKeySigningOptions>().ReturnUnsignedOnFailure);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="ServiceCollectionExtensions.AddAsiBackboneManagedKeySigningForLocalValidation(IServiceCollection, Action{ManagedKeySigningOptions}, Func{IServiceProvider, IManagedKeySigningClient})"/> method registers a fail-open signing service.
+    /// </summary>
     [Fact]
     public void AddAsiBackboneManagedKeySigningForLocalValidationRegistersFailOpenSigningService()
     {

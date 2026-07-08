@@ -7,8 +7,14 @@ using Xunit;
 
 namespace AsiBackbone.AspNetCore.Tests.Endpoints;
 
+/// <summary>
+/// Tests for the AsiBackboneEndpointPolicyEvaluationOptionsMetadata class, which is responsible for reading and writing policy evaluation options metadata from ASP.NET Core endpoints.
+/// </summary>
 public sealed class AsiBackboneEndpointPolicyEvaluationOptionsMetadataTests
 {
+    /// <summary>
+    /// Tests that the AsiBackboneEndpointGovernanceDescriptor correctly reads the ShortCircuitOnFirstDenial metadata from an endpoint and short-circuits on the first denial.
+    /// </summary>
     [Fact]
     public void DescriptorReadsShortCircuitOnFirstDenialMetadataFromEndpoint()
     {
@@ -28,6 +34,9 @@ public sealed class AsiBackboneEndpointPolicyEvaluationOptionsMetadataTests
         Assert.Equal("true", metadata["endpoint.short_circuit_on_first_denial"]);
     }
 
+    /// <summary>
+    /// Tests that the AsiBackboneEndpointGovernanceDescriptor correctly reads the ShortCircuitOnFirstDenial metadata from an endpoint and uses the last value when multiple attributes are present.
+    /// </summary>
     [Fact]
     public void DescriptorUsesLastShortCircuitOnFirstDenialMetadataValue()
     {
@@ -47,6 +56,9 @@ public sealed class AsiBackboneEndpointPolicyEvaluationOptionsMetadataTests
         Assert.Equal("false", metadata["endpoint.short_circuit_on_first_denial"]);
     }
 
+    /// <summary>
+    /// Tests that the RouteBuilderShortCircuitOnFirstDenial extension method adds the ShortCircuitOnFirstDenial metadata to the endpoint and returns the same builder instance.
+    /// </summary>
     [Fact]
     public void RouteBuilderShortCircuitOnFirstDenialAddsMetadataAndReturnsSameBuilder()
     {
@@ -67,6 +79,9 @@ public sealed class AsiBackboneEndpointPolicyEvaluationOptionsMetadataTests
         Assert.True(metadata.ShortCircuitOnFirstDenial.Value);
     }
 
+    /// <summary>
+    /// Tests that the RouteBuilderShortCircuitOnFirstDenial extension method can disable the ShortCircuitOnFirstDenial metadata value when called with enabled: false.
+    /// </summary>
     [Fact]
     public void RouteBuilderShortCircuitOnFirstDenialCanDisableMetadataValue()
     {

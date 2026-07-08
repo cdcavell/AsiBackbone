@@ -3,8 +3,14 @@ using Xunit;
 
 namespace AsiBackbone.DependencyInjection.Tests;
 
+/// <summary>
+/// Tests for the <see cref="AsiBackboneServiceCollectionExtensions"/> class.
+/// </summary>
 public sealed class AsiBackboneServiceCollectionExtensionsTests
 {
+    /// <summary>
+    /// Tests that the <see cref="AsiBackboneServiceCollectionExtensions.AddAsiBackbone(IServiceCollection, Action{IAsiBackboneBuilder})"/> method invokes the provided configuration action and returns the same service collection instance.
+    /// </summary>
     [Fact]
     public void AddAsiBackboneInvokesConfigureAndReturnsSameServiceCollection()
     {
@@ -21,6 +27,9 @@ public sealed class AsiBackboneServiceCollectionExtensionsTests
         Assert.Same(services, returned);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AsiBackboneServiceCollectionExtensions.AddAsiBackbone(IServiceCollection, Action{IAsiBackboneBuilder})"/> method does not register any hidden default services when the configuration action is empty.
+    /// </summary>
     [Fact]
     public void AddAsiBackboneEmptyConfigurationDoesNotRegisterHiddenDefaults()
     {
@@ -31,6 +40,9 @@ public sealed class AsiBackboneServiceCollectionExtensionsTests
         Assert.Empty(services);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AsiBackboneServiceCollectionExtensions.AddAsiBackbone(IServiceCollection, Action{IAsiBackboneBuilder})"/> method registers only the named provider services when a partial configuration is provided.
+    /// </summary>
     [Fact]
     public void AddAsiBackbonePartialConfigurationRegistersOnlyNamedProviderServices()
     {
@@ -45,6 +57,9 @@ public sealed class AsiBackboneServiceCollectionExtensionsTests
         Assert.Null(provider.GetService<MarkerC>());
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AsiBackboneServiceCollectionExtensions.AddAsiBackbone(IServiceCollection, Action{IAsiBackboneBuilder})"/> method registers all named provider services when a composed configuration is provided.
+    /// </summary>
     [Fact]
     public void AddAsiBackboneComposedConfigurationRegistersAllNamedProviderServices()
     {

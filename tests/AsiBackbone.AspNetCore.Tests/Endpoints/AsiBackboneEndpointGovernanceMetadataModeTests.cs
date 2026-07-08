@@ -11,8 +11,14 @@ using Xunit;
 
 namespace AsiBackbone.AspNetCore.Tests.Endpoints;
 
+/// <summary>
+/// Tests for the AsiBackboneEndpointGovernanceMetadataMode enumeration and its effects on endpoint governance metadata generation and evaluation.
+/// </summary>
 public sealed class AsiBackboneEndpointGovernanceMetadataModeTests
 {
+    /// <summary>
+    /// Tests that the default behavior of converting an AsiBackboneEndpointGovernanceDescriptor to metadata includes all expected metadata entries when using the full metadata mode.
+    /// </summary>
     [Fact]
     public void DescriptorToMetadataDefaultsToFullMetadata()
     {
@@ -27,6 +33,9 @@ public sealed class AsiBackboneEndpointGovernanceMetadataModeTests
         Assert.Equal("robotics.execute", metadata["endpoint.capability_scopes"]);
     }
 
+    /// <summary>
+    /// Tests that converting an AsiBackboneEndpointGovernanceDescriptor to metadata using the reduced metadata mode only includes the operation name and excludes other metadata entries.
+    /// </summary>
     [Fact]
     public void DescriptorToMetadataCanUseReducedMode()
     {
@@ -43,6 +52,12 @@ public sealed class AsiBackboneEndpointGovernanceMetadataModeTests
         Assert.False(metadata.ContainsKey("endpoint.capability_scopes"));
     }
 
+    /// <summary>
+    /// Tests that when the AsiBackboneEndpointGovernanceService is configured to use reduced metadata mode, the policy evaluator receives only the reduced metadata during evaluation.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation of evaluating the endpoint governance with reduced metadata mode.
+    /// </returns>
     [Fact]
     public async Task DefaultServicePassesReducedMetadataToPolicyEvaluator()
     {
@@ -77,6 +92,12 @@ public sealed class AsiBackboneEndpointGovernanceMetadataModeTests
         Assert.Equal("sample.metadata.reduced", item.Value);
     }
 
+    /// <summary>
+    /// Tests that when the AsiBackboneEndpointGovernanceService is configured to enable development diagnostics and use reduced metadata mode, the failure result includes diagnostic information indicating that reduced metadata mode is in effect.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation of evaluating the endpoint governance with development diagnostics and reduced metadata mode.
+    /// </returns>
     [Fact]
     public async Task DefaultServiceDevelopmentDiagnosticsHonorsReducedMetadataMode()
     {

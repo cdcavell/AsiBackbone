@@ -8,8 +8,15 @@ using Xunit;
 
 namespace AsiBackbone.Testing.Tests.Contracts;
 
+/// <summary>
+/// Contains unit tests that verify the behavior of the AsiBackbone contract classes, ensuring that they enforce the expected contracts and handle various scenarios correctly.
+/// </summary>
 public sealed class AsiBackboneContractCoverageTests
 {
+    /// <summary>
+    /// Verifies that the VerifySafeDecision method accepts all supported safe decision shapes without throwing exceptions and returns the same decision instance.
+    /// </summary>
+    /// <param name="safeDecisionCase"></param>
     [Theory]
     [MemberData(nameof(SafeDecisionCases))]
     public void VerifySafeDecisionAcceptsSupportedSafeDecisionShapes(SafeDecisionCase safeDecisionCase)
@@ -21,6 +28,9 @@ public sealed class AsiBackboneContractCoverageTests
         Assert.Same(decision, verifiedDecision);
     }
 
+    /// <summary>
+    /// Verifies that the VerifySafeDecision method rejects a null decision and throws an AsiBackboneContractViolationException with an appropriate message.
+    /// </summary>
     [Fact]
     public void VerifySafeDecisionRejectsNullDecision()
     {
@@ -30,6 +40,9 @@ public sealed class AsiBackboneContractCoverageTests
         Assert.Contains("never return null", exception.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Verifies that the VerifyInvalidCapabilityGrantDoesNotAllow method rejects a denied decision and throws an AsiBackboneContractViolationException with an appropriate message.
+    /// </summary>
     [Fact]
     public void VerifyInvalidCapabilityGrantDoesNotAllowAcceptsDeniedDecision()
     {
@@ -40,6 +53,12 @@ public sealed class AsiBackboneContractCoverageTests
         Assert.Same(decision, verifiedDecision);
     }
 
+    /// <summary>
+    /// Verifies that the PolicyEvaluatorContract rejects a null decision returned by the policy evaluator and throws an AsiBackboneContractViolationException with an appropriate message.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task PolicyEvaluatorContractRejectsNullDecision()
     {
@@ -51,6 +70,12 @@ public sealed class AsiBackboneContractCoverageTests
         Assert.Contains("must return a decision", exception.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Verifies that the PolicyEvaluatorContract wraps any exceptions thrown by the policy evaluator and throws an AsiBackboneContractViolationException with an appropriate message and inner exception.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task PolicyEvaluatorContractWrapsImplementationFailure()
     {
@@ -63,6 +88,12 @@ public sealed class AsiBackboneContractCoverageTests
         _ = Assert.IsType<InvalidOperationException>(exception.InnerException);
     }
 
+    /// <summary>
+    /// Verifies that the DecisionPolicyContract passes for a safe decision policy and returns the expected safe decision with the correct properties.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task DecisionPolicyContractPassesForSafeDecisionPolicy()
     {
@@ -76,6 +107,12 @@ public sealed class AsiBackboneContractCoverageTests
         Assert.Equal("contract-policy-hash", decision.PolicyHash);
     }
 
+    /// <summary>
+    /// Verifies that the DecisionPolicyContract wraps any exceptions thrown by the decision policy and throws an AsiBackboneContractViolationException with an appropriate message and inner exception.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task DecisionPolicyContractWrapsImplementationFailure()
     {
@@ -88,6 +125,12 @@ public sealed class AsiBackboneContractCoverageTests
         _ = Assert.IsType<InvalidOperationException>(exception.InnerException);
     }
 
+    /// <summary>
+    /// Verifies that the ConstraintContract passes for an allowed constraint and returns the expected safe result.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task ConstraintContractPassesForAllowedConstraint()
     {
@@ -98,6 +141,12 @@ public sealed class AsiBackboneContractCoverageTests
         Assert.False(result.IsDenied);
     }
 
+    /// <summary>
+    /// Verifies that the ConstraintContract passes for a denied constraint and returns the expected safe result with the correct reason codes.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task ConstraintContractPassesForDeniedConstraintWithReason()
     {
@@ -109,6 +158,12 @@ public sealed class AsiBackboneContractCoverageTests
         Assert.Contains("contract.constraint_denied", result.ReasonCodes);
     }
 
+    /// <summary>
+    /// Verifies that the ConstraintContract rejects constraints with empty names.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task ConstraintContractRejectsEmptyConstraintName()
     {
@@ -120,6 +175,12 @@ public sealed class AsiBackboneContractCoverageTests
         Assert.Contains("stable, non-empty", exception.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Verifies that the ConstraintContract rejects constraints that return null results.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task ConstraintContractRejectsNullResult()
     {
@@ -131,6 +192,12 @@ public sealed class AsiBackboneContractCoverageTests
         Assert.Contains("must return a result", exception.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Verifies that the ConstraintContract wraps any exceptions thrown by the constraint and throws an AsiBackboneContractViolationException with an appropriate message and inner exception.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task ConstraintContractWrapsImplementationFailure()
     {
@@ -143,6 +210,12 @@ public sealed class AsiBackboneContractCoverageTests
         _ = Assert.IsType<InvalidOperationException>(exception.InnerException);
     }
 
+    /// <summary>
+    /// Verifies that the AuditSinkContract wraps any exceptions thrown by the audit sink and throws an AsiBackboneContractViolationException with an appropriate message and inner exception.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task AuditSinkContractWrapsWriteFailure()
     {
@@ -155,6 +228,9 @@ public sealed class AsiBackboneContractCoverageTests
         _ = Assert.IsType<InvalidOperationException>(exception.InnerException);
     }
 
+    /// <summary>
+    /// Gets the test cases for all supported safe decision shapes, which are used to verify that the VerifySafeDecision method accepts them without throwing exceptions.
+    /// </summary>
     public static TheoryData<SafeDecisionCase> SafeDecisionCases =>
     [
         SafeDecisionCase.Allowed,
@@ -201,13 +277,34 @@ public sealed class AsiBackboneContractCoverageTests
         };
     }
 
+    /// <summary>
+    /// Represents the different cases of safe decisions that can be created and verified in the contract coverage tests.
+    /// </summary>
     public enum SafeDecisionCase
     {
+        /// <summary>
+        /// Represents a safe decision that allows the requested action without any warnings or restrictions.
+        /// </summary>
         Allowed,
+        /// <summary>
+        /// Represents a safe decision that allows the requested action but includes a warning message indicating potential issues or considerations.
+        /// </summary>
         Warning,
+        /// <summary>
+        /// Represents a safe decision that denies the requested action, providing a reason for the denial.
+        /// </summary>
         Denied,
+        /// <summary>
+        /// Represents a safe decision that defers the requested action, indicating that further evaluation or information is needed before a final decision can be made.
+        /// </summary>
         Deferred,
+        /// <summary>
+        /// Represents a safe decision that requires acknowledgment before proceeding.
+        /// </summary>
         AcknowledgmentRequired,
+        /// <summary>
+        /// Represents a safe decision that recommends escalation to a higher authority or department.
+        /// </summary>
         EscalationRecommended
     }
 

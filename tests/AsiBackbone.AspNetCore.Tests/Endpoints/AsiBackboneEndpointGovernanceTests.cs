@@ -12,8 +12,14 @@ using Xunit;
 
 namespace AsiBackbone.AspNetCore.Tests.Endpoints;
 
+/// <summary>
+/// Contains unit tests for the AsiBackboneEndpointGovernanceMiddleware and related classes, verifying that endpoint governance metadata is correctly read, that middleware behaves as expected under various conditions, and that configuration options are validated properly.
+/// </summary>
 public sealed class AsiBackboneEndpointGovernanceTests
 {
+    /// <summary>
+    /// Verifies that the AsiBackboneEndpointGovernanceDescriptor correctly reads governance metadata from an endpoint, including policy types, liability handshake requirement, capability scopes, and audit emission settings.
+    /// </summary>
     [Fact]
     public void DescriptorReadsAttributeMetadataFromEndpoint()
     {
@@ -37,6 +43,10 @@ public sealed class AsiBackboneEndpointGovernanceTests
         Assert.Equal("sample.robotics.execute", descriptor.ToMetadata()["endpoint.operation_name"]);
     }
 
+    /// <summary>
+    /// Verifies that the middleware skips governance when the endpoint has no governance metadata.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task MiddlewareSkipsGovernanceWhenEndpointHasNoGovernanceMetadata()
     {
@@ -56,6 +66,12 @@ public sealed class AsiBackboneEndpointGovernanceTests
         Assert.True(nextCalled);
     }
 
+    /// <summary>
+    /// Verifies that the middleware blocks execution when the governance service indicates that execution is blocked, and that the next delegate is not called.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task MiddlewareBlocksWhenGovernanceServiceBlocksExecution()
     {
@@ -84,6 +100,12 @@ public sealed class AsiBackboneEndpointGovernanceTests
         Assert.Equal(StatusCodes.Status403Forbidden, httpContext.Response.StatusCode);
     }
 
+    /// <summary>
+    /// Verifies that the middleware uses a bodyless default forbidden result when the governance service blocks execution without providing a failure result, and that the next delegate is not called.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task MiddlewareUsesBodylessDefaultForbiddenResultWhenBlockedWithoutFailureResult()
     {
@@ -113,6 +135,12 @@ public sealed class AsiBackboneEndpointGovernanceTests
         Assert.Equal(0, httpContext.Response.Body.Length);
     }
 
+    /// <summary>
+    /// Verifies that the middleware includes development diagnostics in the response body when execution is blocked and development diagnostics are enabled in a development environment, and that the next delegate is not called.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task MiddlewareIncludesDevelopmentDiagnosticsWhenEnabledInDevelopment()
     {
@@ -159,6 +187,12 @@ public sealed class AsiBackboneEndpointGovernanceTests
         Assert.Contains("endpoint-governance-development-diagnostics.html", body, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Verifies that the middleware does not include development diagnostics in the response body when execution is blocked, even in a development environment, if development diagnostics are not enabled, and that the next delegate is not called.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task MiddlewareExcludesDevelopmentDiagnosticsByDefaultEvenInDevelopment()
     {
@@ -191,6 +225,12 @@ public sealed class AsiBackboneEndpointGovernanceTests
         Assert.Equal(0, httpContext.Response.Body.Length);
     }
 
+    /// <summary>
+    /// Verifies that the middleware does not include development diagnostics in the response body when execution is blocked, even if development diagnostics are enabled, when the environment is not set to "Development", and that the next delegate is not called.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task MiddlewareExcludesDevelopmentDiagnosticsOutsideDevelopment()
     {
@@ -228,6 +268,12 @@ public sealed class AsiBackboneEndpointGovernanceTests
         Assert.Equal(0, httpContext.Response.Body.Length);
     }
 
+    /// <summary>
+    /// Verifies that the middleware uses a configured default forbidden result factory to generate a rich failure response when execution is blocked without a specific failure result, and that the next delegate is not called.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task MiddlewareUsesConfiguredDefaultForbiddenResultFactoryWhenBlockedWithoutFailureResult()
     {
@@ -264,6 +310,12 @@ public sealed class AsiBackboneEndpointGovernanceTests
         Assert.Equal("rich failure response", await ReadResponseBodyAsync(httpContext));
     }
 
+    /// <summary>
+    /// Verifies that the middleware preserves a custom failure result provided by the governance service, even when a configured default forbidden result factory exists, and that the next delegate is not called.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task MiddlewarePreservesCustomFailureResultWhenConfiguredDefaultForbiddenResultFactoryExists()
     {
@@ -300,6 +352,12 @@ public sealed class AsiBackboneEndpointGovernanceTests
         Assert.Equal("custom failure response", await ReadResponseBodyAsync(httpContext));
     }
 
+    /// <summary>
+    /// Verifies that the default governance service fails closed when a capability validator is missing, returning a failure result and a decision indicating the missing capability validator, and that execution is not allowed.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task DefaultServiceFailsClosedWhenCapabilityValidatorIsMissing()
     {
@@ -328,6 +386,12 @@ public sealed class AsiBackboneEndpointGovernanceTests
         Assert.Contains("endpoint.capability_validator.missing", result.Decision.ReasonCodes);
     }
 
+    /// <summary>
+    /// Verifies that the default governance service includes development diagnostics in the response body when a capability validator is missing, if development diagnostics are enabled and the environment is set to "Development", and that execution is not allowed.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task DefaultServiceIncludesDevelopmentDiagnosticsForMissingCapabilityValidator()
     {
@@ -369,6 +433,12 @@ public sealed class AsiBackboneEndpointGovernanceTests
         Assert.Contains("endpoint-governance-development-diagnostics.html", body, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Verifies that the default governance service uses a default failure result when a policy decision is denied, returning a decision indicating the denial and no specific failure result, and that execution is not allowed.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task DefaultServiceUsesDefaultFailureForDeniedPolicyDecision()
     {
@@ -399,6 +469,12 @@ public sealed class AsiBackboneEndpointGovernanceTests
         Assert.Contains("policy.denied", result.Decision.ReasonCodes);
     }
 
+    /// <summary>
+    /// Verifies that the middleware blocks execution for an endpoint without governance metadata when the RequireGovernanceMetadata option is enabled, returning a 403 Forbidden status code and not calling the next delegate.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task MiddlewareBlocksUngovernedEndpointWhenRequireGovernanceMetadataIsEnabled()
     {
@@ -438,6 +514,12 @@ public sealed class AsiBackboneEndpointGovernanceTests
         Assert.Equal(0, httpContext.Response.Body.Length);
     }
 
+    /// <summary>
+    /// Verifies that the middleware allows execution for an endpoint without governance metadata when the RequireGovernanceMetadata option is enabled, but the endpoint has an explicit AllowMissingGovernanceMetadataAttribute, and that the next delegate is called.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task MiddlewareAllowsUngovernedEndpointWithExplicitMissingGovernanceMetadataOptOut()
     {
@@ -466,6 +548,9 @@ public sealed class AsiBackboneEndpointGovernanceTests
         Assert.True(nextCalled);
     }
 
+    /// <summary>
+    /// Verifies that the AsiBackboneEndpointGovernanceOptions.Validate method throws an InvalidOperationException when an invalid status code is configured for ConfigurationFailureStatusCode, and that the exception message contains the property name.
+    /// </summary>
     [Fact]
     public void EndpointGovernanceOptionsValidateRejectsInvalidStatusCode()
     {
@@ -479,6 +564,9 @@ public sealed class AsiBackboneEndpointGovernanceTests
         Assert.Contains(nameof(AsiBackboneEndpointGovernanceOptions.ConfigurationFailureStatusCode), exception.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Verifies that the AsiBackboneEndpointGovernanceOptions validation rejects post-configured invalid options, throwing an OptionsValidationException when the CapabilityFailureStatusCode is set to an invalid value, and that the exception message contains the expected text.
+    /// </summary>
     [Fact]
     public void EndpointGovernanceOptionsValidationRejectsPostConfiguredInvalidOptions()
     {

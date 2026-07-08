@@ -10,8 +10,17 @@ using Xunit;
 
 namespace AsiBackbone.Testing.Tests;
 
+/// <summary>
+/// Tests for the AsiBackbone test harness and its integration with ASP.NET Core.
+/// </summary>
 public sealed class AsiBackboneTestHarnessTests
 {
+    /// <summary>
+    /// Tests that the AsiBackbone test harness allows a protected endpoint to be executed without requiring host persistence or signing setup.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation. 
+    /// </returns>
     [Fact]
     public async Task AddAsiBackboneTestHarnessAllowsProtectedEndpointWithoutHostPersistenceOrSigningSetup()
     {
@@ -50,6 +59,12 @@ public sealed class AsiBackboneTestHarnessTests
         Assert.Equal("testing.protected", auditSink.Entries[0].OperationName);
     }
 
+    /// <summary>
+    /// Tests that the AsiBackbone test harness can be configured to return a deterministic decision for a specific policy marker type, and that this decision is respected when evaluating an endpoint that requires that policy.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task SetPolicyResultUsesDeterministicDecisionByPolicyMarkerType()
     {
@@ -84,6 +99,12 @@ public sealed class AsiBackboneTestHarnessTests
         Assert.Contains("test.denied", result.Decision.ReasonCodes);
     }
 
+    /// <summary>
+    /// Tests that the AsiBackbone test harness can be configured to deny all policies by default, and that this default deny decision is applied when evaluating a policy that has not been explicitly configured.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task DenyAllPoliciesAppliesDefaultDenyDecision()
     {
@@ -109,6 +130,12 @@ public sealed class AsiBackboneTestHarnessTests
         Assert.Contains("test.default_denied", decision.ReasonCodes);
     }
 
+    /// <summary>
+    /// Tests that the AsiBackbone test harness returns a denied decision when evaluating a policy that has not been explicitly configured, and that the decision includes a reason code indicating that the policy result is missing.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task RequirePolicyResultFailsClosedForUnconfiguredPolicyMarker()
     {
@@ -132,6 +159,12 @@ public sealed class AsiBackboneTestHarnessTests
         Assert.Contains("test_harness.policy_result.missing", decision.ReasonCodes);
     }
 
+    /// <summary>
+    /// Tests that the AsiBackbone test harness can be configured to deny specific capability grants, and that this denial is respected when evaluating an endpoint that requires that capability.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task DenyCapabilityGrantsBlocksEndpointAfterAllowedPolicyDecision()
     {
@@ -166,6 +199,12 @@ public sealed class AsiBackboneTestHarnessTests
         Assert.Contains("test.capability_denied", result.Decision.ReasonCodes);
     }
 
+    /// <summary>
+    /// Tests that the AsiBackbone test harness can be configured to return a deterministic signing result, and that this result is respected when attempting to sign a payload.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task DeterministicSigningServiceReturnsNoSignatureResult()
     {

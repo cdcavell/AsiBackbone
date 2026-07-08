@@ -8,8 +8,14 @@ using Xunit;
 
 namespace AsiBackbone.AspNetCore.Tests.Correlation;
 
+/// <summary>
+/// Unit tests for the <see cref="HttpContextAsiBackboneRequestCorrelationResolver"/> class, focusing on branch coverage and edge cases.
+/// </summary>
 public sealed class HttpContextAsiBackboneRequestCorrelationResolverBranchTests
 {
+    /// <summary>
+    /// Tests that the resolver correctly skips blank header names and blank header values when resolving the correlation ID.
+    /// </summary>
     [Fact]
     public void ResolveRequestCorrelationSkipsBlankHeaderNamesAndBlankHeaderValues()
     {
@@ -29,6 +35,9 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverBranchTests
         Assert.Equal("correlation-valid", correlation.CorrelationId);
     }
 
+    /// <summary>
+    /// Tests that the resolver returns a null correlation ID when the trace identifier
+    /// </summary>
     [Fact]
     public void ResolveRequestCorrelationReturnsNullCorrelationIdWhenTraceFallbackDisabled()
     {
@@ -47,6 +56,9 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverBranchTests
         Assert.Equal("trace-no-fallback", correlation.TraceId);
     }
 
+    /// <summary>
+    /// Tests that the resolver omits the request method from metadata when it is blank or whitespace.
+    /// </summary>
     [Fact]
     public void ResolveRequestCorrelationOmitsRequestMethodWhenBlank()
     {
@@ -63,6 +75,9 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverBranchTests
         Assert.False(correlation.Metadata.ContainsKey(AsiBackboneHttpRequestMetadataKeys.Method));
     }
 
+    /// <summary>
+    /// Tests that the resolver omits route metadata when the endpoint is not a route endpoint.
+    /// </summary>
     [Fact]
     public void ResolveRequestCorrelationOmitsRouteMetadataWhenEndpointIsNotRouteEndpoint()
     {
@@ -80,6 +95,9 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverBranchTests
         Assert.False(correlation.Metadata.ContainsKey(AsiBackboneHttpRequestMetadataKeys.RoutePattern));
     }
 
+    /// <summary>
+    /// Tests that the resolver omits the endpoint display name from metadata when it is blank or whitespace.
+    /// </summary>
     [Fact]
     public void ResolveRequestCorrelationOmitsEndpointDisplayNameWhenBlank()
     {
@@ -97,6 +115,9 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverBranchTests
         Assert.Equal("/items/{id}", correlation.Metadata[AsiBackboneHttpRequestMetadataKeys.RoutePattern]);
     }
 
+    /// <summary>
+    /// Tests that the resolver skips null and blank route values when resolving request correlation metadata.
+    /// </summary>
     [Fact]
     public void ResolveRequestCorrelationSkipsNullAndBlankRouteValues()
     {
@@ -117,6 +138,9 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverBranchTests
         Assert.DoesNotContain(correlation.Metadata.Values, value => value == "blank-key");
     }
 
+    /// <summary>
+    /// Tests that the resolver respects the metadata exclusion options and does not include request method, endpoint metadata, or route values when they are disabled in the options.
+    /// </summary>
     [Fact]
     public void ResolveRequestCorrelationHonorsMetadataExclusionOptions()
     {

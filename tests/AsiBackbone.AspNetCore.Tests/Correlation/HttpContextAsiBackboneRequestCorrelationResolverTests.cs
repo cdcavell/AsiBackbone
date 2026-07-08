@@ -8,8 +8,14 @@ using Xunit;
 
 namespace AsiBackbone.AspNetCore.Tests.Correlation;
 
+/// <summary>
+/// Unit tests for <see cref="HttpContextAsiBackboneRequestCorrelationResolver"/> class.
+/// </summary>
 public sealed class HttpContextAsiBackboneRequestCorrelationResolverTests
 {
+    /// <summary>
+    /// Tests that <see cref="HttpContextAsiBackboneRequestCorrelationResolver.ResolveRequestCorrelation"/> uses the configured correlation ID header before falling back to the trace identifier.
+    /// </summary>
     [Fact]
     public void ResolveRequestCorrelationUsesConfiguredHeaderBeforeTraceIdentifier()
     {
@@ -27,6 +33,9 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverTests
         Assert.Equal("trace-123", correlation.TraceId);
     }
 
+    /// <summary>
+    /// Tests that <see cref="HttpContextAsiBackboneRequestCorrelationResolver.ResolveRequestCorrelation"/> falls back to the trace identifier
+    /// </summary>
     [Fact]
     public void ResolveRequestCorrelationFallsBackToTraceIdentifierByDefault()
     {
@@ -43,6 +52,9 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverTests
         Assert.Equal("trace-789", correlation.TraceId);
     }
 
+    /// <summary>
+    /// Tests that <see cref="HttpContextAsiBackboneRequestCorrelationResolver.ResolveRequestCorrelation"/> supports custom configured header names for correlation ID.
+    /// </summary>
     [Fact]
     public void ResolveRequestCorrelationSupportsConfiguredHeaderNames()
     {
@@ -61,6 +73,9 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverTests
         Assert.Equal("tenant-correlation", correlation.CorrelationId);
     }
 
+    /// <summary>
+    /// Tests that <see cref="HttpContextAsiBackboneRequestCorrelationResolver.ResolveRequestCorrelation"/> adds safe request metadata such as HTTP method, route pattern, endpoint display name, and route values, while excluding sensitive data like query parameters and headers.
+    /// </summary>
     [Fact]
     public void ResolveRequestCorrelationAddsSafeRequestMetadata()
     {
@@ -84,6 +99,9 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverTests
         Assert.False(correlation.Metadata.ContainsKey(AsiBackboneHttpRequestMetadataKeys.Path));
     }
 
+    /// <summary>
+    /// Tests that <see cref="HttpContextAsiBackboneRequestCorrelationResolver.ResolveRequestCorrelation"/> includes the request path in the metadata when configured to do so.
+    /// </summary>
     [Fact]
     public void ResolveRequestCorrelationCanIncludeRequestPathWhenConfigured()
     {
@@ -102,6 +120,9 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverTests
         Assert.Equal("/api/widgets/42", correlation.Metadata[AsiBackboneHttpRequestMetadataKeys.Path]);
     }
 
+    /// <summary>
+    /// Tests that <see cref="HttpContextAsiBackboneRequestCorrelationResolver.ResolveRequestCorrelation"/> excludes sensitive request data such as query parameters and headers by default.
+    /// </summary>
     [Fact]
     public void ResolveRequestCorrelationExcludesSensitiveRequestDataByDefault()
     {
@@ -126,6 +147,9 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverTests
         Assert.DoesNotContain(correlation.Metadata.Values, value => value.Contains("Bearer", StringComparison.OrdinalIgnoreCase));
     }
 
+    /// <summary>
+    /// Tests that <see cref="HttpContextAsiBackboneRequestCorrelationResolver.ResolveRequestCorrelation"/> returns only the trace identifier
+    /// </summary>
     [Fact]
     public void ResolveRequestCorrelationReturnsTraceOnlyForBackgroundScenario()
     {

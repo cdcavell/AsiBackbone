@@ -6,8 +6,17 @@ using Xunit;
 
 namespace AsiBackbone.Analyzers.Tests;
 
+/// <summary>
+/// Tests for the <see cref="LocalDevelopmentSigningProductionAnalyzer"/> analyzer, which checks for the usage of local development signing services in production code.
+/// </summary>
 public sealed class LocalDevelopmentSigningProductionAnalyzerTests
 {
+    /// <summary>
+    /// Tests that registering the <see cref="AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningService"/> inside a production branch reports the ASIB002 diagnostic.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task LocalDevelopmentSignerRegisteredInsideProductionBranchReportsASIB002()
     {
@@ -19,6 +28,12 @@ public sealed class LocalDevelopmentSigningProductionAnalyzerTests
         Assert.Equal(LocalDevelopmentSigningProductionAnalyzer.DiagnosticId, diagnostic.Id);
     }
 
+    /// <summary>
+    /// Tests that constructing the <see cref="AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningService"/> inside a production branch reports the ASIB002 diagnostic.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task LocalDevelopmentSignerConstructedInsideProductionBranchReportsASIB002()
     {
@@ -30,6 +45,12 @@ public sealed class LocalDevelopmentSigningProductionAnalyzerTests
         Assert.Equal(LocalDevelopmentSigningProductionAnalyzer.DiagnosticId, diagnostic.Id);
     }
 
+    /// <summary>
+    /// Tests that registering the <see cref="AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningOptions"/> inside a production branch reports the ASIB002 diagnostic.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task LocalDevelopmentOptionsRegisteredInsideProductionBranchReportsASIB002()
     {
@@ -41,6 +62,12 @@ public sealed class LocalDevelopmentSigningProductionAnalyzerTests
         Assert.Equal(LocalDevelopmentSigningProductionAnalyzer.DiagnosticId, diagnostic.Id);
     }
 
+    /// <summary>
+    /// Tests that registering the <see cref="AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningService"/> inside a development branch does not report the ASIB002 diagnostic.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task LocalDevelopmentSignerRegisteredInsideDevelopmentBranchDoesNotReport()
     {
@@ -56,6 +83,12 @@ public sealed class LocalDevelopmentSigningProductionAnalyzerTests
         Assert.Empty(diagnostics);
     }
 
+    /// <summary>
+    /// Tests that comparing the environment name to "Production" reports the ASIB002 diagnostic.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task ProductionEnvironmentNameComparisonReportsASIB002()
     {
@@ -72,6 +105,12 @@ public sealed class LocalDevelopmentSigningProductionAnalyzerTests
         Assert.Equal(LocalDevelopmentSigningProductionAnalyzer.DiagnosticId, diagnostic.Id);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AsiBackboneProductionConfigurationReviewedAttribute"/> suppresses the ASIB002 diagnostic.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task ProductionConfigurationReviewedMarkerSuppressesASIB002()
     {

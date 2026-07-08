@@ -14,7 +14,7 @@ public sealed class GovernanceEmissionResultBranchTests
             [" key "] = " value "
         };
 
-        GovernanceEmissionResult result = GovernanceEmissionResult.Delivered(
+        var result = GovernanceEmissionResult.Delivered(
             " provider ",
             " record-1 ",
             metadata);
@@ -32,7 +32,7 @@ public sealed class GovernanceEmissionResultBranchTests
     [Fact]
     public void PendingTreatsWhitespaceProviderAndEmptyMetadataAsAbsent()
     {
-        GovernanceEmissionResult result = GovernanceEmissionResult.Pending(
+        var result = GovernanceEmissionResult.Pending(
             " ",
             new Dictionary<string, string>(StringComparer.Ordinal)
             {
@@ -51,13 +51,13 @@ public sealed class GovernanceEmissionResultBranchTests
     public void DeferredUsesErrorProviderAndRetryAfterUtc()
     {
         DateTimeOffset retryAfter = new(2026, 7, 8, 8, 30, 0, TimeSpan.FromHours(-4));
-        GovernanceEmissionError error = GovernanceEmissionError.Create(
+        var error = GovernanceEmissionError.Create(
             "provider.deferred",
             "Provider deferred the emission.",
             isRetryable: true,
             providerName: " provider ");
 
-        GovernanceEmissionResult result = GovernanceEmissionResult.Deferred(error, retryAfter);
+        var result = GovernanceEmissionResult.Deferred(error, retryAfter);
 
         Assert.Equal(GovernanceEmissionStatus.Deferred, result.Status);
         Assert.Equal("provider", result.ProviderName);
@@ -69,9 +69,9 @@ public sealed class GovernanceEmissionResultBranchTests
     [Fact]
     public void FailedResultRetryBehaviorFollowsErrorRetryFlag()
     {
-        GovernanceEmissionResult nonRetryable = GovernanceEmissionResult.Failed(
+        var nonRetryable = GovernanceEmissionResult.Failed(
             GovernanceEmissionError.Create("provider.failed", "Provider failed.", isRetryable: false));
-        GovernanceEmissionResult retryable = GovernanceEmissionResult.Failed(
+        var retryable = GovernanceEmissionResult.Failed(
             GovernanceEmissionError.Create("provider.retryable", "Provider failed transiently.", isRetryable: true));
 
         Assert.False(nonRetryable.ShouldRetry);
@@ -82,9 +82,9 @@ public sealed class GovernanceEmissionResultBranchTests
     [Fact]
     public void RetryableFailureAndDeadLetteredExposeExpectedTerminalSemantics()
     {
-        GovernanceEmissionResult retryableFailure = GovernanceEmissionResult.RetryableFailure(
+        var retryableFailure = GovernanceEmissionResult.RetryableFailure(
             GovernanceEmissionError.Create("provider.retryable", "Provider failed transiently."));
-        GovernanceEmissionResult deadLettered = GovernanceEmissionResult.DeadLettered(
+        var deadLettered = GovernanceEmissionResult.DeadLettered(
             GovernanceEmissionError.Create("provider.deadletter", "Provider rejected the emission."));
 
         Assert.True(retryableFailure.ShouldRetry);
@@ -96,15 +96,15 @@ public sealed class GovernanceEmissionResultBranchTests
     [Fact]
     public void FailureFactoriesRequireErrorDetails()
     {
-        Assert.Throws<ArgumentNullException>(() => GovernanceEmissionResult.Failed(null!));
-        Assert.Throws<ArgumentNullException>(() => GovernanceEmissionResult.RetryableFailure(null!));
-        Assert.Throws<ArgumentNullException>(() => GovernanceEmissionResult.DeadLettered(null!));
+        _ = Assert.Throws<ArgumentNullException>(() => GovernanceEmissionResult.Failed(null!));
+        _ = Assert.Throws<ArgumentNullException>(() => GovernanceEmissionResult.RetryableFailure(null!));
+        _ = Assert.Throws<ArgumentNullException>(() => GovernanceEmissionResult.DeadLettered(null!));
     }
 
     [Fact]
     public void GovernanceEmissionErrorNormalizesOptionalValuesAndRejectsRequiredBlanks()
     {
-        GovernanceEmissionError error = GovernanceEmissionError.Create(
+        var error = GovernanceEmissionError.Create(
             " code ",
             " message ",
             isRetryable: true,
@@ -116,7 +116,7 @@ public sealed class GovernanceEmissionResultBranchTests
         Assert.True(error.IsRetryable);
         Assert.Equal("provider", error.ProviderName);
         Assert.Equal("provider-code", error.ProviderErrorCode);
-        Assert.Throws<ArgumentException>(() => GovernanceEmissionError.Create(" ", "message"));
-        Assert.Throws<ArgumentException>(() => GovernanceEmissionError.Create("code", " "));
+        _ = Assert.Throws<ArgumentException>(() => GovernanceEmissionError.Create(" ", "message"));
+        _ = Assert.Throws<ArgumentException>(() => GovernanceEmissionError.Create("code", " "));
     }
 }

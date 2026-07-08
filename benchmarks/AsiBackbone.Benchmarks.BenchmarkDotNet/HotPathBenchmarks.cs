@@ -333,12 +333,26 @@ public class AsiBackboneHotPathBenchmarks
     [Benchmark(Description = "endpoint_governance.policy_allow")]
     public int EndpointGovernancePolicyAllow() => endpointAllow.Evaluate();
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns>
+    /// An integer checksum representing the policy evaluation outcome, used for validation in benchmarks.
+    /// </returns>
     [Benchmark(Description = "endpoint_governance.policy_warning")]
     public int EndpointGovernancePolicyWarning() => endpointWarning.Evaluate();
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns>An integer checksum representing the policy evaluation outcome, used for validation in benchmarks.</returns>
     [Benchmark(Description = "endpoint_governance.policy_deny")]
     public int EndpointGovernancePolicyDeny() => endpointDeny.Evaluate();
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns>An integer checksum representing the policy evaluation outcome, used for validation in benchmarks.</returns>
     [Benchmark(Description = "outbox_drain.small_batch_25")]
     public int OutboxDrainSmallBatch25()
     {
@@ -346,6 +360,10 @@ public class AsiBackboneHotPathBenchmarks
         return entries.Count ^ entries[0].Metadata.Count;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns>An integer checksum representing the policy evaluation outcome, used for validation in benchmarks.</returns>
     [Benchmark(Description = "outbox_drain.medium_batch_100")]
     public int OutboxDrainMediumBatch100()
     {
@@ -353,9 +371,17 @@ public class AsiBackboneHotPathBenchmarks
         return entries.Count ^ entries[0].Metadata.Count;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns>An integer checksum representing the policy evaluation outcome, used for validation in benchmarks.</returns>
     [Benchmark(Description = "outbox_drain.scoped_medium_batch_100")]
     public int OutboxDrainScopedMediumBatch100() => scopedOutbox100.Drain(BenchmarkDrainUtc);
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns>An integer checksum representing the policy evaluation outcome, used for validation in benchmarks.</returns>
     [Benchmark(Description = "audit_residue.from_decision")]
     public int AuditResidueFromDecision()
     {
@@ -376,6 +402,10 @@ public class AsiBackboneHotPathBenchmarks
         return Checksum(residue);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns>An integer checksum representing the policy evaluation outcome, used for validation in benchmarks.</returns>
     [Benchmark(Description = "audit_residue.builder_no_metadata")]
     public int AuditResidueBuilderNoMetadata()
     {
@@ -391,6 +421,10 @@ public class AsiBackboneHotPathBenchmarks
         return Checksum(residue);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns>An integer checksum representing the policy evaluation outcome, used for validation in benchmarks.</returns>
     [Benchmark(Description = "audit_residue.builder_one_metadata")]
     public int AuditResidueBuilderOneMetadata()
     {
@@ -407,6 +441,10 @@ public class AsiBackboneHotPathBenchmarks
         return Checksum(residue);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns>An integer checksum representing the policy evaluation outcome, used for validation in benchmarks.</returns>
     [Benchmark(Description = "audit_residue.builder_many_metadata")]
     public int AuditResidueBuilderManyMetadata()
     {

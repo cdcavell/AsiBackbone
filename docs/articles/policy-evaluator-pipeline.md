@@ -144,7 +144,7 @@ Changing the default value of `TreatConstraintExceptionAsDenial` from `false` to
 
 ## Optional fast-abort on first blocked result
 
-By default, the evaluator runs every registered constraint so the resulting decision and downstream decision policy have the fullest available reason visibility. This comprehensive path is the safest default for audit receipts, diagnostics, and policy review.
+By default, the evaluator runs every registered constraint so the resulting decision, constraint result set, and downstream decision policy have the fullest available denial-reason visibility. This comprehensive path is the safest default for audit receipts, diagnostics, and policy review, while denied governance decisions remain focused on blocking reasons rather than warning-only audit messages.
 
 Latency-sensitive hosts can opt into first-denial fast-abort behavior:
 
@@ -158,9 +158,9 @@ var evaluator = new DefaultAsiBackbonePolicyEvaluator<MyPolicyContext>(
     });
 ```
 
-When enabled, the evaluator stops iterating constraints immediately after a blocked constraint result. The composed decision still includes the block reasons produced at the abort point and any warning reasons produced before that point. Constraints later in the list are not evaluated, so their warnings, block reasons, telemetry side effects, or expensive checks are intentionally skipped.
+When enabled, the evaluator stops iterating constraints immediately after a blocked constraint result. The composed decision still includes the block reasons produced at the abort point and any warning reasons produced before that point, including actionable threat-model warning reasons. Constraints later in the list are not evaluated, so their warnings, block reasons, telemetry side effects, or expensive checks are intentionally skipped.
 
-Use this mode only when the host explicitly prefers latency or throughput over complete constraint visibility. Keep the default full-evaluation mode for audit-heavy, diagnostic, or reviewer-facing paths.
+Use this mode only when the host explicitly prefers latency or throughput over complete constraint visibility. Keep the default full-evaluation mode for audit-heavy, diagnostic, or reviewer-facing paths where denial-reason aggregation is more important than preserving warning-only messages inside a denied decision.
 
 ### ASP.NET Core endpoint metadata exploration
 

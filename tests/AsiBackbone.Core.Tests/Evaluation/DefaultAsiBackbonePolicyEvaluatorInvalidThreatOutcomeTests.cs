@@ -12,6 +12,9 @@ namespace AsiBackbone.Core.Tests.Evaluation;
 /// </summary>
 public sealed class DefaultAsiBackbonePolicyEvaluatorInvalidThreatOutcomeTests
 {
+    /// <summary>
+    /// Tests that the CreateThreatEvaluationResult method rejects an Allowed outcome from a threat model contributor.
+    /// </summary>
     [Fact]
     public void CreateThreatEvaluationResultRejectsAllowedOutcome()
     {
@@ -30,6 +33,9 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorInvalidThreatOutcomeTests
         Assert.Contains("Threat model contributors cannot return an Allowed outcome", innerException.Message);
     }
 
+    /// <summary>
+    /// Tests that the GetThreatOutcomeRank method rejects an Allowed outcome from a threat model contributor.
+    /// </summary>
     [Fact]
     public void GetThreatOutcomeRankRejectsAllowedOutcome()
     {

@@ -5,10 +5,16 @@ using Xunit;
 
 namespace AsiBackbone.Core.Tests.Integrity;
 
+/// <summary>
+/// Unit tests for the <see cref="AuditIntegrityVerifier"/> class, which verifies the integrity of an audit ledger chain of links.
+/// </summary>
 public sealed class AuditIntegrityVerifierTests
 {
     private static readonly DateTimeOffset Now = new(2026, 6, 16, 12, 0, 0, TimeSpan.Zero);
 
+    /// <summary>
+    /// Verifies that the <see cref="AuditIntegrityVerifier.Verify"/> method correctly validates a continuous chain of audit integrity links.
+    /// </summary>
     [Fact]
     public void VerifyAcceptsContinuousChain()
     {
@@ -25,6 +31,9 @@ public sealed class AuditIntegrityVerifierTests
         Assert.Equal(third.LinkHash, result.SafeMetadata["tip_hash"]);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AuditIntegrityLink.Append"/> method correctly binds the previous link hash and increments the sequence number.
+    /// </summary>
     [Fact]
     public void AppendBindsPreviousHashAndNextSequence()
     {
@@ -38,6 +47,9 @@ public sealed class AuditIntegrityVerifierTests
         Assert.NotEqual(first.LinkHash, second.LinkHash);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AuditIntegrityVerifier.Verify"/> method correctly detects modified link fields.
+    /// </summary>
     [Fact]
     public void VerifyDetectsModifiedLinkFields()
     {
@@ -62,6 +74,9 @@ public sealed class AuditIntegrityVerifierTests
         Assert.Equal("integrity.link-hash-mismatch", result.FailureCode);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AuditIntegrityVerifier.Verify"/> method correctly detects a missing sequence in the chain of links.
+    /// </summary>
     [Fact]
     public void VerifyDetectsMissingSequence()
     {
@@ -78,6 +93,9 @@ public sealed class AuditIntegrityVerifierTests
         Assert.Equal("3", result.SafeMetadata["actual_sequence"]);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AuditIntegrityVerifier.Verify"/> method correctly detects a forked sequence in the chain of links.
+    /// </summary>
     [Fact]
     public void VerifyDetectsForkedSequence()
     {
@@ -103,6 +121,9 @@ public sealed class AuditIntegrityVerifierTests
         Assert.Equal("integrity.sequence-duplicate", result.FailureCode);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AuditIntegrityVerifier.Verify"/> method correctly detects a mismatch in the previous link hash of a link in the chain.
+    /// </summary>
     [Fact]
     public void VerifyDetectsPreviousHashMismatch()
     {
@@ -128,6 +149,9 @@ public sealed class AuditIntegrityVerifierTests
         Assert.Equal("integrity.previous-link-hash-mismatch", result.FailureCode);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AuditIntegrityVerifier.Verify"/> method correctly rejects an empty chain of links.
+    /// </summary>
     [Fact]
     public void VerifyRejectsEmptyChain()
     {
@@ -138,6 +162,9 @@ public sealed class AuditIntegrityVerifierTests
         Assert.Equal("integrity.chain-empty", result.FailureCode);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AuditIntegrityVerifier.Verify"/> method correctly detects a mismatch in the chain ID of a link in the chain.
+    /// </summary>  
     [Fact]
     public void VerifyDetectsWrongChain()
     {
@@ -150,6 +177,9 @@ public sealed class AuditIntegrityVerifierTests
         Assert.Equal("integrity.chain-id-mismatch", result.FailureCode);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AuditIntegrityVerifier.Verify"/> method correctly detects an unsupported hash algorithm in a link in the chain.
+    /// </summary>
     [Fact]
     public void VerifyDetectsUnsupportedHashAlgorithm()
     {
@@ -174,6 +204,9 @@ public sealed class AuditIntegrityVerifierTests
         Assert.Equal("integrity.hash-algorithm-unsupported", result.FailureCode);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AuditIntegrityVerifier.Verify"/> method correctly detects a previous link hash present in a genesis link, which is not allowed.
+    /// </summary>
     [Fact]
     public void VerifyDetectsGenesisPreviousHash()
     {
@@ -198,6 +231,9 @@ public sealed class AuditIntegrityVerifierTests
         Assert.Equal("integrity.genesis-previous-hash-present", result.FailureCode);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AuditIntegrityVerifier.Verify"/> method correctly accepts a partial chain when the genesis link is not required.
+    /// </summary>
     [Fact]
     public void VerifyAcceptsPartialChainWhenGenesisIsNotRequired()
     {
@@ -210,6 +246,9 @@ public sealed class AuditIntegrityVerifierTests
         Assert.Equal(partial.LinkHash, result.SafeMetadata["tip_hash"]);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AuditIntegrityLink.CreateGenesis"/> method correctly normalizes metadata keys and values, trimming whitespace and handling null values.
+    /// </summary>
     [Fact]
     public void CreateGenesisNormalizesMetadata()
     {
@@ -234,6 +273,9 @@ public sealed class AuditIntegrityVerifierTests
         Assert.False(link.Metadata.ContainsKey(string.Empty));
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AuditIntegrityLink.CreateGenesis"/> method correctly uses empty metadata when all entries normalize away (e.g., whitespace keys).
+    /// </summary>
     [Fact]
     public void CreateGenesisUsesEmptyMetadataWhenEntriesNormalizeAway()
     {
@@ -250,6 +292,9 @@ public sealed class AuditIntegrityVerifierTests
         Assert.Empty(link.Metadata);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AuditIntegrityLink.Rehydrate"/> method correctly normalizes the chain ID, record ID, previous link hash, and metadata, trimming whitespace and handling case sensitivity.
+    /// </summary>
     [Fact]
     public void RehydrateNormalizesHashesPreviousHashAndMetadata()
     {
@@ -280,6 +325,9 @@ public sealed class AuditIntegrityVerifierTests
         Assert.Equal("rehydrate-test", link.Metadata["source"]);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AuditIntegrityLink.Rehydrate"/> method throws an exception when given an invalid sequence number (e.g., zero or negative), as sequences must be positive integers.
+    /// </summary>
     [Fact]
     public void RehydrateRejectsInvalidSequence()
     {
@@ -300,6 +348,9 @@ public sealed class AuditIntegrityVerifierTests
                 Now));
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AuditIntegrityLink.Append"/> method throws an exception when given a null previous link, as appending requires a valid previous link to maintain the integrity of the chain.
+    /// </summary>
     [Fact]
     public void AppendRejectsNullPreviousLink()
     {
@@ -307,6 +358,9 @@ public sealed class AuditIntegrityVerifierTests
             AuditIntegrityLink.Append(null!, CreateRecordHash("record-2"), Now));
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AuditIntegrityLink.CreateGenesis"/> method throws an exception when given a null record hash, as a genesis link must have a valid record hash to establish the integrity of the chain.
+    /// </summary>
     [Fact]
     public void CreateGenesisRejectsNullRecordHash()
     {

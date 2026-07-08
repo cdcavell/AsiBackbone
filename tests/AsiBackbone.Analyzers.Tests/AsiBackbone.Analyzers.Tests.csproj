@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../../src/AsiBackbone.Analyzers/AsiBackbone.Analyzers.csproj" />
+    <ProjectReference Include="..\..\src\AsiBackbone.Core\AsiBackbone.Core.csproj" />
   </ItemGroup>
 
 </Project>

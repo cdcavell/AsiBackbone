@@ -4,8 +4,14 @@ using Xunit;
 
 namespace AsiBackbone.AspNetCore.Tests.Endpoints;
 
+/// <summary>
+/// Tests for the <see cref="AsiBackboneEndpointGovernanceDescriptor"/> class, focusing on caching behavior of metadata generation.
+/// </summary>
 public sealed class AsiBackboneEndpointGovernanceDescriptorCacheTests
 {
+    /// <summary>
+    /// Tests that the <c>AsiBackboneEndpointGovernanceDescriptor.ToMetadata</c> method returns cached metadata for repeated calls, both for full and reduced metadata modes.
+    /// </summary>
     [Fact]
     public void ToMetadataReturnsCachedMetadataForRepeatedHotPathUse()
     {

@@ -18,6 +18,9 @@ public sealed class PolicyInputHardeningFuzzTests
     private const string OversizedRequestCase = "__OVERSIZED__";
     private const string ControlCharacterRequestCase = "__CONTROL__";
 
+    /// <summary>
+    /// Verifies that the <see cref="AsiBackboneConstraintEvaluationContext"/> constructor normalizes malformed inputs, such as whitespace-only strings and null values, to ensure consistent behavior in downstream evaluation logic.
+    /// </summary>
     [Fact]
     public void ConstraintEvaluationContextNormalizesMalformedConstructionInputs()
     {
@@ -41,6 +44,19 @@ public sealed class PolicyInputHardeningFuzzTests
         Assert.Equal(string.Empty, context.Metadata["null-value"]);
     }
 
+    /// <summary>
+    /// Verifies that the policy input hardening threat contributor correctly identifies and denies malformed or suspicious inputs, producing a denied decision with appropriate reason codes and metadata, while ensuring that no allow decisions are produced for such inputs.
+    /// </summary>
+    /// <param name="scenario">The test scenario</param>
+    /// <param name="intent">The intent value</param>
+    /// <param name="requestCase">The request case</param>
+    /// <param name="expectedReasonCode">The expected reason code</param>
+    /// <param name="region">The region value</param>
+    /// <param name="capability">The capability value</param>
+    /// <param name="capabilityTokenCase">The capability token case</param>
+    /// <param name="acknowledgment">The acknowledgment value</param>
+    /// <param name="extraMetadataCase">The extra metadata case</param>
+    /// <returns></returns>
     [Theory]
     [InlineData("empty-intent", " ", "approve-safe-operation", "input.intent.empty", "US-LA", "read", null, /*lang=json,strict*/ "{\"accepted\":true}", null)]
     [InlineData("empty-request", "approve", " ", "input.request.empty", "US-LA", "read", null, /*lang=json,strict*/ "{\"accepted\":true}", null)]
@@ -101,6 +117,12 @@ public sealed class PolicyInputHardeningFuzzTests
         Assert.True(reason.Metadata.ContainsKey("threat.category"));
     }
 
+    /// <summary>
+    /// Verifies that a valid generated policy input can produce an allow decision when the fixture is expected, ensuring that the policy evaluator correctly permits safe and well-formed requests.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation of evaluating the policy with a valid generated policy input, ensuring that it results in an allow decision when the fixture is expected.
+    /// </returns>
     [Fact]
     public async Task ValidGeneratedPolicyInputCanProduceAllowWhenFixtureIsExpected()
     {
@@ -121,6 +143,12 @@ public sealed class PolicyInputHardeningFuzzTests
         Assert.Empty(decision.ReasonCodes);
     }
 
+    /// <summary>
+    /// Verifies that when a correlation ID exceeds the maximum allowed length, the policy evaluator correctly bounds it to the maximum length and produces a denied decision, ensuring that oversized correlation IDs are handled appropriately in the evaluation process.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation of evaluating the policy with an oversized correlation ID, ensuring that it results in a denied decision and that the correlation ID is bounded to the maximum allowed length.
+    /// </returns>
     [Fact]
     public async Task OversizedCorrelationIdIsBoundedWhenMalformedInputIsRejected()
     {
@@ -139,6 +167,12 @@ public sealed class PolicyInputHardeningFuzzTests
         Assert.Equal(new string('c', GovernanceDecision.MaxCorrelationIdLength), decision.CorrelationId);
     }
 
+    /// <summary>
+    /// Verifies that when a suspicious input is detected by the policy input hardening threat contributor, it cannot be downgraded to an allow decision by the decision policy, ensuring that the evaluator enforces strict denial for such inputs regardless of the decision policy's behavior.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation of evaluating the policy with a suspicious input, ensuring that it results in a denied decision and cannot be downgraded to an allow decision by the decision policy.
+    /// </returns>
     [Fact]
     public async Task SuspiciousInputCannotBeDowngradedToAllowByDecisionPolicy()
     {
@@ -162,6 +196,12 @@ public sealed class PolicyInputHardeningFuzzTests
         Assert.Equal("input.command_like", Assert.Single(decision.ReasonCodes));
     }
 
+    /// <summary>
+    /// Verifies that when a threat contributor throws an exception during evaluation, the policy evaluator produces a controlled denied decision with the appropriate reason code and metadata, ensuring that exceptions from threat contributors are handled gracefully and do not result in unhandled errors or allow decisions.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation of evaluating the policy with a threat contributor that throws an exception, ensuring that it results in a controlled denied decision with the appropriate reason code and metadata.
+    /// </returns>
     [Fact]
     public async Task ThreatContributorExceptionsProduceControlledDeniedDecisionWhenConfigured()
     {

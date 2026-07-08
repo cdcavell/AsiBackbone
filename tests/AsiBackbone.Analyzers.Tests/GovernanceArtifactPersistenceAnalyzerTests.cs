@@ -1,4 +1,6 @@
 using System.Collections.Immutable;
+using AsiBackbone.Core.Decisions;
+using AsiBackbone.Core.Results;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -6,8 +8,17 @@ using Xunit;
 
 namespace AsiBackbone.Analyzers.Tests;
 
+/// <summary>
+/// Tests for the <see cref="GovernanceArtifactPersistenceAnalyzer"/> analyzer.
+/// </summary>
 public sealed class GovernanceArtifactPersistenceAnalyzerTests
 {
+    /// <summary>
+    /// Tests that a discarded <see cref="GovernanceDecision"/> reports the ASIB001 diagnostic.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task DiscardedGovernanceDecisionReportsASIB001()
     {
@@ -19,6 +30,12 @@ public sealed class GovernanceArtifactPersistenceAnalyzerTests
         Assert.Equal(GovernanceArtifactPersistenceAnalyzer.DiagnosticId, diagnostic.Id);
     }
 
+    /// <summary>
+    /// Tests that a discarded assignment of a <see cref="GovernanceDecision"/> reports the ASIB001 diagnostic.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task DiscardAssignmentReportsASIB001()
     {
@@ -30,6 +47,12 @@ public sealed class GovernanceArtifactPersistenceAnalyzerTests
         Assert.Equal(GovernanceArtifactPersistenceAnalyzer.DiagnosticId, diagnostic.Id);
     }
 
+    /// <summary>
+    /// Tests that a stored <see cref="GovernanceDecision"/> does not report any diagnostics.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task StoredGovernanceDecisionDoesNotReport()
     {
@@ -40,6 +63,12 @@ public sealed class GovernanceArtifactPersistenceAnalyzerTests
         Assert.Empty(diagnostics);
     }
 
+    /// <summary>
+    /// Tests that a returned <see cref="GovernanceDecision"/> does not report any diagnostics.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task ReturnedGovernanceDecisionDoesNotReport()
     {
@@ -68,6 +97,12 @@ public sealed class GovernanceArtifactPersistenceAnalyzerTests
         Assert.Empty(diagnostics);
     }
 
+    /// <summary>
+    /// Tests that an awaited <see cref="GovernanceDecision"/> reports the ASIB001 diagnostic.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task AwaitedGovernanceDecisionReportsASIB001()
     {
@@ -98,6 +133,12 @@ public sealed class GovernanceArtifactPersistenceAnalyzerTests
         Assert.Equal(GovernanceArtifactPersistenceAnalyzer.DiagnosticId, diagnostic.Id);
     }
 
+    /// <summary>
+    /// Tests that an <see cref="OperationResult{T}"/> of a <see cref="GovernanceDecision"/> reports the ASIB001 diagnostic.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task OperationResultOfGovernanceDecisionReportsASIB001()
     {
@@ -136,6 +177,12 @@ public sealed class GovernanceArtifactPersistenceAnalyzerTests
         Assert.Equal(GovernanceArtifactPersistenceAnalyzer.DiagnosticId, diagnostic.Id);
     }
 
+    /// <summary>
+    /// Tests that a method or class marked with the <c>AsiBackbonePersistenceHandledAttribute</c> suppresses the ASIB001 diagnostic.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task HostMarkerAttributeSuppressesASIB001()
     {

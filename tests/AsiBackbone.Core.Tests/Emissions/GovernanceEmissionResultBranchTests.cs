@@ -3,8 +3,14 @@ using Xunit;
 
 namespace AsiBackbone.Core.Tests.Emissions;
 
+/// <summary>
+/// Tests for the GovernanceEmissionResult and GovernanceEmissionError classes, focusing on the behavior of the result branches and error normalization.
+/// </summary>
 public sealed class GovernanceEmissionResultBranchTests
 {
+    /// <summary>
+    /// Tests that the Delivered result branch correctly normalizes optional values and metadata, ensuring that whitespace is trimmed and empty keys are ignored.
+    /// </summary>
     [Fact]
     public void DeliveredNormalizesOptionalValuesAndMetadata()
     {
@@ -29,6 +35,9 @@ public sealed class GovernanceEmissionResultBranchTests
         Assert.False(result.Metadata.ContainsKey(" "));
     }
 
+    /// <summary>
+    /// Tests that the Pending result branch treats whitespace provider names and empty metadata as absent, resulting in a Pending status with no provider name and no metadata.
+    /// </summary>
     [Fact]
     public void PendingTreatsWhitespaceProviderAndEmptyMetadataAsAbsent()
     {
@@ -47,6 +56,9 @@ public sealed class GovernanceEmissionResultBranchTests
         Assert.False(result.HasMetadata);
     }
 
+    /// <summary>
+    /// Tests that the Deferred result branch uses the error's provider name and retry after UTC, ensuring proper normalization of optional values.
+    /// </summary>
     [Fact]
     public void DeferredUsesErrorProviderAndRetryAfterUtc()
     {
@@ -66,6 +78,9 @@ public sealed class GovernanceEmissionResultBranchTests
         Assert.False(result.IsTerminal);
     }
 
+    /// <summary>
+    /// Tests that the Failed result branch correctly reflects the error's retryable flag, ensuring that non-retryable errors do not suggest a retry while retryable errors do.
+    /// </summary>
     [Fact]
     public void FailedResultRetryBehaviorFollowsErrorRetryFlag()
     {
@@ -79,6 +94,9 @@ public sealed class GovernanceEmissionResultBranchTests
         Assert.True(retryable.ShouldRetry);
     }
 
+    /// <summary>
+    /// Tests that the RetryableFailure and DeadLettered result branches expose the expected terminal semantics, ensuring that retryable failures suggest a retry while dead-lettered results are terminal and do not suggest a retry.
+    /// </summary>
     [Fact]
     public void RetryableFailureAndDeadLetteredExposeExpectedTerminalSemantics()
     {
@@ -93,6 +111,9 @@ public sealed class GovernanceEmissionResultBranchTests
         Assert.True(deadLettered.IsTerminal);
     }
 
+    /// <summary>
+    /// Tests that the failure factory methods (Failed, RetryableFailure, DeadLettered) throw an ArgumentNullException when provided with a null error, ensuring that error details are required for these result branches.
+    /// </summary>
     [Fact]
     public void FailureFactoriesRequireErrorDetails()
     {
@@ -101,6 +122,9 @@ public sealed class GovernanceEmissionResultBranchTests
         _ = Assert.Throws<ArgumentNullException>(() => GovernanceEmissionResult.DeadLettered(null!));
     }
 
+    /// <summary>
+    /// Tests that the GovernanceEmissionError.Create method normalizes optional values (trimming whitespace) and rejects required blank values for code and message, ensuring that error details are valid and consistent.
+    /// </summary>
     [Fact]
     public void GovernanceEmissionErrorNormalizesOptionalValuesAndRejectsRequiredBlanks()
     {

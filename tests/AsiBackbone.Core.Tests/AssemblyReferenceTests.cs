@@ -3,6 +3,9 @@ using Xunit;
 
 namespace AsiBackbone.Core.Tests;
 
+/// <summary>
+/// This class contains unit tests for the <see cref="AssemblyReference"/> class, which provides a reference to the assembly containing the core functionality of the AsiBackbone framework. The tests ensure that the assembly reference is correctly retrieved and matches the expected assembly, validating the integrity of the assembly reference mechanism within the framework.
+/// </summary>
 public sealed class AssemblyReferenceTests
 {
     /// <summary>

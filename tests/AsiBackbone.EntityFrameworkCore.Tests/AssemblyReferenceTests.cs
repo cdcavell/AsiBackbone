@@ -2,6 +2,9 @@ using Xunit;
 
 namespace AsiBackbone.EntityFrameworkCore.Tests;
 
+/// <summary>
+/// Tests for the assembly reference marker in the Entity Framework Core integration package.
+/// </summary>
 public sealed class AssemblyReferenceTests
 {
     /// <summary>

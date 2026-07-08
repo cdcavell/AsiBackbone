@@ -32,7 +32,11 @@
     <AnalysisLevel>latest-recommended</AnalysisLevel>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>$(NoWarn);CS1591</NoWarn>
+
+    <!--
+      CS1591 warning controls are applied in Directory.Build.targets so package
+      projects can opt into a scoped baseline after their project properties load.
+    -->
 
     <RepositoryUrl>https://github.com/cdcavell/AsiBackbone</RepositoryUrl>
     <RepositoryType>git</RepositoryType>

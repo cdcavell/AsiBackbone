@@ -5,8 +5,17 @@ using Xunit;
 
 namespace AsiBackbone.Signing.LocalDevelopment.Tests;
 
+/// <summary>
+/// Tests for the <see cref="LocalDevelopmentSigningService"/> class, which provides signing and verification functionality for local development scenarios.
+/// </summary>
 public sealed class LocalDevelopmentSigningServiceTests
 {
+    /// <summary>
+    /// Tests that the <see cref="LocalDevelopmentSigningService.SignAsync(SigningRequest, CancellationToken)"/> method returns signing metadata that is provider-neutral and contains the expected values.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation of signing a request and verifying the returned metadata.
+    /// </returns>
     [Fact]
     public async Task SignAsyncReturnsProviderNeutralSigningMetadata()
     {
@@ -35,6 +44,12 @@ public sealed class LocalDevelopmentSigningServiceTests
         Assert.Equal("local-development-only", result.Metadata.Metadata["provider_warning"]);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="LocalDevelopmentSigningService.VerifyAsync(SignatureVerificationRequest, CancellationToken)"/> method correctly validates a signature produced by the same provider instance.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation of signing a request and verifying the returned signature.
+    /// </returns>
     [Fact]
     public async Task VerifyAsyncValidatesSignatureProducedBySameProviderInstance()
     {
@@ -60,6 +75,12 @@ public sealed class LocalDevelopmentSigningServiceTests
         Assert.Null(verificationResult.FailureCode);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="LocalDevelopmentSigningService.VerifyAsync(SignatureVerificationRequest, CancellationToken)"/> method fails when the signing hash does not match the expected value, even if the hash lengths are the same.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation of signing a request and verifying the returned signature with a tampered hash.
+    /// </returns>
     [Fact]
     public async Task VerifyAsyncFailsForSameLengthHashMismatch()
     {
@@ -76,6 +97,12 @@ public sealed class LocalDevelopmentSigningServiceTests
         Assert.Equal("localdev.signature.hash-mismatch", verificationResult.FailureCode);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="LocalDevelopmentSigningService.SignAsync(SigningRequest, CancellationToken)"/> method returns an unsigned failure metadata when an unsupported hash algorithm is specified in the signing request.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation of signing a request with an unsupported hash algorithm and verifying that the returned metadata indicates failure.
+    /// </returns>
     [Fact]
     public async Task SignAsyncReturnsUnsignedFailureMetadataForUnsupportedAlgorithm()
     {
@@ -93,6 +120,12 @@ public sealed class LocalDevelopmentSigningServiceTests
         Assert.Equal("localdev.signing.hash-algorithm-unsupported", result.Metadata.Metadata["failure_code"]);
     }
 
+    /// <summary>
+    /// Tests that a canonical audit ledger record can be signed and verified end-to-end using the <see cref="LocalDevelopmentSigningService"/>. This test creates an audit residue, converts it to an audit ledger record, computes its canonical payload hash, signs it, and then verifies the signature.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation of signing and verifying a canonical audit ledger record end-to-end.
+    /// </returns>
     [Fact]
     public async Task CanonicalAuditLedgerRecordCanBeSignedAndVerifiedEndToEnd()
     {

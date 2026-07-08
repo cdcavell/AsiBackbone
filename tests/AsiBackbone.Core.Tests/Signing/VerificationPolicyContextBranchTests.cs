@@ -3,8 +3,14 @@ using Xunit;
 
 namespace AsiBackbone.Core.Tests.Signing;
 
+/// <summary>
+/// Tests for the <see cref="VerificationPolicyContext"/> class, focusing on the behavior of the Create method and normalization of expectations and metadata.
+/// </summary>
 public sealed class VerificationPolicyContextBranchTests
 {
+    /// <summary>
+    /// Tests that the Create method of the VerificationPolicyContext class correctly normalizes expectations and metadata, trimming whitespace and handling null values appropriately.
+    /// </summary>
     [Fact]
     public void CreateNormalizesExpectationsAndMetadata()
     {
@@ -36,6 +42,9 @@ public sealed class VerificationPolicyContextBranchTests
         Assert.False(context.Metadata.ContainsKey(string.Empty));
     }
 
+    /// <summary>
+    /// Tests that the Create method of the VerificationPolicyContext class uses empty metadata for missing or blank entries, ensuring that the context is created with null or empty values as expected.
+    /// </summary>
     [Fact]
     public void CreateUsesEmptyMetadataForMissingOrBlankEntries()
     {

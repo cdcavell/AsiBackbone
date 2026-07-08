@@ -10,6 +10,10 @@ namespace AsiBackbone.Core.Tests.Evaluation;
 /// </summary>
 public sealed class CustomDecisionPolicyExampleTests
 {
+    /// <summary>
+    /// Demonstrates a custom decision policy that preserves both warning and deny reasons when a strict deny wins policy is applied.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task StrictDenyWinsPolicyPreservesWarningAndDenyReasons()
     {
@@ -34,6 +38,10 @@ public sealed class CustomDecisionPolicyExampleTests
             decision.ReasonCodes);
     }
 
+    /// <summary>
+    /// Demonstrates a custom decision policy that overlays regional requirements on top of global policy decisions, requiring acknowledgment for high-risk actions in supported regions.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task RegionalOverlayPolicyCanRequireAcknowledgmentForLocalHighRiskAction()
     {
@@ -52,6 +60,10 @@ public sealed class CustomDecisionPolicyExampleTests
         Assert.Equal("policy-hash-v1", decision.PolicyHash);
     }
 
+    /// <summary>
+    /// Demonstrates a custom decision policy that overlays regional requirements on top of global policy decisions, denying actions in unsupported regions even if the global policy allows them.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task RegionalOverlayPolicyNarrowsGlobalAllowForUnsupportedRegion()
     {
@@ -67,6 +79,10 @@ public sealed class CustomDecisionPolicyExampleTests
         Assert.Equal("regional.unsupported", Assert.Single(decision.ReasonCodes));
     }
 
+    /// <summary>
+    /// Demonstrates a custom decision policy that overlays regional requirements on top of global policy decisions, ensuring that an existing deny decision from a global constraint is not overridden by the regional overlay.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task RegionalOverlayPolicyDoesNotOverrideExistingDenyDecision()
     {

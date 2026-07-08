@@ -10,6 +10,10 @@ namespace AsiBackbone.Core.Tests.Evaluation;
 /// </summary>
 public sealed class DefaultAsiBackbonePolicyEvaluatorHotPathCoverageTests
 {
+    /// <summary>
+    /// Verifies that a policy evaluation with all pass-through constraints produces an allowed decision with no reason codes.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task EvaluateWithAllPassThroughConstraintsProducesAllowedDecision()
     {
@@ -31,6 +35,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorHotPathCoverageTests
         Assert.Equal(context.PolicyHash, decision.PolicyHash);
     }
 
+    /// <summary>
+    /// Verifies that a policy evaluation with multiple warning-producing constraints aggregates the warning reason codes into the final decision.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task EvaluateWithMultipleWarningsAggregatesWarningReasons()
     {
@@ -57,6 +65,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorHotPathCoverageTests
             decision.ReasonCodes);
     }
 
+    /// <summary>
+    /// Verifies that a policy evaluation with multiple denied constraints aggregates the denied reason codes into the final decision and drops any prior warnings by default.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task EvaluateWithMultipleDenialsAggregatesDeniedReasonsAndDropsPriorWarningsByDefault()
     {
@@ -87,6 +99,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorHotPathCoverageTests
         Assert.DoesNotContain("constraint.prior_warning", decision.ReasonCodes);
     }
 
+    /// <summary>
+    /// Verifies that a policy evaluation with short-circuiting on the first denial preserves only the evaluated reason codes, skipping any subsequent constraints.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task ShortCircuitWithPriorWarningsPreservesOnlyEvaluatedReasons()
     {
@@ -131,6 +147,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorHotPathCoverageTests
         Assert.DoesNotContain("constraint.skipped_warning", decision.ReasonCodes);
     }
 
+    /// <summary>
+    /// Verifies that a decision policy receives read-only results for all pass-through constraints, and that attempts to modify the list of constraint results throw a NotSupportedException.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task DecisionPolicyReceivesReadOnlyResultsForAllPassThroughConstraints()
     {

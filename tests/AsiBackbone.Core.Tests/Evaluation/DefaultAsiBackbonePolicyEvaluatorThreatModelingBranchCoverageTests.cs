@@ -11,6 +11,12 @@ namespace AsiBackbone.Core.Tests.Evaluation;
 /// </summary>
 public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverageTests
 {
+    /// <summary>
+    /// Test that when a threat warning and a constraint denial are both present, the threat warning is suppressed by default in the final governance decision.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task EvaluateThreatWarningAndConstraintDenialSuppressesThreatWarningByDefault()
     {
@@ -26,6 +32,12 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
         Assert.DoesNotContain("threat.warning", decision.ReasonCodes);
     }
 
+    /// <summary>
+    /// Test that when a threat warning and a constraint denial are both present, the threat warning is preserved in the final governance decision when short-circuiting is enabled.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task EvaluateThreatWarningAndConstraintDenialPreservesThreatWarningWhenShortCircuitEnabled()
     {
@@ -46,6 +58,12 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
         Assert.Contains("constraint.denied", decision.ReasonCodes);
     }
 
+    /// <summary>
+    /// Test that when a constraint denial is followed by a constraint warning, the warning is ignored in the final governance decision when short-circuiting is not enabled.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task EvaluateConstraintWarningAfterDenialIsIgnoredWhenNotShortCircuiting()
     {
@@ -64,6 +82,12 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
         Assert.DoesNotContain("constraint.warning", decision.ReasonCodes);
     }
 
+    /// <summary>
+    /// Test that when a constraint denial is present and short-circuiting is enabled, the evaluation stops after the first denial and only that denial reason is included in the final governance decision.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task EvaluateShortCircuitDenialWithoutWarningsReturnsSingleDenialReason()
     {
@@ -83,6 +107,12 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
         Assert.Equal("constraint.denied", Assert.Single(decision.ReasonCodes));
     }
 
+    /// <summary>
+    /// Test that when a constraint denial is present and short-circuiting is enabled, the evaluation stops after the first denial and any subsequent constraints are not evaluated, ensuring that only the first denial reason is included in the final governance decision.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task EvaluateShortCircuitDenialSkipsLaterConstraint()
     {
@@ -111,6 +141,12 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
         Assert.False(secondConstraintRan);
     }
 
+    /// <summary>
+    /// Test that when multiple warnings are produced by constraints and threat contributors, all warning reason codes are included in the final governance decision.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task EvaluateMultipleWarningsProducesMultipleWarningReasons()
     {
@@ -126,6 +162,12 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
         Assert.Contains("constraint.warning", decision.ReasonCodes);
     }
 
+    /// <summary>
+    /// Test that when multiple denials are produced by constraints, all denial reason codes are included in the final governance decision.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task EvaluateMultipleDenialsProducesMultipleDenialReasons()
     {
@@ -144,6 +186,12 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
         Assert.Contains("constraint.denied.two", decision.ReasonCodes);
     }
 
+    /// <summary>
+    /// Test that when a decision policy denies the operation, it overrides any threat warnings produced by contributors, resulting in a final governance decision that is denied with the reason code from the decision policy.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task EvaluateDecisionPolicyDenialIsNotOverriddenByThreatWarningProtection()
     {
@@ -159,6 +207,12 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
         Assert.Equal("decision.policy_denied", Assert.Single(decision.ReasonCodes));
     }
 
+    /// <summary>
+    /// Test that when a threat warning is produced by a contributor and the evaluator is configured to allow downgrades, the final governance decision is allowed with no reason codes, effectively downgrading the warning to an allowed outcome.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task EvaluateNoConstraintThreatWarningCanBeDowngradedWhenProtectionDisabled()
     {
@@ -178,6 +232,12 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
         Assert.Empty(decision.ReasonCodes);
     }
 
+    /// <summary>
+    /// Test that when the cancellation token is canceled before evaluation starts, the evaluator throws an OperationCanceledException and does not run any threat contributors.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task EvaluateCanceledTokenThrowsBeforeContributorRuns()
     {
@@ -200,6 +260,15 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
         Assert.False(contributorRan);
     }
 
+    /// <summary>
+    /// Test that when a threat contributor throws an OperationCanceledException during evaluation, the exception propagates and the evaluation is canceled.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
+    /// <exception cref="OperationCanceledException">
+    /// Thrown when the evaluation is canceled due to a contributor throwing an OperationCanceledException.
+    /// </exception>
     [Fact]
     public async Task EvaluateContributorOperationCanceledExceptionPropagates()
     {
@@ -214,6 +283,12 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
             async () => await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken));
     }
 
+    /// <summary>
+    /// Test that when a constraint throws an OperationCanceledException during evaluation, the exception propagates and the evaluation is canceled.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task EvaluateConstraintOperationCanceledExceptionPropagates()
     {
@@ -226,6 +301,12 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
             async () => await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken));
     }
 
+    /// <summary>
+    /// Test that when a more restrictive threat contributor (denial) is evaluated before a less restrictive threat contributor (warning), the final governance decision reflects the more restrictive outcome, and both reason codes are included in the decision.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task EvaluateLessRestrictiveSecondThreatKeepsMoreRestrictiveFirstOutcome()
     {
@@ -251,6 +332,12 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
         Assert.Contains("threat.warning", decision.ReasonCodes);
     }
 
+    /// <summary>
+    /// Test that when a threat contributor reports an unknown outcome, the evaluator falls back to the normal constraint composition behavior, resulting in an allowed decision with no reason codes.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task EvaluateUnknownThreatOutcomeFallsBackToNormalConstraintComposition()
     {
@@ -272,6 +359,12 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
         Assert.Empty(decision.ReasonCodes);
     }
 
+    /// <summary>
+    /// Test that when a threat contributor reports an unknown outcome, but there is an existing warning outcome from another contributor, the evaluator preserves the existing warning outcome in the final governance decision, including both reason codes.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task EvaluateUnknownSecondThreatOutcomeKeepsExistingWarningOutcome()
     {
@@ -297,6 +390,9 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
         Assert.Contains("threat.unknown_outcome", decision.ReasonCodes);
     }
 
+    /// <summary>
+    /// Test that when a threat assessment is created with no threat, it results in a non-actionable assessment with severity None, category None, and recommended outcome Allowed.
+    /// </summary>
     [Fact]
     public void ThreatAssessmentNoThreatCreatesNonActionableAllowedAssessment()
     {
@@ -308,6 +404,9 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
         Assert.Equal(GovernanceDecisionOutcome.Allowed, assessment.RecommendedOutcome);
     }
 
+    /// <summary>
+    /// Test that when a threat assessment is created with severity None but a warning outcome, it is still considered actionable, demonstrating that even low-severity threats can require attention.
+    /// </summary>
     [Fact]
     public void ThreatAssessmentNoneSeverityWarningOutcomeIsActionable()
     {
@@ -321,6 +420,9 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
         Assert.True(assessment.IsActionable);
     }
 
+    /// <summary>
+    /// Test that when a threat assessment is created with empty metadata, it results in an empty metadata collection, ensuring that the assessment does not contain any unintended metadata entries.
+    /// </summary>
     [Fact]
     public void ThreatAssessmentEmptyMetadataUsesEmptyMetadataCollection()
     {
@@ -335,6 +437,9 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
         Assert.Empty(assessment.Metadata);
     }
 
+    /// <summary>
+    /// Test that when a threat assessment is created with blank metadata keys, those keys are ignored and not included in the final metadata collection, ensuring that only valid metadata entries are preserved.
+    /// </summary>
     [Fact]
     public void ThreatAssessmentBlankMetadataKeysAreIgnored()
     {
@@ -352,6 +457,9 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
         Assert.Empty(assessment.Metadata);
     }
 
+    /// <summary>
+    /// Test that when a threat assessment is created with blank category, it throws an ArgumentException, ensuring that the category must be a non-empty string.
+    /// </summary>
     [Fact]
     public void ThreatAssessmentRejectsBlankCategory()
     {
@@ -363,6 +471,9 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
             GovernanceDecisionOutcome.Warning));
     }
 
+    /// <summary>
+    /// Test that when a threat assessment is created with blank reason code, it throws an ArgumentException, ensuring that the reason code must be a non-empty string.
+    /// </summary>
     [Fact]
     public void ThreatAssessmentRejectsBlankReasonCode()
     {
@@ -374,6 +485,9 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
             GovernanceDecisionOutcome.Warning));
     }
 
+    /// <summary>
+    /// Test that when a threat assessment is created with blank description, it throws an ArgumentException, ensuring that the description must be a non-empty string.
+    /// </summary>
     [Fact]
     public void ThreatAssessmentRejectsBlankDescription()
     {
@@ -385,6 +499,9 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
             GovernanceDecisionOutcome.Warning));
     }
 
+    /// <summary>
+    /// Test that when a threat assessment is created with a negative confidence value, it throws an ArgumentOutOfRangeException, ensuring that the confidence must be within the range of 0 to 1.
+    /// </summary>
     [Fact]
     public void ThreatAssessmentRejectsNegativeConfidence()
     {
@@ -397,6 +514,9 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
             confidence: -0.1D));
     }
 
+    /// <summary>
+    /// Test that when a threat assessment is created with a blank contributor name, the contributor metadata is omitted from the operation reason.
+    /// </summary>
     [Fact]
     public void ThreatAssessmentOperationReasonOmitsContributorMetadataWhenNameIsBlank()
     {
@@ -413,6 +533,9 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
         Assert.Equal(ThreatCategories.InputMalformed, reason.Metadata["threat.category"]);
     }
 
+    /// <summary>
+    /// Test that when a threat assessment is created with a null metadata value, the value is normalized to an empty string in the operation reason, ensuring that null values do not propagate into the metadata collection.
+    /// </summary>
     [Fact]
     public void ThreatAssessmentOperationReasonNormalizesNullMetadataValue()
     {

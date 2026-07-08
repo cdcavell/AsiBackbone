@@ -10,6 +10,9 @@ namespace AsiBackbone.Core.Tests.Handshakes;
 /// </summary>
 public sealed class LiabilityHandshakeMutationTests
 {
+    /// <summary>
+    /// Tests that the FromDecision method correctly uses the first decision reason and preserves trace policy metadata when creating a LiabilityHandshakeRequest.
+    /// </summary>
     [Fact]
     public void FromDecisionUsesFirstDecisionReasonAndPreservesTracePolicyMetadata()
     {
@@ -62,6 +65,9 @@ public sealed class LiabilityHandshakeMutationTests
         Assert.False(request.Metadata.ContainsKey("other"));
     }
 
+    /// <summary>
+    /// Tests that the acknowledgment creation method correctly uses the responding actor and request handshake boundary when creating a LiabilityHandshakeAcknowledgment.
+    /// </summary>
     [Fact]
     public void AcknowledgmentUsesRespondingActorAndRequestHandshakeBoundary()
     {

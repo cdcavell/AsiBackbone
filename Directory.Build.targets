@@ -1,0 +1,14 @@
+<Project>
+  <!--
+    Apply CS1591 controls after project files load so package projects can opt
+    into a scoped baseline with AsiBackboneSuppressMissingXmlDocs=true while
+    inventory/enforcement commands can override that property from the CLI.
+  -->
+  <PropertyGroup Condition="'$(AsiBackboneSuppressMissingXmlDocs)' == 'true'">
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(AsiBackboneEnforceMissingXmlDocs)' == 'true'">
+    <WarningsAsErrors>$(WarningsAsErrors);CS1591</WarningsAsErrors>
+  </PropertyGroup>
+</Project>

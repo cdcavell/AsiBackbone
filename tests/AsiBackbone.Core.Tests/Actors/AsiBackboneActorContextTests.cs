@@ -3,6 +3,9 @@ using Xunit;
 
 namespace AsiBackbone.Core.Tests.Actors;
 
+/// <summary>
+/// Tests for the <see cref="AsiBackboneActorContext"/> class, which represents the context of an actor in the AsiBackbone system.
+/// </summary>
 public sealed class AsiBackboneActorContextTests
 {
     /// <summary>

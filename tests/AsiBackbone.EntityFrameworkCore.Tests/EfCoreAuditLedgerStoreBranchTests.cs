@@ -9,8 +9,17 @@ using Xunit;
 
 namespace AsiBackbone.EntityFrameworkCore.Tests;
 
+/// <summary>
+/// Tests for the <see cref="EfCoreAuditLedgerStore"/> class using a branch of the audit ledger.
+/// </summary>
 public sealed class EfCoreAuditLedgerStoreBranchTests
 {
+    /// <summary>
+    /// Tests that the <see cref="EfCoreAuditLedgerStore.FindByRecordIdAsync(string, CancellationToken)"/> method returns null when the specified record ID does not exist in the audit ledger.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result is null when the record ID does not exist.
+    /// </returns>
     [Fact]
     public async Task FindByRecordIdAsyncReturnsNullWhenRecordDoesNotExist()
     {
@@ -24,6 +33,12 @@ public sealed class EfCoreAuditLedgerStoreBranchTests
         Assert.Null(found);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="EfCoreAuditLedgerStore.FindByRecordedUtcRangeAsync(DateTimeOffset, DateTimeOffset, CancellationToken)"/> method throws an <see cref="ArgumentException"/> when the specified recorded UTC range is inverted (i.e., the start time is after the end time).
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result is an <see cref="ArgumentException"/> when the recorded UTC range is inverted.
+    /// </returns>
     [Fact]
     public async Task FindByRecordedUtcRangeAsyncRejectsInvertedRange()
     {
@@ -39,6 +54,12 @@ public sealed class EfCoreAuditLedgerStoreBranchTests
         Assert.Contains("recorded UTC range", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="EfCoreAuditLedgerStore.AppendAsync(AuditLedgerRecord, CancellationToken)"/> method returns a failure result when attempting to append a record with a duplicate record ID, which is rejected by the underlying database provider.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result is a failure result when the provider rejects the duplicate record ID.
+    /// </returns>
     [Fact]
     public async Task AppendAsyncReturnsFailureWhenProviderRejectsDuplicateRecordId()
     {
@@ -68,6 +89,12 @@ public sealed class EfCoreAuditLedgerStoreBranchTests
         Assert.Contains("asi_backbone.audit_ledger.append_failed", secondResult.ReasonCodes);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="EfCoreAuditLedgerStore.FindByRecordIdAsync(string, CancellationToken)"/> method correctly handles empty JSON payloads for reason codes and metadata, treating them as empty collections instead of null or invalid data.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result is an <see cref="AuditLedgerRecord"/> with empty collections for reason codes and metadata when the JSON payloads are empty.
+    /// </returns>
     [Fact]
     public async Task FindByRecordIdAsyncHandlesEmptyJsonPayloadsAsEmptyCollections()
     {

@@ -8,6 +8,9 @@ namespace AsiBackbone.Core.Tests.Decisions;
 /// </summary>
 public sealed class GovernanceDecisionMutationTests
 {
+    /// <summary>
+    /// Tests that non-allow decision factories preserve trace fields and reason messages correctly.
+    /// </summary>
     [Fact]
     public void NonAllowDecisionFactoriesPreserveTraceFieldsAndReasonMessages()
     {
@@ -97,6 +100,9 @@ public sealed class GovernanceDecisionMutationTests
             expectedCanProceed: false);
     }
 
+    /// <summary>
+    /// Tests that the collections of reasons in a deny decision are read-only snapshots and not affected by external modifications.
+    /// </summary>
     [Fact]
     public void DenyReasonCollectionsAreReadOnlySnapshots()
     {
@@ -122,6 +128,9 @@ public sealed class GovernanceDecisionMutationTests
             codeView.Add("policy.add"));
     }
 
+    /// <summary>
+    /// Tests that the collections of reasons in a warning decision are read-only snapshots and not affected by external modifications.
+    /// </summary>
     [Fact]
     public void WarningReasonCollectionsAreReadOnlySnapshots()
     {

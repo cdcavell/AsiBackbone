@@ -10,6 +10,10 @@ namespace AsiBackbone.Core.Tests.Evaluation;
 /// </summary>
 public sealed class DefaultAsiBackbonePolicyEvaluatorHotPathTests
 {
+    /// <summary>
+    /// Validates that when all constraints allow, the decision is allowed and the constraints are evaluated in order.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task EvaluateAllAllowConstraintsProducesAllowedDecisionAndRunsInOrder()
     {
@@ -42,6 +46,11 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorHotPathTests
         Assert.Equal(context.PolicyHash, decision.PolicyHash);
     }
 
+
+    /// <summary>
+    /// Validates that when a constraint produces a warning, the decision is allowed but contains the warning reasons.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task EvaluateWarningConstraintReturnsWarningReasons()
     {
@@ -63,6 +72,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorHotPathTests
         Assert.Equal("The constraint produced a warning.", Assert.Single(decision.Reasons).Message);
     }
 
+    /// <summary>
+    /// Validates that when a constraint denies the operation, the decision is denied and contains the denial reasons.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task EvaluateDenialConstraintReturnsDenialReasons()
     {
@@ -83,6 +96,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorHotPathTests
         Assert.Equal("The constraint denied the operation.", Assert.Single(decision.Reasons).Message);
     }
 
+    /// <summary>
+    /// Validates that when a mix of allow, warning, and deny constraints are evaluated, the order is preserved and warnings are suppressed when the decision is denied.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task EvaluateMixedResultsPreservesOrderAndSuppressesWarningsWhenDenied()
     {

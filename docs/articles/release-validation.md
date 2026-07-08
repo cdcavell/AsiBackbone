@@ -16,6 +16,7 @@ Before cutting a stable release tag, confirm the following checks have passed on
 | Version metadata validation | stable release validation, package publish | Confirms MSBuild version metadata, citation metadata, Zenodo metadata, optional tag metadata, and generated package filenames align. |
 | Restore | CI, stable release validation, package publish | Confirms package dependencies resolve for the solution. |
 | Build | CI, stable release validation, package publish | Confirms release projects compile in Release configuration. |
+| Public API XML documentation inventory | CI, release readiness record | Inventories `CS1591` gaps for selected public package projects while staged enforcement is phased in. |
 | Formatting | CI, stable release validation, package publish | Confirms source formatting is stable before release. |
 | Tests | CI, stable release validation, package publish | Confirms the solution test suite passes before packaging or publishing. |
 | Package creation | CI, stable release validation, package publish | Confirms every package project under `src`, excluding template-content projects, can be packed. |
@@ -35,7 +36,7 @@ Before cutting a stable release tag, confirm the following checks have passed on
 
 The following workflows form the reusable gate for stable release candidates:
 
-- `CI` validates dependency review for pull requests, solution restore/build/test, formatting, package creation, package SBOM generation, template package smoke validation, coverage output, and CodeQL analysis.
+- `CI` validates dependency review for pull requests, solution restore/build/test, public API XML documentation inventory, formatting, package creation, package SBOM generation, template package smoke validation, coverage output, and CodeQL analysis.
 - `External Consumer Smoke Test` validates package-consumer wiring through the external consumer and stable package integration smoke scripts.
 - `Publish Documentation` validates the DocFX build used for the documentation site.
 - `Stable Release Validation` provides a single release-candidate gate for version metadata, restore, build, formatting, tests, DocFX, package creation, generated package version validation, generated NuGet metadata validation, SBOM generation, package/SBOM provenance attestation where supported, template package smoke validation, and smoke checks.
@@ -63,6 +64,12 @@ The package publish workflow performs release-critical validation before publish
 
 This check catches release-blocking NuGet metadata mistakes before package publication because NuGet package metadata for a published version cannot be overwritten.
 
+## Public API XML documentation inventory
+
+`Validate-XmlDocumentation.ps1` builds selected public package projects with `CS1591` unsuppressed and writes a Markdown inventory to `artifacts/xml-docs/cs1591-inventory.md`. CI uploads this file as the `asi-backbone-cs1591-inventory` artifact.
+
+The staged policy is documented in [Public API XML Documentation](public-api-xml-documentation.md). Existing package projects may carry `AsiBackboneSuppressMissingXmlDocs=true` as a transitional, project-scoped baseline. New projects should not add that property unless the exception is documented.
+
 ## Pre-release metadata and asset checklist
 
 For every stable release, the release readiness record should explicitly confirm:
@@ -73,9 +80,10 @@ For every stable release, the release readiness record should explicitly confirm
 - Source Link repository commit metadata is generated and has a post-publish validation plan when NuGet download is required to confirm it;
 - package SBOM files and `sbom-manifest.json` are generated for produced `.nupkg` artifacts;
 - package and SBOM provenance artifacts are uploaded and attested where the workflow event supports attestation;
+- public API XML documentation inventory is reviewed, and staged enforcement changes or intentional exceptions are documented;
 - NuGet package signing status is checked against `SECURITY.md`, and release notes/readiness records state whether signing remains deferred or has an adopted signing and verification process;
 - README, DocFX navigation, release notes, migration notes, package README links, and GitHub Pages links are current;
-- any intentionally deferred metadata, asset, Source Link, SBOM, provenance, package-signing, or documentation-link check is recorded with risk and follow-up.
+- any intentionally deferred metadata, asset, Source Link, SBOM, provenance, package-signing, public API XML documentation, or documentation-link check is recorded with risk and follow-up.
 
 ## Source Link metadata validation
 
@@ -98,6 +106,7 @@ NuGet package signing is currently a known open supply-chain readiness item. Unt
 ## Related documentation
 
 - [Release Cadence and Readiness](release-cadence-and-readiness.md)
+- [Public API XML Documentation](public-api-xml-documentation.md)
 - [Supply-Chain Provenance and Package SBOMs](supply-chain-provenance.md)
 - [2.3.0 Release Readiness Record](release-readiness-230.md)
 - [2.3.0 Release Notes](release-notes-230.md)

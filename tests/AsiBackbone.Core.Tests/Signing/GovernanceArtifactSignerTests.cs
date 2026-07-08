@@ -7,8 +7,14 @@ using Xunit;
 
 namespace AsiBackbone.Core.Tests.Signing;
 
+/// <summary>
+/// Tests for the <see cref="GovernanceArtifactSigner"/> class, which provides methods for creating and signing governance artifacts such as AuditLedgerRecords and GovernanceOutboxEntries.
+/// </summary>
 public sealed class GovernanceArtifactSignerTests
 {
+    /// <summary>
+    /// Tests that creating a signing-ready AuditLedgerRecord preserves the hash metadata without including a signature.
+    /// </summary>
     [Fact]
     public void CreateSigningReadyAuditLedgerRecordPreservesHashMetadataWithoutSignature()
     {
@@ -30,6 +36,12 @@ public sealed class GovernanceArtifactSignerTests
         Assert.Null(artifact.SigningMetadata.Signature);
     }
 
+    /// <summary>
+    /// Tests that signing a GovernanceOutboxEntry preserves the provider metadata and canonical descriptors in the resulting SignedGovernanceArtifact.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation of signing a GovernanceOutboxEntry and verifying the resulting SignedGovernanceArtifact.
+    /// </returns>
     [Fact]
     public async Task SignGovernanceOutboxEntryAsyncPreservesProviderMetadataAndCanonicalDescriptors()
     {
@@ -64,6 +76,9 @@ public sealed class GovernanceArtifactSignerTests
         Assert.Equal("outbox-signing", artifact.SigningMetadata.Metadata["workflow"]);
     }
 
+    /// <summary>
+    /// Tests that creating an unsigned GovernanceOutboxEntry preserves the canonical hash without including any signing metadata.
+    /// </summary>
     [Fact]
     public void CreateUnsignedGovernanceOutboxEntryKeepsCanonicalHashWithoutSigningMetadata()
     {
@@ -83,6 +98,12 @@ public sealed class GovernanceArtifactSignerTests
         Assert.Empty(artifact.SigningMetadata.Metadata);
     }
 
+    /// <summary>
+    /// Tests that signing an AuditLedgerRecord with a failing signing service propagates the failure metadata correctly in the resulting SignedGovernanceArtifact.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation of signing an AuditLedgerRecord with a failing signing service and verifying the resulting SignedGovernanceArtifact contains the expected failure metadata.
+    /// </returns>
     [Fact]
     public async Task SignAuditLedgerRecordAsyncPropagatesUnsignedFailureMetadata()
     {

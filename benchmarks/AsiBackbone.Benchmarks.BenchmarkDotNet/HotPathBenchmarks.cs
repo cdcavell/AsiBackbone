@@ -106,6 +106,9 @@ public class AsiBackboneHotPathBenchmarks
         ["risk"] = "routine"
     };
 
+    /// <summary>
+    /// Cleans up resources after all benchmarks have completed.
+    /// </summary>
     [GlobalCleanup]
     public void Cleanup()
     {
@@ -115,6 +118,12 @@ public class AsiBackboneHotPathBenchmarks
         scopedOutbox100.Dispose();
     }
 
+    /// <summary>
+    /// Benchmarks the creation of a governance decision that allows an operation with no reasons.
+    /// </summary>
+    /// <returns>
+    /// An integer checksum representing the decision outcome and reason count, used for validation in benchmarks.
+    /// </returns>
     [Benchmark(Description = "decision.allow_no_reasons")]
     public static int DecisionAllowNoReasons()
     {
@@ -127,6 +136,12 @@ public class AsiBackboneHotPathBenchmarks
         return Checksum(decision);
     }
 
+    /// <summary>
+    /// Benchmarks the creation of a governance decision that denies an operation with one reason.
+    /// </summary>
+    /// <returns>
+    /// An integer checksum representing the decision outcome and reason count, used for validation in benchmarks.
+    /// </returns>
     [Benchmark(Description = "decision.deny_one_reason")]
     public int DecisionDenyOneReason()
     {
@@ -140,6 +155,12 @@ public class AsiBackboneHotPathBenchmarks
         return Checksum(decision);
     }
 
+    /// <summary>
+    /// Benchmarks the creation of a governance decision that denies an operation with multiple reasons.
+    /// </summary>
+    /// <returns>
+    /// An integer checksum representing the decision outcome and reason count, used for validation in benchmarks.
+    /// </returns>
     [Benchmark(Description = "decision.deny_multiple_reasons")]
     public int DecisionDenyMultipleReasons()
     {
@@ -153,6 +174,12 @@ public class AsiBackboneHotPathBenchmarks
         return Checksum(decision);
     }
 
+    /// <summary>
+    /// Benchmarks the creation of a governance decision that escalates an operation with one reason.
+    /// </summary>
+    /// <returns>
+    /// An integer checksum representing the decision outcome and reason count, used for validation in benchmarks.
+    /// </returns>
     [Benchmark(Description = "decision.escalate_one_reason")]
     public static int DecisionEscalateOneReason()
     {
@@ -167,6 +194,12 @@ public class AsiBackboneHotPathBenchmarks
         return Checksum(decision);
     }
 
+    /// <summary>
+    /// Benchmarks the creation of a governance decision that requires acknowledgment for an operation with one reason.
+    /// </summary>
+    /// <returns>
+    /// An integer checksum representing the decision outcome and reason count, used for validation in benchmarks.
+    /// </returns>
     [Benchmark(Description = "operation_result.success_no_reasons")]
     public static int OperationResultSuccessNoReasons()
     {
@@ -174,6 +207,12 @@ public class AsiBackboneHotPathBenchmarks
         return Checksum(result);
     }
 
+    /// <summary>
+    /// Benchmarks the creation of a governance decision that fails an operation with one reason.
+    /// </summary>
+    /// <returns>
+    /// An integer checksum representing the decision outcome and reason count, used for validation in benchmarks.
+    /// </returns>
     [Benchmark(Description = "operation_result.failure_one_reason")]
     public int OperationResultFailureOneReason()
     {
@@ -181,6 +220,12 @@ public class AsiBackboneHotPathBenchmarks
         return Checksum(result);
     }
 
+    /// <summary>
+    /// Benchmarks the creation of a governance decision that fails an operation with multiple reasons.
+    /// </summary>
+    /// <returns>
+    /// An integer checksum representing the decision outcome and reason count, used for validation in benchmarks.
+    /// </returns>
     [Benchmark(Description = "operation_result.failure_multiple_reasons")]
     public int OperationResultFailureMultipleReasons()
     {
@@ -188,6 +233,12 @@ public class AsiBackboneHotPathBenchmarks
         return Checksum(result);
     }
 
+    /// <summary>
+    /// Benchmarks the evaluation of a policy with zero constraints, which should allow the operation by default.
+    /// </summary>
+    /// <returns>
+    /// An integer checksum representing the policy evaluation outcome, used for validation in benchmarks.
+    /// </returns>
     [Benchmark(Description = "policy.zero_constraints")]
     public int PolicyZeroConstraints()
     {
@@ -195,6 +246,12 @@ public class AsiBackboneHotPathBenchmarks
         return Checksum(decision);
     }
 
+    /// <summary>
+    /// Benchmarks the evaluation of a policy with eight constraints that all allow the operation, resulting in an overall allow decision.
+    /// </summary>
+    /// <returns>
+    /// An integer checksum representing the policy evaluation outcome, used for validation in benchmarks.
+    /// </returns>
     [Benchmark(Description = "policy.all_allow_8")]
     public int PolicyAllAllow8()
     {
@@ -202,6 +259,12 @@ public class AsiBackboneHotPathBenchmarks
         return Checksum(decision);
     }
 
+    /// <summary>
+    /// Benchmarks the evaluation of a policy with mixed constraints that produce warnings and denials, resulting in an overall decision that reflects the most severe outcome.
+    /// </summary>
+    /// <returns>
+    /// An integer checksum representing the policy evaluation outcome, used for validation in benchmarks.
+    /// </returns>
     [Benchmark(Description = "policy.warning_and_denial_full")]
     public int PolicyWarningAndDenialFull()
     {
@@ -209,6 +272,12 @@ public class AsiBackboneHotPathBenchmarks
         return Checksum(decision);
     }
 
+    /// <summary>
+    /// Benchmarks the evaluation of a policy with mixed constraints that short-circuits on the first denial, resulting in an overall denial decision without evaluating remaining constraints.
+    /// </summary>
+    /// <returns>
+    /// An integer checksum representing the policy evaluation outcome, used for validation in benchmarks.
+    /// </returns>
     [Benchmark(Description = "policy.first_denial_short_circuit")]
     public int PolicyFirstDenialShortCircuit()
     {
@@ -216,6 +285,12 @@ public class AsiBackboneHotPathBenchmarks
         return Checksum(decision);
     }
 
+    /// <summary>
+    /// Benchmarks the evaluation of a policy that requires acknowledgment for an operation, resulting in a decision that indicates acknowledgment is required.
+    /// </summary>
+    /// <returns>
+    /// An integer checksum representing the policy evaluation outcome, used for validation in benchmarks.
+    /// </returns>
     [Benchmark(Description = "policy.acknowledgment_required")]
     public int PolicyAcknowledgmentRequired()
     {
@@ -223,6 +298,12 @@ public class AsiBackboneHotPathBenchmarks
         return Checksum(decision);
     }
 
+    /// <summary>
+    /// Benchmarks the evaluation of a policy that recommends escalation for an operation, resulting in a decision that indicates escalation is recommended.
+    /// </summary>
+    /// <returns>
+    /// An integer checksum representing the policy evaluation outcome, used for validation in benchmarks.
+    /// </returns>
     [Benchmark(Description = "policy.escalation_recommended")]
     public int PolicyEscalationRecommended()
     {
@@ -230,6 +311,12 @@ public class AsiBackboneHotPathBenchmarks
         return Checksum(decision);
     }
 
+    /// <summary>
+    /// Benchmarks the evaluation of a policy that treats constraint exceptions as denials, resulting in an overall denial decision when a constraint throws an exception during evaluation.
+    /// </summary>
+    /// <returns>
+    /// An integer checksum representing the policy evaluation outcome, used for validation in benchmarks.
+    /// </returns>
     [Benchmark(Description = "policy.constraint_exception_as_denial")]
     public int PolicyConstraintExceptionAsDenial()
     {
@@ -237,15 +324,35 @@ public class AsiBackboneHotPathBenchmarks
         return Checksum(decision);
     }
 
+    /// <summary>
+    /// Benchmarks the evaluation of an endpoint governance policy that allows the operation, resulting in a decision that indicates the endpoint can be executed.
+    /// </summary>
+    /// <returns>
+    /// An integer checksum representing the policy evaluation outcome, used for validation in benchmarks.
+    /// </returns>
     [Benchmark(Description = "endpoint_governance.policy_allow")]
     public int EndpointGovernancePolicyAllow() => endpointAllow.Evaluate();
 
+    /// <summary>
+    /// Benchmarks endpoint governance evaluation when the endpoint policy returns a warning decision.
+    /// </summary>
+    /// <returns>
+    /// An integer checksum representing the policy evaluation outcome, used for validation in benchmarks.
+    /// </returns>
     [Benchmark(Description = "endpoint_governance.policy_warning")]
     public int EndpointGovernancePolicyWarning() => endpointWarning.Evaluate();
 
+    /// <summary>
+    /// Benchmarks endpoint governance evaluation when the endpoint policy denies execution.
+    /// </summary>
+    /// <returns>An integer checksum representing the policy evaluation outcome, used for validation in benchmarks.</returns>
     [Benchmark(Description = "endpoint_governance.policy_deny")]
     public int EndpointGovernancePolicyDeny() => endpointDeny.Evaluate();
 
+    /// <summary>
+    /// Benchmarks draining a small batch of pending governance outbox entries.
+    /// </summary>
+    /// <returns>An integer checksum representing the policy evaluation outcome, used for validation in benchmarks.</returns>
     [Benchmark(Description = "outbox_drain.small_batch_25")]
     public int OutboxDrainSmallBatch25()
     {
@@ -253,6 +360,10 @@ public class AsiBackboneHotPathBenchmarks
         return entries.Count ^ entries[0].Metadata.Count;
     }
 
+    /// <summary>
+    /// Benchmarks draining a medium batch of pending governance outbox entries.
+    /// </summary>
+    /// <returns>An integer checksum representing the policy evaluation outcome, used for validation in benchmarks.</returns>
     [Benchmark(Description = "outbox_drain.medium_batch_100")]
     public int OutboxDrainMediumBatch100()
     {
@@ -260,9 +371,17 @@ public class AsiBackboneHotPathBenchmarks
         return entries.Count ^ entries[0].Metadata.Count;
     }
 
+    /// <summary>
+    /// Benchmarks resolving a scoped outbox drain service and draining a medium batch of pending entries.
+    /// </summary>
+    /// <returns>An integer checksum representing the policy evaluation outcome, used for validation in benchmarks.</returns>
     [Benchmark(Description = "outbox_drain.scoped_medium_batch_100")]
     public int OutboxDrainScopedMediumBatch100() => scopedOutbox100.Drain(BenchmarkDrainUtc);
 
+    /// <summary>
+    /// Benchmarks creating an audit residue directly from a governance decision and metadata.
+    /// </summary>
+    /// <returns>An integer checksum representing the policy evaluation outcome, used for validation in benchmarks.</returns>
     [Benchmark(Description = "audit_residue.from_decision")]
     public int AuditResidueFromDecision()
     {
@@ -283,6 +402,10 @@ public class AsiBackboneHotPathBenchmarks
         return Checksum(residue);
     }
 
+    /// <summary>
+    /// Benchmarks creating an audit residue through the builder without metadata.
+    /// </summary>
+    /// <returns>An integer checksum representing the policy evaluation outcome, used for validation in benchmarks.</returns>
     [Benchmark(Description = "audit_residue.builder_no_metadata")]
     public int AuditResidueBuilderNoMetadata()
     {
@@ -298,6 +421,10 @@ public class AsiBackboneHotPathBenchmarks
         return Checksum(residue);
     }
 
+    /// <summary>
+    /// Benchmarks creating an audit residue through the builder with one metadata entry.
+    /// </summary>
+    /// <returns>An integer checksum representing the policy evaluation outcome, used for validation in benchmarks.</returns>
     [Benchmark(Description = "audit_residue.builder_one_metadata")]
     public int AuditResidueBuilderOneMetadata()
     {
@@ -314,6 +441,10 @@ public class AsiBackboneHotPathBenchmarks
         return Checksum(residue);
     }
 
+    /// <summary>
+    /// Benchmarks creating an audit residue through the builder with multiple metadata entries.
+    /// </summary>
+    /// <returns>An integer checksum representing the policy evaluation outcome, used for validation in benchmarks.</returns>
     [Benchmark(Description = "audit_residue.builder_many_metadata")]
     public int AuditResidueBuilderManyMetadata()
     {

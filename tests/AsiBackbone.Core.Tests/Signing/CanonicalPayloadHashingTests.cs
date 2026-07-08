@@ -8,8 +8,14 @@ using Xunit;
 
 namespace AsiBackbone.Core.Tests.Signing;
 
+/// <summary>
+/// This class contains unit tests for verifying the behavior of canonical payload hashing in the AsiBackbone.Core library. It ensures that equivalent audit ledger records, audit residues, governance emission envelopes, and governance outbox entries produce stable canonical payloads and hashes, while meaningful changes result in different hashes. The tests also validate that allow-listed metadata participates in the hash computation, while other metadata does not. Additionally, it checks that signing metadata correctly reflects the signing hash and algorithm without implying a signature is present.
+/// </summary>
 public sealed class CanonicalPayloadHashingTests
 {
+    /// <summary>
+    /// This test verifies that two equivalent AuditLedgerRecord instances, which differ only in the order of reason codes and the presence of non-allow-listed metadata, produce the same canonical payload and hash. It ensures that the canonicalization process correctly normalizes the reason codes and filters out non-allow-listed metadata, resulting in a stable hash for equivalent records.
+    /// </summary>
     [Fact]
     public void EquivalentAuditLedgerRecordsProduceStableCanonicalPayloadAndHash()
     {
@@ -36,6 +42,9 @@ public sealed class CanonicalPayloadHashingTests
         Assert.Equal("record-1", firstHash.ArtifactId);
     }
 
+    /// <summary>
+    /// This test verifies that a meaningful change in an AuditLedgerRecord, such as adding an additional reason code, results in a different canonical payload and hash. It ensures that the canonicalization process correctly reflects changes in the record's content, leading to a distinct hash for records with different reason codes.
+    /// </summary>
     [Fact]
     public void MeaningfulAuditLedgerChangeChangesCanonicalHash()
     {
@@ -55,6 +64,9 @@ public sealed class CanonicalPayloadHashingTests
         Assert.NotEqual(firstHash.HashValue, secondHash.HashValue);
     }
 
+    /// <summary>
+    /// This test verifies that allow-listed metadata keys participate in the canonical hash computation, while other metadata keys do not. It ensures that changes to non-allow-listed metadata do not affect the hash, while changes to allow-listed metadata result in a different hash. This behavior is important for maintaining stable hashes for records with irrelevant metadata changes, while still capturing meaningful changes in the allow-listed metadata.
+    /// </summary>
     [Fact]
     public void AllowListedMetadataParticipatesInHashButOtherMetadataDoesNot()
     {
@@ -85,6 +97,9 @@ public sealed class CanonicalPayloadHashingTests
 
     private static readonly string[] expected = ["alpha", "beta"];
 
+    /// <summary>
+    /// This test verifies that when an AuditResidue has a blank AuditResidueId, the canonical payload uses the EventId as the artifact identifier. It also checks that reason codes are normalized (trimmed and deduplicated) and that metadata is filtered according to the allow-list specified in the CanonicalPayloadOptions. The test ensures that the canonical payload correctly reflects these transformations and produces the expected artifact type and identifier.
+    /// </summary>
     [Fact]
     public void AuditResiduePayloadUsesEventIdWhenResidueIdIsBlankAndNormalizesReasonCodesAndMetadata()
     {
@@ -121,6 +136,9 @@ public sealed class CanonicalPayloadHashingTests
         Assert.False(metadata.TryGetProperty("unsafe", out _));
     }
 
+    /// <summary>
+    /// This test verifies that the canonical payload for an AuditResidueLifecycleEvent correctly preserves the stage, correlation ID, and occurred UTC timestamp, while also filtering metadata according to the allow-list specified in the CanonicalPayloadOptions. It ensures that the canonical payload reflects the expected artifact type and identifier, and that only allow-listed metadata keys are included in the final payload.
+    /// </summary>
     [Fact]
     public void AuditResidueLifecyclePayloadPreservesStageCorrelationUtcAndFilteredMetadata()
     {
@@ -162,6 +180,9 @@ public sealed class CanonicalPayloadHashingTests
         Assert.False(metadata.TryGetProperty("unsafe", out _));
     }
 
+    /// <summary>
+    /// This test verifies that the canonical payload for a GovernanceEmissionEnvelope correctly handles the presence of a payload, lifecycle fields, and metadata filtering. It ensures that the canonical payload reflects the expected artifact type and identifier, and that only allow-listed metadata keys are included in both the envelope and payload metadata. The test also checks that lifecycle fields such as event type, lifecycle stage, and timestamps are preserved in the canonical payload.
+    /// </summary>
     [Fact]
     public void GovernanceEmissionEnvelopePayloadHandlesLifecycleFieldsPayloadPresenceAndMetadataFiltering()
     {
@@ -233,6 +254,9 @@ public sealed class CanonicalPayloadHashingTests
         Assert.Equal(128, payloadContent.GetProperty("sizeBytes").GetInt64());
     }
 
+    /// <summary>
+    /// This test verifies that when a GovernanceEmissionEnvelope is created without a payload and lifecycle fields, the canonical payload correctly represents these fields as null. It ensures that the canonicalization process handles omitted optional fields gracefully, resulting in a stable canonical payload that reflects the absence of these fields. The test checks that the payload and lifecycle fields are represented as null in the final canonical JSON output.
+    /// </summary>
     [Fact]
     public void GovernanceEmissionEnvelopePayloadWritesNullPayloadAndLifecycleFieldsWhenOmitted()
     {
@@ -253,6 +277,9 @@ public sealed class CanonicalPayloadHashingTests
         Assert.Equal(JsonValueKind.Null, content.GetProperty("lifecycleStageSequence").ValueKind);
     }
 
+    /// <summary>
+    /// This test verifies that the canonical payload for a GovernanceOutboxEntry correctly handles error, retry, provider, dead letter, and metadata fields. It ensures that the canonical payload reflects the expected artifact type and identifier, and that only allow-listed metadata keys are included in the final payload.
+    /// </summary>
     [Fact]
     public void GovernanceOutboxEntryPayloadHandlesErrorRetryProviderDeadLetterAndMetadataFields()
     {
@@ -311,6 +338,9 @@ public sealed class CanonicalPayloadHashingTests
         Assert.False(metadata.TryGetProperty("unsafe", out _));
     }
 
+    /// <summary>
+    /// This test verifies that when a GovernanceOutboxEntry is created without optional fields such as dead letter reason, last error, next retry timestamp, provider name, and provider record ID, the canonical payload correctly represents these fields as null. It ensures that the canonicalization process handles omitted optional fields gracefully, resulting in a stable canonical payload that reflects the absence of these fields. The test checks that the optional fields are represented as null in the final canonical JSON output.
+    /// </summary>
     [Fact]
     public void GovernanceOutboxEntryPayloadWritesNullOptionalFieldsWhenAbsent()
     {
@@ -332,6 +362,9 @@ public sealed class CanonicalPayloadHashingTests
         Assert.Equal(JsonValueKind.Null, content.GetProperty("providerRecordId").ValueKind);
     }
 
+    /// <summary>
+    /// This test verifies that the canonical hash of a GovernanceEmissionEnvelope is stable when only non-allow-listed metadata changes, and that a meaningful change in the payload content results in a different hash.
+    /// </summary>
     [Fact]
     public void EquivalentGovernanceEmissionPayloadsProduceStableHashAndMeaningfulPayloadChangeChangesHash()
     {
@@ -369,6 +402,9 @@ public sealed class CanonicalPayloadHashingTests
         Assert.NotEqual(firstHash, meaningfulChangeHash);
     }
 
+    /// <summary>
+    /// This test verifies that the canonical hash of a GovernanceOutboxEntry correctly binds the artifact type and identifier, ensuring that the hash reflects the unique identity of the outbox entry.
+    /// </summary>
     [Fact]
     public void OutboxEntryHashBindsArtifactTypeAndIdentifier()
     {
@@ -417,6 +453,9 @@ public sealed class CanonicalPayloadHashingTests
         Assert.Contains("\"artifactType\":\"asibackbone.governance-outbox-entry\"", payloadToHash.CanonicalJson, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// This test verifies that the SigningMetadata generated from a CanonicalPayloadHash correctly carries the signing hash and hash algorithm, without implying that a signature is present. It ensures that the SigningMetadata reflects the correct artifact type and identifier, and that it indicates the absence of a signature.
+    /// </summary>
     [Fact]
     public void HashMetadataCarriesSigningHashWithoutImplyingSignature()
     {

@@ -10,8 +10,17 @@ using Xunit;
 
 namespace AsiBackbone.Testing.Tests.Contracts;
 
+/// <summary>
+/// Tests for the AsiBackbone contract fixtures to ensure that the test harnesses and contracts behave as expected.
+/// </summary>
 public sealed class AsiBackboneContractFixtureTests
 {
+    /// <summary>
+    /// Verifies that the policy evaluator contract passes when using the test harness policy evaluator with a deny-all policy configuration.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task PolicyEvaluatorContractPassesForHarnessEvaluator()
     {
@@ -29,6 +38,12 @@ public sealed class AsiBackboneContractFixtureTests
         Assert.Contains("contract.policy_denied", decision.ReasonCodes);
     }
 
+    /// <summary>
+    /// Verifies that the capability grant contract passes when using the test harness capability grant validator with a deny-all configuration for capability grants.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task CapabilityGrantContractPassesWhenInvalidGrantFailsClosed()
     {
@@ -43,6 +58,12 @@ public sealed class AsiBackboneContractFixtureTests
         Assert.Contains("contract.capability_denied", decision.ReasonCodes);
     }
 
+    /// <summary>
+    /// Verifies that the capability grant contract fails when using a capability grant validator that incorrectly allows an invalid grant, ensuring that the contract correctly identifies this violation.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task CapabilityGrantContractFailsWhenInvalidGrantAllows()
     {
@@ -54,6 +75,12 @@ public sealed class AsiBackboneContractFixtureTests
         Assert.Contains("must not return Allow", exception.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Verifies that the audit sink contract passes when using the test audit sink, ensuring that valid audit residues are accepted and recorded correctly.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task AuditSinkContractPassesForTestAuditSink()
     {
@@ -66,6 +93,12 @@ public sealed class AsiBackboneContractFixtureTests
         Assert.Equal("contract-event", auditSink.Entries[0].EventId);
     }
 
+    /// <summary>
+    /// Verifies that the audit sink contract fails when an audit residue is missing a required event ID, ensuring that the contract correctly identifies this violation.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public void DecisionContractRejectsAuditResidueWithoutEventId()
     {

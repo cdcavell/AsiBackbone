@@ -11,6 +11,12 @@ namespace AsiBackbone.Core.Tests.Evaluation;
 /// </summary>
 public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
 {
+    /// <summary>
+    /// Verifies that a threat contributor that returns NoThreat allows the evaluation to proceed and runs the contributor.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation of evaluating the policy with a threat contributor that returns NoThreat.
+    /// </returns>
     [Fact]
     public async Task EvaluateNoThreatContributorAllowsDecisionAndRunsContributor()
     {
@@ -34,6 +40,12 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
         Assert.Empty(decision.ReasonCodes);
     }
 
+    /// <summary>
+    /// Verifies that a threat contributor that returns null is ignored and does not affect the evaluation outcome.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation of evaluating the policy with a threat contributor that returns null.
+    /// </returns>
     [Fact]
     public async Task EvaluateNullThreatAssessmentIsIgnored()
     {
@@ -48,6 +60,12 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
         Assert.Empty(decision.ReasonCodes);
     }
 
+    /// <summary>
+    /// Verifies that a threat contributor that returns an Allowed outcome throws an InvalidOperationException and skips constraint evaluation.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation of evaluating the policy with a threat contributor that returns an Allowed outcome.
+    /// </returns>
     [Fact]
     public async Task EvaluateActionableAllowedThreatRecommendationThrowsInvalidOperationExceptionAndSkipsConstraints()
     {
@@ -77,6 +95,12 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
         Assert.Contains("ThreatAssessment.NoThreat", exception.Message);
     }
 
+    /// <summary>
+    /// Verifies that a threat contributor that returns a Deferred outcome results in a deferred decision and includes the reason code from the threat assessment.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation of evaluating the policy with a threat contributor that returns a Deferred outcome.
+    /// </returns>
     [Fact]
     public async Task EvaluateDeferredThreatRecommendationReturnsDeferredDecision()
     {
@@ -99,6 +123,12 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
         Assert.Equal("threat.region_policy_mismatch", Assert.Single(decision.ReasonCodes));
     }
 
+    /// <summary>
+    /// Verifies that a threat contributor that returns an AcknowledgmentRequired outcome results in a decision that requires acknowledgment and includes the reason code from the threat assessment.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation of evaluating the policy with a threat contributor that returns an AcknowledgmentRequired outcome.
+    /// </returns>
     [Fact]
     public async Task EvaluateAcknowledgmentThreatRecommendationReturnsAcknowledgmentRequiredDecision()
     {
@@ -121,6 +151,12 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
         Assert.Equal("threat.audit_ack_required", Assert.Single(decision.ReasonCodes));
     }
 
+    /// <summary>
+    /// Verifies that multiple threat contributors can aggregate denied reasons with metadata and that the evaluation order is preserved.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation of evaluating the policy with multiple threat contributors that return denied reasons with metadata.
+    /// </returns>
     [Fact]
     public async Task EvaluateMultipleThreatContributorsCanAggregateDeniedReasonsWithMetadata()
     {
@@ -174,6 +210,12 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
             decision.Reasons.Single(reason => reason.Code == "threat.capability_token_mismatch").Metadata["threat.severity"]);
     }
 
+    /// <summary>
+    /// Verifies that a threat contributor that throws an exception results in a denied decision with the default reason code for threat contributor exceptions when the evaluator is configured to fail closed.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation of evaluating the policy with a threat contributor that throws an exception, resulting in a denied decision with the default reason code for threat contributor exceptions when the evaluator is configured to fail closed.
+    /// </returns>
     [Fact]
     public async Task EvaluateThreatContributorExceptionFailsClosedByDefault()
     {
@@ -194,6 +236,12 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
             Assert.Single(decision.Reasons).Metadata["threat.contributor"]);
     }
 
+    /// <summary>
+    /// Verifies that a threat contributor that throws an exception propagates the exception when the evaluator is configured to not fail closed.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation of evaluating the policy with a threat contributor that throws an exception, propagating the exception when the evaluator is configured to not fail closed.
+    /// </returns>
     [Fact]
     public async Task EvaluateThreatContributorExceptionPropagatesWhenFailClosedDisabled()
     {
@@ -211,6 +259,12 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
             async () => await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken));
     }
 
+    /// <summary>
+    /// Verifies that a threat contributor that returns a warning outcome cannot be downgraded to an allow decision by the decision policy by default.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation of evaluating the policy with a threat contributor that returns a warning outcome, ensuring that it cannot be downgraded to an allow decision by the decision policy by default.
+    /// </returns>
     [Fact]
     public async Task EvaluateThreatWarningCannotBeDowngradedToAllowByDecisionPolicyByDefault()
     {
@@ -234,6 +288,12 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
         Assert.Equal("threat.input_malformed", Assert.Single(decision.ReasonCodes));
     }
 
+    /// <summary>
+    /// Verifies that a threat contributor that returns a warning outcome can be downgraded to an allow decision by the decision policy when the evaluator is configured to allow downgrades.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation of evaluating the policy with a threat contributor that returns a warning outcome, ensuring that it can be downgraded to an allow decision by the decision policy when the evaluator is configured to allow downgrades.
+    /// </returns>
     [Fact]
     public async Task EvaluateThreatWarningCanBeDowngradedWhenProtectionDisabled()
     {
@@ -260,6 +320,12 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
         Assert.Empty(decision.ReasonCodes);
     }
 
+    /// <summary>
+    /// Verifies that a threat contributor that returns a warning outcome results in a warning decision when there are no constraints and the policy allows warnings.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation of evaluating the policy with a threat contributor that returns a warning outcome, ensuring that it results in a warning decision when there are no constraints and the policy allows warnings.
+    /// </returns>
     [Fact]
     public async Task EvaluateThreatWarningWithoutConstraintsReturnsWarningWhenEmptyPolicyAllows()
     {
@@ -281,6 +347,12 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
         Assert.Equal("threat.audit_integrity_risk", Assert.Single(decision.ReasonCodes));
     }
 
+    /// <summary>
+    /// Verifies that a threat contributor that returns a warning outcome results in a denied decision with the default reason code for no constraints when there are no constraints and the policy denies warnings.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation of evaluating the policy with a threat contributor that returns a warning outcome, ensuring that it results in a denied decision with the default reason code for no constraints when there are no constraints and the policy denies warnings.
+    /// </returns>
     [Fact]
     public async Task EvaluateThreatWarningWithoutConstraintsReturnsNoConstraintDenialWhenEmptyPolicyDenies()
     {
@@ -309,6 +381,9 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
             Assert.Single(decision.ReasonCodes));
     }
 
+    /// <summary>
+    /// Verifies that a threat assessment with an out-of-range confidence value throws an ArgumentOutOfRangeException when created.
+    /// </summary>
     [Fact]
     public void ThreatAssessmentRejectsOutOfRangeConfidence()
     {
@@ -321,6 +396,9 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
             confidence: 1.1D));
     }
 
+    /// <summary>
+    /// Verifies that a threat assessment can merge custom metadata into the operation reason and that the metadata is normalized (trimmed and lowercased).
+    /// </summary>
     [Fact]
     public void ThreatAssessmentOperationReasonMergesCustomMetadata()
     {

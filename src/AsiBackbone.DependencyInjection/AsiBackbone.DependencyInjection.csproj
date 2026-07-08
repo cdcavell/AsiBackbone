@@ -12,6 +12,7 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>accountable-systems-infrastructure;asi-backbone;dotnet;governance;dependency-injection;builder;configuration;provider-coordination</PackageTags>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <AsiBackboneSuppressMissingXmlDocs>true</AsiBackboneSuppressMissingXmlDocs>
   </PropertyGroup>
 
   <ItemGroup>

@@ -2,6 +2,9 @@ using Xunit;
 
 namespace AsiBackbone.AspNetCore.Tests;
 
+/// <summary>
+/// This class contains unit tests for the assembly marker type in the AsiBackbone.AspNetCore assembly.
+/// </summary>
 public sealed class AssemblyMarkerTests
 {
     /// <summary>

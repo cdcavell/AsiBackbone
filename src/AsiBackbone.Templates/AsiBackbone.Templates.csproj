@@ -15,6 +15,7 @@
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
     <NoDefaultExcludes>true</NoDefaultExcludes>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <AsiBackboneSuppressMissingXmlDocs>true</AsiBackboneSuppressMissingXmlDocs>
     <NoWarn>$(NoWarn);NU5128</NoWarn>
   </PropertyGroup>
 

@@ -4,11 +4,17 @@ using Xunit;
 
 namespace AsiBackbone.Core.Tests.CapabilityTokens;
 
+/// <summary>
+/// Tests for the branches of the CapabilityGrantResult class, including both use results and validation results.
+/// </summary>
 public sealed class CapabilityGrantResultBranchTests
 {
     private static readonly DateTimeOffset IssuedUtc = new(2026, 6, 18, 12, 0, 0, TimeSpan.Zero);
     private static readonly DateTimeOffset ExpiresUtc = new(2026, 6, 18, 12, 30, 0, TimeSpan.Zero);
 
+    /// <summary>
+    /// Tests that the Accepted factory method of CapabilityGrantUseResult correctly normalizes the success branch, ensuring that the result indicates acceptance, has the correct state, use count, and no failure code or message.
+    /// </summary>
     [Fact]
     public void UseResultAcceptedNormalizesSuccessBranches()
     {
@@ -21,6 +27,15 @@ public sealed class CapabilityGrantResultBranchTests
         Assert.Null(result.FailureMessage);
     }
 
+    /// <summary>
+    /// Tests that the failure factory methods of CapabilityGrantUseResult correctly normalize the failure branches, ensuring that the result indicates non-acceptance, has the correct state, use count, failure code, and normalized failure message.
+    /// </summary>
+    /// <param name="failureMessage">The failure message to test.</param>
+    /// <param name="expectedState">The expected state of the result.</param>
+    /// <param name="expectedFailureCode">The expected failure code of the result.</param>
+    /// <param name="expectedUseCount">The expected use count of the result.</param>
+    /// <exception cref="ArgumentException"></exception>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
     [Theory]
     [InlineData(" use limit reached ", GrantUseState.UseLimitExceeded, "capability.use-limit-exceeded", 3)]
     [InlineData(" stopped ", GrantUseState.Stopped, "capability.grant-stopped", 0)]
@@ -49,6 +64,9 @@ public sealed class CapabilityGrantResultBranchTests
         Assert.Equal(failureMessage.Trim(), result.FailureMessage);
     }
 
+    /// <summary>
+    /// Tests that the factory methods of CapabilityGrantUseResult throw an ArgumentOutOfRangeException when provided with a negative use count, ensuring that invalid input is correctly handled.
+    /// </summary>
     [Fact]
     public void UseResultRejectsNegativeUseCount()
     {
@@ -56,6 +74,9 @@ public sealed class CapabilityGrantResultBranchTests
         _ = Assert.Throws<ArgumentOutOfRangeException>(() => CapabilityGrantUseResult.UseLimitExceeded(-1));
     }
 
+    /// <summary>
+    /// Tests that the Valid factory method of CapabilityGrantValidationResult correctly includes safe metadata and indicates that the grant should be allowed, ensuring that the result reflects a valid grant with the expected properties.
+    /// </summary>
     [Fact]
     public void ValidationResultValidIncludesSafeMetadataAndAllows()
     {
@@ -77,6 +98,9 @@ public sealed class CapabilityGrantResultBranchTests
         Assert.Equal("robot-arm-1", result.SafeMetadata["resource_binding"]);
     }
 
+    /// <summary>
+    /// Tests that the Failed factory method of CapabilityGrantValidationResult correctly normalizes the failure message and metadata, ensuring that the result reflects a failed validation with the expected properties and normalized values.
+    /// </summary>
     [Fact]
     public void ValidationResultFailedNormalizesFailureMessageAndMetadata()
     {
@@ -104,6 +128,9 @@ public sealed class CapabilityGrantResultBranchTests
         Assert.Equal("capability.scope-missing", result.SafeMetadata["failure_code"]);
     }
 
+    /// <summary>
+    /// Tests that the Failed factory method of CapabilityGrantValidationResult omits blank optional safe metadata, ensuring that the result does not include any empty or whitespace-only values in its safe metadata dictionary.
+    /// </summary>
     [Fact]
     public void ValidationResultOmitsBlankOptionalSafeMetadata()
     {
@@ -129,6 +156,9 @@ public sealed class CapabilityGrantResultBranchTests
         Assert.False(result.SafeMetadata.ContainsKey("resource_binding"));
     }
 
+    /// <summary>
+    /// Tests that the factory methods of CapabilityGrantValidationResult throw appropriate exceptions when provided with null or invalid inputs, ensuring that the methods enforce input validation and handle error cases correctly.
+    /// </summary>
     [Fact]
     public void ValidationResultFactoriesRejectNullInputs()
     {

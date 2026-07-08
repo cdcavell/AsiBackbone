@@ -3,8 +3,14 @@ using Xunit;
 
 namespace AsiBackbone.Core.Tests.CapabilityTokens;
 
+/// <summary>
+/// Unit tests for <see cref="CapabilityGrantValidationOptions"/> class.
+/// </summary>
 public sealed class CapabilityGrantValidationOptionsTests
 {
+    /// <summary>
+    /// Tests that the <see cref="CapabilityGrantValidationOptions.Create"/> method correctly normalizes optional bindings and scopes, ensuring that whitespace is trimmed and duplicates are removed.
+    /// </summary>
     [Fact]
     public void CreateNormalizesOptionalBindingsAndScopes()
     {
@@ -45,6 +51,9 @@ public sealed class CapabilityGrantValidationOptionsTests
         Assert.Equal(3, options.MaxUseCount);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="CapabilityGrantValidationOptions.Create"/> method uses empty scopes and null bindings for missing or whitespace-only inputs, ensuring that the options are properly initialized.
+    /// </summary>
     [Fact]
     public void CreateUsesEmptyScopesAndNullBindingsForMissingOrWhitespaceInputs()
     {
@@ -75,6 +84,9 @@ public sealed class CapabilityGrantValidationOptionsTests
         Assert.Equal(1, options.MaxUseCount);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="CapabilityGrantValidationOptions.Create"/> method uses empty scopes when all provided scope entries normalize away to empty strings, ensuring that the options are properly initialized with no scopes.
+    /// </summary>
     [Fact]
     public void CreateUsesEmptyScopesWhenAllScopeEntriesNormalizeAway()
     {
@@ -83,6 +95,9 @@ public sealed class CapabilityGrantValidationOptionsTests
         Assert.Empty(options.Scopes);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="CapabilityGrantValidationOptions.Create"/> method throws an <see cref="ArgumentOutOfRangeException"/> when a non-positive maximum use count is provided, ensuring that the options enforce valid usage constraints.
+    /// </summary>
     [Fact]
     public void CreateRejectsNonPositiveMaximumUseCount()
     {

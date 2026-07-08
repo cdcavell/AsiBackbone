@@ -12,6 +12,7 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>accountable-systems-infrastructure;asi-backbone;dotnet;governance;in-memory;non-durable;storage;local-validation;testing</PackageTags>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <AsiBackboneSuppressMissingXmlDocs>true</AsiBackboneSuppressMissingXmlDocs>
   </PropertyGroup>
 
   <ItemGroup>

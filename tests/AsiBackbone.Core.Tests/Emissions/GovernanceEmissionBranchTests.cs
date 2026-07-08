@@ -10,6 +10,9 @@ namespace AsiBackbone.Core.Tests.Emissions;
 /// </summary>
 public sealed class GovernanceEmissionBranchTests
 {
+    /// <summary>
+    /// Tests that creating a governance emission envelope with an invalid lifecycle stage throws an exception.
+    /// </summary>
     [Fact]
     public void CreateRejectsInvalidLifecycleStageWhenSupplied()
     {
@@ -19,6 +22,21 @@ public sealed class GovernanceEmissionBranchTests
                 lifecycleStage: (AuditResidueLifecycleStage)999));
     }
 
+    /// <summary>
+    /// Tests that creating a governance emission envelope with any of the supported correlation fields results in HasCorrelation being true, and that when all are null, HasCorrelation is false.
+    /// </summary>
+    /// <param name="correlationId">
+    /// The correlation ID for the emission envelope.
+    /// </param>
+    /// <param name="traceId">
+    /// The trace ID for the emission envelope.
+    /// </param>
+    /// <param name="auditResidueId">
+    /// The audit residue ID for the emission envelope.
+    /// </param>
+    /// <param name="expectedHasCorrelation">
+    /// The expected value of the HasCorrelation property.
+    /// </param>
     [Theory]
     [InlineData(null, null, null, false)]
     [InlineData(" correlation-123 ", null, null, true)]
@@ -39,6 +57,9 @@ public sealed class GovernanceEmissionBranchTests
         Assert.Equal(expectedHasCorrelation, envelope.HasCorrelation);
     }
 
+    /// <summary>
+    /// Tests that when creating a governance emission envelope from an audit residue, if the caller-supplied metadata contains keys that overlap with the residue's metadata, the caller's values take precedence in the resulting envelope's metadata.
+    /// </summary>
     [Fact]
     public void FromResidueUsesCallerMetadataWhenKeysOverlapResidueMetadata()
     {
@@ -68,6 +89,9 @@ public sealed class GovernanceEmissionBranchTests
         Assert.Equal("added", envelope.Metadata["caller-only"]);
     }
 
+    /// <summary>
+    /// Tests that when creating a governance emission envelope from an audit residue lifecycle event, if the caller-supplied metadata contains keys that overlap with the lifecycle event's metadata, the caller's values take precedence in the resulting envelope's metadata.
+    /// </summary>
     [Fact]
     public void FromLifecycleEventUsesCallerMetadataWhenKeysOverlapLifecycleMetadata()
     {
@@ -95,6 +119,9 @@ public sealed class GovernanceEmissionBranchTests
         Assert.Equal("added", envelope.Metadata["caller-only"]);
     }
 
+    /// <summary>
+    /// Tests that creating a governance emission envelope with null, empty, or blank metadata results in an empty metadata view in the resulting envelope.
+    /// </summary>
     [Fact]
     public void CreateReturnsEmptyMetadataViewForNullEmptyAndBlankMetadata()
     {
@@ -119,6 +146,9 @@ public sealed class GovernanceEmissionBranchTests
         Assert.Empty(blankMetadataEnvelope.Metadata);
     }
 
+    /// <summary>
+    /// Tests that creating a governance emission envelope with optional string parameters trims whitespace and normalizes blank strings to null in the resulting envelope.
+    /// </summary>
     [Fact]
     public void CreateTrimsOptionalStringsAndNormalizesBlankStringsToNull()
     {
@@ -160,6 +190,9 @@ public sealed class GovernanceEmissionBranchTests
         Assert.True(envelope.HasCorrelation);
     }
 
+    /// <summary>
+    /// Tests that creating a governance emission payload trims whitespace from optional string parameters, normalizes blank strings to null, and rejects invalid inputs.
+    /// </summary>
     [Fact]
     public void PayloadCreateTrimsOptionalStringsNormalizesMetadataAndRejectsInvalidInputs()
     {
@@ -186,6 +219,9 @@ public sealed class GovernanceEmissionBranchTests
         _ = Assert.Throws<ArgumentException>(() => GovernanceEmissionPayload.Create(" "));
     }
 
+    /// <summary>
+    /// Tests that creating governance emission results and errors trims whitespace from optional string parameters, normalizes blank strings to null, and rejects invalid inputs.
+    /// </summary>
     [Fact]
     public void ResultFactoriesNormalizeOptionalStringsAndMetadata()
     {
@@ -216,6 +252,9 @@ public sealed class GovernanceEmissionBranchTests
         Assert.True(failed.ShouldRetry);
     }
 
+    /// <summary>
+    /// Tests that creating a governance emission error trims whitespace from optional string parameters and rejects blank required values.
+    /// </summary>
     [Fact]
     public void ErrorCreateTrimsOptionalStringsAndRejectsBlankRequiredValues()
     {

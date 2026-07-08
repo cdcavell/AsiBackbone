@@ -11,6 +11,12 @@ namespace AsiBackbone.Core.Tests.Outbox;
 /// </summary>
 public sealed class GovernanceOutboxDrainSmokeTests
 {
+    /// <summary>
+    /// Smoke test for the no-op governance emitter that returns a delivered result without an external provider.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task NoOpGovernanceEmitterReturnsDeliveredResultWithoutExternalProvider()
     {
@@ -28,6 +34,12 @@ public sealed class GovernanceOutboxDrainSmokeTests
         Assert.Equal("outbox-drain-validation", result.Metadata["emitter.purpose"]);
     }
 
+    /// <summary>
+    /// Smoke test for the outbox drain that enqueues a pending entry, drains it to the no-op sink, and marks it as delivered.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task DrainAsyncHandsPendingEntryToNoOpSinkAndMarksDelivered()
     {
@@ -61,6 +73,12 @@ public sealed class GovernanceOutboxDrainSmokeTests
         Assert.DoesNotContain(pendingEntries, pendingEntry => pendingEntry.OutboxEntryId == entry.OutboxEntryId);
     }
 
+    /// <summary>
+    /// Smoke test for the outbox drain that enqueues a pending entry, drains it to a retryable failure result, and ensures the local outbox record is not lost and is retried after the specified retry time.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task DrainAsyncRetryableFailureDoesNotLoseLocalOutboxRecord()
     {

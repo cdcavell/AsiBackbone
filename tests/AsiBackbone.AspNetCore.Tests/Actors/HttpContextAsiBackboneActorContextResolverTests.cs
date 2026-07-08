@@ -7,8 +7,14 @@ using Xunit;
 
 namespace AsiBackbone.AspNetCore.Tests.Actors;
 
+/// <summary>
+/// Unit tests for <see cref="HttpContextAsiBackboneActorContextResolver"/> class.
+/// </summary>
 public sealed class HttpContextAsiBackboneActorContextResolverTests
 {
+    /// <summary>
+    /// Tests that the <see cref="HttpContextAsiBackboneActorContextResolver.ResolveActorContext"/> method correctly maps an authenticated user from default claim types.
+    /// </summary>
     [Fact]
     public void ResolveActorContextMapsAuthenticatedUserFromDefaultClaims()
     {
@@ -30,6 +36,9 @@ public sealed class HttpContextAsiBackboneActorContextResolverTests
         Assert.True(actorContext.IsAuthenticated);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="HttpContextAsiBackboneActorContextResolver.ResolveActorContext"/> method correctly uses configured claim types and actor type when resolving the actor context.
+    /// </summary>
     [Fact]
     public void ResolveActorContextUsesConfiguredClaimTypesAndActorType()
     {
@@ -59,6 +68,9 @@ public sealed class HttpContextAsiBackboneActorContextResolverTests
         Assert.True(actorContext.IsAuthenticated);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="HttpContextAsiBackboneActorContextResolver.ResolveActorContext"/> method correctly maps a system actor type to the system context.
+    /// </summary>
     [Fact]
     public void ResolveActorContextMapsSystemActorTypeToSystemContext()
     {
@@ -80,6 +92,9 @@ public sealed class HttpContextAsiBackboneActorContextResolverTests
         Assert.True(actorContext.IsAuthenticated);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="HttpContextAsiBackboneActorContextResolver.ResolveActorContext"/> method correctly maps an agent actor type to the agent context.
+    /// </summary>
     [Fact]
     public void ResolveActorContextMapsAgentActorType()
     {
@@ -102,6 +117,9 @@ public sealed class HttpContextAsiBackboneActorContextResolverTests
         Assert.True(actorContext.IsAuthenticated);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="HttpContextAsiBackboneActorContextResolver.ResolveActorContext"/> method correctly maps an unknown actor type claim to the unknown context.
+    /// </summary>
     [Fact]
     public void ResolveActorContextMapsUnknownActorTypeClaimToUnknownContext()
     {
@@ -122,6 +140,9 @@ public sealed class HttpContextAsiBackboneActorContextResolverTests
         Assert.False(actorContext.IsAuthenticated);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="HttpContextAsiBackboneActorContextResolver.ResolveActorContext"/> method falls back to the configured default actor type when the claim is invalid.
+    /// </summary>
     [Fact]
     public void ResolveActorContextFallsBackToConfiguredDefaultActorTypeWhenClaimIsInvalid()
     {
@@ -144,6 +165,9 @@ public sealed class HttpContextAsiBackboneActorContextResolverTests
         Assert.True(actorContext.IsAuthenticated);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="HttpContextAsiBackboneActorContextResolver.ResolveActorContext"/> method falls back to the human actor type when the claim is undefined or unrecognized.
+    /// </summary>
     [Fact]
     public void ResolveActorContextFallsBackToHumanForUndefinedParsedActorType()
     {
@@ -164,6 +188,9 @@ public sealed class HttpContextAsiBackboneActorContextResolverTests
         Assert.True(actorContext.IsAuthenticated);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="HttpContextAsiBackboneActorContextResolver.ResolveActorContext"/> method correctly skips blank configured claim types and blank claim values when resolving the actor context.
+    /// </summary>
     [Fact]
     public void ResolveActorContextSkipsBlankConfiguredClaimTypesAndBlankClaimValues()
     {
@@ -190,6 +217,9 @@ public sealed class HttpContextAsiBackboneActorContextResolverTests
         Assert.Equal(AsiBackboneActorType.Human, actorContext.ActorType);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="HttpContextAsiBackboneActorContextResolver.ResolveActorContext"/> method correctly represents an unauthenticated request without throwing an exception.
+    /// </summary>
     [Fact]
     public void ResolveActorContextRepresentsUnauthenticatedRequestWithoutThrowing()
     {
@@ -209,6 +239,9 @@ public sealed class HttpContextAsiBackboneActorContextResolverTests
         Assert.False(actorContext.IsAuthenticated);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="HttpContextAsiBackboneActorContextResolver.ResolveActorContext"/> method correctly uses the configured unauthenticated display name when resolving the actor context for an unauthenticated request.
+    /// </summary>
     [Fact]
     public void ResolveActorContextUsesConfiguredUnauthenticatedDisplayName()
     {
@@ -230,6 +263,9 @@ public sealed class HttpContextAsiBackboneActorContextResolverTests
         Assert.False(actorContext.IsAuthenticated);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="HttpContextAsiBackboneActorContextResolver.ResolveActorContext"/> method correctly represents a missing actor identifier claim without throwing an exception.
+    /// </summary>
     [Fact]
     public void ResolveActorContextRepresentsMissingActorIdClaimWithoutThrowing()
     {
@@ -248,6 +284,9 @@ public sealed class HttpContextAsiBackboneActorContextResolverTests
         Assert.False(actorContext.IsAuthenticated);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="HttpContextAsiBackboneActorContextResolver.ResolveActorContext"/> method correctly represents a background scenario (no HTTP context) without throwing an exception.
+    /// </summary>
     [Fact]
     public void ResolveActorContextRepresentsBackgroundScenarioWithoutThrowing()
     {
@@ -264,6 +303,9 @@ public sealed class HttpContextAsiBackboneActorContextResolverTests
         Assert.False(actorContext.IsAuthenticated);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="HttpContextAsiBackboneActorContextResolver"/> constructor throws an <see cref="ArgumentNullException"/> when provided with a null <see cref="IHttpContextAccessor"/>.
+    /// </summary>
     [Fact]
     public void ConstructorRejectsNullHttpContextAccessor()
     {
@@ -271,6 +313,9 @@ public sealed class HttpContextAsiBackboneActorContextResolverTests
             new HttpContextAsiBackboneActorContextResolver(null!, Options.Create(new AsiBackboneHttpActorContextOptions())));
     }
 
+    /// <summary>
+    /// Tests that the <see cref="HttpContextAsiBackboneActorContextResolver"/> constructor throws an <see cref="ArgumentNullException"/> when provided with a null <see cref="IOptions{AsiBackboneHttpActorContextOptions}"/>.
+    /// </summary>
     [Fact]
     public void ConstructorRejectsNullOptionsWrapper()
     {
@@ -278,6 +323,9 @@ public sealed class HttpContextAsiBackboneActorContextResolverTests
             new HttpContextAsiBackboneActorContextResolver(new HttpContextAccessor(), null!));
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AsiBackboneHttpActorContextOptions"/> validation rejects invalid actor identifier claim types.
+    /// </summary>
     [Theory]
     [InlineData(null)]
     [InlineData("empty")]
@@ -294,6 +342,9 @@ public sealed class HttpContextAsiBackboneActorContextResolverTests
         Assert.Contains("actor identifier claim type", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AsiBackboneHttpActorContextOptions"/> validation rejects null display name claim types.
+    /// </summary>
     [Fact]
     public void ActorOptionsRejectNullDisplayNameClaimTypes()
     {
@@ -307,6 +358,9 @@ public sealed class HttpContextAsiBackboneActorContextResolverTests
         Assert.Contains(nameof(AsiBackboneHttpActorContextOptions.DisplayNameClaimTypes), exception.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AsiBackboneHttpActorContextOptions"/> validation rejects blank actor type claim types.
+    /// </summary>
     [Theory]
     [InlineData(null)]
     [InlineData("")]

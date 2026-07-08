@@ -11,6 +11,10 @@ namespace AsiBackbone.Core.Tests.Evaluation;
 /// </summary>
 public sealed class DefaultAsiBackbonePolicyEvaluatorAuditMessageBehaviorTests
 {
+    /// <summary>
+    /// This test ensures that when a full evaluation is performed, and multiple constraints produce denials, the audit warnings are suppressed in the final decision, and all denials are aggregated into the decision's reason codes.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task FullEvaluationDeniedDecisionSuppressesAuditWarningsAndAggregatesDenials()
     {
@@ -59,6 +63,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorAuditMessageBehaviorTests
         Assert.DoesNotContain("threat.warning", decision.ReasonCodes);
     }
 
+    /// <summary>
+    /// This test ensures that when short-circuit evaluation is enabled, and a denial is encountered after an audit warning, the evaluation stops at the first denial, preserving the audit warning in the final decision, and skipping any subsequent constraints.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task ShortCircuitDeniedDecisionPreservesEvaluatedAuditWarningsAndSkipsLaterConstraints()
     {

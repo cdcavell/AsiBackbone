@@ -1,0 +1,4 @@
+# Projects listed here run with CS1591 as an error in Enforce mode.
+# Start empty to keep the 2.x line stable while inventory is collected.
+# Add a project only after its public API XML documentation inventory is clean
+# or after remaining exceptions are intentionally documented.

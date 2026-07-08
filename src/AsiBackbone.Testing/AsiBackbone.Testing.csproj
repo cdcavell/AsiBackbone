@@ -12,6 +12,7 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>accountable-systems-infrastructure;asi-backbone;dotnet;governance;testing;test-harness;aspnetcore;policy-evaluation;audit</PackageTags>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <AsiBackboneSuppressMissingXmlDocs>true</AsiBackboneSuppressMissingXmlDocs>
   </PropertyGroup>
 
   <ItemGroup>

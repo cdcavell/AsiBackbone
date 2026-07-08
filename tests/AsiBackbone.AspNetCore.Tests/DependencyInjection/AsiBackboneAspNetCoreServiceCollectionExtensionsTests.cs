@@ -15,8 +15,14 @@ using Xunit;
 
 namespace AsiBackbone.AspNetCore.Tests.DependencyInjection;
 
+/// <summary>
+/// Unit tests for the <see cref="AsiBackboneAspNetCoreServiceCollectionExtensions"/> class.
+/// </summary>
 public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
 {
+    /// <summary>
+    /// Tests that the <see cref="AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection)"/> method registers the default options correctly.
+    /// </summary>
     [Fact]
     public void AddAsiBackboneAspNetCoreRegistersDefaultOptions()
     {
@@ -37,6 +43,9 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
         Assert.Contains("Traceparent", options.CorrelationIdHeaderNames);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection)"/> method registers the actor context services correctly.
+    /// </summary>
     [Fact]
     public void AddAsiBackboneAspNetCoreRegistersActorContextServices()
     {
@@ -56,6 +65,9 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
         Assert.Equal("actor_type", options.ActorTypeClaimType);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection)"/> method registers the request correlation services correctly.
+    /// </summary>
     [Fact]
     public void AddAsiBackboneAspNetCoreRegistersRequestCorrelationServices()
     {
@@ -69,6 +81,9 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
         _ = scope.ServiceProvider.GetRequiredService<IAsiBackboneHttpRequestCorrelationResolver>();
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection)"/> method registers the result mapping options correctly.
+    /// </summary>
     [Fact]
     public void AddAsiBackboneAspNetCoreRegistersResultMappingOptions()
     {
@@ -89,6 +104,9 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
         Assert.False(options.IncludePolicyMetadata);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection)"/> method registers the acknowledgment challenge services correctly.
+    /// </summary>
     [Fact]
     public void AddAsiBackboneAspNetCoreRegistersAcknowledgmentChallengeServices()
     {
@@ -108,6 +126,9 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
         Assert.False(options.IncludePolicyMetadata);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection, Action{AsiBackboneAspNetCoreOptions})"/> method applies the configured options correctly.
+    /// </summary>
     [Fact]
     public void AddAsiBackboneAspNetCoreAppliesConfiguredOptions()
     {
@@ -134,6 +155,9 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
         Assert.Equal("X-Request-ID", options.CorrelationIdHeaderName);
     }
 
+    /// <summary>
+    /// Tests that the <c>AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneStrictGovernance(IServiceCollection)</c> method configures the fail-closed options correctly.
+    /// </summary>
     [Fact]
     public void AddAsiBackboneStrictGovernanceConfiguresFailClosedOptions()
     {
@@ -154,6 +178,9 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
         Assert.True(endpointOptions.RequireGovernanceMetadata);
     }
 
+    /// <summary>
+    /// Tests that the <c>AsiBackboneAspNetCoreServiceCollectionExtensions.UseStrictGovernanceProfile(IAsiBackboneBuilder)</c> method configures the fail-closed options correctly through the builder facade.
+    /// </summary>
     [Fact]
     public void UseStrictGovernanceProfileConfiguresFailClosedOptionsThroughBuilderFacade()
     {
@@ -169,6 +196,12 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
         Assert.True(endpointOptions.RequireGovernanceMetadata);
     }
 
+    /// <summary>
+    /// Tests that the <c>AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneStrictGovernance(IServiceCollection)</c> method configures the policy evaluator to deny when no constraints are provided.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task AddAsiBackboneStrictGovernanceOptionsDenyEmptyPolicyEvaluation()
     {
@@ -189,6 +222,12 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
             Assert.Single(decision.ReasonCodes));
     }
 
+    /// <summary>
+    /// Tests that the <c>AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneStrictGovernance(IServiceCollection)</c> method configures the policy evaluator to treat constraint evaluation exceptions as denials.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task AddAsiBackboneStrictGovernanceOptionsConvertConstraintExceptionToDeniedDecision()
     {
@@ -210,6 +249,9 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
         Assert.DoesNotContain("sensitive", Assert.Single(decision.Reasons).Message, StringComparison.OrdinalIgnoreCase);
     }
 
+    /// <summary>
+    /// Tests that the <c>AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection)</c> method throws an <see cref="ArgumentNullException"/> when the <c>services</c> argument is null.
+    /// </summary>
     [Fact]
     public void AddAsiBackboneAspNetCoreRejectsNullServices()
     {
@@ -218,6 +260,9 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
         _ = Assert.Throws<ArgumentNullException>(() => services!.AddAsiBackboneAspNetCore());
     }
 
+    /// <summary>
+    /// Tests that the <c>AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection, Action{AsiBackboneAspNetCoreOptions})</c> method throws an <see cref="ArgumentNullException"/> when the <c>configureOptions</c> callback is null.
+    /// </summary>
     [Fact]
     public void AddAsiBackboneAspNetCoreRejectsNullConfigureCallback()
     {
@@ -226,6 +271,12 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
         _ = Assert.Throws<ArgumentNullException>(() => services.AddAsiBackboneAspNetCore(null!));
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection, Action{AsiBackboneAspNetCoreOptions})"/> method throws an <see cref="InvalidOperationException"/> when the <see cref="AsiBackboneAspNetCoreOptions.CorrelationIdHeaderName"/> is null, empty, or whitespace.
+    /// </summary>
+    /// <param name="headerName">
+    /// The name of the correlation identifier header.
+    /// </param>
     [Theory]
     [InlineData(null)]
     [InlineData("")]
@@ -240,6 +291,9 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
         Assert.Contains("correlation identifier header name", exception.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection, Action{AsiBackboneAspNetCoreOptions})"/> method throws an <see cref="OptionsValidationException"/> when the <see cref="AsiBackboneHttpActorContextOptions"/> are configured with invalid values.
+    /// </summary>
     [Fact]
     public void ActorContextOptionsRegistrationRejectsInvalidConfiguredOptions()
     {
@@ -253,6 +307,9 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
         Assert.Contains("HTTP actor context options", exception.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection, Action{AsiBackboneAspNetCoreOptions})"/> method throws an <see cref="OptionsValidationException"/> when the <see cref="AsiBackboneHttpResultMappingOptions"/> are configured with invalid values.
+    /// </summary>
     [Fact]
     public void ResultMappingOptionsRegistrationRejectsInvalidConfiguredOptions()
     {
@@ -266,6 +323,9 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
         Assert.Contains("HTTP result mapping options", exception.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Tests that the <see cref="AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection, Action{AsiBackboneAspNetCoreOptions})"/> method throws an <see cref="OptionsValidationException"/> when the <see cref="AsiBackboneAcknowledgmentChallengeOptions"/> are configured with invalid values.
+    /// </summary>
     [Fact]
     public void AcknowledgmentChallengeOptionsRegistrationRejectsInvalidConfiguredOptions()
     {

@@ -6,8 +6,17 @@ using Xunit;
 
 namespace AsiBackbone.Core.Tests.Outbox;
 
+/// <summary>
+/// This class contains unit tests for the <see cref="AsiBackboneGovernanceOutboxDrain"/> class, specifically focusing on scenarios where entries are not claimed by the emitter. The tests cover various cases, including draining with no eligible entries, merging pending and retry-ready entries, respecting maximum count limits, applying non-claimed result transitions, and handling exceptions thrown by the emitter.
+/// </summary>
 public sealed class GovernanceOutboxDrainNonClaimTests
 {
+    /// <summary>
+    /// This test verifies that when the DrainAsync method is called on an empty outbox store, it returns an empty list of drained entries. It ensures that the drain operation correctly handles the case where there are no eligible entries to process.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous test operation.
+    /// </returns>
     [Fact]
     public async Task DrainAsyncReturnsEmptyWhenNoEntriesAreEligible()
     {
@@ -21,6 +30,12 @@ public sealed class GovernanceOutboxDrainNonClaimTests
         Assert.Empty(drainedEntries);
     }
 
+    /// <summary>
+    /// This test verifies that the DrainAsync method correctly merges pending entries and retry-ready entries when there is remaining capacity. It ensures that both types of entries are processed and marked as delivered when the maximum count allows for it.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous test operation.
+    /// </returns>
     [Fact]
     public async Task DrainAsyncMergesPendingAndRetryReadyEntriesWhenCapacityRemains()
     {
@@ -49,6 +64,12 @@ public sealed class GovernanceOutboxDrainNonClaimTests
         Assert.Contains(drainedEntries, entry => entry.OutboxEntryId == retryEntry.OutboxEntryId && entry.IsDelivered);
     }
 
+    /// <summary>
+    /// This test verifies that the DrainAsync method stops processing entries when the maximum count is reached, even if there are retry-ready entries available. It ensures that the drain respects the maxCount limit before attempting to process any retry-ready entries.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous test operation.
+    /// </returns>
     [Fact]
     public async Task DrainAsyncStopsAtPendingLimitBeforeRetryReadyLookup()
     {
@@ -79,6 +100,12 @@ public sealed class GovernanceOutboxDrainNonClaimTests
         Assert.False(storedRetryEntry.IsDelivered);
     }
 
+    /// <summary>
+    /// This test verifies that the DrainAsync method correctly applies result transitions for entries that are not claimed by the emitter. It tests various scenarios, including deferred, pending, dead-lettered, and failed results, ensuring that the outbox entries are updated with the appropriate status and retry information based on the emission results returned by the emitter.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous test operation.
+    /// </returns>
     [Fact]
     public async Task DrainAsyncAppliesNonClaimedResultTransitions()
     {
@@ -117,6 +144,12 @@ public sealed class GovernanceOutboxDrainNonClaimTests
         Assert.Equal(GovernanceEmissionStatus.Failed, failedEntry.Status);
     }
 
+    /// <summary>
+    /// This test verifies that when the DrainAsync method is called and the emitter throws an exception during emission, the non-claimed entry is marked as retryable. It ensures that the outbox entry's status is updated to RetryableFailure, the last error code is set to "emission.exception", and the next retry time is scheduled appropriately after the drain operation.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous test operation.
+    /// </returns>
     [Fact]
     public async Task DrainAsyncMarksNonClaimedEntryRetryableWhenEmitterThrows()
     {

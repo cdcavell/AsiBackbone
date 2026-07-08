@@ -10,6 +10,12 @@ namespace AsiBackbone.Core.Tests.Audit;
 /// </summary>
 public sealed class AuditResidueHotPathTests
 {
+    /// <summary>
+    /// Validates that the <see cref="AuditResidue.FromDecision"/> method correctly copies the decision outcome, trace, and reason codes into the resulting audit residue.
+    /// </summary>
+    /// <param name="scenario">The scenario under test.</param>
+    /// <param name="expectedOutcome">The expected outcome of the audit residue.</param>
+    /// <param name="expectedReasonCode">The expected reason code for the audit residue.</param>
     [Theory]
     [InlineData("allow", "Allowed", null)]
     [InlineData("warning", "Warning", "policy.warning")]
@@ -41,6 +47,9 @@ public sealed class AuditResidueHotPathTests
         Assert.Equal(decision.PolicyHash, residue.PolicyHash);
     }
 
+    /// <summary>
+    /// Validates that the <see cref="AuditResidue.FromDecision"/> method reuses the immutable reason codes from the decision to ensure audit fidelity and avoid unnecessary allocations.
+    /// </summary>
     [Fact]
     public void FromDecisionReusesImmutableDecisionReasonCodesForAuditFidelity()
     {
@@ -62,6 +71,9 @@ public sealed class AuditResidueHotPathTests
         Assert.Equal("policy.denied", Assert.Single(residue.ReasonCodes));
     }
 
+    /// <summary>
+    /// Validates that the <see cref="AuditResidue.FromDecision"/> method defensively copies the metadata to ensure audit fidelity and avoid unnecessary allocations.
+    /// </summary>
     [Fact]
     public void FromDecisionStillDefensivelyCopiesMetadata()
     {

@@ -3,6 +3,9 @@ using Xunit;
 
 namespace AsiBackbone.EntityFrameworkCore.Tests;
 
+/// <summary>
+/// Tests for the <see cref="AsiBackboneModelBuilderExtensions"/> class, which provides extension methods for configuring the Entity Framework Core model with ASI Backbone conventions.
+/// </summary>
 public sealed class AsiBackboneModelBuilderExtensionsTests
 {
     /// <summary>

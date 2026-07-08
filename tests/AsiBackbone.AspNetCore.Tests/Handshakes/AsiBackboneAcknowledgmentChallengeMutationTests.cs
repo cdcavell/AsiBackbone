@@ -7,8 +7,14 @@ using Xunit;
 
 namespace AsiBackbone.AspNetCore.Tests.Handshakes;
 
+/// <summary>
+/// Unit tests for the <see cref="AsiBackboneAcknowledgmentChallenge"/> class and related functionality.
+/// </summary>
 public sealed class AsiBackboneAcknowledgmentChallengeMutationTests
 {
+    /// <summary>
+    /// Tests that the default acknowledgment challenge service correctly creates a challenge while keeping trace and policy metadata out of the host-facing shape, ensuring that sensitive information is not exposed in the public API response.
+    /// </summary>
     [Fact]
     public void DefaultChallengeKeepsTraceAndPolicyMetadataOutOfHostFacingShape()
     {
@@ -34,6 +40,9 @@ public sealed class AsiBackboneAcknowledgmentChallengeMutationTests
         Assert.Equal("hash-123", challenge.HandshakeRequest.PolicyHash);
     }
 
+    /// <summary>
+    /// Tests that when the acknowledgment challenge service is configured to exclude the reason message, the reason message is not included in the public-facing challenge object, but it still remains accessible within the internal handshake request for auditing or logging purposes.
+    /// </summary>
     [Fact]
     public void HiddenReasonMessageStillStaysInsideCoreHandshakeRequest()
     {
@@ -50,6 +59,9 @@ public sealed class AsiBackboneAcknowledgmentChallengeMutationTests
         Assert.Equal("Do not expose this.", challenge.HandshakeRequest.Message);
     }
 
+    /// <summary>
+    /// Tests that accepted responses correctly copy actor and response metadata into the core acknowledgment object.
+    /// </summary>
     [Fact]
     public void AcceptedResponseCopiesActorAndResponseMetadataIntoCoreAcknowledgment()
     {
@@ -93,6 +105,9 @@ public sealed class AsiBackboneAcknowledgmentChallengeMutationTests
         Assert.Equal(occurredUtc, result.Acknowledgment.OccurredUtc);
     }
 
+    /// <summary>
+    /// Tests that a declined acknowledgment response still requires the correct acknowledgment code to be provided, and if the code does not match, the response is rejected with an appropriate reason code indicating a mismatch.
+    /// </summary>
     [Fact]
     public void DeclinedResponseStillRequiresMatchingAcknowledgmentCode()
     {
@@ -116,6 +131,9 @@ public sealed class AsiBackboneAcknowledgmentChallengeMutationTests
         Assert.Contains("acknowledgment.challenge.code_mismatch", result.Result.ReasonCodes);
     }
 
+    /// <summary>
+    /// Tests that when creating an acknowledgment challenge from a handshake request, the metadata keys and values are normalized by trimming whitespace and ignoring empty keys or values, ensuring that the resulting metadata dictionary is clean and consistent.
+    /// </summary>
     [Fact]
     public void FromHandshakeRequestNormalizesMetadataKeysAndValues()
     {
@@ -144,6 +162,9 @@ public sealed class AsiBackboneAcknowledgmentChallengeMutationTests
         Assert.False(challenge.Metadata.ContainsKey("   "));
     }
 
+    /// <summary>
+    /// Tests that when creating an acknowledgment challenge from a handshake request with null or empty metadata, the resulting challenge has an empty metadata dictionary, ensuring that no null references or unexpected values are present in the challenge's metadata.
+    /// </summary>
     [Fact]
     public void FromHandshakeRequestUsesEmptyMetadataWhenMetadataIsNullOrEmpty()
     {
@@ -163,6 +184,9 @@ public sealed class AsiBackboneAcknowledgmentChallengeMutationTests
         Assert.Empty(challenge.Metadata);
     }
 
+    /// <summary>
+    /// Tests that when creating an acknowledgment challenge from a handshake request with optional trace and policy metadata enabled, the resulting challenge includes the trace ID, policy version, and policy hash from the handshake request, ensuring that this information is preserved in the challenge for auditing or tracking purposes.
+    /// </summary>
     [Fact]
     public void FromHandshakeRequestIncludesOptionalTraceAndPolicyMetadataWhenEnabled()
     {
@@ -197,6 +221,9 @@ public sealed class AsiBackboneAcknowledgmentChallengeMutationTests
         Assert.Equal("hash-123", challenge.PolicyHash);
     }
 
+    /// <summary>
+    /// Tests that when creating an acknowledgment challenge from a handshake request with null input, an ArgumentNullException is thrown, ensuring that the method correctly validates its input parameters and does not allow null requests to be processed.
+    /// </summary>
     [Fact]
     public void FromHandshakeRequestRejectsNullRequest()
     {
@@ -204,6 +231,9 @@ public sealed class AsiBackboneAcknowledgmentChallengeMutationTests
             AsiBackboneAcknowledgmentChallenge.FromHandshakeRequest(null!));
     }
 
+    /// <summary>
+    /// Tests that when creating an acknowledgment challenge from a handshake request with invalid options (e.g., a required acknowledgment code that is null or whitespace), an InvalidOperationException is thrown, ensuring that the method enforces valid configuration and does not allow challenges to be created with invalid parameters.
+    /// </summary>
     [Fact]
     public void FromHandshakeRequestRejectsInvalidOptions()
     {
@@ -226,6 +256,9 @@ public sealed class AsiBackboneAcknowledgmentChallengeMutationTests
             AsiBackboneAcknowledgmentChallenge.FromHandshakeRequest(request, options));
     }
 
+    /// <summary>
+    /// Tests that when constructing an acknowledgment challenge with a null handshake request, an ArgumentNullException is thrown, ensuring that the constructor correctly validates its input parameters and does not allow null requests to be processed.
+    /// </summary>
     [Fact]
     public void ConstructorRejectsNullHandshakeRequest()
     {
@@ -251,6 +284,9 @@ public sealed class AsiBackboneAcknowledgmentChallengeMutationTests
         Assert.Equal("handshakeRequest", exception.ParamName);
     }
 
+    /// <summary>
+    /// Tests that when constructing an acknowledgment challenge with a missing handshake ID (null or whitespace), an ArgumentException is thrown, ensuring that the constructor correctly validates its input parameters and does not allow challenges to be created without a valid handshake ID.
+    /// </summary>
     [Fact]
     public void ConstructorRejectsMissingHandshakeId()
     {
@@ -260,6 +296,9 @@ public sealed class AsiBackboneAcknowledgmentChallengeMutationTests
         Assert.Equal("handshakeId", exception.ParamName);
     }
 
+    /// <summary>
+    /// Tests that when constructing an acknowledgment challenge with a missing operation name (null or whitespace), an ArgumentException is thrown, ensuring that the constructor correctly validates its input parameters and does not allow challenges to be created without a valid operation name.
+    /// </summary>
     [Fact]
     public void ConstructorRejectsMissingOperationName()
     {
@@ -269,6 +308,9 @@ public sealed class AsiBackboneAcknowledgmentChallengeMutationTests
         Assert.Equal("operationName", exception.ParamName);
     }
 
+    /// <summary>
+    /// Tests that when constructing an acknowledgment challenge with a missing reason code (null or whitespace), an ArgumentException is thrown, ensuring that the constructor correctly validates its input parameters and does not allow challenges to be created without a valid reason code.
+    /// </summary>
     [Fact]
     public void ConstructorRejectsMissingReasonCode()
     {
@@ -278,6 +320,9 @@ public sealed class AsiBackboneAcknowledgmentChallengeMutationTests
         Assert.Equal("reasonCode", exception.ParamName);
     }
 
+    /// <summary>
+    /// Tests that when constructing an acknowledgment challenge with a missing required acknowledgment code (null or whitespace), an ArgumentException is thrown, ensuring that the constructor correctly validates its input parameters and does not allow challenges to be created without a valid required acknowledgment code.
+    /// </summary>
     [Fact]
     public void ConstructorRejectsMissingRequiredAcknowledgmentCode()
     {
@@ -287,6 +332,9 @@ public sealed class AsiBackboneAcknowledgmentChallengeMutationTests
         Assert.Equal("requiredAcknowledgmentCode", exception.ParamName);
     }
 
+    /// <summary>
+    /// Tests that when constructing an acknowledgment challenge with a missing required acknowledgment text (null or whitespace), an ArgumentException is thrown, ensuring that the constructor correctly validates its input parameters and does not allow challenges to be created without a valid required acknowledgment text.
+    /// </summary>
     [Fact]
     public void ConstructorRejectsMissingRequiredAcknowledgmentText()
     {
@@ -296,6 +344,9 @@ public sealed class AsiBackboneAcknowledgmentChallengeMutationTests
         Assert.Equal("requiredAcknowledgmentText", exception.ParamName);
     }
 
+    /// <summary>
+    /// Tests that when creating an acknowledgment challenge with a null actor before a decision is made, an ArgumentNullException is thrown, ensuring that the service correctly validates its input parameters and does not allow challenges to be created without a valid actor context.
+    /// </summary>
     [Fact]
     public void CreateChallengeRejectsNullActorBeforeDecision()
     {

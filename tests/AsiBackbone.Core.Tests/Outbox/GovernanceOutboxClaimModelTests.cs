@@ -11,7 +11,7 @@ public sealed class GovernanceOutboxClaimModelTests
     {
         DateTimeOffset now = new(2026, 7, 8, 12, 0, 0, TimeSpan.FromHours(-4));
 
-        GovernanceOutboxClaimRequest request = GovernanceOutboxClaimRequest.Create(
+        var request = GovernanceOutboxClaimRequest.Create(
             " worker-1 ",
             now,
             TimeSpan.FromMinutes(3),
@@ -27,9 +27,9 @@ public sealed class GovernanceOutboxClaimModelTests
     [Fact]
     public void ClaimRequestCreateRejectsInvalidValues()
     {
-        Assert.Throws<ArgumentException>(() => GovernanceOutboxClaimRequest.Create(" "));
-        Assert.Throws<ArgumentOutOfRangeException>(() => GovernanceOutboxClaimRequest.Create("worker-1", leaseDuration: TimeSpan.Zero));
-        Assert.Throws<ArgumentOutOfRangeException>(() => GovernanceOutboxClaimRequest.Create("worker-1", maxCount: 0));
+        _ = Assert.Throws<ArgumentException>(() => GovernanceOutboxClaimRequest.Create(" "));
+        _ = Assert.Throws<ArgumentOutOfRangeException>(() => GovernanceOutboxClaimRequest.Create("worker-1", leaseDuration: TimeSpan.Zero));
+        _ = Assert.Throws<ArgumentOutOfRangeException>(() => GovernanceOutboxClaimRequest.Create("worker-1", maxCount: 0));
     }
 
     [Fact]
@@ -39,7 +39,7 @@ public sealed class GovernanceOutboxClaimModelTests
         DateTimeOffset claimedUtc = new(2026, 7, 8, 12, 0, 0, TimeSpan.Zero);
         DateTimeOffset expiresUtc = claimedUtc.AddMinutes(5);
 
-        GovernanceOutboxClaim claim = GovernanceOutboxClaim.Create(
+        var claim = GovernanceOutboxClaim.Create(
             entry,
             " worker-1 ",
             " token-1 ",
@@ -58,7 +58,7 @@ public sealed class GovernanceOutboxClaimModelTests
         GovernanceOutboxEntry entry = CreateEntry();
         DateTimeOffset claimedUtc = new(2026, 7, 8, 12, 0, 0, TimeSpan.Zero);
 
-        Assert.Throws<ArgumentOutOfRangeException>(() => GovernanceOutboxClaim.Create(
+        _ = Assert.Throws<ArgumentOutOfRangeException>(() => GovernanceOutboxClaim.Create(
             entry,
             "worker-1",
             "token-1",
@@ -77,13 +77,13 @@ public sealed class GovernanceOutboxClaimModelTests
             "token-1",
             claimedUtc,
             TimeSpan.FromMinutes(5));
-        GovernanceOutboxClaim matchingClaim = GovernanceOutboxClaim.Create(
+        var matchingClaim = GovernanceOutboxClaim.Create(
             claimedEntry,
             "worker-1",
             "token-1",
             claimedUtc,
             claimedUtc.AddMinutes(5));
-        GovernanceOutboxClaim otherClaim = GovernanceOutboxClaim.Create(
+        var otherClaim = GovernanceOutboxClaim.Create(
             claimedEntry,
             "worker-1",
             "token-2",
@@ -109,7 +109,7 @@ public sealed class GovernanceOutboxClaimModelTests
     {
         GovernanceOutboxEntry entry = CreateEntry();
 
-        Assert.Throws<ArgumentOutOfRangeException>(() => entry.MarkClaimed(
+        _ = Assert.Throws<ArgumentOutOfRangeException>(() => entry.MarkClaimed(
             "worker-1",
             leaseDuration: TimeSpan.Zero));
     }

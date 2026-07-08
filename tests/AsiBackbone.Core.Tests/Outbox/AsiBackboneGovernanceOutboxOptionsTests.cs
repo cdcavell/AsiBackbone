@@ -33,17 +33,17 @@ public sealed class AsiBackboneGovernanceOutboxOptionsTests
     [Fact]
     public void ValidateRejectsInvalidTimingOptions()
     {
-        Assert.Throws<InvalidOperationException>(() => new AsiBackboneGovernanceOutboxOptions
+        _ = Assert.Throws<InvalidOperationException>(() => new AsiBackboneGovernanceOutboxOptions
         {
             RetryDelay = TimeSpan.FromTicks(-1)
         }.Validate());
 
-        Assert.Throws<InvalidOperationException>(() => new AsiBackboneGovernanceOutboxOptions
+        _ = Assert.Throws<InvalidOperationException>(() => new AsiBackboneGovernanceOutboxOptions
         {
             DeferredDelay = TimeSpan.FromTicks(-1)
         }.Validate());
 
-        Assert.Throws<InvalidOperationException>(() => new AsiBackboneGovernanceOutboxOptions
+        _ = Assert.Throws<InvalidOperationException>(() => new AsiBackboneGovernanceOutboxOptions
         {
             ClaimLeaseDuration = TimeSpan.Zero
         }.Validate());
@@ -58,6 +58,6 @@ public sealed class AsiBackboneGovernanceOutboxOptionsTests
             ClaimWorkerId = " "
         };
 
-        Assert.Throws<InvalidOperationException>(options.Validate);
+        _ = Assert.Throws<InvalidOperationException>(options.Validate);
     }
 }

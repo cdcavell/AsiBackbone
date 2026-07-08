@@ -3,6 +3,7 @@ using AsiBackbone.Core.Emissions;
 using AsiBackbone.Core.Outbox;
 using AsiBackbone.Storage.InMemory.Audit;
 using AsiBackbone.Storage.InMemory.Outbox;
+using Microsoft.Extensions.Options;
 using Xunit;
 
 namespace AsiBackbone.Core.Tests.Outbox;
@@ -314,6 +315,302 @@ public sealed class GovernanceOutboxStoreTests
         Assert.DoesNotContain(retryReadyEntries, retryReadyEntry => retryReadyEntry.OutboxEntryId == entry.OutboxEntryId);
     }
 
+    [Fact]
+    public void GovernanceEmissionResultBranchSemanticsAreCoveredInCompiledOutboxTests()
+    {
+        var normalizedDelivered = GovernanceEmissionResult.Delivered(
+            " provider ",
+            " record-1 ",
+            new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                [" "] = "ignored",
+                [" key "] = " value "
+            });
+        var pending = GovernanceEmissionResult.Pending(" ", new Dictionary<string, string>(StringComparer.Ordinal) { [" "] = "ignored" });
+        var retryableError = GovernanceEmissionError.Create(" retry ", " retry message ", isRetryable: true, providerName: " provider ", providerErrorCode: " code ");
+        var deferred = GovernanceEmissionResult.Deferred(retryableError, new DateTimeOffset(2026, 7, 8, 8, 30, 0, TimeSpan.FromHours(-4)));
+        var failedRetryable = GovernanceEmissionResult.Failed(retryableError);
+        var deadLettered = GovernanceEmissionResult.DeadLettered(GovernanceEmissionError.Create("dead", "dead message"));
+
+        Assert.True(normalizedDelivered.IsSuccess);
+        Assert.True(normalizedDelivered.IsTerminal);
+        Assert.False(normalizedDelivered.ShouldRetry);
+        Assert.True(normalizedDelivered.HasMetadata);
+        Assert.Equal("provider", normalizedDelivered.ProviderName);
+        Assert.Equal("record-1", normalizedDelivered.ProviderRecordId);
+        Assert.Equal("value", normalizedDelivered.Metadata["key"]);
+        Assert.False(pending.HasMetadata);
+        Assert.Null(pending.ProviderName);
+        Assert.True(deferred.ShouldRetry);
+        Assert.Equal("provider", deferred.ProviderName);
+        Assert.Equal(new DateTimeOffset(2026, 7, 8, 12, 30, 0, TimeSpan.Zero), deferred.RetryAfterUtc);
+        Assert.True(failedRetryable.ShouldRetry);
+        Assert.False(deadLettered.ShouldRetry);
+        Assert.True(deadLettered.IsTerminal);
+        Assert.Equal("retry", retryableError.Code);
+        Assert.Equal("retry message", retryableError.Message);
+        Assert.Equal("code", retryableError.ProviderErrorCode);
+        _ = Assert.Throws<ArgumentException>(() => GovernanceEmissionError.Create(" ", "message"));
+        _ = Assert.Throws<ArgumentException>(() => GovernanceEmissionError.Create("code", " "));
+        _ = Assert.Throws<ArgumentNullException>(() => GovernanceEmissionResult.Failed(null!));
+        _ = Assert.Throws<ArgumentNullException>(() => GovernanceEmissionResult.RetryableFailure(null!));
+        _ = Assert.Throws<ArgumentNullException>(() => GovernanceEmissionResult.DeadLettered(null!));
+    }
+
+    [Fact]
+    public async Task ClaimLeaseBranchesAreCoveredInCompiledOutboxTests()
+    {
+        var outboxStore = new InMemoryGovernanceOutboxStore();
+        GovernanceOutboxEntry entry = await outboxStore.EnqueueAsync(
+            CreateEnvelope("event-claim", "correlation-claim"),
+            TestContext.Current.CancellationToken);
+        DateTimeOffset claimedUtc = new(2026, 7, 8, 12, 0, 0, TimeSpan.Zero);
+
+        IReadOnlyList<GovernanceOutboxClaim> claims = await outboxStore.ClaimPendingAsync(
+            GovernanceOutboxClaimRequest.Create(" worker-a ", claimedUtc, TimeSpan.FromMinutes(5), maxCount: 1),
+            TestContext.Current.CancellationToken);
+        IReadOnlyList<GovernanceOutboxClaim> blockedClaims = await outboxStore.ClaimPendingAsync(
+            GovernanceOutboxClaimRequest.Create("worker-b", claimedUtc.AddMinutes(1), TimeSpan.FromMinutes(5), maxCount: 1),
+            TestContext.Current.CancellationToken);
+        GovernanceOutboxClaim claim = Assert.Single(claims);
+        var mismatchedClaim = GovernanceOutboxClaim.Create(
+            claim.Entry,
+            claim.WorkerId,
+            "mismatched-token",
+            claimedUtc,
+            claimedUtc.AddMinutes(5));
+
+        GovernanceOutboxEntry mismatchedResult = await outboxStore.MarkClaimDeliveredAsync(
+            mismatchedClaim,
+            GovernanceEmissionResult.Delivered("provider", "wrong-record"),
+            TestContext.Current.CancellationToken);
+        GovernanceOutboxEntry deliveredResult = await outboxStore.MarkClaimDeliveredAsync(
+            claim,
+            GovernanceEmissionResult.Delivered("provider", "record-1"),
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal("worker-a", claim.WorkerId);
+        Assert.False(claim.IsExpired(claimedUtc.AddMinutes(4)));
+        Assert.True(claim.IsExpired(claimedUtc.AddMinutes(5)));
+        Assert.Empty(blockedClaims);
+        Assert.False(mismatchedResult.IsDelivered);
+        Assert.True(deliveredResult.IsDelivered);
+        Assert.False(deliveredResult.HasClaim);
+        _ = Assert.Throws<ArgumentOutOfRangeException>(() => GovernanceOutboxClaimRequest.Create("worker-a", leaseDuration: TimeSpan.Zero));
+        _ = Assert.Throws<ArgumentOutOfRangeException>(() => GovernanceOutboxClaimRequest.Create("worker-a", maxCount: 0));
+        _ = Assert.Throws<ArgumentOutOfRangeException>(() => GovernanceOutboxClaim.Create(entry, "worker-a", "token", claimedUtc, claimedUtc));
+        _ = Assert.Throws<ArgumentOutOfRangeException>(() => entry.MarkClaimed("worker-a", leaseDuration: TimeSpan.Zero));
+    }
+
+    [Fact]
+    public void GovernanceOutboxEntryValidationAndTransitionBranchesAreCovered()
+    {
+        GovernanceEmissionEnvelope envelope = CreateEnvelope("event-validation", "correlation-validation");
+        DateTimeOffset now = new(2026, 7, 8, 12, 0, 0, TimeSpan.Zero);
+        var nonRetryableError = GovernanceEmissionError.Create("provider.failed", "Provider failed.", isRetryable: false, providerName: " provider ");
+
+        _ = Assert.Throws<ArgumentException>(() => GovernanceOutboxEntry.Restore(envelope, GovernanceEmissionStatus.Pending, " ", now, now));
+        _ = Assert.Throws<ArgumentNullException>(() => GovernanceOutboxEntry.Restore(null!, GovernanceEmissionStatus.Pending, "entry-1", now, now));
+        _ = Assert.Throws<ArgumentOutOfRangeException>(() => GovernanceOutboxEntry.Restore(envelope, (GovernanceEmissionStatus)999, "entry-1", now, now));
+        _ = Assert.Throws<ArgumentOutOfRangeException>(() => GovernanceOutboxEntry.Restore(envelope, GovernanceEmissionStatus.Pending, "entry-1", now, now, retryCount: -1));
+        _ = Assert.Throws<ArgumentOutOfRangeException>(() => GovernanceOutboxEntry.Restore(envelope, GovernanceEmissionStatus.Pending, "entry-1", now, now, maxRetryCount: -1));
+        _ = Assert.Throws<ArgumentOutOfRangeException>(() => GovernanceOutboxEntry.Restore(envelope, GovernanceEmissionStatus.Pending, "entry-1", now, now, claimAttemptCount: -1));
+
+        var entry = GovernanceOutboxEntry.Create(
+            envelope,
+            " entry-1 ",
+            now,
+            metadata: new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                [" "] = "ignored",
+                [" key "] = " value "
+            });
+        GovernanceOutboxEntry failedEntry = entry.MarkFailed(nonRetryableError, now.AddMinutes(1), now.AddSeconds(1));
+        GovernanceOutboxEntry maxRetryEntry = GovernanceOutboxEntry.Create(envelope, "entry-2", now, maxRetryCount: 1)
+            .MarkFailed(nonRetryableError, now.AddMinutes(1), now.AddSeconds(1));
+        var restoredWithoutFullClaim = GovernanceOutboxEntry.Restore(
+            envelope,
+            GovernanceEmissionStatus.Pending,
+            "entry-3",
+            now,
+            now,
+            claimOwner: " ",
+            claimToken: "token",
+            claimedUtc: now,
+            claimExpiresUtc: now.AddMinutes(5));
+
+        Assert.Equal("entry-1", entry.OutboxEntryId);
+        Assert.True(entry.HasMetadata);
+        Assert.Equal("value", entry.Metadata["key"]);
+        Assert.Equal(GovernanceEmissionStatus.Failed, failedEntry.Status);
+        Assert.Equal(now.AddMinutes(1), failedEntry.NextRetryUtc);
+        Assert.Equal("provider", failedEntry.ProviderName);
+        Assert.Equal(GovernanceEmissionStatus.DeadLettered, maxRetryEntry.Status);
+        Assert.Null(maxRetryEntry.NextRetryUtc);
+        Assert.Equal("Provider failed.", maxRetryEntry.DeadLetterReason);
+        Assert.False(restoredWithoutFullClaim.HasClaim);
+        Assert.True(restoredWithoutFullClaim.CanBeClaimed(now));
+        _ = Assert.Throws<ArgumentException>(() => entry.MarkDelivered(GovernanceEmissionResult.Failed(nonRetryableError)));
+    }
+
+    [Fact]
+    public void OutboxOptionValidationBranchesAreCoveredInCompiledOutboxTests()
+    {
+        new AsiBackboneGovernanceOutboxOptions().Validate();
+
+        new AsiBackboneGovernanceOutboxOptions
+        {
+            UseClaimLeases = true,
+            ClaimWorkerId = "worker-1",
+            ClaimLeaseDuration = TimeSpan.FromMinutes(2)
+        }.Validate();
+
+        _ = Assert.Throws<InvalidOperationException>(() => new AsiBackboneGovernanceOutboxOptions
+        {
+            RetryDelay = TimeSpan.FromTicks(-1)
+        }.Validate());
+        _ = Assert.Throws<InvalidOperationException>(() => new AsiBackboneGovernanceOutboxOptions
+        {
+            DeferredDelay = TimeSpan.FromTicks(-1)
+        }.Validate());
+        _ = Assert.Throws<InvalidOperationException>(() => new AsiBackboneGovernanceOutboxOptions
+        {
+            ClaimLeaseDuration = TimeSpan.Zero
+        }.Validate());
+        _ = Assert.Throws<InvalidOperationException>(() => new AsiBackboneGovernanceOutboxOptions
+        {
+            UseClaimLeases = true,
+            ClaimWorkerId = " "
+        }.Validate());
+    }
+
+    [Fact]
+    public async Task ClaimedDrainBranchesAreCoveredInCompiledOutboxTests()
+    {
+        DateTimeOffset drainUtc = new(2026, 7, 8, 12, 0, 0, TimeSpan.Zero);
+        var selectionOnlyDrain = new AsiBackboneGovernanceOutboxDrain(
+            new SelectionOnlyOutboxStore(),
+            new ResultEmitter(GovernanceEmissionResult.Delivered("provider", "record")),
+            outboxOptions: Options.Create(new AsiBackboneGovernanceOutboxOptions
+            {
+                UseClaimLeases = true,
+                ClaimWorkerId = "worker-1"
+            }));
+        _ = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await selectionOnlyDrain.DrainAsync(drainUtc, cancellationToken: TestContext.Current.CancellationToken));
+
+        var emptyStore = new InMemoryGovernanceOutboxStore();
+        IReadOnlyList<GovernanceOutboxEntry> emptyDrain = await CreateClaimDrain(
+            emptyStore,
+            new ResultEmitter(GovernanceEmissionResult.Delivered("provider", "record-empty"))).DrainAsync(
+            drainUtc,
+            cancellationToken: TestContext.Current.CancellationToken);
+        Assert.Empty(emptyDrain);
+
+        var deliveredStore = new InMemoryGovernanceOutboxStore();
+        GovernanceOutboxEntry deliveredSource = await deliveredStore.EnqueueAsync(
+            CreateEnvelope("event-delivered", "correlation-delivered"),
+            TestContext.Current.CancellationToken);
+        IReadOnlyList<GovernanceOutboxEntry> deliveredDrain = await CreateClaimDrain(
+            deliveredStore,
+            new ResultEmitter(GovernanceEmissionResult.Delivered("provider", "record-delivered"))).DrainAsync(
+            drainUtc,
+            maxCount: 1,
+            cancellationToken: TestContext.Current.CancellationToken);
+        GovernanceOutboxEntry deliveredEntry = Assert.Single(deliveredDrain);
+        Assert.Equal(deliveredSource.OutboxEntryId, deliveredEntry.OutboxEntryId);
+        Assert.True(deliveredEntry.IsDelivered);
+        Assert.False(deliveredEntry.HasClaim);
+
+        var retryStore = new InMemoryGovernanceOutboxStore();
+        GovernanceOutboxEntry retrySource = await retryStore.EnqueueAsync(
+            CreateEnvelope("event-retry", "correlation-retry"),
+            TestContext.Current.CancellationToken);
+        _ = await retryStore.MarkFailedAsync(
+            retrySource.OutboxEntryId,
+            GovernanceEmissionError.Create("provider.transient", "Transient failure.", isRetryable: true),
+            drainUtc.AddMinutes(-1),
+            TestContext.Current.CancellationToken);
+        GovernanceOutboxEntry retryEntry = Assert.Single(await CreateClaimDrain(
+            retryStore,
+            new ResultEmitter(GovernanceEmissionResult.Delivered("provider", "record-retry"))).DrainAsync(
+            drainUtc,
+            cancellationToken: TestContext.Current.CancellationToken));
+        Assert.True(retryEntry.IsDelivered);
+
+        var deferredStore = new InMemoryGovernanceOutboxStore();
+        _ = await deferredStore.EnqueueAsync(CreateEnvelope("event-deferred", "correlation-deferred"), TestContext.Current.CancellationToken);
+        GovernanceOutboxEntry deferredEntry = Assert.Single(await CreateClaimDrain(
+            deferredStore,
+            new ResultEmitter(GovernanceEmissionResult.Deferred(
+                GovernanceEmissionError.Create("provider.deferred", "Deferred.", isRetryable: true),
+                drainUtc.AddMinutes(10),
+                "provider"))).DrainAsync(
+            drainUtc,
+            cancellationToken: TestContext.Current.CancellationToken));
+        Assert.Equal(GovernanceEmissionStatus.Deferred, deferredEntry.Status);
+        Assert.Equal(drainUtc.AddMinutes(10), deferredEntry.NextRetryUtc);
+        Assert.False(deferredEntry.HasClaim);
+
+        var pendingStore = new InMemoryGovernanceOutboxStore();
+        _ = await pendingStore.EnqueueAsync(CreateEnvelope("event-pending", "correlation-pending"), TestContext.Current.CancellationToken);
+        GovernanceOutboxEntry pendingEntry = Assert.Single(await CreateClaimDrain(
+            pendingStore,
+            new ResultEmitter(GovernanceEmissionResult.Pending("provider"))).DrainAsync(
+            drainUtc,
+            cancellationToken: TestContext.Current.CancellationToken));
+        Assert.Equal(GovernanceEmissionStatus.Deferred, pendingEntry.Status);
+        Assert.Equal("emission.pending", pendingEntry.LastError?.Code);
+
+        var deadLetterStore = new InMemoryGovernanceOutboxStore();
+        _ = await deadLetterStore.EnqueueAsync(CreateEnvelope("event-dead", "correlation-dead"), TestContext.Current.CancellationToken);
+        GovernanceOutboxEntry deadLetterEntry = Assert.Single(await CreateClaimDrain(
+            deadLetterStore,
+            new ResultEmitter(GovernanceEmissionResult.DeadLettered(
+                GovernanceEmissionError.Create("provider.dead", "Dead letter.", providerName: "provider")))).DrainAsync(
+            drainUtc,
+            cancellationToken: TestContext.Current.CancellationToken));
+        Assert.True(deadLetterEntry.IsDeadLettered);
+        Assert.False(deadLetterEntry.HasClaim);
+
+        var failedStore = new InMemoryGovernanceOutboxStore();
+        _ = await failedStore.EnqueueAsync(CreateEnvelope("event-failed", "correlation-failed"), TestContext.Current.CancellationToken);
+        GovernanceOutboxEntry failedEntry = Assert.Single(await CreateClaimDrain(
+            failedStore,
+            new ResultEmitter(GovernanceEmissionResult.Failed(
+                GovernanceEmissionError.Create("provider.failed", "Failed.", isRetryable: false, providerName: "provider")))).DrainAsync(
+            drainUtc,
+            cancellationToken: TestContext.Current.CancellationToken));
+        Assert.Equal(GovernanceEmissionStatus.Failed, failedEntry.Status);
+        Assert.False(failedEntry.HasClaim);
+
+        var throwingStore = new InMemoryGovernanceOutboxStore();
+        _ = await throwingStore.EnqueueAsync(CreateEnvelope("event-throw", "correlation-throw"), TestContext.Current.CancellationToken);
+        GovernanceOutboxEntry thrownEntry = Assert.Single(await CreateClaimDrain(
+            throwingStore,
+            new ThrowingEmitter()).DrainAsync(
+            drainUtc,
+            cancellationToken: TestContext.Current.CancellationToken));
+        Assert.Equal(GovernanceEmissionStatus.RetryableFailure, thrownEntry.Status);
+        Assert.Equal("emission.exception", thrownEntry.LastError?.Code);
+        Assert.Equal(drainUtc.AddMinutes(1), thrownEntry.NextRetryUtc);
+    }
+
+    private static AsiBackboneGovernanceOutboxDrain CreateClaimDrain(
+        InMemoryGovernanceOutboxStore outboxStore,
+        IAsiBackboneGovernanceEmitter emitter)
+    {
+        return new AsiBackboneGovernanceOutboxDrain(
+            outboxStore,
+            emitter,
+            outboxOptions: Options.Create(new AsiBackboneGovernanceOutboxOptions
+            {
+                UseClaimLeases = true,
+                ClaimWorkerId = "worker-1",
+                ClaimLeaseDuration = TimeSpan.FromMinutes(5)
+            }));
+    }
+
     private static GovernanceEmissionEnvelope CreateEnvelope(string eventId, string correlationId)
     {
         return GovernanceEmissionEnvelope.Create(
@@ -327,5 +624,68 @@ public sealed class GovernanceOutboxStoreTests
             operationName: "governance.emit",
             emitterStatus: "pending",
             emitterProvider: "outbox");
+    }
+
+    private sealed class ResultEmitter(GovernanceEmissionResult result) : IAsiBackboneGovernanceEmitter
+    {
+        public ValueTask<GovernanceEmissionResult> EmitAsync(
+            GovernanceEmissionEnvelope envelope,
+            CancellationToken cancellationToken = default)
+        {
+            return ValueTask.FromResult(result);
+        }
+    }
+
+    private sealed class ThrowingEmitter : IAsiBackboneGovernanceEmitter
+    {
+        public ValueTask<GovernanceEmissionResult> EmitAsync(
+            GovernanceEmissionEnvelope envelope,
+            CancellationToken cancellationToken = default)
+        {
+            throw new InvalidOperationException("Emitter failed.");
+        }
+    }
+
+    private sealed class SelectionOnlyOutboxStore : IAsiBackboneGovernanceOutboxStore
+    {
+        public ValueTask<GovernanceOutboxEntry> EnqueueAsync(GovernanceEmissionEnvelope envelope, CancellationToken cancellationToken = default)
+        {
+            return ValueTask.FromResult(GovernanceOutboxEntry.Create(envelope));
+        }
+
+        public ValueTask<GovernanceOutboxEntry> SaveAsync(GovernanceOutboxEntry entry, CancellationToken cancellationToken = default)
+        {
+            return ValueTask.FromResult(entry);
+        }
+
+        public ValueTask<GovernanceOutboxEntry?> FindByOutboxEntryIdAsync(string outboxEntryId, CancellationToken cancellationToken = default)
+        {
+            return ValueTask.FromResult<GovernanceOutboxEntry?>(null);
+        }
+
+        public ValueTask<IReadOnlyList<GovernanceOutboxEntry>> FindPendingAsync(int maxCount = 100, CancellationToken cancellationToken = default)
+        {
+            return ValueTask.FromResult<IReadOnlyList<GovernanceOutboxEntry>>(Array.Empty<GovernanceOutboxEntry>());
+        }
+
+        public ValueTask<IReadOnlyList<GovernanceOutboxEntry>> FindRetryReadyAsync(DateTimeOffset utcNow, int maxCount = 100, CancellationToken cancellationToken = default)
+        {
+            return ValueTask.FromResult<IReadOnlyList<GovernanceOutboxEntry>>(Array.Empty<GovernanceOutboxEntry>());
+        }
+
+        public ValueTask<GovernanceOutboxEntry> MarkDeliveredAsync(string outboxEntryId, GovernanceEmissionResult result, CancellationToken cancellationToken = default)
+        {
+            throw new NotSupportedException();
+        }
+
+        public ValueTask<GovernanceOutboxEntry> MarkFailedAsync(string outboxEntryId, GovernanceEmissionError governanceEmissionError, DateTimeOffset? nextRetryUtc = null, CancellationToken cancellationToken = default)
+        {
+            throw new NotSupportedException();
+        }
+
+        public ValueTask<GovernanceOutboxEntry> MarkDeadLetteredAsync(string outboxEntryId, GovernanceEmissionError governanceEmissionError, string? deadLetterReason = null, CancellationToken cancellationToken = default)
+        {
+            throw new NotSupportedException();
+        }
     }
 }

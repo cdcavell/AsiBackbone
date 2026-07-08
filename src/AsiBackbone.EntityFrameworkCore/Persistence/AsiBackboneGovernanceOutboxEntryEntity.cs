@@ -96,6 +96,31 @@ public sealed class AsiBackboneGovernanceOutboxEntryEntity : AsiBackboneEntity
     public string MetadataJson { get; set; } = "{}";
 
     /// <summary>
+    /// Gets or sets the worker, process, node, or partition owner holding the current claim lease.
+    /// </summary>
+    public string? ClaimOwner { get; set; }
+
+    /// <summary>
+    /// Gets or sets the opaque token for the current claim lease.
+    /// </summary>
+    public string? ClaimToken { get; set; }
+
+    /// <summary>
+    /// Gets or sets the UTC timestamp when the current claim was acquired.
+    /// </summary>
+    public DateTimeOffset? ClaimedUtc { get; set; }
+
+    /// <summary>
+    /// Gets or sets the UTC timestamp when the current claim lease expires.
+    /// </summary>
+    public DateTimeOffset? ClaimExpiresUtc { get; set; }
+
+    /// <summary>
+    /// Gets or sets the number of claim or reclaim attempts recorded for this entry.
+    /// </summary>
+    public int ClaimAttemptCount { get; set; }
+
+    /// <summary>
     /// Gets or sets the stable envelope identifier.
     /// </summary>
     public string EnvelopeId { get; set; } = string.Empty;

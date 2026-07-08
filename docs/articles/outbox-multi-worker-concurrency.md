@@ -1,18 +1,18 @@
 # Outbox Multi-Worker Concurrency Guidance
 
-This article records the current concurrency review for the provider-neutral governance outbox drain and the EF Core-backed outbox store.
+This article records the current concurrency review for the provider-neutral governance outbox drain, the in-memory outbox store, and the EF Core-backed outbox store.
 
 The goal is to help hosts avoid accidental duplicate emissions when an ASP.NET Core application is horizontally scaled and the hosted drain worker is registered in every replica.
 
 ## Summary decision
 
-For the current release line, multi-worker outbox safety is handled through explicit documentation and host-owned deployment/storage patterns rather than a package-owned distributed lock manager.
+For the current release line, the default outbox drain remains a single-worker selection-and-emit path. Multi-worker coordination is available through an explicit opt-in claim/lease path rather than a silent behavior change to the existing find APIs.
 
-The existing APIs are safe for single active worker usage and for local/test validation. They do not currently provide an atomic provider-neutral claim-before-emit operation.
+The existing `FindPendingAsync` and `FindRetryReadyAsync` APIs remain safe for single active worker usage and for local/test validation. They return candidate rows; they do not claim, lease, lock, or hide rows from another worker.
 
-A future release may add an explicit claim/lease abstraction, but that should be designed deliberately because it affects schema shape, migrations, provider-specific SQL, retry semantics, and host deployment operations.
+Hosts that need multiple workers against the same durable rows can opt into claim leasing by using a claim-capable store and enabling `AsiBackboneGovernanceOutboxOptions.UseClaimLeases`. Claim leases reduce duplicate selection risk for cooperating workers, but downstream provider delivery remains at-least-once unless the provider and host enforce idempotency.
 
-The selected design direction is recorded in [Outbox Claim and Lease Design Record](outbox-claim-lease-design.md). It keeps current single-worker selection APIs supported, treats claim/lease as an explicit opt-in durable outbox capability, and preserves provider-side idempotency guidance even after claim support exists.
+The selected design direction is recorded in [Outbox Claim and Lease Design Record](outbox-claim-lease-design.md).
 
 ## Repeatable validation path
 
@@ -22,11 +22,11 @@ Issue #311 adds a CI-friendly EF Core validation path for concurrent outbox/life
 tests/AsiBackbone.EntityFrameworkCore.Tests/EfCoreOutboxConcurrencyValidationTests.cs
 ```
 
-The validation deliberately confirms both sides of the current reliability story:
+The validation deliberately confirms both sides of the reliability story:
 
 - EF Core-backed local outbox and lifecycle records can be preserved under concurrent host-owned context writes in the tested SQLite relational path.
 - Retryable provider failures remain represented as local outbox state and can be queried as retry-ready work.
-- Two drain workers can still reach the same pending entry before final state is saved, so the current drain should not be described as exactly-once or duplicate-proof.
+- Workers that use the non-claiming drain path can still reach the same pending entry before final state is saved, so that path should not be described as exactly-once or duplicate-proof.
 
 See [EF Core Outbox Concurrency Validation](../quality/ef-core-outbox-concurrency-validation.md) for the local command and interpretation guidance.
 
@@ -36,16 +36,17 @@ See [EF Core Outbox Concurrency Validation](../quality/ef-core-outbox-concurrenc
 | --- | --- | --- |
 | `IAsiBackboneGovernanceOutboxStore.FindPendingAsync` | Returns pending entries ordered for delivery. | Selection only. It does not claim, lease, lock, or hide rows from another worker. |
 | `IAsiBackboneGovernanceOutboxStore.FindRetryReadyAsync` | Returns retry-ready entries ordered for delivery. | Selection only. It does not prevent another worker from selecting the same entry. |
-| `AsiBackboneGovernanceOutboxDrain` | Reads candidate entries, emits each envelope, then persists delivered/deferred/failed state. | Two workers can read the same candidate before either persists the final state. |
-| `EfCoreGovernanceOutboxStore` | Uses EF Core persistence and configured concurrency tokens for state updates. | Optimistic concurrency helps detect conflicting saves, but it does not prevent duplicate provider calls before the save. |
-| `InMemoryGovernanceOutboxStore` | Intended for tests, samples, and local validation. Same-entry status transitions use single-process compare-and-swap updates, and delivered/dead-lettered entries are terminal for later in-memory updates. | Single-process only. It is not durable, does not claim work, and does not model cross-replica concurrency. |
-| Hosted drain worker | Runs wherever it is registered and enabled. | In scaled deployments, each replica may run a worker unless the host disables or coordinates it. |
+| `IAsiBackboneGovernanceOutboxClaimStore` | Adds explicit `ClaimPendingAsync`, `ClaimRetryReadyAsync`, claim completion, save, and release operations. | Cooperating workers emit only after acquiring a claim lease. Completion verifies claim owner/token before final state transition. |
+| `AsiBackboneGovernanceOutboxDrain` | Uses the existing candidate path by default. When `UseClaimLeases = true`, it requires a claim-capable store and emits only after claim acquisition. | Hosts choose the behavior explicitly. Claim leasing reduces duplicate selection risk but does not create exactly-once provider delivery. |
+| `EfCoreGovernanceOutboxStore` | Uses EF Core persistence and configured concurrency tokens for state updates. It also implements the claim-capable store contract with claim owner, token, claimed time, expiration, and attempt count fields. | Hosts must apply schema/migration changes before enabling claim leases. The baseline EF implementation is portable and optimistic-concurrency based; provider-specific SQL may be stronger for high throughput. |
+| `InMemoryGovernanceOutboxStore` | Intended for tests, samples, and local validation. Same-entry status transitions and claim updates use single-process compare-and-swap updates. | Useful for local validation and tests only. It is not durable and does not model cross-replica infrastructure behavior. |
+| Hosted drain worker | Runs wherever it is registered and enabled. | In scaled deployments, each replica may run a worker unless the host disables, partitions, or claim-coordinates it. |
 
 ## What optimistic concurrency does and does not solve
 
 The EF Core persistence configuration marks `ConcurrencyStamp` as a concurrency token. That is useful for detecting stale updates when two contexts try to save incompatible state transitions for the same row.
 
-However, the drain flow performs provider emission before the final delivered/failed state is saved. Optimistic concurrency at save time cannot undo a provider call that already happened. In other words:
+However, the non-claiming drain flow performs provider emission before the final delivered/failed state is saved. Optimistic concurrency at save time cannot undo a provider call that already happened. In other words:
 
 ```text
 worker A reads pending row
@@ -57,6 +58,17 @@ worker B may hit a concurrency conflict or overwrite attempt
 ```
 
 Even if the second save fails, the second provider emission may already have occurred. Treat optimistic concurrency as state-protection, not as duplicate-emission protection.
+
+Claim leasing moves the coordination point before provider emission for cooperating workers:
+
+```text
+worker A claims row 123
+worker B cannot claim row 123 while the lease is active
+worker A emits to provider
+worker A completes the row only if the claim token still matches
+```
+
+A crashed worker's claim becomes eligible for reclaim after `ClaimExpiresUtc`. That reclaim path is necessary for recovery, but it means provider delivery should still be treated as at-least-once.
 
 ## Recommended host patterns
 
@@ -71,7 +83,7 @@ Common deployment patterns include:
 - use platform leader election or a singleton scheduler if the hosting platform provides it;
 - ensure only one replica has permission or configuration to drain a given outbox partition.
 
-This is the recommended pattern unless the host has designed and tested a multi-worker claim strategy.
+This remains the recommended pattern unless the host has designed and tested a multi-worker claim or partition strategy.
 
 ### 2. Partitioned workers
 
@@ -79,19 +91,28 @@ Multiple workers can be safe when each worker owns a disjoint outbox partition. 
 
 Partitioning must be enforced in the durable selection query or storage adapter. Merely giving workers different names is not enough if they still read the same pending rows.
 
-### 3. Host-owned claim or lease before provider emission
+### 3. Opt-in package claim leases before provider emission
 
-A multi-worker durable store should claim work before calling the provider.
+A multi-worker durable store can claim work before calling the provider when the configured store implements `IAsiBackboneGovernanceOutboxClaimStore`.
 
-A typical host-owned claim pattern includes:
+```csharp
+builder.Services.Configure<AsiBackboneGovernanceOutboxOptions>(options =>
+{
+    options.UseClaimLeases = true;
+    options.ClaimWorkerId = "worker-1";
+    options.ClaimLeaseDuration = TimeSpan.FromMinutes(5);
+});
+```
 
-- claim fields such as `ClaimedBy`, `ClaimedUtc`, and `ClaimExpiresUtc`;
-- an atomic update from unclaimed/retry-ready to claimed;
-- a lease expiration policy so abandoned claims can be retried;
-- provider-specific locking or update semantics in the same database transaction;
-- a final delivered/failed/deferred/dead-letter transition that verifies the claim owner where appropriate.
+When claim leases are enabled, the drain:
 
-This package does not prescribe those columns or migration steps in the current release line. The host owns the database schema, migrations, and provider behavior. The future package-owned design direction is tracked in [Outbox Claim and Lease Design Record](outbox-claim-lease-design.md).
+- claims pending work before provider emission;
+- claims retry-ready work before provider emission;
+- emits only claimed entries;
+- completes delivered, deferred, failed, retryable, or dead-letter transitions only when the claim token still matches;
+- allows expired claims to be reclaimed by another worker.
+
+Hosts using EF Core must add the claim columns and indexes to their host-owned migration before enabling this option in production.
 
 ### 4. Provider-side idempotency
 
@@ -105,11 +126,11 @@ Use stable identifiers where available:
 - provider idempotency keys, when the provider supports them;
 - provider record IDs returned after delivery.
 
-Provider idempotency is especially important for retry, recovery, replay, and manual re-drain operations.
+Provider idempotency is especially important for retry, recovery, replay, lease expiration, and manual re-drain operations.
 
 ## Provider-specific SQL patterns
 
-Provider-specific locking and skip-locked semantics should remain host/provider-specific unless a future package explicitly targets a provider.
+The baseline EF Core claim implementation is provider-neutral and optimistic-concurrency based. Provider-specific locking and skip-locked semantics may still be stronger for high-throughput deployments.
 
 Examples that hosts may evaluate in their own infrastructure include:
 
@@ -124,7 +145,7 @@ These patterns are useful, but they are not provider-neutral. They also require 
 
 `AddAsiBackboneGovernanceOutboxDrainWorker` should be treated as an operational registration. In multi-replica applications, do not assume it becomes singleton across replicas.
 
-Recommended configuration posture:
+Recommended single-worker configuration posture:
 
 ```csharp
 builder.Services.Configure<AsiBackboneGovernanceOutboxDrainWorkerOptions>(options =>
@@ -137,6 +158,19 @@ builder.Services.Configure<AsiBackboneGovernanceOutboxDrainWorkerOptions>(option
 
 Then set `AsiBackbone:OutboxDrain:Enabled` to `true` only for the selected worker role or selected partition owner.
 
+Recommended claim-capable configuration posture:
+
+```csharp
+builder.Services.Configure<AsiBackboneGovernanceOutboxOptions>(options =>
+{
+    options.UseClaimLeases = true;
+    options.ClaimWorkerId = builder.Configuration["AsiBackbone:OutboxDrain:WorkerId"];
+    options.ClaimLeaseDuration = TimeSpan.FromMinutes(5);
+});
+```
+
+Ensure the configured worker ID is stable enough to diagnose ownership but unique enough to distinguish concurrent workers.
+
 ## Operational checks
 
 Hosts should monitor for signals that may indicate accidental duplicate workers or unsafe claim behavior:
@@ -146,33 +180,30 @@ Hosts should monitor for signals that may indicate accidental duplicate workers 
 - repeated EF Core concurrency exceptions during outbox state transitions;
 - provider throttling caused by duplicate drain attempts;
 - delivered records without the expected provider record IDs;
-- rising retry/dead-letter counts after a scale-out event.
+- rising retry/dead-letter counts after a scale-out event;
+- claims that remain active until expiration without completion;
+- frequent claim reclaims that may indicate worker crashes, too-short leases, or slow provider calls.
 
 If duplicate workers are discovered, disable extra workers first, then inspect provider-side duplicates and outbox state before replaying records.
 
 ## Wording boundary
 
-Do not describe the current provider-neutral outbox drain as exactly-once delivery.
+Do not describe the provider-neutral outbox drain as exactly-once delivery.
 
 A safer description is:
 
-> AsiBackbone provides durable local outbox records and provider-neutral drain primitives. Hosts that run multiple workers against the same durable store must add host-owned claiming, partitioning, or provider-side idempotency to avoid duplicate emissions.
+> AsiBackbone provides durable local outbox records, provider-neutral drain primitives, and opt-in claim/lease coordination for cooperating workers. Hosts must still use partitioning, host-owned migrations, and provider-side idempotency appropriate to their deployment to avoid or collapse duplicate emissions.
 
 This keeps the package boundary clear and avoids overstating delivery guarantees.
 
-## Future design considerations
+## Continuing design considerations
 
-A future claim/lease feature should be evaluated as a deliberate API and storage design, not as an incidental change to the current find-and-drain API.
+Claim/lease support is now an implemented baseline rather than only a future design item, but some questions remain host- or provider-specific:
 
-The current design record selects an additive direction: explicit claim/lease contracts in Core, opt-in durable-store implementations, no silent mutation in existing find APIs, no first-step `Claimed` or `InProgress` status, and continued idempotency guidance.
-
-Open implementation questions include:
-
-- exact Core model names for claim request, claim result, owner, lease expiration, and claim token values;
-- whether the first EF Core implementation can be provider-neutral enough or should wait for provider-specific adapters;
-- how to avoid breaking existing migrations and host-owned schemas;
+- whether the baseline EF Core optimistic-concurrency claim path is sufficient for a given production workload;
+- how to avoid breaking existing host-owned migrations and deployed schemas;
 - how provider idempotency keys should flow into downstream emitters;
-- how tests should model real database concurrency instead of only in-memory concurrency;
-- whether later operational evidence justifies a new provider-neutral `Claimed` or `InProgress` status.
+- how tests should model real database concurrency beyond in-memory concurrency;
+- whether later operational evidence justifies provider-specific claim packages or a new provider-neutral `Claimed` or `InProgress` status.
 
-Until that implementation exists, production multi-replica hosts should use a single active worker, partitioned workers, or host-owned claim/lease behavior.
+Production multi-replica hosts should choose one active worker, partitioned workers, or the opt-in claim/lease behavior with provider-side idempotency.

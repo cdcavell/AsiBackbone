@@ -1,6 +1,6 @@
 # Managed-Key Signing Provider
 
-Issue: #210, updated for #253 and #408.
+Issue: #210, updated for #253, #408, and #465.
 
 This article documents the released `AsiBackbone.Signing.ManagedKey` provider package.
 
@@ -62,6 +62,14 @@ The client must not return:
 - connection strings;
 - raw credential material.
 
+## Signature algorithm descriptor
+
+The default managed-key signature descriptor is `RSASSA-PSS-SHA256-MANAGED-KEY`.
+
+This value is provider-neutral metadata. AsiBackbone passes it to the host-owned `IManagedKeySigningClient`, and the host-owned client maps it to the concrete algorithm identifier required by Azure Key Vault, Managed HSM, a cloud KMS, an HSM appliance, or an organization-owned signing service.
+
+Migration note: earlier examples used `RSASSA-PKCS1-v1_5-SHA256-MANAGED-KEY`. Hosts that still require PKCS#1 v1.5 for an existing managed-key backend can override `ManagedKeySigningOptions.SignatureAlgorithm` explicitly, but new integrations should prefer RSA-PSS when the key provider supports it. Verification services must use the same algorithm family recorded in the signing metadata.
+
 ## Dependency injection
 
 Use `AddAsiBackboneManagedKeySigning(...)` for production-oriented managed-key signing. This registration fails closed by default because `ManagedKeySigningOptions.ReturnUnsignedOnFailure` defaults to `false`.
@@ -73,7 +81,7 @@ services.AddAsiBackboneManagedKeySigning(
         options.ProviderName = "azure-key-vault";
         options.KeyId = "https://vault-name.vault.azure.net/keys/audit-signing-key";
         options.KeyVersion = "00000000000000000000000000000000";
-        options.SignatureAlgorithm = "RSASSA-PKCS1-v1_5-SHA256-MANAGED-KEY";
+        options.SignatureAlgorithm = "RSASSA-PSS-SHA256-MANAGED-KEY";
         options.HashAlgorithm = "SHA-256";
         options.RequireKeyVersion = true;
         options.ReturnUnsignedOnFailure = false;

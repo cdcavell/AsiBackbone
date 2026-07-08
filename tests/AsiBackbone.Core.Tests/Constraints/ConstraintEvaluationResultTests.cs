@@ -121,6 +121,9 @@ public sealed class ConstraintEvaluationResultTests
         Assert.Empty(result.ReasonCodes);
     }
 
+    /// <summary>
+    /// Verifies that the NotApplicable factory method reuses a shared instance for not applicable results, ensuring that multiple calls to NotApplicable return the same object reference.
+    /// </summary>
     [Fact]
     public void NotApplicableReusesSharedPassThroughResult()
     {

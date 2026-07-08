@@ -3,8 +3,14 @@ using Xunit;
 
 namespace AsiBackbone.Core.Tests.Signing;
 
+/// <summary>
+/// Tests for the SignatureVerificationRequest class, focusing on normalization of purpose and metadata.
+/// </summary>
 public sealed class VerificationRequestBranchTests
 {
+    /// <summary>
+    /// Verifies that the SignatureVerificationRequest normalizes the purpose and metadata correctly, trimming whitespace and handling null or empty values.
+    /// </summary>
     [Fact]
     public void RequestNormalizesPurposeAndMetadata()
     {

@@ -45,7 +45,7 @@ public sealed class GovernanceOutboxEntryTests
                 CreateEnvelope(),
                 maxRetryCount: -1));
     }
-    
+
     /// <summary>
     /// Tests that restoring a governance outbox entry with an invalid status, negative counts, or a blank identifier throws the appropriate exceptions.
     /// </summary>  

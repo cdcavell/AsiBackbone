@@ -86,6 +86,9 @@ public sealed class AuditResidueBuilderTests
         AssertEquivalentResidue(direct, built);
     }
 
+    /// <summary>
+    /// Verifies that the fluent builder produces an <see cref="AuditResidue" /> equivalent to the direct creation method when starting from a <see cref="GovernanceDecision" />.
+    /// </summary>
     [Fact]
     public void BuilderFromDecisionMatchesDirectFromDecisionSemantics()
     {
@@ -152,6 +155,9 @@ public sealed class AuditResidueBuilderTests
         AssertEquivalentResidue(direct, built);
     }
 
+    /// <summary>
+    /// Verifies that the fluent builder produces an <see cref="AuditResidue" /> equivalent to the direct creation method when starting from a <see cref="ConstraintEvaluationResult" />.
+    /// </summary>
     [Fact]
     public void BuilderFromConstraintMatchesDirectFromConstraintSemantics()
     {
@@ -189,6 +195,9 @@ public sealed class AuditResidueBuilderTests
         AssertEquivalentResidue(direct, built);
     }
 
+    /// <summary>
+    /// Verifies that the fluent builder does not allocate metadata storage when no metadata is added, and that the built <see cref="AuditResidue" /> has no metadata.
+    /// </summary>
     [Fact]
     public void BuilderDoesNotAllocateMetadataStorageWhenNoMetadataIsAdded()
     {
@@ -206,6 +215,9 @@ public sealed class AuditResidueBuilderTests
         Assert.Null(GetMetadataStorage(builder));
     }
 
+    /// <summary>
+    /// Verifies that the fluent builder allocates metadata storage when metadata is added, and that the built <see cref="AuditResidue" /> has the expected metadata.
+    /// </summary>
     [Fact]
     public void AddMetadataInitializesStorageAndBuildsSingleEntry()
     {
@@ -224,6 +236,9 @@ public sealed class AuditResidueBuilderTests
         Assert.Equal("unit-test", residue.Metadata["source"]);
     }
 
+    /// <summary>
+    /// Verifies that the fluent builder allocates metadata storage when metadata is added, and that the built <see cref="AuditResidue" /> has the expected metadata.
+    /// </summary>
     [Fact]
     public void WithMetadataInitializesStorageAndBuildsMultipleEntries()
     {
@@ -248,6 +263,9 @@ public sealed class AuditResidueBuilderTests
         Assert.Equal("us-la", residue.Metadata["region"]);
     }
 
+    /// <summary>
+    /// Verifies that the fluent builder overwrites existing metadata entries when the same key is added again, and that the built <see cref="AuditResidue" /> has the updated value.
+    /// </summary>
     [Fact]
     public void AddMetadataOverwritesExistingEntry()
     {
@@ -263,6 +281,9 @@ public sealed class AuditResidueBuilderTests
         Assert.Equal("updated", residue.Metadata["source"]);
     }
 
+    /// <summary>
+    /// Verifies that the fluent builder clears existing metadata storage when null or empty metadata is provided, and that the built <see cref="AuditResidue" /> has no metadata.
+    /// </summary>
     [Fact]
     public void WithMetadataClearsStorageForNullAndEmptyInputs()
     {
@@ -290,6 +311,9 @@ public sealed class AuditResidueBuilderTests
         Assert.Empty(emptyMetadataResidue.Metadata);
     }
 
+    /// <summary>
+    /// Verifies that the built <see cref="AuditResidue" /> has immutable metadata, and that attempts to modify the metadata dictionary throw a <see cref="NotSupportedException" />.
+    /// </summary>
     [Fact]
     public void BuiltResidueMetadataIsImmutable()
     {
@@ -312,6 +336,9 @@ public sealed class AuditResidueBuilderTests
         _ = Assert.Throws<NotSupportedException>(() => mutableMetadata["source"] = "mutated");
     }
 
+    /// <summary>
+    /// Verifies that the built <see cref="AuditResidue" /> does not change when the builder is reused to build another residue, ensuring that each build produces a separate instance with its own state.
+    /// </summary>
     [Fact]
     public void BuiltResidueDoesNotChangeWhenBuilderIsReused()
     {
@@ -334,6 +361,9 @@ public sealed class AuditResidueBuilderTests
         Assert.Equal("mutated", second.Metadata["source"]);
     }
 
+    /// <summary>
+    /// Verifies that the fluent builder throws an <see cref="ArgumentNullException" /> when attempting to create an <see cref="AuditResidue" /> from a null <see cref="GovernanceDecision" />.
+    /// </summary>
     [Fact]
     public void BuilderThrowsForMissingDecision()
     {
@@ -344,6 +374,9 @@ public sealed class AuditResidueBuilderTests
                 decision: null!));
     }
 
+    /// <summary>
+    /// Verifies that the fluent builder throws an <see cref="ArgumentNullException" /> when attempting to create an <see cref="AuditResidue" /> from a null <see cref="ConstraintEvaluationResult" />.
+    /// </summary>
     [Fact]
     public void BuilderThrowsForMissingConstraintResult()
     {

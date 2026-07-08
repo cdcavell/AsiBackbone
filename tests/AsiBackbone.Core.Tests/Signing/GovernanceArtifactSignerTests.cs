@@ -76,6 +76,9 @@ public sealed class GovernanceArtifactSignerTests
         Assert.Equal("outbox-signing", artifact.SigningMetadata.Metadata["workflow"]);
     }
 
+    /// <summary>
+    /// Tests that creating an unsigned GovernanceOutboxEntry preserves the canonical hash without including any signing metadata.
+    /// </summary>
     [Fact]
     public void CreateUnsignedGovernanceOutboxEntryKeepsCanonicalHashWithoutSigningMetadata()
     {
@@ -95,6 +98,12 @@ public sealed class GovernanceArtifactSignerTests
         Assert.Empty(artifact.SigningMetadata.Metadata);
     }
 
+    /// <summary>
+    /// Tests that signing an AuditLedgerRecord with a failing signing service propagates the failure metadata correctly in the resulting SignedGovernanceArtifact.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation of signing an AuditLedgerRecord with a failing signing service and verifying the resulting SignedGovernanceArtifact contains the expected failure metadata.
+    /// </returns>
     [Fact]
     public async Task SignAuditLedgerRecordAsyncPropagatesUnsignedFailureMetadata()
     {

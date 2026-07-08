@@ -115,6 +115,9 @@ public sealed class SigningPolicyResultBranchTests
         Assert.Equal("include-me", outcome.SafeMetadata["public_hint"]);
     }
 
+    /// <summary>
+    /// Tests that the VerificationPolicyOutcome correctly allows a verified artifact when the verification policy options are overridden to allow valid signatures, ensuring that the outcome reflects the expected category and action without any failure codes.
+    /// </summary>
     [Fact]
     public void VerificationPolicyOutcomeAllowsVerifiedArtifactWithOverrideOptions()
     {
@@ -138,6 +141,9 @@ public sealed class SigningPolicyResultBranchTests
         Assert.Null(outcome.FailureCode);
     }
 
+    /// <summary>
+    /// Tests that signed governance artifacts expose unsigned, signing-ready, and mismatch branches correctly.
+    /// </summary>
     [Fact]
     public void SignedGovernanceArtifactsExposeUnsignedSigningReadyAndMismatchBranches()
     {

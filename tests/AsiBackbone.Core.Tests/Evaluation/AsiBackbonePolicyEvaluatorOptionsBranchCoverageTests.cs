@@ -60,7 +60,7 @@ public sealed class AsiBackbonePolicyEvaluatorOptionsBranchCoverageTests
 
         _ = Assert.Throws<InvalidOperationException>(options.Validate);
     }
-    
+
     /// <summary>
     /// Validates that blank constraint exception reason messages are rejected by validation.
     /// </summary>  

@@ -5,8 +5,14 @@ using Xunit;
 
 namespace AsiBackbone.Core.Tests.Signing;
 
+/// <summary>
+/// Tests for signing abstractions, including signing metadata, signing requests, signing results, and signature verification.
+/// </summary>
 public sealed class SigningAbstractionsTests
 {
+    /// <summary>
+    /// Tests that the <see cref="SigningMetadata.NoSignature"/> instance has no signature or key reference, and that its properties are null or empty as expected.
+    /// </summary>
     [Fact]
     public void NoSignatureMetadataHasNoSignatureOrKeyReference()
     {
@@ -21,6 +27,9 @@ public sealed class SigningAbstractionsTests
         Assert.Empty(metadata.Metadata);
     }
 
+    /// <summary>
+    /// Tests that a <see cref="SigningRequest"/> instance normalizes its key references and metadata by trimming whitespace and ignoring empty keys, ensuring that the properties are set correctly.
+    /// </summary>
     [Fact]
     public void SigningRequestNormalizesKeyReferencesAndMetadata()
     {

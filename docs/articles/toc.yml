@@ -212,6 +212,8 @@
       href: release-readiness-120.md
     - name: API Baseline and Boundary Checks
       href: api-baseline-and-boundary-checks.md
+    - name: Public API XML Documentation
+      href: public-api-xml-documentation.md
     - name: Developer Checklist
       href: developer-checklist.md
     - name: 2.3.0 Release Notes

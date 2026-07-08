@@ -42,9 +42,11 @@ public sealed class AsiBackbonePolicyEvaluatorOptions
     /// Gets or sets a value indicating whether evaluation should stop after the first denied constraint result.
     /// </summary>
     /// <remarks>
-    /// The default value is <see langword="false" /> so the evaluator continues to collect the complete set of
-    /// warning and denial reasons for audit visibility. Set this to <see langword="true" /> only when the host
-    /// intentionally prefers latency-optimized fast-abort behavior over full reason-code aggregation.
+    /// The default value is <see langword="false" /> so the evaluator continues to collect all constraint results
+    /// and denial reasons for audit visibility. In that full-evaluation mode, denied decisions intentionally remain
+    /// denial-focused and do not include warning-only audit messages. Set this to <see langword="true" /> only when
+    /// the host intentionally prefers latency-optimized fast-abort behavior; fast-abort decisions preserve warning
+    /// reasons produced before the first denial because later constraints are not evaluated.
     /// </remarks>
     public bool ShortCircuitOnFirstDenial { get; set; }
 

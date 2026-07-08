@@ -124,7 +124,7 @@ For production-style hosts, add durable audit/outbox persistence, signing or ver
 
 ## Package family
 
-Stable `3.x` is the current package family. `3.0.0` establishes the current major release line and binary assembly identity while preserving the simplified `AsiBackbone.*` package IDs and namespaces established by `2.0.0`. The package family carries forward the governance-spine surface with builder-facade, analyzer, OpenTelemetry, signing-provider, testing-harness, template package, endpoint diagnostics, endpoint reduced metadata mode, metadata budget guardrails, constraint-exception denial behavior, empty-policy warning diagnostics, managed-key fail-closed defaults, threat-model contributor hooks, strict-governance profile helpers, EF Core JSON metadata storage guidance, policy-input hardening, production placeholder guardrails, samples, Source Link metadata, package SBOM/provenance artifacts, BenchmarkDotNet allocation baselines, benchmark guidance, custom decision-policy examples, and documentation-alignment surfaces.
+Stable `3.0.x` package family. `3.0.0` establishes the current major release line and binary assembly identity while preserving the simplified `AsiBackbone.*` package IDs and namespaces established by `2.0.0`. The package family carries forward the governance-spine surface with builder-facade, analyzer, OpenTelemetry, signing-provider, testing-harness, template package, endpoint diagnostics, endpoint reduced metadata mode, metadata budget guardrails, constraint-exception denial behavior, empty-policy warning diagnostics, managed-key fail-closed defaults, threat-model contributor hooks, strict-governance profile helpers, EF Core JSON metadata storage guidance, policy-input hardening, production placeholder guardrails, samples, Source Link metadata, package SBOM/provenance artifacts, BenchmarkDotNet allocation baselines, benchmark guidance, custom decision-policy examples, and documentation-alignment surfaces.
 
 | Package | Role |
 | --- | --- |
@@ -171,7 +171,7 @@ The full, categorized documentation set lives at the [documentation site](https:
 
 ## Current status
 
-Stable `3.x` is the current released line, with `3.0.0` as the current major release. This release preserves the simplified `AsiBackbone.*` package and namespace identity established by `2.0.0` while carrying forward the released governance-spine package family and updating the binary assembly identity to `3.0.0.0`.
+Stable `3.0.x` is the current released line, with `3.0.0` as the current major release. This release preserves the simplified `AsiBackbone.*` package and namespace identity established by `2.0.0` while carrying forward the released governance-spine package family and updating the binary assembly identity to `3.0.0.0`.
 
 The stable API contract is documented in [API Compatibility and SemVer](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/api-compatibility-and-semver.md). The `3.0.0` release boundary is recorded in [3.0.0 Release Notes](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/release-notes-300.md) and [3.0.0 Release Readiness Record](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/release-readiness-300.md). Earlier `1.x` and `2.x` release notes remain available for historical traceability.
 

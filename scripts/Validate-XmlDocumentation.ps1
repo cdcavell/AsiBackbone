@@ -77,7 +77,7 @@ function Escape-MarkdownTableValue {
         return ''
     }
 
-    return ($Value -replace '\|', '\|').Replace("`r", ' ').Replace("`n", ' ')
+    return $Value.Replace('|', '\|').Replace("`r", ' ').Replace("`n", ' ')
 }
 
 $resolvedRepositoryRoot = Resolve-Path -LiteralPath $RepositoryRoot
@@ -192,7 +192,8 @@ else {
     $report.Add('| --- | ---: | ---: |')
 
     foreach ($summary in $projectSummaries) {
-        $report.Add("| $(Escape-MarkdownTableValue $summary.Project) | $($summary.CS1591) | $($summary.ExitCode) |")
+        $projectName = Escape-MarkdownTableValue -Value $summary.Project
+        $report.Add('| {0} | {1} | {2} |' -f $projectName, $summary.CS1591, $summary.ExitCode)
     }
 
     $report.Add('')
@@ -205,7 +206,10 @@ if ($findings.Count -gt 0) {
     $report.Add('| --- | --- | ---: | --- |')
 
     foreach ($finding in $findings) {
-        $report.Add("| $(Escape-MarkdownTableValue $finding.Project) | $(Escape-MarkdownTableValue $finding.File) | $($finding.Line) | $(Escape-MarkdownTableValue $finding.Message) |")
+        $projectName = Escape-MarkdownTableValue -Value $finding.Project
+        $fileName = Escape-MarkdownTableValue -Value $finding.File
+        $message = Escape-MarkdownTableValue -Value $finding.Message
+        $report.Add('| {0} | {1} | {2} | {3} |' -f $projectName, $fileName, $finding.Line, $message)
     }
 
     $report.Add('')
@@ -222,7 +226,8 @@ if ($buildFailures.Count -gt 0) {
     $report.Add('| --- | ---: |')
 
     foreach ($failure in $buildFailures) {
-        $report.Add("| $(Escape-MarkdownTableValue $failure.Project) | $($failure.ExitCode) |")
+        $projectName = Escape-MarkdownTableValue -Value $failure.Project
+        $report.Add('| {0} | {1} |' -f $projectName, $failure.ExitCode)
     }
 
     $report.Add('')

@@ -193,7 +193,8 @@ else {
 
     foreach ($summary in $projectSummaries) {
         $projectName = Escape-MarkdownTableValue -Value $summary.Project
-        $report.Add('| {0} | {1} | {2} |' -f $projectName, $summary.CS1591, $summary.ExitCode)
+        $reportLine = '| {0} | {1} | {2} |' -f $projectName, $summary.CS1591, $summary.ExitCode
+        $report.Add($reportLine)
     }
 
     $report.Add('')
@@ -209,7 +210,8 @@ if ($findings.Count -gt 0) {
         $projectName = Escape-MarkdownTableValue -Value $finding.Project
         $fileName = Escape-MarkdownTableValue -Value $finding.File
         $message = Escape-MarkdownTableValue -Value $finding.Message
-        $report.Add('| {0} | {1} | {2} | {3} |' -f $projectName, $fileName, $finding.Line, $message)
+        $reportLine = '| {0} | {1} | {2} | {3} |' -f $projectName, $fileName, $finding.Line, $message
+        $report.Add($reportLine)
     }
 
     $report.Add('')
@@ -227,7 +229,8 @@ if ($buildFailures.Count -gt 0) {
 
     foreach ($failure in $buildFailures) {
         $projectName = Escape-MarkdownTableValue -Value $failure.Project
-        $report.Add('| {0} | {1} |' -f $projectName, $failure.ExitCode)
+        $reportLine = '| {0} | {1} |' -f $projectName, $failure.ExitCode
+        $report.Add($reportLine)
     }
 
     $report.Add('')

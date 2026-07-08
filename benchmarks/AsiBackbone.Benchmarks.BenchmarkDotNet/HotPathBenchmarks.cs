@@ -107,6 +107,14 @@ public class AsiBackboneHotPathBenchmarks
     };
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="AsiBackboneHotPathBenchmarks"/> class
+    /// with reusable benchmark fixtures for governance hot-path measurements.
+    /// </summary>
+    public AsiBackboneHotPathBenchmarks()
+    {
+    }
+
+    /// <summary>
     /// Cleans up resources after all benchmarks have completed.
     /// </summary>
     [GlobalCleanup]

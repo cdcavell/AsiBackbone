@@ -31,7 +31,7 @@ function Resolve-RepositoryPath {
         return $Path
     }
 
-    return (Join-Path $RepositoryRoot $Path)
+    return Join-Path $RepositoryRoot $Path
 }
 
 function Get-RepositoryRelativePath {
@@ -92,9 +92,9 @@ if ($Project.Count -eq 0) {
     }
 }
 
-$findings = New-Object System.Collections.Generic.List[object]
-$projectSummaries = New-Object System.Collections.Generic.List[object]
-$buildFailures = New-Object System.Collections.Generic.List[object]
+$findings = @()
+$projectSummaries = @()
+$buildFailures = @()
 $generatedAt = (Get-Date).ToUniversalTime().ToString('yyyy-MM-dd HH:mm:ssZ')
 $enforceXmlDocs = if ($Mode -eq 'Enforce') { 'true' } else { 'false' }
 
@@ -135,35 +135,36 @@ foreach ($projectPath in $Project) {
         if ($text -match $pattern) {
             $cs1591Count++
             $sourcePath = $Matches['path']
-            $displaySourcePath = if ([System.IO.Path]::IsPathRooted($sourcePath)) {
-                Get-RepositoryRelativePath -Path $sourcePath
+
+            if ([System.IO.Path]::IsPathRooted($sourcePath)) {
+                $displaySourcePath = Get-RepositoryRelativePath -Path $sourcePath
             }
             else {
-                $sourcePath
+                $displaySourcePath = $sourcePath
             }
 
-            $findings.Add([pscustomobject]@{
+            $findings += [pscustomobject]@{
                 Project = $displayProjectPath
                 File = $displaySourcePath
                 Line = $Matches['line']
                 Column = $Matches['column']
                 Level = $Matches['level']
                 Message = $Matches['message']
-            })
+            }
         }
     }
 
-    $projectSummaries.Add([pscustomobject]@{
+    $projectSummaries += [pscustomobject]@{
         Project = $displayProjectPath
         CS1591 = $cs1591Count
         ExitCode = $exitCode
-    })
+    }
 
     if ($exitCode -ne 0) {
-        $buildFailures.Add([pscustomobject]@{
+        $buildFailures += [pscustomobject]@{
             Project = $displayProjectPath
             ExitCode = $exitCode
-        })
+        }
     }
 }
 
@@ -171,69 +172,70 @@ $outputAbsolutePath = Resolve-RepositoryPath -Path $OutputPath
 $outputDirectory = Split-Path -Parent $outputAbsolutePath
 New-Item -ItemType Directory -Path $outputDirectory -Force | Out-Null
 
-$report = New-Object System.Collections.Generic.List[string]
-$report.Add('# Public API XML Documentation Inventory')
-$report.Add('')
-$report.Add("Generated: $generatedAt")
-$report.Add('')
-$report.Add("Mode: `$Mode`")
-$report.Add('')
-$report.Add('This report is produced by `scripts/Validate-XmlDocumentation.ps1` with `CS1591` unsuppressed for the selected public package projects. Inventory mode records gaps without treating them as release-blocking. Enforce mode treats `CS1591` as an error for projects listed in `eng/xml-docs/staged-enforcement-projects.txt` or passed with `-Project`.')
-$report.Add('')
+$report = @(
+    '# Public API XML Documentation Inventory',
+    '',
+    "Generated: $generatedAt",
+    '',
+    "Mode: `$Mode`",
+    '',
+    'This report is produced by `scripts/Validate-XmlDocumentation.ps1` with `CS1591` unsuppressed for the selected public package projects. Inventory mode records gaps without treating them as release-blocking. Enforce mode treats `CS1591` as an error for projects listed in `eng/xml-docs/staged-enforcement-projects.txt` or passed with `-Project`.',
+    ''
+)
 
 if ($Project.Count -eq 0) {
-    $report.Add('No projects were configured for this mode.')
-    $report.Add('')
+    $report += 'No projects were configured for this mode.'
+    $report += ''
 }
 else {
-    $report.Add('## Project summary')
-    $report.Add('')
-    $report.Add('| Project | CS1591 count | Build exit code |')
-    $report.Add('| --- | ---: | ---: |')
+    $report += '## Project summary'
+    $report += ''
+    $report += '| Project | CS1591 count | Build exit code |'
+    $report += '| --- | ---: | ---: |'
 
     foreach ($summary in $projectSummaries) {
         $projectName = Escape-MarkdownTableValue -Value $summary.Project
         $reportLine = '| {0} | {1} | {2} |' -f $projectName, $summary.CS1591, $summary.ExitCode
-        $report.Add($reportLine)
+        $report += $reportLine
     }
 
-    $report.Add('')
+    $report += ''
 }
 
 if ($findings.Count -gt 0) {
-    $report.Add('## CS1591 findings')
-    $report.Add('')
-    $report.Add('| Project | File | Line | Member/message |')
-    $report.Add('| --- | --- | ---: | --- |')
+    $report += '## CS1591 findings'
+    $report += ''
+    $report += '| Project | File | Line | Member/message |'
+    $report += '| --- | --- | ---: | --- |'
 
     foreach ($finding in $findings) {
         $projectName = Escape-MarkdownTableValue -Value $finding.Project
         $fileName = Escape-MarkdownTableValue -Value $finding.File
         $message = Escape-MarkdownTableValue -Value $finding.Message
         $reportLine = '| {0} | {1} | {2} | {3} |' -f $projectName, $fileName, $finding.Line, $message
-        $report.Add($reportLine)
+        $report += $reportLine
     }
 
-    $report.Add('')
+    $report += ''
 }
 else {
-    $report.Add('No `CS1591` gaps were reported for the selected projects.')
-    $report.Add('')
+    $report += 'No `CS1591` gaps were reported for the selected projects.'
+    $report += ''
 }
 
 if ($buildFailures.Count -gt 0) {
-    $report.Add('## Build failures')
-    $report.Add('')
-    $report.Add('| Project | Exit code |')
-    $report.Add('| --- | ---: |')
+    $report += '## Build failures'
+    $report += ''
+    $report += '| Project | Exit code |'
+    $report += '| --- | ---: |'
 
     foreach ($failure in $buildFailures) {
         $projectName = Escape-MarkdownTableValue -Value $failure.Project
         $reportLine = '| {0} | {1} |' -f $projectName, $failure.ExitCode
-        $report.Add($reportLine)
+        $report += $reportLine
     }
 
-    $report.Add('')
+    $report += ''
 }
 
 $report | Set-Content -LiteralPath $outputAbsolutePath -Encoding utf8

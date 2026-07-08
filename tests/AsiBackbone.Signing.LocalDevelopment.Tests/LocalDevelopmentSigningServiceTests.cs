@@ -61,7 +61,7 @@ public sealed class LocalDevelopmentSigningServiceTests
     }
 
     [Fact]
-    public async Task VerifyAsyncFailsForHashMismatch()
+    public async Task VerifyAsyncFailsForSameLengthHashMismatch()
     {
         using var service = new LocalDevelopmentSigningService();
         SigningResult signingResult = await service.SignAsync(
@@ -69,7 +69,7 @@ public sealed class LocalDevelopmentSigningServiceTests
             TestContext.Current.CancellationToken);
 
         SignatureVerificationResult verificationResult = await service.VerifyAsync(
-            new SignatureVerificationRequest("changed-hash", signingResult.Metadata),
+            new SignatureVerificationRequest("tampered-hash", signingResult.Metadata),
             TestContext.Current.CancellationToken);
 
         Assert.False(verificationResult.IsValid);

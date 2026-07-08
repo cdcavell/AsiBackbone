@@ -13,6 +13,7 @@ Contributions should preserve the stable package direction:
 - keep package boundaries clear;
 - avoid hidden infrastructure assumptions;
 - document public behavior before presenting it as stable;
+- preserve the documented implicit-usings posture unless a project-specific change improves package-boundary reviewability;
 - avoid overclaiming around signing, tamper-evidence, privacy, compliance, AI, or physical execution.
 
 ## Local setup

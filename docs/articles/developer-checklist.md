@@ -71,6 +71,14 @@ dotnet tool run docfx docs/docfx.json --serve
 - Samples and smoke tests do not become hidden requirements for consumers.
 - Provider-specific behavior is not implied to be part of `1.0.0` unless explicitly released as stable.
 
+## Language and namespace posture checklist
+
+- Repository-wide implicit usings remain enabled; see [Implicit Usings Posture](implicit-usings-posture.md).
+- Use normal file-level `using` directives for provider-specific, package-specific, persistence, telemetry, signing, ASP.NET Core, EF Core, and benchmark namespaces when they improve boundary review.
+- Do not add `GlobalUsings.cs` files only to mirror SDK-provided implicit usings.
+- Add project-local global usings only when they make repeated local test, sample, or host-scaffolding namespaces easier to review without hiding package dependencies.
+- Avoid churn-only using-directive changes unless they improve package-boundary clarity.
+
 ## Production hygiene checklist
 
 - Production source under `src/` must not use `NotImplementedException` as a placeholder.

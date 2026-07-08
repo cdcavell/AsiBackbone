@@ -214,6 +214,8 @@
       href: api-baseline-and-boundary-checks.md
     - name: Public API XML Documentation
       href: public-api-xml-documentation.md
+    - name: Implicit Usings Posture
+      href: implicit-usings-posture.md
     - name: Developer Checklist
       href: developer-checklist.md
     - name: 2.3.0 Release Notes

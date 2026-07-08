@@ -199,7 +199,9 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
     /// <summary>
     /// Tests that the <c>AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneStrictGovernance(IServiceCollection)</c> method configures the policy evaluator to deny when no constraints are provided.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task AddAsiBackboneStrictGovernanceOptionsDenyEmptyPolicyEvaluation()
     {
@@ -248,7 +250,7 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
     }
 
     /// <summary>
-    /// Tests that the <c>AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection)</c> method throws an <see cref="ArgumentNullException"/> when the <paramref name="services"/> parameter is null.
+    /// Tests that the <c>AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection)</c> method throws an <see cref="ArgumentNullException"/> when the <c>services</c> argument is null.
     /// </summary>
     [Fact]
     public void AddAsiBackboneAspNetCoreRejectsNullServices()
@@ -259,7 +261,7 @@ public sealed class AsiBackboneAspNetCoreServiceCollectionExtensionsTests
     }
 
     /// <summary>
-    /// Tests that the <c>AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection, Action{AsiBackboneAspNetCoreOptions})</c> method throws an <see cref="ArgumentNullException"/> when the <paramref name="configureOptions"/> parameter is null.
+    /// Tests that the <c>AsiBackboneAspNetCoreServiceCollectionExtensions.AddAsiBackboneAspNetCore(IServiceCollection, Action{AsiBackboneAspNetCoreOptions})</c> method throws an <see cref="ArgumentNullException"/> when the <c>configureOptions</c> callback is null.
     /// </summary>
     [Fact]
     public void AddAsiBackboneAspNetCoreRejectsNullConfigureCallback()

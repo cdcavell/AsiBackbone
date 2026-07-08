@@ -12,7 +12,7 @@ namespace AsiBackbone.Analyzers.Tests;
 public sealed class LocalDevelopmentSigningProductionAnalyzerTests
 {
     /// <summary>
-    /// Tests that registering the <see cref="AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningService"/> inside a production branch reports the ASIB002 diagnostic.
+    /// Tests that registering the <c>LocalDevelopmentSigningService</c> inside a production branch reports the ASIB002 diagnostic.
     /// </summary>
     /// <returns>
     /// A task representing the asynchronous operation.
@@ -29,7 +29,7 @@ public sealed class LocalDevelopmentSigningProductionAnalyzerTests
     }
 
     /// <summary>
-    /// Tests that constructing the <see cref="AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningService"/> inside a production branch reports the ASIB002 diagnostic.
+    /// Tests that constructing the <c>LocalDevelopmentSigningService</c> inside a production branch reports the ASIB002 diagnostic.
     /// </summary>
     /// <returns>
     /// A task representing the asynchronous operation.
@@ -46,7 +46,7 @@ public sealed class LocalDevelopmentSigningProductionAnalyzerTests
     }
 
     /// <summary>
-    /// Tests that registering the <see cref="AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningOptions"/> inside a production branch reports the ASIB002 diagnostic.
+    /// Tests that registering the <c>LocalDevelopmentSigningOptions</c> inside a production branch reports the ASIB002 diagnostic.
     /// </summary>
     /// <returns>
     /// A task representing the asynchronous operation.
@@ -63,7 +63,7 @@ public sealed class LocalDevelopmentSigningProductionAnalyzerTests
     }
 
     /// <summary>
-    /// Tests that registering the <see cref="AsiBackbone.Signing.LocalDevelopment.LocalDevelopmentSigningService"/> inside a development branch does not report the ASIB002 diagnostic.
+    /// Tests that registering the <c>LocalDevelopmentSigningService</c> inside a development branch does not report the ASIB002 diagnostic.
     /// </summary>
     /// <returns>
     /// A task representing the asynchronous operation.
@@ -106,7 +106,7 @@ public sealed class LocalDevelopmentSigningProductionAnalyzerTests
     }
 
     /// <summary>
-    /// Tests that the <see cref="AsiBackboneProductionConfigurationReviewedAttribute"/> suppresses the ASIB002 diagnostic.
+    /// Tests that the <c>AsiBackboneProductionConfigurationReviewedAttribute</c> suppresses the ASIB002 diagnostic.
     /// </summary>
     /// <returns>
     /// A task representing the asynchronous operation.

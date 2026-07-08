@@ -29,6 +29,9 @@ public sealed class VerificationRequestBranchTests
         Assert.False(request.Metadata.ContainsKey(string.Empty));
     }
 
+    /// <summary>
+    /// Verifies that the request uses empty metadata for missing or blank entries.
+    /// </summary>
     [Fact]
     public void RequestUsesEmptyMetadataForMissingOrBlankEntries()
     {

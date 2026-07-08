@@ -3,8 +3,14 @@ using Xunit;
 
 namespace AsiBackbone.Core.Tests.Signing;
 
+/// <summary>
+/// Tests for the signing policy result branches, including canonical payload options normalization, verification policy options application, and verification policy outcome construction, ensuring that the signing and verification processes behave as expected under various scenarios.
+/// </summary>
 public sealed class SigningPolicyResultBranchTests
 {
+    /// <summary>
+    /// Tests that the CanonicalPayloadOptions correctly normalizes the canonicalization version, hash algorithm, and metadata key allow list by trimming whitespace, removing duplicates, and applying default values where necessary, ensuring that the resulting options reflect the expected normalized state.
+    /// </summary>
     [Fact]
     public void CanonicalPayloadOptionsNormalizesDefaultsAndAllowList()
     {
@@ -24,6 +30,9 @@ public sealed class SigningPolicyResultBranchTests
         Assert.False(options.AllowsMetadataKey(" "));
     }
 
+    /// <summary>
+    /// Tests that the CanonicalPayloadOptions correctly applies default values and an empty allow list when provided with blank or whitespace inputs, ensuring that the resulting options reflect the expected defaults and do not allow any metadata keys.
+    /// </summary>
     [Fact]
     public void CanonicalPayloadOptionsUsesDefaultsAndEmptyAllowListForBlankInputs()
     {
@@ -38,6 +47,9 @@ public sealed class SigningPolicyResultBranchTests
         Assert.False(options.AllowsMetadataKey("alpha"));
     }
 
+    /// <summary>
+    /// Tests that the VerificationPolicyOptions correctly applies overrides for specific signature verification categories, while rejecting undefined inputs and ensuring that default actions are applied for categories not explicitly overridden.
+    /// </summary>
     [Fact]
     public void VerificationPolicyOptionsAppliesOverridesAndRejectsUndefinedInputs()
     {
@@ -65,6 +77,9 @@ public sealed class SigningPolicyResultBranchTests
             VerificationPolicyOptions.Default.GetAction((SignatureVerificationCategory)999));
     }
 
+    /// <summary>
+    /// Tests that the VerificationPolicyOutcome correctly builds safe metadata and normalizes provider fields from the signing metadata of a signed artifact, while also reflecting the signature verification result.
+    /// </summary>
     [Fact]
     public void VerificationPolicyOutcomeBuildsSafeMetadataAndNormalizesProviderFields()
     {

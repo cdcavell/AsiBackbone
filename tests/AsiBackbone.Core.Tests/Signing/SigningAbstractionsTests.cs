@@ -46,6 +46,12 @@ public sealed class SigningAbstractionsTests
         Assert.False(request.Metadata.ContainsKey(string.Empty));
     }
 
+    /// <summary>
+    /// Tests that a fake signing service can produce signing metadata that is provider-neutral and contains the expected values based on the input signing request.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation of signing and verifying the signing metadata.
+    /// </returns>
     [Fact]
     public async Task FakeSignerReturnsProviderNeutralSigningMetadata()
     {
@@ -69,6 +75,12 @@ public sealed class SigningAbstractionsTests
         Assert.Equal("fake-signer", result.Metadata.Provider);
     }
 
+    /// <summary>
+    /// Tests that a fake verification service can validate signing metadata that is provider-neutral and contains the expected values based on the input signing request.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation of verifying the signing metadata.
+    /// </returns>
     [Fact]
     public async Task FakeVerifierValidatesProviderNeutralSigningMetadata()
     {
@@ -91,6 +103,9 @@ public sealed class SigningAbstractionsTests
         Assert.Null(result.FailureCode);
     }
 
+    /// <summary>
+    /// Tests that an audit ledger record can carry signing metadata and a reference to a capability token, and that the properties are correctly set and normalized.
+    /// </summary>
     [Fact]
     public void AuditLedgerRecordCarriesSigningMetadataAndCapabilityTokenReference()
     {

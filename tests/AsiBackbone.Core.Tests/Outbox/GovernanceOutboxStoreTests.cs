@@ -315,6 +315,9 @@ public sealed class GovernanceOutboxStoreTests
         Assert.DoesNotContain(retryReadyEntries, retryReadyEntry => retryReadyEntry.OutboxEntryId == entry.OutboxEntryId);
     }
 
+    /// <summary>
+    /// Verifies that the semantics of the GovernanceEmissionResult branches are covered in the compiled outbox tests.
+    /// </summary>
     [Fact]
     public void GovernanceEmissionResultBranchSemanticsAreCoveredInCompiledOutboxTests()
     {
@@ -357,6 +360,12 @@ public sealed class GovernanceOutboxStoreTests
         _ = Assert.Throws<ArgumentNullException>(() => GovernanceEmissionResult.DeadLettered(null!));
     }
 
+    /// <summary>
+    /// Verifies that the semantics of the GovernanceOutboxClaim branches are covered in the compiled outbox tests.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task ClaimLeaseBranchesAreCoveredInCompiledOutboxTests()
     {
@@ -402,6 +411,9 @@ public sealed class GovernanceOutboxStoreTests
         _ = Assert.Throws<ArgumentOutOfRangeException>(() => entry.MarkClaimed("worker-a", leaseDuration: TimeSpan.Zero));
     }
 
+    /// <summary>
+    /// Verifies that the semantics of the GovernanceOutboxEntry validation and transition branches are covered in the compiled outbox tests.
+    /// </summary>
     [Fact]
     public void GovernanceOutboxEntryValidationAndTransitionBranchesAreCovered()
     {
@@ -453,6 +465,9 @@ public sealed class GovernanceOutboxStoreTests
         _ = Assert.Throws<ArgumentException>(() => entry.MarkDelivered(GovernanceEmissionResult.Failed(nonRetryableError)));
     }
 
+    /// <summary>
+    /// Verifies that the semantics of the GovernanceOutboxOptions validation branches are covered in the compiled outbox tests.
+    /// </summary>
     [Fact]
     public void OutboxOptionValidationBranchesAreCoveredInCompiledOutboxTests()
     {
@@ -484,6 +499,12 @@ public sealed class GovernanceOutboxStoreTests
         }.Validate());
     }
 
+    /// <summary>
+    /// Verifies that the semantics of the claimed drain branches are covered in the compiled outbox tests.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     [Fact]
     public async Task ClaimedDrainBranchesAreCoveredInCompiledOutboxTests()
     {

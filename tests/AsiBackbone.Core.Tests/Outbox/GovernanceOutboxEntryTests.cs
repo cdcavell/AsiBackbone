@@ -14,6 +14,9 @@ public sealed class GovernanceOutboxEntryTests
     private static readonly DateTimeOffset UpdatedLocal = new(2026, 6, 17, 8, 5, 0, TimeSpan.FromHours(-5));
     private static readonly DateTimeOffset RetryLocal = new(2026, 6, 17, 8, 10, 0, TimeSpan.FromHours(-5));
 
+    /// <summary>
+    /// Tests that creating a governance outbox entry with a blank outbox entry ID generates a new identifier and normalizes the created timestamp to UTC.
+    /// </summary>
     [Fact]
     public void CreateGeneratesIdentifierForBlankOutboxIdAndNormalizesCreatedTimestamp()
     {
@@ -31,6 +34,9 @@ public sealed class GovernanceOutboxEntryTests
         Assert.Equal(5, entry.MaxRetryCount);
     }
 
+    /// <summary>
+    /// Tests that creating a governance outbox entry with a negative maximum retry count throws an ArgumentOutOfRangeException.
+    /// </summary>
     [Fact]
     public void CreateRejectsNegativeMaxRetryCount()
     {
@@ -39,7 +45,10 @@ public sealed class GovernanceOutboxEntryTests
                 CreateEnvelope(),
                 maxRetryCount: -1));
     }
-
+    
+    /// <summary>
+    /// Tests that restoring a governance outbox entry with an invalid status, negative counts, or a blank identifier throws the appropriate exceptions.
+    /// </summary>  
     [Fact]
     public void RestoreRejectsInvalidStatusNegativeCountsAndBlankIdentifier()
     {
@@ -80,6 +89,9 @@ public sealed class GovernanceOutboxEntryTests
                 UpdatedLocal));
     }
 
+    /// <summary>
+    /// Tests that restoring a governance outbox entry normalizes timestamps to UTC and trims optional string properties.
+    /// </summary>
     [Fact]
     public void RestoreNormalizesTimestampsAndOptionalStrings()
     {
@@ -101,6 +113,9 @@ public sealed class GovernanceOutboxEntryTests
         Assert.Equal("reason", entry.DeadLetterReason);
     }
 
+    /// <summary>
+    /// Tests that creating a governance outbox entry with metadata normalizes keys and values, ignores blank keys, and allows delivered results to override entry metadata.
+    /// </summary>
     [Fact]
     public void MetadataNormalizationIgnoresBlankKeysTrimsValuesAndAllowsDeliveredResultOverrides()
     {
@@ -136,6 +151,9 @@ public sealed class GovernanceOutboxEntryTests
         Assert.Equal(new DateTimeOffset(2026, 6, 17, 13, 5, 0, TimeSpan.Zero), delivered.UpdatedUtc);
     }
 
+    /// <summary>
+    /// Tests that creating a governance outbox entry with null, empty, or blank metadata results in an empty metadata view and indicates that no metadata is present.
+    /// </summary>
     [Fact]
     public void CreateReturnsEmptyMetadataViewForNullEmptyAndBlankMetadata()
     {
@@ -156,6 +174,9 @@ public sealed class GovernanceOutboxEntryTests
         Assert.Empty(blankMetadataEntry.Metadata);
     }
 
+    /// <summary>
+    /// Tests that the IsRetryReady method correctly evaluates the retry readiness of governance outbox entries based on their status, retry count, maximum retry count, and next retry timestamp.
+    /// </summary>
     [Fact]
     public void IsRetryReadyCoversTerminalPendingMaxRetryAndRetryTimingBranches()
     {
@@ -179,6 +200,9 @@ public sealed class GovernanceOutboxEntryTests
             nextRetryUtc: now).IsRetryReady(now));
     }
 
+    /// <summary>
+    /// Tests that marking a governance outbox entry as delivered with a non-success result throws an ArgumentException, ensuring that only successful results can be used to mark delivery.
+    /// </summary>
     [Fact]
     public void MarkDeliveredRejectsNonSuccessResults()
     {
@@ -188,6 +212,9 @@ public sealed class GovernanceOutboxEntryTests
             entry.MarkDelivered(GovernanceEmissionResult.Pending()));
     }
 
+    /// <summary>
+    /// Tests that marking a governance outbox entry as failed correctly updates the status, retry count, next retry timestamp, last error, provider name, and dead letter reason for non-retryable failures, retryable failures, and entries that have reached the maximum retry count and are dead-lettered.
+    /// </summary>
     [Fact]
     public void MarkFailedCoversNonRetryableRetryableAndMaxRetryDeadLetterBranches()
     {
@@ -235,6 +262,9 @@ public sealed class GovernanceOutboxEntryTests
         Assert.Equal("Provider timed out.", deadLettered.DeadLetterReason);
     }
 
+    /// <summary>
+    /// Tests that marking a governance outbox entry as deferred correctly updates the status, next retry timestamp, last error, provider name, and retry count for both cases where an error is present and where no error is provided.
+    /// </summary>
     [Fact]
     public void MarkDeferredCoversNullErrorAndErrorPresentPaths()
     {
@@ -266,6 +296,9 @@ public sealed class GovernanceOutboxEntryTests
         Assert.Equal(0, deferredWithError.RetryCount);
     }
 
+    /// <summary>
+    /// Tests that marking a governance outbox entry as dead-lettered correctly updates the status, dead letter reason, last error, provider name, and next retry timestamp for both cases where an explicit dead letter reason is provided and where it falls back to the error message.
+    /// </summary>
     [Fact]
     public void MarkDeadLetteredCoversExplicitReasonAndFallbackErrorMessageReason()
     {

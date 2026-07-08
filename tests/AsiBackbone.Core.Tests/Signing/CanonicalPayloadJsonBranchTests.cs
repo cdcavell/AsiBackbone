@@ -4,10 +4,16 @@ using Xunit;
 
 namespace AsiBackbone.Core.Tests.Signing;
 
+/// <summary>
+/// Tests for the <see cref="CanonicalPayload"/> class, specifically focusing on the JSON serialization of supported primitive dictionary and array values, as well as handling of unsupported content value types and non-finite double values.
+/// </summary>
 public sealed class CanonicalPayloadJsonBranchTests
 {
     private static readonly string[] content = ["beta", "alpha"];
 
+    /// <summary>
+    /// Tests that the <see cref="CanonicalPayload.Create"/> method correctly serializes supported primitive dictionary and array values into canonical JSON format. The test verifies that the resulting JSON string contains the expected key-value pairs and that the payload can be converted to UTF-8 bytes without errors.
+    /// </summary>
     [Fact]
     public void CreateSerializesSupportedPrimitiveDictionaryAndArrayValues()
     {
@@ -49,6 +55,12 @@ public sealed class CanonicalPayloadJsonBranchTests
         Assert.NotEmpty(payload.ToUtf8Bytes());
     }
 
+    /// <summary>
+    /// Tests that the <see cref="CanonicalPayload.Create"/> method throws an <see cref="ArgumentOutOfRangeException"/> when attempting to create a payload with non-finite double values (NaN, PositiveInfinity, NegativeInfinity). The test uses the [Theory] attribute to run the test for each of the specified non-finite double values.
+    /// </summary>
+    /// <param name="value">
+    /// The non-finite double value to test (NaN, PositiveInfinity, or NegativeInfinity).
+    /// </param>
     [Theory]
     [InlineData(double.NaN)]
     [InlineData(double.PositiveInfinity)]
@@ -67,6 +79,9 @@ public sealed class CanonicalPayloadJsonBranchTests
                 }));
     }
 
+    /// <summary>
+    /// Tests that the <see cref="CanonicalPayload.Create"/> method throws a <see cref="NotSupportedException"/> when attempting to create a payload with an unsupported content value type (in this case, a DateTimeOffset). The test verifies that the exception is thrown as expected when an unsupported type is included in the content dictionary.
+    /// </summary>
     [Fact]
     public void CreateRejectsUnsupportedContentValueType()
     {

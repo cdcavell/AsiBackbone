@@ -4,8 +4,14 @@ using Xunit;
 
 namespace AsiBackbone.Core.Tests.Signing;
 
+/// <summary>
+/// Contains unit tests for the verification policy handling logic in the AsiBackbone.Core.Signing namespace, specifically focusing on the behavior of the GovernanceArtifactVerifier and its interaction with signature verification results, preflight checks, and policy evaluation.
+/// </summary>
 public sealed class VerificationPolicyHandlingTests
 {
+    /// <summary>
+    /// Provides test cases for various failure scenarios that should result in preflight verification failures.
+    /// </summary>
     public static TheoryData<string, SignatureVerificationCategory, VerificationPolicyAction, string> PreflightFailureCases => new()
     {
         { "missing-signing-hash", SignatureVerificationCategory.MissingSignature, VerificationPolicyAction.RequireAcknowledgment, "signature.missing" },
@@ -22,6 +28,9 @@ public sealed class VerificationPolicyHandlingTests
         { "expected-policy-hash-mismatch", SignatureVerificationCategory.CanonicalizationMismatch, VerificationPolicyAction.Escalate, "signature.canonicalization-mismatch" }
     };
 
+    /// <summary>
+    /// Provides test cases for mapping various failure codes and status patterns to the expected SignatureVerificationCategory.
+    /// </summary>
     public static TheoryData<string, SignatureVerificationCategory> CategoryMappingCases => new()
     {
         { "missing-signature-status", SignatureVerificationCategory.MissingSignature },
@@ -48,6 +57,12 @@ public sealed class VerificationPolicyHandlingTests
         { "failed-fallback", SignatureVerificationCategory.Failed }
     };
 
+    /// <summary>
+    /// Verifies that the VerifyAsync method correctly maps a valid signature to the expected SignatureVerificationCategory and VerificationPolicyAction, resulting in an allow outcome.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation of verifying the artifact and asserting the expected outcome for a valid signature scenario.
+    /// </returns>
     [Fact]
     public async Task VerifyAsyncMapsValidSignatureToAllow()
     {
@@ -72,6 +87,12 @@ public sealed class VerificationPolicyHandlingTests
         Assert.True(outcome.SafeMetadata.ContainsKey("signed_utc"));
     }
 
+    /// <summary>
+    /// Verifies that the VerifyAsync method correctly maps an invalid signature to the expected SignatureVerificationCategory and VerificationPolicyAction, resulting in a deny outcome.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation of verifying the artifact and asserting the expected outcome for an invalid signature scenario.
+    /// </returns>
     [Fact]
     public async Task VerifyAsyncMapsInvalidSignatureToDeny()
     {
@@ -92,6 +113,12 @@ public sealed class VerificationPolicyHandlingTests
         Assert.Equal("signature.invalid", outcome.FailureCode);
     }
 
+    /// <summary>
+    /// Verifies that the VerifyAsync method correctly maps a missing signature to the expected SignatureVerificationCategory and VerificationPolicyAction, resulting in a require acknowledgment outcome.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation of verifying the artifact and asserting the expected outcome for a missing signature scenario.
+    /// </returns>
     [Fact]
     public async Task VerifyAsyncMapsMissingSignatureToRequireAcknowledgment()
     {
@@ -110,6 +137,12 @@ public sealed class VerificationPolicyHandlingTests
         Assert.False(verifier.WasCalled);
     }
 
+    /// <summary>
+    /// Verifies that the VerifyAsync method correctly maps an unknown key version to the expected SignatureVerificationCategory and VerificationPolicyAction, resulting in an escalated outcome.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation of verifying the artifact and asserting the expected outcome for an unknown key version scenario.
+    /// </returns>
     [Fact]
     public async Task VerifyAsyncMapsUnknownKeyVersionToEscalate()
     {
@@ -130,6 +163,12 @@ public sealed class VerificationPolicyHandlingTests
         Assert.False(verifier.WasCalled);
     }
 
+    /// <summary>
+    /// Verifies that the VerifyAsync method correctly maps a provider unavailable exception to the expected SignatureVerificationCategory and VerificationPolicyAction, resulting in a deferred outcome.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation of verifying the artifact and asserting the expected outcome for a provider unavailable scenario.
+    /// </returns>
     [Fact]
     public async Task VerifyAsyncMapsProviderUnavailableToDefer()
     {
@@ -150,6 +189,12 @@ public sealed class VerificationPolicyHandlingTests
         Assert.True(verifier.WasCalled);
     }
 
+    /// <summary>
+    /// Verifies that the VerifyAsync method correctly applies host policy overrides specified in the VerificationPolicyOptions, resulting in the expected SignatureVerificationCategory and VerificationPolicyAction for a missing signature scenario.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous operation of verifying the artifact with host policy overrides and asserting the expected outcome.
+    /// </returns>
     [Fact]
     public async Task VerifyAsyncSupportsHostPolicyOverrides()
     {
@@ -170,6 +215,22 @@ public sealed class VerificationPolicyHandlingTests
         Assert.Equal(VerificationPolicyAction.DeadLetter, outcome.Action);
     }
 
+    /// <summary>
+    /// Verifies that the VerifyAsync method correctly identifies and handles various preflight failure scenarios, returning the expected SignatureVerificationCategory, VerificationPolicyAction, and failure code without invoking the signature verification service.
+    /// </summary>
+    /// <param name="scenario">
+    /// The scenario name that represents a specific preflight failure condition to be tested. This parameter is used to create a SignedGovernanceArtifact and an optional VerificationPolicyContext that simulate the corresponding failure condition.
+    /// </param>
+    /// <param name="expectedCategory">
+    /// The expected SignatureVerificationCategory that the VerifyAsync method should return for the given preflight failure scenario. This parameter is used to assert that the actual category returned by the method matches the expected category.
+    /// </param>
+    /// <param name="expectedAction">
+    /// The expected VerificationPolicyAction that the VerifyAsync method should return for the given preflight failure scenario. This parameter is used to assert that the actual action returned by the method matches the expected action.
+    /// </param>
+    /// <param name="expectedFailureCode">
+    /// The expected failure code that the VerifyAsync method should return for the given preflight failure scenario. This parameter is used to assert that the actual failure code returned by the method matches the expected failure code.
+    /// </param>
+    /// <returns></returns>
     [Theory]
     [MemberData(nameof(PreflightFailureCases))]
     public async Task VerifyAsyncReturnsExpectedPreflightFailures(
@@ -195,6 +256,15 @@ public sealed class VerificationPolicyHandlingTests
         Assert.False(verifier.WasCalled);
     }
 
+    /// <summary>
+    /// Verifies that the VerifyAsync method correctly maps various provider exceptions to the expected SignatureVerificationCategory and VerificationPolicyAction.
+    /// </summary>
+    /// <param name="scenario">
+    /// The scenario name that represents a specific provider exception to be tested. This parameter is used to create an exception instance that simulates the corresponding provider failure condition.
+    /// </param>
+    /// <returns>
+    /// A task that represents the asynchronous operation of verifying the artifact and asserting the expected outcome based on the provider exception scenario.
+    /// </returns>
     [Theory]
     [InlineData("invalid-operation")]
     [InlineData("not-supported")]
@@ -218,6 +288,15 @@ public sealed class VerificationPolicyHandlingTests
         Assert.True(verifier.WasCalled);
     }
 
+    /// <summary>
+    /// Verifies that the Categorize method correctly maps various failure codes and status patterns to the expected SignatureVerificationCategory.
+    /// </summary>
+    /// <param name="scenario">
+    /// The scenario name that represents a specific failure code and status pattern to be tested. This parameter is used to create a SignatureVerificationResult instance that simulates the corresponding failure condition.
+    /// </param>
+    /// <param name="expectedCategory">
+    /// The expected SignatureVerificationCategory that the Categorize method should return for the given scenario. This parameter is used to assert that the actual category returned by the Categorize method matches the expected category.
+    /// </param>
     [Theory]
     [MemberData(nameof(CategoryMappingCases))]
     public void CategorizeMapsFailureCodeAndStatusPatterns(
@@ -231,6 +310,10 @@ public sealed class VerificationPolicyHandlingTests
         Assert.Equal(expectedCategory, category);
     }
 
+    /// <summary>
+    /// Verifies that the VerifyAsync method builds a safe metadata dictionary that includes the signed UTC timestamp and filters out any unsafe custom keys.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation of verifying the artifact and building the safe metadata dictionary.</returns>
     [Fact]
     public async Task VerifyAsyncBuildsSafeMetadataWithSignedUtcAndFiltersUnsafeCustomKeys()
     {

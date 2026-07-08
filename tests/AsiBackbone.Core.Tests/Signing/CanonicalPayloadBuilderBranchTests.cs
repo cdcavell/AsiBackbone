@@ -7,12 +7,18 @@ using Xunit;
 
 namespace AsiBackbone.Core.Tests.Signing;
 
+/// <summary>
+/// Tests for the CanonicalPayloadBuilder class, focusing on branch coverage for different artifact types and scenarios.
+/// </summary>
 public sealed class CanonicalPayloadBuilderBranchTests
 {
     private static readonly DateTimeOffset OccurredLocal = new(2026, 6, 18, 7, 0, 0, TimeSpan.FromHours(-5));
     private static readonly DateTimeOffset CreatedUtc = new(2026, 6, 18, 12, 0, 1, TimeSpan.Zero);
     private static readonly DateTimeOffset RetryUtc = new(2026, 6, 18, 12, 10, 0, TimeSpan.Zero);
 
+    /// <summary>
+    /// Tests that the ForAuditResidue method uses the event identifier as the artifact ID when the audit residue ID is missing, and filters metadata based on the provided options.
+    /// </summary>
     [Fact]
     public void ForAuditResidueUsesEventIdentifierWhenResidueIdIsMissingAndFiltersMetadata()
     {
@@ -43,6 +49,9 @@ public sealed class CanonicalPayloadBuilderBranchTests
         Assert.DoesNotContain("ignored", payload.CanonicalJson, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Tests that the ForAuditResidueLifecycleEvent method includes filtered metadata and the correct stage sequence in the canonical payload.
+    /// </summary>
     [Fact]
     public void ForAuditResidueLifecycleEventIncludesFilteredMetadataAndStageSequence()
     {
@@ -71,6 +80,9 @@ public sealed class CanonicalPayloadBuilderBranchTests
         Assert.DoesNotContain("ignored", payload.CanonicalJson, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Tests that the ForGovernanceEmissionEnvelope method writes a null payload in the canonical JSON when the envelope has no payload, and includes empty metadata.
+    /// </summary>
     [Fact]
     public void ForGovernanceEmissionEnvelopeWritesNullPayloadWhenEnvelopeHasNoPayload()
     {
@@ -84,6 +96,9 @@ public sealed class CanonicalPayloadBuilderBranchTests
         Assert.Contains("\"payload\":null", payload.CanonicalJson, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Tests that the ForGovernanceEmissionEnvelope method includes both the payload and filtered metadata in the canonical JSON when they are present, and excludes any disallowed metadata keys.
+    /// </summary>
     [Fact]
     public void ForGovernanceEmissionEnvelopeIncludesPayloadAndFilteredMetadataWhenPresent()
     {
@@ -116,6 +131,9 @@ public sealed class CanonicalPayloadBuilderBranchTests
         Assert.DoesNotContain("excluded", payload.CanonicalJson, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Tests that the ForGovernanceOutboxEntry method includes error content and the next retry timestamp in the canonical JSON when the outbox entry has failed with a retryable error.
+    /// </summary>
     [Fact]
     public void ForGovernanceOutboxEntryIncludesErrorContentAndRetryTimestamp()
     {
@@ -141,6 +159,9 @@ public sealed class CanonicalPayloadBuilderBranchTests
         Assert.Contains("\"nextRetryUtc\":\"2026-06-18T12:10:00.0000000Z\"", payload.CanonicalJson, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Tests that the ForGovernanceOutboxEntry method writes null values for optional fields in the canonical JSON when the outbox entry has no error and no retry information.
+    /// </summary>
     [Fact]
     public void ForGovernanceOutboxEntryWritesNullOptionalErrorAndRetryFields()
     {

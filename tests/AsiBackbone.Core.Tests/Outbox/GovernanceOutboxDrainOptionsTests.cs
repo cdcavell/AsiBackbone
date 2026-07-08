@@ -7,10 +7,19 @@ using Xunit;
 
 namespace AsiBackbone.Core.Tests.Outbox;
 
+/// <summary>
+/// Tests for <see cref="AsiBackboneGovernanceOutboxDrain"/> that verify the behavior of the drain operation with respect to configured retry and deferred delays.
+/// </summary>
 public sealed class GovernanceOutboxDrainOptionsTests
 {
     private static readonly DateTimeOffset DrainUtc = new(2026, 6, 29, 14, 0, 0, TimeSpan.Zero);
 
+    /// <summary>
+    /// Verifies that when the emitter throws an exception during the drain operation, the next retry time for the outbox entry is set according to the configured retry delay in <see cref="AsiBackboneGovernanceOutboxOptions"/>.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous test operation.
+    /// </returns>
     [Fact]
     public async Task DrainAsyncUsesConfiguredRetryDelayForEmitterExceptions()
     {
@@ -41,6 +50,12 @@ public sealed class GovernanceOutboxDrainOptionsTests
         Assert.Equal(DrainUtc.AddMinutes(7), storedEntry.NextRetryUtc);
     }
 
+    /// <summary>
+    /// Verifies that when the emitter returns a deferred result without a specified retry-after time, the next retry time for the outbox entry is set according to the configured deferred delay in <see cref="AsiBackboneGovernanceOutboxOptions"/>.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous test operation.
+    /// </returns>
     [Fact]
     public async Task DrainAsyncUsesConfiguredDeferredDelayWhenDeferredResultHasNoRetryAfter()
     {
@@ -66,6 +81,12 @@ public sealed class GovernanceOutboxDrainOptionsTests
         Assert.Equal(DrainUtc.AddMinutes(13), drained.NextRetryUtc);
     }
 
+    /// <summary>
+    /// Verifies that when the emitter returns a deferred result with a specified retry-after time, the next retry time for the outbox entry is set to that retry-after time, even if it exceeds the configured deferred delay in <see cref="AsiBackboneGovernanceOutboxOptions"/>.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous test operation.
+    /// </returns>
     [Fact]
     public async Task DrainAsyncPreservesEmitterRetryAfterOverConfiguredDeferredDelay()
     {
@@ -92,6 +113,9 @@ public sealed class GovernanceOutboxDrainOptionsTests
         Assert.Equal(retryAfterUtc, drained.NextRetryUtc);
     }
 
+    /// <summary>
+    /// Verifies that the constructor of <see cref="AsiBackboneGovernanceOutboxDrain"/> throws an <see cref="InvalidOperationException"/> when provided with options that have a negative retry delay.
+    /// </summary>
     [Fact]
     public void ConstructorRejectsNegativeRetryDelayOptions()
     {
@@ -106,6 +130,9 @@ public sealed class GovernanceOutboxDrainOptionsTests
             outboxOptions: options));
     }
 
+    /// <summary>
+    /// Verifies that the constructor of <see cref="AsiBackboneGovernanceOutboxDrain"/> throws an <see cref="InvalidOperationException"/> when provided with options that have a negative deferred delay.
+    /// </summary>  
     [Fact]
     public void ConstructorRejectsNegativeDeferredDelayOptions()
     {

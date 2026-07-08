@@ -240,7 +240,7 @@ if ($buildFailures.Count -gt 0) {
 
 $report | Set-Content -LiteralPath $outputAbsolutePath -Encoding utf8
 $relativeOutputPath = Get-RepositoryRelativePath -Path $outputAbsolutePath
-Write-Host "XML documentation report written to $relativeOutputPath"
+Write-Host $relativeOutputPath
 
 if ($buildFailures.Count -gt 0) {
     throw 'One or more XML documentation validation builds failed.'

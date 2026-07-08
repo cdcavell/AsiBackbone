@@ -32,7 +32,14 @@
     <AnalysisLevel>latest-recommended</AnalysisLevel>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>$(NoWarn);CS1591</NoWarn>
+
+    <!--
+      CS1591 is intentionally not suppressed at repository scope. Existing package
+      projects may opt into a documented baseline with AsiBackboneSuppressMissingXmlDocs=true
+      while CI inventories public API documentation gaps.
+    -->
+    <NoWarn Condition="'$(AsiBackboneSuppressMissingXmlDocs)' == 'true'">$(NoWarn);CS1591</NoWarn>
+    <WarningsAsErrors Condition="'$(AsiBackboneEnforceMissingXmlDocs)' == 'true'">$(WarningsAsErrors);CS1591</WarningsAsErrors>
 
     <RepositoryUrl>https://github.com/cdcavell/AsiBackbone</RepositoryUrl>
     <RepositoryType>git</RepositoryType>

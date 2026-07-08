@@ -38,6 +38,8 @@ services.AddAsiBackboneManagedKeySigning(
         options.SignatureAlgorithm = "RSASSA-PSS-SHA256-MANAGED-KEY";
         options.RequireKeyVersion = true;
         options.ReturnUnsignedOnFailure = false;
+        options.MaxRetryAttempts = 2;
+        options.RetryDelay = TimeSpan.FromMilliseconds(200);
     },
     serviceProvider => new HostOwnedManagedKeySigningClient());
 ```
@@ -66,11 +68,24 @@ When `ReturnUnsignedOnFailure` is `true`, signing failures return unsigned `Sign
 - `signing_status = failed`
 - `failure_code`
 - `failure_message`
+- `failure_exception_type` when a provider/client exception was observed
+- `failure_retryable` when a provider/client exception was observed
 - `provider_kind = managed-key`
 - `raw_private_key_loaded = false`
 - `retry_attempts`
+- `provider_attempts`
+- `max_retry_attempts`
+- `retry_delay_milliseconds`
+- `retry_delay_configured`
+- `retry_delay_applied`
 
 Unsigned failure metadata is not a successful signature and must not be described as a signed governance artifact.
+
+## Retry diagnostics
+
+`ManagedKeySigningService` retries only when the host-owned client throws `ManagedKeySigningException` with `IsRetryable = true` and retry attempts remain. `RetryDelay` is applied only between retryable attempts. Set `RetryDelay = TimeSpan.Zero` when a host wants retry attempts without an intentional wait between attempts.
+
+Signed and unsigned results include retry diagnostics so operators can see how the managed-key boundary behaved without relying on exception text alone. Request metadata and provider-supplied metadata are not allowed to overwrite service-owned diagnostic keys such as `signing_status`, `retry_attempts`, `provider_attempts`, `provider_operation_id`, or `failure_code`.
 
 ## Safe metadata
 
@@ -84,9 +99,10 @@ Signed results preserve provider-neutral metadata:
 - key version;
 - provider descriptor;
 - signed UTC timestamp;
-- safe provider operation ID when supplied.
+- safe provider operation ID when supplied;
+- retry diagnostics such as `retry_attempts`, `provider_attempts`, and retry delay fields.
 
-Provider metadata keys that appear to contain secrets, tokens, credentials, private key material, or connection strings are filtered.
+Provider metadata keys that appear to contain secrets, tokens, credentials, private key material, or connection strings are filtered. Provider metadata keys that collide with service-owned diagnostic metadata are also filtered so caller or provider metadata cannot hide the actual managed-key signing outcome.
 
 ## Non-goals
 

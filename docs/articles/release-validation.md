@@ -24,11 +24,12 @@ Before cutting a stable release tag, confirm the following checks have passed on
 | Package metadata asset checklist | release readiness record, generated package inspection | Confirms package icons, packaged README rendering, NuGet metadata, Source Link metadata, SBOM/provenance artifacts, and documentation links are reviewed. |
 | Package SBOM generation | CI, stable release validation, package publish | Generates SPDX JSON SBOM files and an SBOM manifest for generated `.nupkg` artifacts. |
 | Package provenance attestation | CI on non-PR events, stable release validation on non-PR events, package publish | Attests generated package and SBOM artifacts where supported. |
+| NuGet package signing readiness | release readiness record, `SECURITY.md`, release notes | Confirms package signing is either explicitly deferred as an open supply-chain item or, when available, documented with signing process, verification guidance, and updated public wording before release. |
 | Template package smoke validation | CI, stable release validation | Confirms the packed `AsiBackbone.Templates` package can be installed, generate supported host styles, restore, and build. |
 | Documentation build | publish docs, stable release validation, package publish | Confirms DocFX can build the documentation included in the release posture. |
 | Documentation link review | release readiness record, manual docs review | Confirms README links, DocFX navigation, release notes, migration guides, package documentation links, and GitHub Pages links point to current pages. |
 | External consumer smoke tests | external consumer smoke workflow, stable release validation | Confirms clean consumer-style projects can reference and wire the package family. |
-| Source Link metadata validation | manual post-publish validation | Confirms published NuGet packages include expected repository type, repository URL, and repository commit metadata. |
+| Source Link metadata validation | manual post-publish validation | Confirms published NuGet packages include expected repository type, repository URL, and non-empty repository commit metadata are present. |
 
 ## Release-blocking workflows
 
@@ -72,8 +73,9 @@ For every stable release, the release readiness record should explicitly confirm
 - Source Link repository commit metadata is generated and has a post-publish validation plan when NuGet download is required to confirm it;
 - package SBOM files and `sbom-manifest.json` are generated for produced `.nupkg` artifacts;
 - package and SBOM provenance artifacts are uploaded and attested where the workflow event supports attestation;
+- NuGet package signing status is checked against `SECURITY.md`, and release notes/readiness records state whether signing remains deferred or has an adopted signing and verification process;
 - README, DocFX navigation, release notes, migration notes, package README links, and GitHub Pages links are current;
-- any intentionally deferred metadata, asset, Source Link, SBOM, provenance, or documentation-link check is recorded with risk and follow-up.
+- any intentionally deferred metadata, asset, Source Link, SBOM, provenance, package-signing, or documentation-link check is recorded with risk and follow-up.
 
 ## Source Link metadata validation
 
@@ -90,6 +92,8 @@ This post-publish check downloads the published packages and confirms the expect
 If a release-critical check is intentionally deferred, document the deferred check, the reason, the accepted risk, the follow-up issue or milestone, and whether release notes need to mention it.
 
 Deferred checks should be rare for a stable release.
+
+NuGet package signing is currently a known open supply-chain readiness item. Until a reviewed signing process is adopted, release candidates should record the deferral instead of describing artifacts as signed. If package signing is introduced, update `SECURITY.md`, this validation guide, the release readiness record, release notes, and consumer verification guidance in the same release-preparation PR.
 
 ## Related documentation
 

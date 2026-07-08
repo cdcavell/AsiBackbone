@@ -64,6 +64,7 @@ Unsigned failure metadata remains diagnostic or policy-routable evidence. It is 
 * Constraint-exception denial behavior is opt-in so compatibility is preserved for hosts that prefer fail-fast exception propagation.
 * Empty-policy warning diagnostics make permissive no-constraint evaluation visible without changing the existing default allow behavior.
 * Managed-key signing defaults now better match production fail-closed expectations.
+* NuGet package signing remains deferred for `2.3.0`; the release may provide SBOMs and package/SBOM provenance artifacts where supported, but it does not introduce maintainer-signed, repository-signed, or Authenticode-signed NuGet packages.
 
 ## Performance and reliability refinements
 
@@ -116,6 +117,7 @@ Before tagging `v2.3.0`, the release candidate should pass the repository releas
 * Package creation.
 * Generated NuGet metadata validation.
 * Package SBOM generation.
+* Package signing readiness documentation review.
 * Template package smoke validation.
 * External consumer smoke tests.
 * Version consistency validation for `2.3.0`.

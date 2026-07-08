@@ -166,7 +166,7 @@ public sealed class GovernanceArtifactSignerLineCoverageTests
     [Fact]
     public void CreateSigningRequestCopiesCanonicalHashAndMergesMetadata()
     {
-        CanonicalPayloadHash canonicalHash = CanonicalPayloadHash.Create(
+        var canonicalHash = CanonicalPayloadHash.Create(
             CanonicalArtifactTypes.GovernanceEmissionEnvelope,
             "envelope-1",
             "v1",
@@ -226,7 +226,7 @@ public sealed class GovernanceArtifactSignerLineCoverageTests
 
     private static GovernanceEmissionEnvelope CreateGovernanceEmissionEnvelope()
     {
-        GovernanceEmissionPayload payload = GovernanceEmissionPayload.Create(
+        var payload = GovernanceEmissionPayload.Create(
             "audit-summary",
             schemaVersion: "v1",
             contentType: "application/json",
@@ -261,7 +261,7 @@ public sealed class GovernanceArtifactSignerLineCoverageTests
             ArgumentNullException.ThrowIfNull(request);
             cancellationToken.ThrowIfCancellationRequested();
 
-            SigningMetadata metadata = SigningMetadata.Create(
+            var metadata = SigningMetadata.Create(
                 signingHash: request.SigningHash,
                 hashAlgorithm: request.HashAlgorithm,
                 signature: $"fake-signature:{request.SigningHash}",

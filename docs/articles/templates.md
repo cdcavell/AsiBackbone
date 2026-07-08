@@ -14,7 +14,7 @@ dotnet new install AsiBackbone.Templates
 For local repository validation, install the generated `.nupkg` from the package artifact directory instead:
 
 ```powershell
-dotnet new install ./artifacts/packages/AsiBackbone.Templates.2.3.0.nupkg
+dotnet new install ./artifacts/packages/AsiBackbone.Templates.3.0.0.nupkg
 ```
 
 ## Create a governed Web API
@@ -89,5 +89,7 @@ This proves the template can be installed and used from a clean directory withou
 
 - [First 15 Minutes: Standard API Gating](quickstart-api-gating.md)
 - [ASP.NET Core Endpoint Governance](aspnetcore-endpoint-governance.md)
+- [Strict Governance Profile](strict-governance-profile.md)
 - [Testing Harness](testing-harness.md)
 - [NetCoreApplicationTemplate Host Validation](netcoreapplicationtemplate-host-validation.md)
+- [3.0.0 Release Notes](release-notes-300.md)

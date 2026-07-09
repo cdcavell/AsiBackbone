@@ -4,6 +4,72 @@ All notable changes to this project are documented in this file.
 
 This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/) and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.0] - 2026-07-13
+
+### Release summary
+
+`3.0.0` establishes the current stable `3.x` AsiBackbone package family.
+
+This is a major release because it starts a new stable binary assembly identity line with `AssemblyVersion` `3.0.0.0`, aligns repository metadata and documentation around the `3.0.0` release posture, and carries forward the current Accountable Systems Infrastructure governance-spine package family.
+
+The release preserves the existing `AsiBackbone.*` package IDs and public namespaces established by the `2.0.0` line. Consumers should update package references, rebuild, and validate host deployments, but no broad package rename or namespace migration is intended.
+
+### Added
+
+* Added `3.0.0` release notes and a `3.0.0` release readiness record.
+* Added `InMemoryCapabilityGrantUseStore` to `AsiBackbone.Storage.InMemory` as a non-production reference implementation of `ICapabilityGrantUseStore` for tests, samples, local validation, and package-consumer smoke coverage of first-use/replay-denied behavior.
+* Added Debug solution build coverage validation so first-party package and test projects remain enabled for default local Debug solution builds unless an exclusion is reviewed and documented.
+* Added CI and Stable Release Validation coverage for Debug solution build posture.
+* Promoted current documentation posture around threat-model contributors, strict-governance profile helpers, EF Core JSON metadata storage guidance, policy-input hardening, production placeholder guardrails, capability-grant hardening, package SBOM/provenance, and release-validation guidance for the `3.x` line.
+
+### Changed
+
+* Promoted central package version metadata from `2.3.0` to `3.0.0`.
+* Updated `AssemblyVersion` from `2.0.0.0` to `3.0.0.0` for the new stable major line.
+* Updated `FileVersion` to `3.0.0.0`.
+* Updated `CITATION.cff` and `.zenodo.json` for the `3.0.0` release.
+* Updated README, documentation home, article index, DocFX article navigation, release validation guidance, release cadence guidance, API compatibility / SemVer guidance, security posture, governance wording, template guidance, generated template fallback package versions, Source Link validation defaults, and package-family wording for the current `3.x` release posture.
+* Changed the Core evaluator constraint-exception posture for the `3.x` line so eligible ordinary constraint exceptions default to denied governance decisions with stable reason codes and auditable policy metadata.
+* Updated release-facing documentation so stale `2.3.0` / `2.x` current-release wording is either corrected to `3.0.0` / `3.x` or preserved only in clearly historical release records.
+* Refreshed historical API and release guidance so older `1.x` and `2.x` records remain traceable without being presented as the current stable package line.
+
+### Fixed
+
+* Fixed consumer-facing version narrative drift between build metadata, README current-release wording, release notes, release readiness guidance, DocFX navigation, and `CHANGELOG.md`.
+* Fixed the changelog gap where `CHANGELOG.md` still presented `2.3.0` as the latest release entry after repository metadata had moved to `3.0.0`.
+* Fixed template fallback package references so generated fallback `.csproj` files use `3.0.0` when repository project references are unavailable.
+* Fixed Source Link post-publish validation defaults so the validation script targets `3.0.0` unless another version is supplied.
+* Fixed the capability-grant replay-hardening gap by providing a packaged in-memory use store that can be wired for local validation before hosts replace it with durable production replay protection.
+* Fixed the default Debug solution build posture so first-party package and test projects are no longer skipped by `Debug|*` solution exclusions.
+
+### Security and governance hardening
+
+* Core evaluator exception handling is more fail-closed for governed policy surfaces by default in the `3.x` line.
+* Capability-grant use tracking now has a packaged in-memory reference path for local validation and smoke coverage while keeping production replay protection host/provider-owned.
+* Debug solution build coverage validation helps prevent first-party package or test projects from silently falling out of the common `dotnet build AsiBackbone.slnx` path.
+* Release documentation now more clearly distinguishes stable package guarantees from host-owned responsibilities, future provider plans, package-signing status, production tamper-evidence, legal/compliance review, robotics, AI model hosting, and physical execution.
+
+### Compatibility notes
+
+* Package IDs remain unchanged.
+* Public namespaces remain unchanged.
+* No broad package rename is included.
+* No `using` namespace migration is expected for consumers already using the `AsiBackbone.*` package family.
+* `AssemblyVersion` changes to `3.0.0.0`; consumers should rebuild and validate applications that rely on strict assembly loading, plugin discovery, binding redirects, or binary compatibility assumptions.
+* Existing `2.x` consumers should update package references to `3.0.0` and review policy-evaluator exception handling, strict-governance settings, capability-grant replay protection, signing/key custody, durable audit/outbox persistence, and host-owned execution boundaries.
+* `InMemoryCapabilityGrantUseStore` is non-durable and intended only for tests, samples, smoke tests, and local validation. Production replay protection remains host/provider-owned.
+* Event Hubs, Purview, Azure-specific SDK adapters, Aspire runtime packages, robotics, immutable-storage, and additional provider packages remain outside the stable package contract unless separately reviewed and released.
+
+### Validation
+
+* Release-candidate validation is expected to pass through CI, Stable Release Validation, Debug solution build coverage validation, Release build/test, formatting, DocFX build, package creation, generated NuGet metadata validation, package SBOM generation, template package smoke validation, external consumer smoke tests, stable package integration smoke tests, version consistency validation for `3.0.0`, and package/SBOM provenance handling where supported.
+* Before tagging `v3.0.0`, release readiness should confirm that `CHANGELOG.md`, README, release notes, release-readiness record, API compatibility / SemVer guidance, DocFX navigation, template guidance, Source Link validation defaults, package metadata, and generated package README metadata all agree on the current `3.0.0` / `3.x` release posture.
+* After packages are published and visible on NuGet, Source Link repository commit metadata should be validated with:
+
+```powershell
+./scripts/Validate-Source-Link-commit-metadata.ps1 -Version 3.0.0
+```
+
 ## [2.3.0] - 2026-07-06
 
 ### Release summary

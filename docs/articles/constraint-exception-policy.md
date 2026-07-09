@@ -22,6 +22,56 @@ The generated denial preserves:
 
 If a decision policy is configured, the generated denied decision is passed through that policy with a synthetic denied `ConstraintEvaluationResult` so downstream policy code can still observe a denial path.
 
+## Consumer rule: return expected denials; do not throw them
+
+`TreatConstraintExceptionAsDenial` is a fail-closed safety boundary, not the recommended way to author normal policy denials.
+
+A constraint should return `ConstraintEvaluationResult.Deny(...)` when the request is understood, the policy is available, and the active rule intentionally blocks the operation. That keeps the decision explicit, cheap, reason-coded, and audit-friendly.
+
+```csharp
+public ValueTask<ConstraintEvaluationResult> EvaluateAsync(
+    IAsiBackboneConstraintEvaluationContext context,
+    CancellationToken cancellationToken = default)
+{
+    if (context.Metadata.TryGetValue("region", out string? region) &&
+        StringComparer.OrdinalIgnoreCase.Equals(region, "restricted"))
+    {
+        return ValueTask.FromResult(ConstraintEvaluationResult.Deny(
+            "policy.region.denied",
+            "The requested region is not permitted by the active policy."));
+    }
+
+    return ValueTask.FromResult(ConstraintEvaluationResult.Allow());
+}
+```
+
+Do **not** intentionally throw exceptions to express routine policy denial:
+
+```csharp
+public ValueTask<ConstraintEvaluationResult> EvaluateAsync(
+    IAsiBackboneConstraintEvaluationContext context,
+    CancellationToken cancellationToken = default)
+{
+    // Avoid this pattern for expected policy outcomes.
+    throw new InvalidOperationException("The requested region is not permitted.");
+}
+```
+
+Throwing for routine denial makes the denial path slower, less semantically precise, and easier to confuse with a broken dependency, malformed policy input, or host incident. The evaluator will still fail closed by default if this happens, but consumers should treat the resulting `asibackbone.policy.constraint_exception` reason code as an abnormal evaluator-failure denial rather than a normal policy-authored denial.
+
+Use exceptions only for unexpected failures such as unavailable host-owned dependencies, corrupted policy inputs, invalid constraint configuration, or other conditions where the constraint cannot honestly produce an ordinary allow, warning, denial, or not-applicable result.
+
+## Denial reason-code distinction
+
+Consumers should keep normal policy denial and converted exception denial separate in logs, audit receipts, dashboards, and incident review:
+
+| Path | Recommended meaning | Typical reason code shape |
+| --- | --- | --- |
+| Constraint returns `Deny(...)` | The rule intentionally blocked the request. | `policy.<area>.denied` or another host-owned stable code. |
+| Evaluator converts a thrown constraint exception | The evaluator failed closed because a constraint faulted. | `asibackbone.policy.constraint_exception`. |
+
+This distinction lets a host say whether a request was denied by policy or denied because the policy evaluation path faulted.
+
 ## Opt-out behavior: fail fast to the host
 
 Hosts that need fail-fast exception propagation can opt out explicitly:
@@ -96,7 +146,7 @@ Use the default fail-closed behavior when:
 
 - every governed attempt should produce a decision artifact;
 - ASP.NET Core endpoint governance or another host layer should be able to audit the resulting denial normally;
-- the host wants a consistent fail-closed policy surface for expected constraint failures;
+- the host wants a consistent fail-closed policy surface for unexpected ordinary constraint failures;
 - downstream systems rely on reason codes rather than exception propagation.
 
 Set `TreatConstraintExceptionAsDenial = false` when:
@@ -107,6 +157,8 @@ Set `TreatConstraintExceptionAsDenial = false` when:
 - retry, circuit-breaker, or incident policy must observe the original exception directly.
 
 Do not use `TreatConstraintExceptionAsDenial` to hide critical runtime failures, broken host dependencies, corrupted process state, or other incidents that should be escalated through host operations.
+
+Do not author normal constraint denials by throwing exceptions. Return `ConstraintEvaluationResult.Deny(...)` for expected policy blocks, and reserve thrown exceptions for unexpected fault conditions that the evaluator may convert into an abnormal fail-closed denial.
 
 ## Boundary
 

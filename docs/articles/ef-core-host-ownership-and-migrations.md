@@ -108,6 +108,24 @@ Those command paths are examples only. The actual projects, migration assembly, 
 
 ASI Backbone should not ship required migrations for the host database because doing so would implicitly choose a provider, schema lifecycle, naming convention, deployment model, and operational policy for the host.
 
+## Audit ledger signing metadata persistence
+
+The EF Core audit ledger shape intentionally persists the full verification-relevant signing surface currently exposed by `AuditLedgerRecord`:
+
+- `SigningHash`
+- `SignatureKeyId`
+- `SignatureKeyVersion`
+- `SignatureAlgorithm`
+- `SignatureValue`
+- `SignatureProvider`
+- `SignedUtc`
+
+This decision keeps signing context durable when hosts later reconstruct a signed audit ledger record for verification, key-rotation investigation, incident review, or hash-chain analysis. `SignatureKeyId` and `SignatureKeyVersion` remain references only; they must not contain raw key material, private keys, credentials, managed identity tokens, connection strings, or provider SDK payloads.
+
+Hosts upgrading an existing database should generate and review a host-owned migration after updating the package. The migration should add nullable columns for the new signing fields to `AsiBackboneAuditLedgerRecords` and include the configured indexes for signing hash, key ID, key version, provider, and signed timestamp. Regulated hosts should validate the generated migration against retention, encryption, access-control, legal hold, and audit-review requirements before deployment.
+
+Persisted signing metadata does not make the database tamper-evident by itself. Verification still requires a concrete signing provider or verifier, protected key-management process, durable storage controls, retention policy, monitoring, and operational procedures supplied by the host environment.
+
 ## Durable governance outbox tables
 
 The EF Core adapter now includes durable local storage for provider-neutral governance outbox entries and audit residue lifecycle events. The durable tables are intended to prove local persistence before optional downstream provider emission is attempted.
@@ -155,7 +173,7 @@ The EF Core package contributes provider-neutral mappings for ASI Backbone accou
 - governance outbox entries
 - audit residue lifecycle events
 
-These records are part of the governance spine. They are intended to preserve durable accountability snapshots such as actor identity, actor type, operation name, outcome, reason codes, metadata, correlation ID, trace ID, policy version, policy hash, handshake identifiers, acknowledgment identifiers, outbox status, retry posture, lifecycle stage, and provider-neutral delivery diagnostics.
+These records are part of the governance spine. They are intended to preserve durable accountability snapshots such as actor identity, actor type, operation name, outcome, reason codes, metadata, correlation ID, trace ID, policy version, policy hash, handshake identifiers, acknowledgment identifiers, capability-token identifiers, signing hashes, key references, signature descriptors, outbox status, retry posture, lifecycle stage, and provider-neutral delivery diagnostics.
 
 ## What the package does not do automatically
 
@@ -204,6 +222,7 @@ When integrating ASI Backbone EF Core persistence, the host application should d
 7. Whether provider-specific conversions or conventions are needed.
 8. Which background service, hosted worker, or provider package drains the governance outbox.
 9. How failed, deferred, retryable, and dead-lettered entries are monitored and escalated.
+10. How signing metadata is protected, reviewed, verified, and correlated during key rotation or audit-chain investigation.
 
 The ASI Backbone package should remain a clean integration layer inside that host-owned plan.
 

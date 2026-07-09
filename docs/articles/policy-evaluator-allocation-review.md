@@ -29,10 +29,23 @@ Warning and denial reason ordering must also remain stable. In fast-abort mode, 
 
 These scenarios complement the broader `AsiBackboneHotPathBenchmarks` suite by isolating the issue #484 review paths.
 
-Run them from the repository root with:
+`FirstDenialShortCircuitBenchmarks` adds the issue #498 follow-up scenarios for:
+
+- `policy_evaluator.first_denial_expensive_tail_full`;
+- `policy_evaluator.first_denial_expensive_tail_short_circuit`.
+
+Those scenarios place CPU-bound tail constraints after the first denial so the benchmark measures the condition where short-circuiting is expected to help: skipping meaningful work. Static-constraint baselines can still show the short-circuit path as neutral, slower, or more allocating because the skipped constraints are trivial and the evaluator still has to compose a denied governance decision.
+
+Run the allocation-focused review benchmarks from the repository root with:
 
 ```bash
 dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks.BenchmarkDotNet --filter '*PolicyEvaluatorAllocationBenchmarks*'
+```
+
+Run the first-denial expensive-tail follow-up benchmarks with:
+
+```bash
+dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks.BenchmarkDotNet --filter '*FirstDenialShortCircuitBenchmarks*'
 ```
 
 ## Code-change posture

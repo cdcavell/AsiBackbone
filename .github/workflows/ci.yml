@@ -25,6 +25,7 @@ env:
   SBOM_OUTPUT: artifacts/package-sbom
   COVERAGE_OUTPUT: artifacts/coverage
   XML_DOCS_OUTPUT: artifacts/xml-docs
+  PACKAGE_COVERAGE_OUTPUT: artifacts/coverage/package-baselines
   CORE_TEST_PROJECT: tests/AsiBackbone.Core.Tests/AsiBackbone.Core.Tests.csproj
   CORE_COVERAGE_OUTPUT: artifacts/coverage/core
   CORE_BRANCH_COVERAGE_THRESHOLD: 90
@@ -120,6 +121,15 @@ jobs:
           /p:ThresholdType=branch
           /p:ThresholdStat=total
 
+      - name: Test adapter and provider package coverage baselines
+        shell: pwsh
+        run: >
+          ./scripts/Validate-PackageCoverageBaselines.ps1
+          -Configuration "$env:CONFIGURATION"
+          -NoBuild
+          -NoRestore
+          -OutputRoot "$env:PACKAGE_COVERAGE_OUTPUT"
+
       - name: Pack packages
         shell: bash
         run: |
@@ -188,6 +198,13 @@ jobs:
         with:
           name: asi-backbone-core-branch-coverage
           path: ${{ env.CORE_COVERAGE_OUTPUT }}/coverage.cobertura.xml
+          if-no-files-found: error
+
+      - name: Upload adapter and provider package coverage artifacts
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: asi-backbone-package-coverage-baselines
+          path: ${{ env.PACKAGE_COVERAGE_OUTPUT }}/**
           if-no-files-found: error
 
       - name: Upload XML documentation inventory artifact

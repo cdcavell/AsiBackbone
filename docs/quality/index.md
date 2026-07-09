@@ -8,15 +8,23 @@ Coverage, mutation analysis, smoke testing, and concurrency validation answer di
 | --- | --- | --- |
 | Coverage Report | Did the tests execute this code? | Shows the tested surface area and highlights unvisited code paths. |
 | Core Branch Coverage | Did Core tests exercise the decision branches that protect governance behavior? | Enforces a stricter branch gate for the framework-neutral Core package without applying that same threshold to every adapter or sample. |
+| Adapter and Provider Package Coverage | Are consumer-facing adapter/provider packages visible independently from the repository-wide total? | Runs package-scoped coverage baselines for selected integration surfaces so adapter debt cannot hide behind total line coverage. |
 | Mutation Analysis | Would tests fail if behavior changed? | Checks assertion strength by introducing small code mutations and verifying tests catch them. |
 | External Consumer Smoke Test | Can a clean host consume package-shaped artifacts? | Validates package ergonomics, DI registration, host-owned EF persistence, in-memory audit storage, and HTTP allow/deny/acknowledgment flows. |
 | EF Core Outbox Concurrency Validation | What happens under concurrent EF Core writes, retryable failures, and drain-worker contention? | Provides CI-friendly relational evidence for outbox/lifecycle persistence and documents the current non-claiming drain boundary. |
 
-For a governance package, these views all matter. Coverage helps show that policy, acknowledgment, audit, capability-token, DLP/classification, provider-neutral emission, durable outbox, signing, verification, and canonical-hashing paths are exercised. The Core branch coverage gate protects the framework-neutral governance engine from missed policy, decision, signing, capability, acknowledgment, audit, emission, outbox, DLP/classification, and verification branches. Mutation analysis helps show that tests are strong enough to detect behavior changes in selected high-value decision logic. External consumer smoke testing helps prove that package-shaped adoption works from outside the repository's normal project-reference graph. EF Core outbox concurrency validation adds repeatable evidence for durable outbox behavior under concurrent local persistence and worker contention without claiming exactly-once delivery.
+For a governance package, these views all matter. Coverage helps show that policy, acknowledgment, audit, capability-token, DLP/classification, provider-neutral emission, durable outbox, signing, verification, and canonical-hashing paths are exercised. The Core branch coverage gate protects the framework-neutral governance engine from missed policy, decision, signing, capability, acknowledgment, audit, emission, outbox, DLP/classification, and verification branches. Adapter/provider package coverage makes integration surfaces visible independently from the repository-wide total. Mutation analysis helps show that tests are strong enough to detect behavior changes in selected high-value decision logic. External consumer smoke testing helps prove that package-shaped adoption works from outside the repository's normal project-reference graph. EF Core outbox concurrency validation adds repeatable evidence for durable outbox behavior under concurrent local persistence and worker contention without claiming exactly-once delivery.
 
 ## Current quality posture
 
-The `1.2.1` stable package family carries forward the `1.2.0` quality surface and adds release-readiness coverage around Source Link repository-commit metadata, package metadata validation, package-signing wording, GitHub Actions dependency refresh, workflow line-ending normalization, documentation alignment, and project-governance readiness.
+The `3.x` stable package family keeps the repository bounded as Accountable Systems Infrastructure for governed .NET decision flow. The current quality posture combines broad repository gates with targeted hardening for high-risk surfaces:
+
+- repository-wide 75% line coverage for the full solution;
+- Core-only 90% branch coverage for the framework-neutral governance engine;
+- adapter/provider package coverage baselines for `AsiBackbone.AspNetCore`, `AsiBackbone.EntityFrameworkCore`, `AsiBackbone.OpenTelemetry`, `AsiBackbone.Signing.ManagedKey`, and `AsiBackbone.Analyzers`;
+- staged public API XML documentation inventory with tracked `CS1591` ceilings and later project-by-project enforcement;
+- targeted mutation reports for selected high-value behavior;
+- external consumer and stable package smoke tests for package-shaped adoption.
 
 Current Core coverage includes provider-neutral governance emission contracts, durable outbox contracts, DLP/classification failure policy primitives, signing-ready metadata, canonical hashing/signing seams, verification-policy primitives, and capability grant hardening. The targeted mutation reports remain quality signals for selected high-value behavior; they are not full-repository certification.
 
@@ -36,10 +44,13 @@ Tracked Core coverage-hardening work includes:
 - [Open Coverage Report](../coverage/index.html)
 - [Open Core Branch Coverage](../coverage/core/index.html)
 - [Core Branch Coverage Quality Gate](core-branch-coverage.md)
+- [Adapter and Provider Package Coverage Baselines](package-coverage-baselines.md)
 
 The repository-wide coverage report is generated from the full test suite using Coverlet and ReportGenerator. It is published with the documentation site when the documentation workflow runs successfully.
 
 The Core branch coverage report is generated separately from `AsiBackbone.Core.Tests`, filtered to `AsiBackbone.Core`, and enforced as a 90% branch coverage gate. The repository-wide 75% line coverage gate remains in place; the stricter Core gate does not apply to every adapter, storage provider, telemetry provider, or sample package.
+
+The adapter/provider package coverage baseline gate runs selected package-scoped Coverlet targets from `eng/coverage/package-coverage-baselines.csv`. It starts with a low visibility floor so each adapter/provider report is independently produced, then records the next hardening step: calibrate thresholds from the first package-specific CI artifacts and raise them package by package.
 
 ### Mutation Analysis
 
@@ -56,7 +67,7 @@ The historical pre-`1.0.0` mutation boundary and accepted `1.x` expansion deferr
 
 - [External Consumer Smoke Test](external-consumer-smoke-test.md)
 
-The external consumer smoke test packs the repository projects into local NuGet packages, generates a temporary external xUnit project, installs the local packages without project references, and validates Core, ASP.NET Core adapter, EF Core ledger, in-memory audit, and HTTP decision-flow ergonomics.
+The external consumer smoke test packs the repository projects into local NuGet packages, generates a temporary external xUnit project, installs the local packages without project references, and validates Core, ASP.NET Core adapter, EF Core ledger, in-memory audit storage, and HTTP decision-flow ergonomics.
 
 ### EF Core Outbox Concurrency Validation
 
@@ -101,13 +112,18 @@ dotnet test ./tests/AsiBackbone.Core.Tests/AsiBackbone.Core.Tests.csproj \
   /p:Threshold=90 \
   /p:ThresholdType=branch \
   /p:ThresholdStat=total
+```
 
-dotnet reportgenerator \
-  -reports:"./artifacts/core-coverage/coverage.cobertura.xml" \
-  -targetdir:"./artifacts/core-branch-coverage-report" \
-  -reporttypes:"Html;MarkdownSummaryGithub;Cobertura" \
-  -assemblyfilters:"+AsiBackbone.Core;-*.Tests" \
-  -filefilters:"-**/bin/**;-**/obj/**;-**/*.g.cs"
+Run the adapter/provider package coverage baseline gate after a Release build:
+
+```powershell
+./scripts/Validate-PackageCoverageBaselines.ps1 -Configuration Release -NoBuild -NoRestore
+```
+
+The package baseline report is written to:
+
+```text
+artifacts/coverage/package-baselines
 ```
 
 Run the initial Core mutation analysis from the Core test-project folder:
@@ -115,12 +131,6 @@ Run the initial Core mutation analysis from the Core test-project folder:
 ```bash
 cd ./tests/AsiBackbone.Core.Tests
 dotnet tool run dotnet-stryker -- --config-file stryker-config.json
-```
-
-The Core mutation report is written to:
-
-```text
-artifacts/mutation-report/core
 ```
 
 Run the external consumer smoke test from the repository root:

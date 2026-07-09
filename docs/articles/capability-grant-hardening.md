@@ -1,6 +1,6 @@
 # Capability Grant Hardening
 
-Issue: #225.
+Issue: #225. Related release-hardening: #506.
 
 This article documents provider-neutral capability grant validation, proof handling, and bounded-use checks for AsiBackbone.
 
@@ -39,7 +39,7 @@ Use `CapabilityGrantValidator.ValidateAsync(...)` before follow-on execution. Va
 - policy version and policy hash;
 - acknowledgment and handshake references;
 - gateway and resource bindings;
-- bounded-use state through a host-owned use store.
+- bounded-use state through an `ICapabilityGrantUseStore`.
 
 Example:
 
@@ -88,7 +88,7 @@ High-risk workflows should not fall back to broad authority when validation fail
 
 ## Bounded-use expectations
 
-`ICapabilityGrantUseStore` is the provider-neutral seam for single-use or bounded-use workflows. Hosts own the implementation because durable state, concurrency control, distributed locks, cache consistency, retention, and storage schema are deployment-specific.
+`ICapabilityGrantUseStore` is the provider-neutral seam for single-use or bounded-use workflows. Hosts own the production implementation because durable state, concurrency control, distributed locks, cache consistency, retention, and storage schema are deployment-specific.
 
 Recommended use-store behavior:
 
@@ -99,7 +99,40 @@ Validate metadata and proof
   -> return use-limit, stopped, cancelled, or unavailable state when not accepted
 ```
 
-For high-risk workflows, use checks should be atomic at the host storage boundary. An in-memory store is acceptable for tests and samples only; production use needs durable, concurrency-safe state.
+For high-risk workflows, use checks should be atomic at the host storage boundary. Production use needs durable, concurrency-safe state that matches the host's transaction and retry model.
+
+## Reference in-memory use store
+
+`AsiBackbone.Storage.InMemory` includes `InMemoryCapabilityGrantUseStore` as a reference implementation for tests, samples, and local validation.
+
+```csharp
+using AsiBackbone.Storage.InMemory.CapabilityTokens;
+
+var useStore = new InMemoryCapabilityGrantUseStore();
+
+CapabilityGrantValidationResult first = await CapabilityGrantValidator.ValidateAsync(
+    signedGrant,
+    CapabilityGrantValidationOptions.Create(requireUseCheck: true, maxUseCount: 1),
+    useStore: useStore,
+    cancellationToken: cancellationToken);
+
+CapabilityGrantValidationResult replay = await CapabilityGrantValidator.ValidateAsync(
+    signedGrant,
+    CapabilityGrantValidationOptions.Create(requireUseCheck: true, maxUseCount: 1),
+    useStore: useStore,
+    cancellationToken: cancellationToken);
+```
+
+The first valid use is accepted. A second use of the same grant ID returns `ReuseLimitExceeded` with `capability.use-limit-exceeded` when `maxUseCount` is `1`.
+
+Hosts that use the builder facade can register the reference store explicitly:
+
+```csharp
+services.AddAsiBackbone(builder =>
+    builder.UseInMemoryCapabilityGrantUseStore());
+```
+
+The in-memory store is thread-safe inside one process and can represent stopped and cancelled local-validation states through its public helpers. It is **not** durable, distributed, replicated, or production replay protection. It does not coordinate across replicas, survive process restarts, or replace a host-owned database/cache/lock strategy.
 
 ## Core boundary
 

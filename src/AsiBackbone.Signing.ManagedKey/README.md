@@ -2,12 +2,14 @@
 
 Provider-neutral managed-key signing adapter for AsiBackbone governance artifacts.
 
-This package keeps `AsiBackbone.Core` provider-neutral while allowing host applications to connect signing flow to a managed key system, HSM, cloud KMS, Azure Key Vault / Managed HSM adapter, or organization-owned signing service.
+This package keeps `AsiBackbone.Core` provider-neutral while allowing host applications to connect signing flow to a host-owned managed key system, HSM, cloud KMS, Azure Key Vault / Managed HSM adapter, or organization-owned signing service through the existing adapter boundary.
 
 > **New to AsiBackbone?** Start with the concept, not this package: [Intent to Execution: An Accountability Pattern](https://cdcavell.github.io/AsiBackbone/articles/intent-to-execution-pattern.html) and the [documentation site](https://cdcavell.github.io/AsiBackbone/). This README covers one package in the family.
 
 > **Important:**
-> This package does not include a live Azure Key Vault, HSM, cloud KMS, certificate store, or blockchain implementation by default. Host applications provide the client and credentials; private keys, tokens, secrets, and raw key material must not be returned to AsiBackbone.
+> This package does not include a live Azure Key Vault, AWS KMS, GCP Cloud KMS, HSM, certificate store, or blockchain implementation by default. Host applications provide the concrete client, credentials, verification path, monitoring, and operational policy; private keys, tokens, secrets, and raw key material must not be returned to AsiBackbone.
+>
+> For production guidance, see the [Production Managed-Key Integration Guide](https://cdcavell.github.io/AsiBackbone/articles/production-managed-key-integration.html). AsiBackbone remains provider-neutral and does not ship first-party production signing providers or production-style signing sample hosts.
 
 ## Boundary
 
@@ -43,6 +45,8 @@ services.AddAsiBackboneManagedKeySigning(
     },
     serviceProvider => new HostOwnedManagedKeySigningClient());
 ```
+
+The `ProviderName`, `KeyId`, and `KeyVersion` values are provider-neutral descriptors recorded by AsiBackbone. The host-owned `IManagedKeySigningClient` maps them to Azure Key Vault, AWS KMS, GCP Cloud KMS, HSM, certificate-store, or enterprise key-management calls outside the AsiBackbone package boundary.
 
 For samples, tests, diagnostics, or explicit policy-routed fallback behavior, use the local-validation registration:
 
@@ -106,4 +110,4 @@ Provider metadata keys that appear to contain secrets, tokens, credentials, priv
 
 ## Non-goals
 
-This package does not provide tamper-evidence, immutable storage, append-only database behavior, external anchoring, legal non-repudiation, or compliance certification by itself. Those guarantees require durable storage controls, verification, audit-chain or anchoring strategy, key-retention policy, monitoring, and incident response.
+This package does not provide production key custody, cloud KMS SDK wrappers, first-party Azure Key Vault/AWS KMS/GCP Cloud KMS/HSM/certificate-store/enterprise KMS providers, production-style signing sample hosts, automatic key rotation, credential management, tamper-evidence, immutable storage, append-only database behavior, external anchoring, legal non-repudiation, incident response, or compliance certification by itself. Those guarantees require concrete host-managed signing infrastructure, durable storage controls, verification, audit-chain or anchoring strategy, key-retention policy, monitoring, and operational procedures.

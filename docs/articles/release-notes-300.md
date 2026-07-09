@@ -14,11 +14,12 @@ Consumers should update package references to `3.0.0`, rebuild, and run their no
 
 * Added 3.0.0 release notes and a 3.0.0 release readiness record.
 * Added the [3.0.0 Consumer Verification Guide](consumer-verification-300.md) with package-source, package ID, package version, NuGet metadata, Source Link, SBOM, provenance, deferred-signing, and copy/paste checklist guidance.
+* Added the [Production Managed-Key Integration Guide](production-managed-key-integration.md), documenting the provider-neutral runtime signing path for hosts that connect Azure Key Vault, AWS KMS, GCP Cloud KMS, HSM, or enterprise key-management clients through the existing managed-key boundary.
 * Added `InMemoryCapabilityGrantUseStore` to `AsiBackbone.Storage.InMemory` as a clearly non-production reference implementation of `ICapabilityGrantUseStore` for tests, samples, local validation, and stable package smoke coverage of first-use/replay-denied behavior.
 * Added Debug solution build coverage validation so first-party package and test projects stay enabled for default local Debug solution builds unless a reviewed exclusion is documented.
 * Promoted current documentation posture around threat-model contributors as governance hardening hooks for suspicious, malformed, replayed, or unsafe command-like inputs.
 * Promoted strict-governance profile guidance for hosts that want explicit fail-closed configuration through `AddAsiBackboneStrictGovernance()` or `UseStrictGovernanceProfile()`.
-* Included current EF Core JSON metadata storage guidance, production placeholder guardrails, policy-input hardening guidance, and release-validation guidance in the 3.0.0 documentation map.
+* Included current EF Core JSON metadata storage guidance, production placeholder guardrails, policy-input hardening guidance, provider-neutral runtime signing guidance, and release-validation guidance in the 3.0.0 documentation map.
 
 ## Changed
 
@@ -27,7 +28,7 @@ Consumers should update package references to `3.0.0`, rebuild, and run their no
 * Updates `FileVersion` to `3.0.0.0`.
 * Updates `CITATION.cff` and `.zenodo.json` for the `3.0.0` release.
 * Changes `AsiBackbonePolicyEvaluatorOptions.TreatConstraintExceptionAsDenial` to default to `true` for the `3.x` line so eligible ordinary constraint exceptions become denied governance decisions with stable reason codes and auditable policy metadata.
-* Updates README, documentation home, article index, DocFX article navigation, release validation guidance, API compatibility / SemVer guidance, release cadence guidance, security posture, governance wording, template documentation, generated template fallback package versions, and Source Link validation defaults for the `3.0.0` package family.
+* Updates README, documentation home, article index, DocFX article navigation, release validation guidance, API compatibility / SemVer guidance, release cadence guidance, security posture, governance wording, template documentation, generated template fallback package versions, runtime signing-provider boundary guidance, and Source Link validation defaults for the `3.0.0` package family.
 * Updates stale documentation that still described `2.3.0` or the `2.x` line as the current stable release line.
 * Refreshes the historical stable API review so it no longer describes the historical `1.2.1` package family as current.
 
@@ -124,9 +125,11 @@ builder.Services.AddAsiBackbone(backbone =>
 
 ## Release boundary
 
-AsiBackbone remains Accountable Systems Infrastructure for governed .NET decision flow: a governance spine, not an intelligence engine. It does not host, train, or run AI models; it does not control physical systems by itself; and it does not provide end-to-end legal, compliance, production tamper-evidence, replay-protection, or package-signing guarantees by default.
+AsiBackbone remains Accountable Systems Infrastructure for governed .NET decision flow: a governance spine, not an intelligence engine. It does not host, train, or run AI models; it does not control physical systems by itself; and it does not provide end-to-end legal, compliance, production tamper-evidence, replay-protection, package-signing, or production key-management guarantees by default.
 
-Event Hubs, Purview, Azure-specific SDK adapters, Aspire runtime packages, robotics, immutable-storage, and additional provider packages remain outside the stable package contract unless separately reviewed and released.
+Runtime governance-residue signing remains provider-neutral through `AsiBackbone.Signing.ManagedKey`. Hosts may connect Azure Key Vault, AWS KMS, GCP Cloud KMS, HSM, certificate-store, or enterprise key-management clients through the managed-key boundary, but AsiBackbone does not ship first-party production signing providers or production-style signing sample hosts.
+
+Event Hubs, Purview, Azure-specific non-signing SDK adapters, Aspire runtime packages, robotics, immutable-storage, and additional non-signing provider packages remain outside the stable package contract unless separately reviewed and released.
 
 ## Consumer verification
 
@@ -148,6 +151,7 @@ Before tagging `v3.0.0`, the release candidate should pass the repository releas
 * Generated NuGet metadata validation.
 * Package SBOM generation.
 * Package signing readiness documentation review.
+* Provider-neutral runtime signing guidance review.
 * Template package smoke validation.
 * External consumer smoke tests.
 * Version consistency validation for `3.0.0`.

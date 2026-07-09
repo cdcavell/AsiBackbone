@@ -140,9 +140,9 @@ Stable `3.0.x` package family. `3.0.0` establishes the current major release lin
 | `AsiBackbone.Analyzers` | Roslyn analyzer safety rails for governance persistence and continuation flows. |
 | `AsiBackbone.OpenTelemetry` | Released OpenTelemetry governance emission provider that projects provider-neutral envelopes into .NET diagnostics. |
 | `AsiBackbone.Signing.LocalDevelopment` | Local-development signing and verification for tests, samples, and wiring proof paths only. Not for production key custody. |
-| `AsiBackbone.Signing.ManagedKey` | Managed-key signing adapter boundary. The host supplies the actual managed-key client, credentials, key operations, verification path, monitoring, and operational policy. Production-oriented registration fails closed by default when signing cannot complete. |
+| `AsiBackbone.Signing.ManagedKey` | Provider-neutral managed-key signing adapter boundary. The host supplies the actual managed-key client, credentials, key operations, verification path, monitoring, and operational policy. Production-oriented registration fails closed by default when signing cannot complete. |
 
-Future Event Hubs, Purview, Azure-specific, gateway, robotics, immutable-storage, or additional provider packages are not part of the stable contract unless separately reviewed and released.
+Runtime governance-residue signing remains provider-neutral through `AsiBackbone.Signing.ManagedKey`. AsiBackbone does not ship first-party Azure Key Vault, AWS KMS, GCP Cloud KMS, HSM, certificate-store, enterprise KMS, or production-style signing sample-host implementations. Future Event Hubs, Purview, gateway, robotics, immutable-storage, or other non-signing provider packages are not part of the stable contract unless separately reviewed and released.
 
 ## Start here
 
@@ -159,6 +159,7 @@ For **implementation-first adoption**:
 - [Project Boundaries and Non-Claims](https://cdcavell.github.io/AsiBackbone/articles/project-boundaries.html)
 - [Terminology Map](https://cdcavell.github.io/AsiBackbone/articles/terminology-map.html)
 - [Progressive Adoption Ladder](https://cdcavell.github.io/AsiBackbone/articles/progressive-adoption.html)
+- [Production Managed-Key Integration Guide](https://cdcavell.github.io/AsiBackbone/articles/production-managed-key-integration.html)
 
 For **optional conceptual background**:
 

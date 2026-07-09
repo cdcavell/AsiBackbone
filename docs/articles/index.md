@@ -13,7 +13,7 @@ Use the header search box for package names, API concepts, and article titles. S
 
 Stable `3.x` is the current package line. `3.0.0` establishes the current major line and binary assembly identity while preserving the `AsiBackbone.*` package IDs and namespaces established by the `2.0.0` public rename from `CDCavell.AsiBackbone.*`.
 
-Released stable package surfaces include Core, DependencyInjection, Storage.InMemory, EntityFrameworkCore, AspNetCore, Testing, Templates, Analyzers, OpenTelemetry, Signing.LocalDevelopment, and Signing.ManagedKey. OpenTelemetry is the concrete released governance-emission provider. Event Hubs, Purview, Azure-specific SDK adapters, Aspire runtime packages, robotics, immutable-storage, and additional provider packages remain design-only, strategy-only, sample-only, host-owned, or future-provider work unless a later stable release explicitly ships them.
+Released stable package surfaces include Core, DependencyInjection, Storage.InMemory, EntityFrameworkCore, AspNetCore, Testing, Templates, Analyzers, OpenTelemetry, Signing.LocalDevelopment, and Signing.ManagedKey. OpenTelemetry is the concrete released governance-emission provider. Runtime governance-residue signing remains provider-neutral through the managed-key adapter boundary; first-party production signing providers and production-style signing sample hosts are not shipped or planned. Event Hubs, Purview, Azure-specific non-signing SDK adapters, Aspire runtime packages, robotics, immutable-storage, and additional non-signing provider packages remain design-only, strategy-only, sample-only, host-owned, or future-provider work unless a later stable release explicitly ships them.
 
 The release process includes explicit [Release Cadence and Readiness](release-cadence-and-readiness.md) guidance for patch/minor/major release selection, early-major stabilization, package metadata assets, Source Link, SBOM/provenance, documentation links, and future package identity or namespace changes. The [3.0.0 Consumer Verification Guide](consumer-verification-300.md) gives consumers a conservative package-source, package ID, Source Link, SBOM/provenance, and deferred-signing verification path.
 
@@ -117,6 +117,7 @@ These pages cover the durability, governance-emission, signing, diagnostics, tes
 * [Released: OpenTelemetry Governance Emission Provider](opentelemetry-governance-emission-provider.md)
 * [Signing Provider Package Boundary](signing-provider-package-boundary.md)
 * [Managed-Key Signing Provider](managed-key-signing-provider.md)
+* [Production Managed-Key Integration Guide](production-managed-key-integration.md)
 
 ## Security and cryptographic boundaries
 
@@ -133,6 +134,7 @@ These pages describe signing, verification, capability, and cryptographic-harden
 * [Capability Grant Hardening](capability-grant-hardening.md)
 * [Audit Integrity Chain Model](audit-integrity-chain-model.md)
 * [Cryptographic Security Posture and Production Guidance](cryptographic-security-posture.md)
+* [Production Managed-Key Integration Guide](production-managed-key-integration.md)
 * [Cryptographic Security Hardening Roadmap](cryptographic-security-hardening-roadmap.md)
 
 ## Design-only and future provider strategy

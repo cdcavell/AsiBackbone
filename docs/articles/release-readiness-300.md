@@ -33,7 +33,7 @@ The release updates the binary assembly identity to `3.0.0.0`, aligns package me
 - Source Link post-publish validation defaults to `3.0.0`.
 - 3.0.0 release notes, this 3.0.0 release readiness record, and the [3.0.0 Consumer Verification Guide](consumer-verification-300.md) are present.
 - Local release-hardening commands are documented in the developer checklist, and Debug solution builds include all first-party package and test projects.
-- README, documentation home, article index, DocFX article navigation, release validation, release cadence, API compatibility / SemVer guidance, security posture, governance wording, and template guidance are aligned to the `3.x` current-release posture.
+- README, documentation home, article index, DocFX article navigation, release validation, release cadence, API compatibility / SemVer guidance, security posture, governance wording, template guidance, and provider-neutral runtime signing guidance are aligned to the `3.x` current-release posture.
 - Public API XML documentation inventory now has a tracked `CS1591` baseline ceiling so inventory debt cannot silently grow.
 - Adapter/provider package coverage now has package-scoped CI artifacts and initial visibility floors for selected consumer-facing integration surfaces.
 - Historical release notes and readiness records remain available for traceability.
@@ -49,13 +49,14 @@ Before tagging `v3.0.0`, confirm:
 - `.zenodo.json` references `3.0.0`.
 - `3.0.0` release notes exist and identify the release as the start of the current `3.x` stable line.
 - `CHANGELOG.md` includes a `3.0.0` entry.
-- README, documentation home, article index, DocFX article TOC, release validation, templates guidance, API compatibility / SemVer guidance, security posture, and governance wording reference `3.0.0` or `3.x` where current-release guidance is expected.
+- README, documentation home, article index, DocFX article TOC, release validation, templates guidance, API compatibility / SemVer guidance, security posture, governance wording, and provider-neutral runtime signing guidance reference `3.0.0` or `3.x` where current-release guidance is expected.
 - The [3.0.0 Consumer Verification Guide](consumer-verification-300.md) is linked from README, release validation, release notes, and documentation navigation.
+- The [Production Managed-Key Integration Guide](production-managed-key-integration.md) is linked from README, package documentation, DocFX navigation, and signing-provider boundary documentation.
 - Source Link post-publish validation defaults to `3.0.0`.
 - Template fallback `PackageReference` versions use `3.0.0`.
 - Release notes state that no package ID or namespace changes are included.
 - Release notes state that the new major line changes binary assembly identity and consumers should rebuild and validate host deployments.
-- Release notes preserve the project boundary: governance spine, not intelligence engine, AI model host, robot controller, compliance certification, or production tamper-evident ledger by default.
+- Release notes preserve the project boundary: governance spine, not intelligence engine, AI model host, robot controller, compliance certification, production key-management platform, production tamper-evident ledger, or production signing provider by default.
 - Release notes state that NuGet package signing remains deferred unless a reviewed package-signing process is adopted before release.
 - The consumer verification guide states what package/SBOM provenance does and does not prove, preserves Source Link post-publish validation instructions, and provides copy/paste validation checklists.
 - The developer checklist states the canonical local release-hardening commands: restore, Release build, and Release test of `AsiBackbone.slnx`.
@@ -94,13 +95,21 @@ Consumers should use the [3.0.0 Consumer Verification Guide](consumer-verificati
 
 If package signing becomes available in a later release, the release-preparation PR should update `SECURITY.md`, `Stable Release Validation`, the current release-readiness record, release notes, and consumer verification guidance before public wording claims signed package artifacts.
 
+## Runtime governance-residue signing provider roadmap
+
+Runtime governance-residue signing is separate from NuGet package signing and GitHub/SBOM provenance.
+
+For production runtime signing, AsiBackbone remains provider-neutral through `AsiBackbone.Signing.ManagedKey`. Hosts may connect Azure Key Vault, AWS KMS, GCP Cloud KMS, HSM, certificate-store, or enterprise key-management clients through the `IManagedKeySigningClient` boundary, but the consuming host owns the concrete client, credentials, key custody, key rotation, verification path, monitoring, incident response, and legal/compliance interpretation.
+
+AsiBackbone does not ship or maintain first-party production signing providers and does not ship a production-style signing sample host. The approved roadmap is documentation and boundary guidance only. This avoids making the project responsible for consumer key-management maintenance while preserving a clear production integration path.
+
 ## Compatibility notes
 
 Consumers already using `AsiBackbone.*` package IDs and namespaces should not need package rename or namespace migration work for `3.0.0`.
 
 Because `AssemblyVersion` moves to `3.0.0.0`, consumers should update package references, rebuild, and validate host deployments, especially where strict assembly loading, plugin discovery, binding redirects, or binary compatibility assumptions are present.
 
-Event Hubs, Purview, Azure-specific SDK adapters, Aspire runtime packages, robotics, immutable-storage, and additional provider packages remain outside the stable package contract unless separately reviewed and released.
+Event Hubs, Purview, Azure-specific non-signing SDK adapters, Aspire runtime packages, robotics, immutable-storage, and additional non-signing provider packages remain outside the stable package contract unless separately reviewed and released. Production runtime signing provider packages remain intentionally out of scope.
 
 ## Post-publish checks
 

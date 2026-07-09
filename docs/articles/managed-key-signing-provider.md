@@ -1,13 +1,15 @@
 # Managed-Key Signing Provider
 
-Issue: #210, updated for #253, #408, and #465.
+Issue: #210, updated for #253, #408, #465, and #512.
 
 This article documents the released `AsiBackbone.Signing.ManagedKey` provider package.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone provides provider-neutral signing, verification, and audit metadata seams. It does not provide immutable storage, external anchoring, blockchain, legal evidence guarantees, compliance certification, or tamper-evidence by itself.
+In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone provides provider-neutral signing, verification, and audit metadata seams. It does not provide immutable storage, external anchoring, blockchain, legal evidence guarantees, compliance certification, production key management, or tamper-evidence by itself.
 
 > [!IMPORTANT]
-> The managed-key package is a stable provider adapter and client boundary. It does not include a live Azure Key Vault, Managed HSM, cloud KMS, certificate store, or HSM implementation by default. Host applications supply the actual managed-key client, credentials, verification path, monitoring, and operational policy.
+> The managed-key package is a stable provider adapter and client boundary. It does not include a live Azure Key Vault, Managed HSM, AWS KMS, GCP Cloud KMS, certificate store, cloud KMS, or HSM implementation by default. Host applications supply the actual managed-key client, credentials, verification path, monitoring, and operational policy.
+>
+> Production runtime signing remains provider-neutral. AsiBackbone does not ship or maintain first-party production signing providers or production-style signing sample hosts. See the [Production Managed-Key Integration Guide](production-managed-key-integration.md).
 
 ## Purpose
 
@@ -32,8 +34,8 @@ Core remains provider-neutral. Provider packages reference Core, not the reverse
 | Boundary | Status | Notes |
 | --- | --- | --- |
 | Managed-key adapter package | Released stable package. | Provides options, DI registration, signing service, and client abstraction. |
-| `IManagedKeySigningClient` | Host-owned implementation boundary. | The host implementation may call Azure Key Vault, Managed HSM, cloud KMS, an HSM appliance, or an organization-owned signing service. |
-| Concrete cloud/HSM/KMS client | Not shipped by default. | Host-owned or future provider-specific package work. |
+| `IManagedKeySigningClient` | Host-owned implementation boundary. | The host implementation may call Azure Key Vault, Managed HSM, AWS KMS, GCP Cloud KMS, an HSM appliance, or an organization-owned signing service. |
+| Concrete cloud/HSM/KMS client | Not shipped by default and not planned as a first-party production signing provider. | Host-owned implementation behind the managed-key boundary. |
 | Verification service | Separate host/provider responsibility. | Signed metadata is preserved for later verification, but hosts must provide a matching verification path when trust is required. |
 | Production tamper-evidence | Not provided by default. | Requires signing, verification, protected key management, durable storage controls, retention, monitoring, and operational procedures. |
 
@@ -50,7 +52,7 @@ public interface IManagedKeySigningClient
 }
 ```
 
-A host-owned implementation can call Azure Key Vault, Managed HSM, a cloud KMS, an HSM appliance, or an organization-owned signing service. The implementation should sign a precomputed AsiBackbone artifact hash and return provider-neutral metadata.
+A host-owned implementation can call Azure Key Vault, Managed HSM, AWS KMS, GCP Cloud KMS, a cloud KMS, an HSM appliance, or an organization-owned signing service. The implementation should sign a precomputed AsiBackbone artifact hash and return provider-neutral metadata.
 
 The client must not return:
 
@@ -66,7 +68,7 @@ The client must not return:
 
 The default managed-key signature descriptor is `RSASSA-PSS-SHA256-MANAGED-KEY`.
 
-This value is provider-neutral metadata. AsiBackbone passes it to the host-owned `IManagedKeySigningClient`, and the host-owned client maps it to the concrete algorithm identifier required by Azure Key Vault, Managed HSM, a cloud KMS, an HSM appliance, or an organization-owned signing service.
+This value is provider-neutral metadata. AsiBackbone passes it to the host-owned `IManagedKeySigningClient`, and the host-owned client maps it to the concrete algorithm identifier required by Azure Key Vault, Managed HSM, AWS KMS, GCP Cloud KMS, a cloud KMS, an HSM appliance, or an organization-owned signing service.
 
 Migration note: earlier examples used `RSASSA-PKCS1-v1_5-SHA256-MANAGED-KEY`. Hosts that still require PKCS#1 v1.5 for an existing managed-key backend can override `ManagedKeySigningOptions.SignatureAlgorithm` explicitly, but new integrations should prefer RSA-PSS when the key provider supports it. Verification services must use the same algorithm family recorded in the signing metadata.
 
@@ -89,6 +91,8 @@ services.AddAsiBackboneManagedKeySigning(
     },
     serviceProvider => new HostOwnedManagedKeySigningClient());
 ```
+
+The `ProviderName`, `KeyId`, `KeyVersion`, hash algorithm, and signature algorithm values are provider-neutral descriptors recorded by AsiBackbone. The host-owned client maps them to concrete provider calls outside the AsiBackbone package boundary.
 
 The package also supports using an already-registered `IManagedKeySigningClient`:
 
@@ -211,22 +215,22 @@ Safe wording:
 - "Signing failures fail closed by default in the production-oriented registration."
 - "Unsigned failure metadata is diagnostic or policy-routable evidence, not a successful signature."
 - "The managed-key package is a released adapter boundary; the concrete key client is host-owned."
+- "Production key custody, credentials, rotation, monitoring, verification, and provider-specific guarantees are host-owned."
 
 Avoid wording such as:
 
 - "This package provides Azure Key Vault support by default."
+- "This package provides AWS KMS, GCP Cloud KMS, or HSM support by default."
+- "AsiBackbone ships a production signing provider."
 - "Managed-key signing makes records tamper-proof."
+- "Managed-key signing proves legal non-repudiation."
 - "Unsigned failure metadata means the artifact was signed."
 - "Signed means verified."
-- "The audit trail is legally non-repudiable."
 
-Use **tamper-evident** only when the deployed system includes signing, verification, durable append-only storage controls, audit-chain or anchoring strategy, key-retention policy, monitoring, and incident response.
+## Related articles
 
-## Related documentation
-
-- [Production Wording and Stable Signing Boundaries](production-wording-and-alpha-limitations.md)
+- [Production Managed-Key Integration Guide](production-managed-key-integration.md)
 - [Signing Provider Package Boundary](signing-provider-package-boundary.md)
 - [Signing-Ready Receipts and Key Handling](signing-ready-receipts-and-key-handling.md)
-- [Signed Audit and Outbox Records](signed-audit-and-outbox-records.md)
 - [Verification Policy and Result Handling](verification-policy-and-result-handling.md)
-- [Cryptographic Security Posture and Production Guidance](cryptographic-security-posture.md)
+- [Key Rotation and Retired-Key Verification](key-rotation-and-retired-key-verification.md)

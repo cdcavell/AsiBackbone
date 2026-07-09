@@ -136,9 +136,9 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorFastAbortTests
 
         Assert.Equal(0, skippedEvaluationCount);
         Assert.True(decision.IsDenied);
-        Assert.Contains("constraint.pre_warning", decision.ReasonCodes);
-        Assert.Contains("constraint.denied", decision.ReasonCodes);
-        Assert.DoesNotContain("constraint.skipped_warning", decision.ReasonCodes);
+        Assert.Equal(
+            ["constraint.pre_warning", "constraint.denied"],
+            decision.ReasonCodes);
     }
 
     /// <summary>

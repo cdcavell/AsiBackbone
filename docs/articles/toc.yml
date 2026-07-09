@@ -145,6 +145,8 @@
       href: signing-provider-package-boundary.md
     - name: Managed-Key Signing Provider
       href: managed-key-signing-provider.md
+    - name: Production Managed-Key Integration Guide
+      href: production-managed-key-integration.md
 
 - name: Security and Boundaries
   items:
@@ -170,6 +172,8 @@
       href: audit-integrity-chain-model.md
     - name: Cryptographic Security Posture and Production Guidance
       href: cryptographic-security-posture.md
+    - name: Production Managed-Key Integration Guide
+      href: production-managed-key-integration.md
     - name: Cryptographic Security Hardening Roadmap
       href: cryptographic-security-hardening-roadmap.md
 

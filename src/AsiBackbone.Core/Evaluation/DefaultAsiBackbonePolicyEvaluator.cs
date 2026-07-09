@@ -315,7 +315,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
         return denials.Count > 0
             ? includeWarningsWhenDenied && warnings.Count > 0
                 ? GovernanceDecision.Deny(
-                    warnings.Concat(denials),
+                    warnings.ConcatAsArray(denials),
                     correlationId: context.CorrelationId,
                     policyVersion: context.PolicyVersion,
                     policyHash: context.PolicyHash)
@@ -722,17 +722,19 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
             }
         }
 
-        public readonly IEnumerable<OperationReason> Concat(OperationReasonAccumulator other)
+        public readonly OperationReason[] ConcatAsArray(OperationReasonAccumulator other)
         {
-            foreach (OperationReason reason in AsEnumerable())
+            int totalCount = Count + other.Count;
+            if (totalCount == 0)
             {
-                yield return reason;
+                return [];
             }
 
-            foreach (OperationReason reason in other.AsEnumerable())
-            {
-                yield return reason;
-            }
+            var reasons = new OperationReason[totalCount];
+            int nextIndex = CopyTo(reasons, 0);
+            _ = other.CopyTo(reasons, nextIndex);
+
+            return reasons;
         }
 
         public readonly ReadOnlyCollection<OperationReason> AsReadOnlyList()
@@ -764,23 +766,21 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
             Count++;
         }
 
-        private readonly IEnumerable<OperationReason> AsEnumerable()
+        private readonly int CopyTo(OperationReason[] destination, int startIndex)
         {
             if (Count == 0)
             {
-                yield break;
+                return startIndex;
             }
 
             if (Count == 1)
             {
-                yield return FirstReason!;
-                yield break;
+                destination[startIndex] = FirstReason!;
+                return startIndex + 1;
             }
 
-            foreach (OperationReason reason in additionalReasons!)
-            {
-                yield return reason;
-            }
+            additionalReasons!.CopyTo(destination, startIndex);
+            return startIndex + additionalReasons.Count;
         }
     }
 }

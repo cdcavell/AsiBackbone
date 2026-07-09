@@ -35,11 +35,11 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     }
 
     /// <summary>
-    /// Verifies that the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}.EvaluateAsync"/> method produces an allowed decision when there are no constraints and the default options are used.
+    /// Verifies that the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}.EvaluateAsync"/> method produces a denied decision when there are no constraints and the default options are used.
     /// </summary>
     /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
-    public async Task EvaluateWithNoConstraintsProducesAllowedDecision()
+    public async Task EvaluateWithNoConstraintsProducesDeniedDecisionByDefault()
     {
         TestPolicyContext context = CreateContext();
 
@@ -47,20 +47,22 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 
-        Assert.True(decision.IsAllowed);
-        Assert.True(decision.CanProceed);
-        Assert.Empty(decision.ReasonCodes);
+        Assert.True(decision.IsDenied);
+        Assert.False(decision.CanProceed);
+        Assert.Equal(
+            AsiBackbonePolicyEvaluatorOptions.DefaultNoConstraintsReasonCode,
+            Assert.Single(decision.ReasonCodes));
         Assert.Equal(context.CorrelationId, decision.CorrelationId);
         Assert.Equal(context.PolicyVersion, decision.PolicyVersion);
         Assert.Equal(context.PolicyHash, decision.PolicyHash);
     }
 
     /// <summary>
-    /// Verifies that the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}.EvaluateAsync"/> method logs a warning when there are no constraints and the default options are used.
+    /// Verifies that the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}.EvaluateAsync"/> method logs a warning when there are no constraints and permissive empty-policy behavior is explicitly enabled.
     /// </summary>
     /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
-    public async Task EvaluateWithNoConstraintsAndDefaultOptionLogsWarning()
+    public async Task EvaluateWithNoConstraintsAndPermissiveOptionLogsWarning()
     {
         TestPolicyContext context = CreateContext();
         var logger = new CapturingLogger<DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>>();
@@ -68,7 +70,10 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
         var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
             constraints: [],
             decisionPolicy: null,
-            options: null,
+            options: new AsiBackbonePolicyEvaluatorOptions
+            {
+                DenyWhenNoConstraints = false
+            },
             logger: logger);
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);

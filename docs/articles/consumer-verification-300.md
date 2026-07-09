@@ -9,10 +9,11 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 For `3.0.0`, consumers can verify release evidence in several layers:
 
 1. package source and expected package IDs;
-2. package version and NuGet repository metadata;
-3. Source Link repository commit metadata after packages are visible on NuGet;
-4. generated package SBOM files and `sbom-manifest.json` when produced by release workflows;
-5. package and SBOM provenance attestations when the workflow event supports GitHub artifact attestation.
+2. package version and target framework;
+3. NuGet repository metadata;
+4. Source Link repository commit metadata after packages are visible on NuGet;
+5. generated package SBOM files and `sbom-manifest.json` when produced by release workflows;
+6. package and SBOM provenance attestations when the workflow event supports GitHub artifact attestation.
 
 NuGet package signing remains deferred unless a later release-preparation PR adopts, documents, and validates a reviewed package-signing process.
 
@@ -38,12 +39,21 @@ AsiBackbone.Signing.ManagedKey
 
 Future Event Hubs, Purview, Azure-specific SDK adapters, Aspire runtime packages, robotics, immutable-storage, and additional provider packages are outside the `3.0.0` stable contract unless a later release explicitly ships them.
 
-## Confirm package version and repository metadata
+## Confirm package version and target framework
 
 For each consumed package, confirm:
 
 - package ID matches the expected `AsiBackbone.*` ID;
 - package version is `3.0.0`;
+- package target assets include `net10.0`;
+- the consuming host uses a .NET 10 SDK/runtime or later.
+
+The `3.0.0` package family intentionally targets `net10.0`. It does not provide `net8.0` package assets. See the [Target Framework Support Decision Record](target-framework-support.md) for the support-boundary decision and revisit criteria.
+
+## Confirm NuGet repository metadata
+
+For each consumed package, confirm:
+
 - license metadata points to the project license;
 - project URL and repository URL point to the AsiBackbone repository or documentation;
 - repository type is present when NuGet metadata exposes it;
@@ -113,6 +123,8 @@ AsiBackbone 3.0.0 package verification checklist
 [ ] Package source is NuGet.org or the expected GitHub Actions release artifact set.
 [ ] Package ID is one of the expected AsiBackbone.* package IDs.
 [ ] Package version is 3.0.0.
+[ ] Package target framework assets are net10.0.
+[ ] Consumer host uses a .NET 10 SDK/runtime or later.
 [ ] Package license, project URL, repository URL, and repository type metadata are present and expected.
 [ ] Repository commit metadata is present after NuGet publish / Source Link validation.
 [ ] Package SBOM exists for the consumed .nupkg when produced by the workflow event.
@@ -129,7 +141,8 @@ AsiBackbone 3.0.0 package verification checklist
 ```text
 3.0.0 consumer verification posture:
 
-- Confirm package source, expected AsiBackbone.* package IDs, and package version 3.0.0.
+- Confirm package source, expected AsiBackbone.* package IDs, package version 3.0.0, and net10.0 target assets.
+- Confirm the consumer host uses a .NET 10 SDK/runtime or later.
 - Confirm NuGet package metadata, including license, project URL, repository URL, repository type, and repository commit metadata where available.
 - After publish, run Source Link metadata validation:
   ./scripts/Validate-Source-Link-commit-metadata.ps1 -Version 3.0.0
@@ -141,6 +154,7 @@ AsiBackbone 3.0.0 package verification checklist
 
 ## Related documentation
 
+- [Target Framework Support Decision Record](target-framework-support.md)
 - [Supply-Chain Provenance and Package SBOMs](supply-chain-provenance.md)
 - [Stable Release Validation](release-validation.md)
 - [3.0.0 Release Readiness Record](release-readiness-300.md)

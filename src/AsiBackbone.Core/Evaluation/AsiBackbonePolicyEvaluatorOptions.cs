@@ -54,14 +54,15 @@ public sealed class AsiBackbonePolicyEvaluatorOptions
     /// Gets or sets a value indicating whether constraint exceptions should be converted into denied governance decisions.
     /// </summary>
     /// <remarks>
-    /// The default value is <see langword="false" /> so constraint exceptions continue to propagate to the host. Set this
-    /// to <see langword="true" /> when the host prefers fail-closed denied decisions with stable reason codes that can be
-    /// audited by downstream governance sinks. Cancellation and critical host/runtime failures are not converted into policy
-    /// denials and continue to propagate. This option is intended for ordinary policy and contributor failures; it does not
-    /// make corrupted process state recoverable, and modern .NET may not deliver some runtime failures to ordinary catch
-    /// filters.
+    /// The default value is <see langword="true" /> so eligible ordinary policy constraint exceptions fail closed as
+    /// denied governance decisions with stable reason codes and auditable policy metadata. Set this to
+    /// <see langword="false" /> only when the host intentionally wants constraint exceptions to propagate to an
+    /// existing exception, transaction, retry, telemetry, or incident-response boundary. Cancellation and critical
+    /// host/runtime failures are not converted into policy denials and continue to propagate. This option is intended
+    /// for ordinary policy and contributor failures; it does not make corrupted process state recoverable, and modern
+    /// .NET may not deliver some runtime failures to ordinary catch filters.
     /// </remarks>
-    public bool TreatConstraintExceptionAsDenial { get; set; }
+    public bool TreatConstraintExceptionAsDenial { get; set; } = true;
 
     /// <summary>
     /// Gets or sets a value indicating whether threat contributor exceptions should be converted into denied governance decisions.

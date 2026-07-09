@@ -4,6 +4,9 @@
 - name: Core Branch Coverage Gate
   href: core-branch-coverage.md
 
+- name: Package Coverage Baselines
+  href: package-coverage-baselines.md
+
 - name: Mutation Coverage Scope
   href: mutation-coverage-scope.md
 

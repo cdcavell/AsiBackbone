@@ -175,7 +175,7 @@ The full, categorized documentation set lives at the [documentation site](https:
 
 Stable `3.0.x` is the current released line, with `3.0.0` as the current major release. This release preserves the simplified `AsiBackbone.*` package and namespace identity established by `2.0.0` while carrying forward the released governance-spine package family and updating the binary assembly identity to `3.0.0.0`.
 
-The stable API contract is documented in [API Compatibility and SemVer](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/api-compatibility-and-semver.md). The `3.0.0` release boundary is recorded in [3.0.0 Release Notes](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/release-notes-300.md) and [3.0.0 Release Readiness Record](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/release-readiness-300.md). Earlier `1.x` and `2.x` release notes remain available for historical traceability.
+The stable API contract is documented in [API Compatibility and SemVer](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/api-compatibility-and-semver.md). The `3.0.0` release boundary is recorded in [3.0.0 Release Notes](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/release-notes-300.md) and [3.0.0 Release Readiness Record](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/release-readiness-300.md). Consumers can use the [3.0.0 Consumer Verification Guide](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/consumer-verification-300.md) for package-source, package ID, Source Link, SBOM, provenance, and deferred-signing checks. Earlier `1.x` and `2.x` release notes remain available for historical traceability.
 
 ## Security and vulnerability reporting
 
@@ -197,7 +197,7 @@ A consumer should be able to use AsiBackbone in an application generated from Ne
 
 AsiBackbone is a governance spine, not an intelligence engine. It implements governance-oriented software primitives for accountable decision flow and keeps execution authority with the host application. See [Project Boundaries and Non-Claims](https://cdcavell.github.io/AsiBackbone/articles/project-boundaries.html) for the full scope statement and safe wording guidance.
 
-> Current NuGet packages are not signed release artifacts from the project maintainer. Package signing may be adopted later through .NET Foundation-supported infrastructure or another reviewed release-signing process.
+> Current NuGet packages are not signed release artifacts from the project maintainer. Package signing may be adopted later through .NET Foundation-supported infrastructure or another reviewed release-signing process. For current package-source, Source Link, SBOM, and provenance checks, see the [3.0.0 Consumer Verification Guide](https://cdcavell.github.io/AsiBackbone/articles/consumer-verification-300.html).
 
 ## Design principles
 

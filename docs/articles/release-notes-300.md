@@ -13,7 +13,8 @@ Consumers should update package references to `3.0.0`, rebuild, and run their no
 ## Added
 
 * Added 3.0.0 release notes and a 3.0.0 release readiness record.
-* Added the [3.0.0 Consumer Verification Guide](consumer-verification-300.md) with package-source, package ID, package version, NuGet metadata, Source Link, SBOM, provenance, deferred-signing, and copy/paste checklist guidance.
+* Added the [3.0.0 Consumer Verification Guide](consumer-verification-300.md) with package-source, package ID, package version, NuGet metadata, Source Link, SBOM, provenance, deferred-signing, target-framework, and copy/paste checklist guidance.
+* Added the [Target Framework Support Decision Record](target-framework-support.md), documenting that the `3.0.x` package family intentionally remains .NET 10+ by targeting `net10.0`, while .NET 8 multi-targeting is deferred unless future consumer demand justifies the full compatibility surface.
 * Added the [Production Managed-Key Integration Guide](production-managed-key-integration.md), documenting the provider-neutral runtime signing path for hosts that connect Azure Key Vault, AWS KMS, GCP Cloud KMS, HSM, or enterprise key-management clients through the existing managed-key boundary.
 * Added `InMemoryCapabilityGrantUseStore` to `AsiBackbone.Storage.InMemory` as a clearly non-production reference implementation of `ICapabilityGrantUseStore` for tests, samples, local validation, and stable package smoke coverage of first-use/replay-denied behavior.
 * Added Debug solution build coverage validation so first-party package and test projects stay enabled for default local Debug solution builds unless a reviewed exclusion is documented.
@@ -28,6 +29,7 @@ Consumers should update package references to `3.0.0`, rebuild, and run their no
 * Updates `FileVersion` to `3.0.0.0`.
 * Updates `CITATION.cff` and `.zenodo.json` for the `3.0.0` release.
 * Changes `AsiBackbonePolicyEvaluatorOptions.TreatConstraintExceptionAsDenial` to default to `true` for the `3.x` line so eligible ordinary constraint exceptions become denied governance decisions with stable reason codes and auditable policy metadata.
+* Documents `net10.0` as the intentional target framework and .NET 10+ consumer boundary for the `3.0.x` package line.
 * Updates README, documentation home, article index, DocFX article navigation, release validation guidance, API compatibility / SemVer guidance, release cadence guidance, security posture, governance wording, template documentation, generated template fallback package versions, runtime signing-provider boundary guidance, and Source Link validation defaults for the `3.0.0` package family.
 * Updates stale documentation that still described `2.3.0` or the `2.x` line as the current stable release line.
 * Refreshes the historical stable API review so it no longer describes the historical `1.2.1` package family as current.
@@ -61,6 +63,8 @@ AsiBackbone.Signing.LocalDevelopment
 AsiBackbone.Signing.ManagedKey
 ```
 
+The `3.0.0` package family intentionally targets `net10.0`. Consumers should use a .NET 10 SDK/runtime or later for this release line. The project does not multi-target .NET 8 for `3.0.x`; compatibility can be reconsidered in a later release only with corresponding CI, packaging validation, analyzer compatibility, template smoke tests, and documentation updates.
+
 `AssemblyVersion` changes to `3.0.0.0`. Consumers should rebuild and validate host deployments, especially applications that depend on assembly binding, plugin loading, or strict package-version pinning.
 
 The release does not intentionally remove or rename public APIs, package IDs, or namespaces. The strict governance profile remains explicit host opt-in; hosts remain responsible for authentication, authorization, execution enforcement, persistence, signing/key custody, monitoring, compliance review, and operational controls.
@@ -77,6 +81,8 @@ Update package references from `2.3.0` to `3.0.0`:
 <PackageReference Include="AsiBackbone.Core" Version="3.0.0" />
 <PackageReference Include="AsiBackbone.AspNetCore" Version="3.0.0" />
 ```
+
+Use a .NET 10 SDK/runtime or later. This release line targets `net10.0`; it does not provide `net8.0` assets.
 
 No namespace update is expected for consumers already using the `AsiBackbone.*` package family.
 
@@ -133,7 +139,7 @@ Event Hubs, Purview, Azure-specific non-signing SDK adapters, Aspire runtime pac
 
 ## Consumer verification
 
-Consumers can use the [3.0.0 Consumer Verification Guide](consumer-verification-300.md) to confirm package source, package IDs, package version, NuGet repository metadata, Source Link commit metadata, SBOM/provenance artifacts, and the current deferred package-signing posture.
+Consumers can use the [3.0.0 Consumer Verification Guide](consumer-verification-300.md) to confirm package source, package IDs, package version, target framework, NuGet repository metadata, Source Link commit metadata, SBOM/provenance artifacts, and the current deferred package-signing posture.
 
 Package SBOMs and package/SBOM provenance artifacts are release evidence for produced package artifacts where supported by the workflow event. They do not prove that packages are maintainer-signed, repository-signed, Authenticode-signed, production tamper-evident after download, legally non-repudiable, vulnerability-free, or approved for a consumer's compliance boundary.
 
@@ -156,7 +162,7 @@ Before tagging `v3.0.0`, the release candidate should pass the repository releas
 * External consumer smoke tests.
 * Version consistency validation for `3.0.0`.
 * Package/SBOM provenance handling where supported by the workflow event.
-* Consumer verification guide review for package source, package IDs, Source Link, SBOM/provenance, deferred signing, and conservative wording.
+* Consumer verification guide review for package source, package IDs, Source Link, SBOM/provenance, target framework, deferred signing, and conservative wording.
 
 After packages are published and visible on NuGet, validate Source Link repository commit metadata with:
 

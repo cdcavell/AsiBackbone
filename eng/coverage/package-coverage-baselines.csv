@@ -1,0 +1,6 @@
+Package,TestProject,Include,LineThreshold,OutputName,Notes
+AsiBackbone.AspNetCore,tests/AsiBackbone.AspNetCore.Tests/AsiBackbone.AspNetCore.Tests.csproj,[AsiBackbone.AspNetCore]*,1,aspnetcore,Initial visibility floor; replace with calibrated baseline after CI report review.
+AsiBackbone.EntityFrameworkCore,tests/AsiBackbone.EntityFrameworkCore.Tests/AsiBackbone.EntityFrameworkCore.Tests.csproj,[AsiBackbone.EntityFrameworkCore]*,1,entityframeworkcore,Initial visibility floor; replace with calibrated provider baseline after CI report review.
+AsiBackbone.OpenTelemetry,tests/AsiBackbone.OpenTelemetry.Tests/AsiBackbone.OpenTelemetry.Tests.csproj,[AsiBackbone.OpenTelemetry]*,1,opentelemetry,Initial visibility floor; replace with calibrated telemetry baseline after CI report review.
+AsiBackbone.Signing.ManagedKey,tests/AsiBackbone.Signing.ManagedKey.Tests/AsiBackbone.Signing.ManagedKey.Tests.csproj,[AsiBackbone.Signing.ManagedKey]*,1,signing-managedkey,Initial visibility floor; replace with calibrated signing-provider baseline after CI report review.
+AsiBackbone.Analyzers,tests/AsiBackbone.Analyzers.Tests/AsiBackbone.Analyzers.Tests.csproj,[AsiBackbone.Analyzers]*,1,analyzers,Initial visibility floor for analyzer package where package-scoped coverage is applicable.

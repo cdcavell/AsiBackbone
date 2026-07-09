@@ -93,12 +93,19 @@ jobs:
 
           mkdir -p "${{ env.PACKAGE_OUTPUT }}"
 
-          mapfile -t package_projects < <(find ./src -name '*.csproj' -type f | sort)
+          mapfile -t package_projects < <(find ./src -name '*.csproj' -type f -not -path '*/templates/*' | sort)
 
           if [ "${#package_projects[@]}" -eq 0 ]; then
             echo "No package projects were found under ./src."
             exit 1
           fi
+
+          for project in "${package_projects[@]}"; do
+            if [[ "$project" == *"/templates/"* ]]; then
+              echo "Template payload project entered package publish candidates: $project"
+              exit 1
+            fi
+          done
 
           for project in "${package_projects[@]}"; do
             echo "Packing $project"

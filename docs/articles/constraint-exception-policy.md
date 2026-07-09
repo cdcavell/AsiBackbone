@@ -2,31 +2,13 @@
 
 This design note defines the intended behavior when an `IAsiBackboneConstraint<TContext>` throws during policy evaluation.
 
-AsiBackbone is audit-first governance infrastructure. A thrown constraint exception may fail closed at the host boundary, especially in HTTP usage, but exception propagation alone can leave no `GovernanceDecision`, no stable reason code, and no downstream audit residue unless the host catches and records the failure.
+AsiBackbone is audit-first governance infrastructure. For the `3.x` stable line, ordinary policy constraint exceptions fail closed by default so a governed attempt can still produce a `GovernanceDecision`, stable reason code, policy metadata, and downstream audit residue. Hosts can still opt out when they intentionally want exceptions to propagate to an existing host error boundary.
 
-## Default behavior: fail fast to the host
+## Default behavior: fail closed as a denied decision
 
-The stable default remains fail-fast exception propagation.
+The `3.x` stable default is fail-closed conversion for eligible ordinary constraint exceptions.
 
-When a constraint throws and `AsiBackbonePolicyEvaluatorOptions.TreatConstraintExceptionAsDenial` is `false`, the evaluator does not catch and convert the exception. The exception propagates to the host application.
-
-This preserves compatibility and lets hosts use their existing exception handling, retry, circuit-breaker, telemetry, and transaction policies.
-
-## Opt-in behavior: fail closed as a denied decision
-
-Hosts that prefer an accountability artifact can opt in:
-
-```csharp
-var evaluator = new DefaultAsiBackbonePolicyEvaluator<MyPolicyContext>(
-    constraints: constraintsFromConfiguration,
-    decisionPolicy: decisionPolicy,
-    options: new AsiBackbonePolicyEvaluatorOptions
-    {
-        TreatConstraintExceptionAsDenial = true
-    });
-```
-
-When enabled, an expected non-cancellation, non-critical exception thrown by a constraint becomes a denied `GovernanceDecision` with reason code:
+When a constraint throws and `AsiBackbonePolicyEvaluatorOptions.TreatConstraintExceptionAsDenial` is `true`, an expected non-cancellation, non-critical exception thrown by a constraint becomes a denied `GovernanceDecision` with reason code:
 
 ```text
 asibackbone.policy.constraint_exception
@@ -39,6 +21,24 @@ The generated denial preserves:
 - `PolicyHash`
 
 If a decision policy is configured, the generated denied decision is passed through that policy with a synthetic denied `ConstraintEvaluationResult` so downstream policy code can still observe a denial path.
+
+## Opt-out behavior: fail fast to the host
+
+Hosts that need fail-fast exception propagation can opt out explicitly:
+
+```csharp
+var evaluator = new DefaultAsiBackbonePolicyEvaluator<MyPolicyContext>(
+    constraints: constraintsFromConfiguration,
+    decisionPolicy: decisionPolicy,
+    options: new AsiBackbonePolicyEvaluatorOptions
+    {
+        TreatConstraintExceptionAsDenial = false
+    });
+```
+
+When `TreatConstraintExceptionAsDenial` is `false`, the evaluator does not convert ordinary constraint exceptions into governance denials. The exception propagates to the host application so host exception handling, retry, circuit-breaker, telemetry, transaction, or incident policy can decide what happens next.
+
+This opt-out is appropriate when the host has reliable exception-to-audit handling or needs to distinguish infrastructure failure from policy denial outside the evaluator.
 
 ## Critical host/runtime failures still propagate
 
@@ -92,18 +92,19 @@ The log message includes the constraint name, exception type, correlation ID, po
 
 ## Recommended host posture
 
-Use the default fail-fast behavior when:
-
-- the host already has reliable exception-to-audit handling;
-- exceptions should abort a transaction and be handled by a central failure path;
-- the host wants to distinguish infrastructure failure from policy denial outside the evaluator.
-
-Use `TreatConstraintExceptionAsDenial = true` when:
+Use the default fail-closed behavior when:
 
 - every governed attempt should produce a decision artifact;
 - ASP.NET Core endpoint governance or another host layer should be able to audit the resulting denial normally;
 - the host wants a consistent fail-closed policy surface for expected constraint failures;
 - downstream systems rely on reason codes rather than exception propagation.
+
+Set `TreatConstraintExceptionAsDenial = false` when:
+
+- the host already has reliable exception-to-audit handling;
+- exceptions should abort a transaction and be handled by a central failure path;
+- the host wants to distinguish infrastructure failure from policy denial outside the evaluator;
+- retry, circuit-breaker, or incident policy must observe the original exception directly.
 
 Do not use `TreatConstraintExceptionAsDenial` to hide critical runtime failures, broken host dependencies, corrupted process state, or other incidents that should be escalated through host operations.
 

@@ -73,11 +73,14 @@ The template intentionally favors safe local defaults:
 
 | Concern | Template default | Production expectation |
 | --- | --- | --- |
+| Evaluator failure posture | Uses the `3.x` fail-closed evaluator defaults: empty policy denies, eligible ordinary constraint exceptions deny, and threat-contributor exceptions deny. | Keep this posture for governed production paths unless the host has a documented exception-to-audit boundary and intentionally opts out. |
 | Audit storage | Non-durable in-memory audit ledger | Host-owned durable audit/outbox persistence when records must survive restart. |
 | Capability validation | Sample scope check for `sample.execute` | Host-owned scope, expiry, replay, actor binding, and downstream authorization checks. |
 | Signing | Not configured by default | Add a production signing/key-management provider only when the host has a concrete trust model. |
 | Authentication and authorization | Not configured by default | Add normal ASP.NET Core auth and policy enforcement for protected hosts. |
 | Execution | Sample response only | Host application owns real business execution and refusal behavior. |
+
+The generated scaffold is meant to demonstrate the fail-closed decision boundary, not to claim production completeness. If a generated host intentionally sets `TreatConstraintExceptionAsDenial = false`, that should be treated as a local-validation or host-owned incident-boundary decision and documented in the generated application.
 
 ## CI validation
 

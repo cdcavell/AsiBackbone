@@ -81,6 +81,37 @@ public sealed class EfCoreAuditLedgerStoreTests
     }
 
     /// <summary>
+    /// Verifies that EF Core persistence failures return a stable sanitized operation result instead of provider exception text.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous test operation.</returns>
+    [Fact]
+    public async Task AppendAsyncReturnsSanitizedFailureWhenPersistenceFails()
+    {
+        await using ThrowingAuditDbContext context = CreateThrowingContext();
+        var store = new EfCoreAuditLedgerStore(context);
+        AuditLedgerRecord record = CreateRecord(
+            "record-sensitive-failure",
+            "correlation-sensitive-failure",
+            "trace-sensitive-failure",
+            "actor-sensitive-failure");
+
+        OperationResult<AuditLedgerRecord> result = await store.AppendAsync(
+            record,
+            TestContext.Current.CancellationToken);
+
+        OperationReason reason = Assert.Single(result.Reasons);
+
+        Assert.True(result.Failed);
+        Assert.Equal("asi_backbone.audit_ledger.append_failed", reason.Code);
+        Assert.Equal(
+            "The audit ledger record could not be persisted by the configured EF Core store.",
+            reason.Message);
+        Assert.DoesNotContain("Sensitive provider detail", reason.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("password", reason.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("prod-db", reason.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
     /// Verifies that audit ledger records can be queried by correlation ID, trace ID, actor ID, and recorded UTC range.
     /// </summary>
     /// <returns>A task that represents the asynchronous test operation.</returns>
@@ -144,6 +175,15 @@ public sealed class EfCoreAuditLedgerStoreTests
         return new HostOwnedAuditDbContext(options);
     }
 
+    private static ThrowingAuditDbContext CreateThrowingContext()
+    {
+        DbContextOptions<ThrowingAuditDbContext> options = new DbContextOptionsBuilder<ThrowingAuditDbContext>()
+            .UseInMemoryDatabase(Guid.NewGuid().ToString("N"))
+            .Options;
+
+        return new ThrowingAuditDbContext(options);
+    }
+
     private static AuditLedgerRecord CreateRecord(
         string recordId,
         string correlationId,
@@ -196,6 +236,33 @@ public sealed class EfCoreAuditLedgerStoreTests
 
         public DbSet<AsiBackboneAuditLedgerMetadataEntity> AuditLedgerMetadata =>
             Set<AsiBackboneAuditLedgerMetadataEntity>();
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            _ = modelBuilder.ApplyAsiBackboneConfigurations();
+        }
+    }
+
+    private sealed class ThrowingAuditDbContext(DbContextOptions<ThrowingAuditDbContext> options)
+        : DbContext(options)
+    {
+        public DbSet<AsiBackboneAuditLedgerRecordEntity> AuditLedgerRecords =>
+            Set<AsiBackboneAuditLedgerRecordEntity>();
+
+        public DbSet<AsiBackboneAuditLedgerReasonCodeEntity> AuditLedgerReasonCodes =>
+            Set<AsiBackboneAuditLedgerReasonCodeEntity>();
+
+        public DbSet<AsiBackboneAuditLedgerMetadataEntity> AuditLedgerMetadata =>
+            Set<AsiBackboneAuditLedgerMetadataEntity>();
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            throw new DbUpdateException("Sensitive provider detail: password=secret; server=prod-db; schema=internal.");
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -9,7 +9,7 @@ namespace AsiBackbone.Core.Tests.Evaluation;
 public sealed class AsiBackbonePolicyEvaluatorOptionsBranchCoverageTests
 {
     /// <summary>
-    /// Validates that the default options pass validation.
+    /// Validates that the default options pass validation and preserve the 3.x fail-closed evaluator posture.
     /// </summary>
     [Fact]
     public void ValidateDefaultOptionsSucceeds()
@@ -17,6 +17,12 @@ public sealed class AsiBackbonePolicyEvaluatorOptionsBranchCoverageTests
         var options = new AsiBackbonePolicyEvaluatorOptions();
 
         options.Validate();
+
+        Assert.True(options.DenyWhenNoConstraints);
+        Assert.True(options.TreatConstraintExceptionAsDenial);
+        Assert.True(options.TreatThreatContributorExceptionAsDenial);
+        Assert.True(options.PreventThreatAssessmentAllowDowngrade);
+        Assert.False(options.ShortCircuitOnFirstDenial);
     }
 
     /// <summary>

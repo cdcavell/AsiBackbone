@@ -33,10 +33,10 @@ public sealed class AsiBackbonePolicyEvaluatorOptions
     /// Gets or sets a value indicating whether evaluation should deny when no constraints are registered or supplied.
     /// </summary>
     /// <remarks>
-    /// The default value is <see langword="false" /> for backward compatibility with hosts that intentionally run
-    /// permissive or explicitly unconstrained evaluation flows.
+    /// The default value is <see langword="true" /> so empty policy structures fail closed by default. Set this to
+    /// <see langword="false" /> only when the host intentionally runs a permissive or explicitly unconstrained evaluation flow.
     /// </remarks>
-    public bool DenyWhenNoConstraints { get; set; }
+    public bool DenyWhenNoConstraints { get; set; } = true;
 
     /// <summary>
     /// Gets or sets a value indicating whether evaluation should stop after the first denied constraint result.

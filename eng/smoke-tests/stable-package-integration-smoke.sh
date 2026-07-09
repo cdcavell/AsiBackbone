@@ -107,6 +107,7 @@ dotnet add "$smoke_project" package SQLitePCLRaw.bundle_e_sqlite3 --version "$sq
 popd > /dev/null
 
 cat > "$smoke_project_dir/StablePackageIntegrationSmokeTests.cs" <<'CSHARP'
+using System.Globalization;
 using System.Net.Http.Json;
 using AsiBackbone.AspNetCore.Actors;
 using AsiBackbone.AspNetCore.Correlation;
@@ -114,13 +115,16 @@ using AsiBackbone.AspNetCore.DependencyInjection;
 using AsiBackbone.AspNetCore.Handshakes;
 using AsiBackbone.Core.Actors;
 using AsiBackbone.Core.Audit;
+using AsiBackbone.Core.CapabilityTokens;
 using AsiBackbone.Core.Constraints;
 using AsiBackbone.Core.Decisions;
 using AsiBackbone.Core.Evaluation;
 using AsiBackbone.Core.Results;
+using AsiBackbone.Core.Signing;
 using AsiBackbone.EntityFrameworkCore;
 using AsiBackbone.EntityFrameworkCore.Audit;
 using AsiBackbone.Storage.InMemory.Audit;
+using AsiBackbone.Storage.InMemory.CapabilityTokens;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -133,6 +137,8 @@ namespace StablePackageIntegrationSmoke.Tests;
 
 public sealed class StablePackageIntegrationSmokeTests
 {
+    private static readonly DateTimeOffset CapabilityGrantNow = new(2026, 7, 9, 12, 0, 0, TimeSpan.Zero);
+
     [Fact]
     public async Task CoreAndInMemoryAuditPackagesComposeDecisionAndStoreResidue()
     {
@@ -172,6 +178,39 @@ public sealed class StablePackageIntegrationSmokeTests
         Assert.Equal(correlationId, stored.CorrelationId);
         Assert.Single(ledger.GetByCorrelationId(correlationId));
         Assert.Same(stored, ledger.GetByEventId(residue.EventId));
+    }
+
+    [Fact]
+    public async Task PackagedInMemoryCapabilityGrantUseStoreAcceptsFirstUseAndDeniesReplay()
+    {
+        SignedGovernanceArtifact<CapabilityTokenGrant> signedGrant = CreateSignedCapabilityGrant();
+        var useStore = new InMemoryCapabilityGrantUseStore();
+        CapabilityGrantValidationOptions options = CapabilityGrantValidationOptions.Create(
+            issuer: "stable-issuer",
+            audience: "stable-gateway",
+            scopes: ["stable.execute"],
+            validationUtc: CapabilityGrantNow,
+            policyVersion: "stable-capability-policy-v1",
+            policyHash: "stable-capability-policy-hash",
+            requireUseCheck: true,
+            maxUseCount: 1);
+
+        CapabilityGrantValidationResult first = await CapabilityGrantValidator.ValidateAsync(
+            signedGrant,
+            options,
+            useStore: useStore);
+        CapabilityGrantValidationResult second = await CapabilityGrantValidator.ValidateAsync(
+            signedGrant,
+            options,
+            useStore: useStore);
+
+        Assert.True(first.IsValid);
+        Assert.True(first.ShouldAllow);
+        Assert.False(second.IsValid);
+        Assert.Equal(CapabilityTokenValidationCategory.ReuseLimitExceeded, second.Category);
+        Assert.Equal(VerificationPolicyAction.Deny, second.Action);
+        Assert.Equal("capability.use-limit-exceeded", second.FailureCode);
+        Assert.Equal(1, useStore.GetUseCount(signedGrant.Artifact.TokenId));
     }
 
     [Fact]
@@ -234,6 +273,44 @@ public sealed class StablePackageIntegrationSmokeTests
         Assert.NotNull(value);
 
         return value;
+    }
+
+    private static SignedGovernanceArtifact<CapabilityTokenGrant> CreateSignedCapabilityGrant()
+    {
+        CapabilityTokenGrant grant = CapabilityTokenGrant.Create(
+            tokenId: "stable-capability-grant",
+            issuer: "stable-issuer",
+            audience: "stable-gateway",
+            scopes: ["stable.execute"],
+            issuedUtc: CapabilityGrantNow.AddMinutes(-5),
+            expiresUtc: CapabilityGrantNow.AddMinutes(5),
+            policyVersion: "stable-capability-policy-v1",
+            policyHash: "stable-capability-policy-hash");
+
+        var payload = CanonicalPayload.Create(
+            CanonicalArtifactTypes.CapabilityTokenGrant,
+            grant.TokenId,
+            grant.SchemaVersion,
+            CanonicalPayloadOptions.DefaultCanonicalizationVersion,
+            new Dictionary<string, object?>
+            {
+                ["audience"] = grant.Audience,
+                ["expiresUtc"] = grant.ExpiresUtc.ToString("O", CultureInfo.InvariantCulture),
+                ["issuer"] = grant.Issuer,
+                ["scopes"] = grant.Scopes.ToArray()
+            });
+        CanonicalPayloadHash hash = CanonicalPayloadHasher.ComputeHash(payload);
+        var signingMetadata = SigningMetadata.Create(
+            signingHash: hash.HashValue,
+            hashAlgorithm: hash.HashAlgorithm,
+            signature: "fake-signature",
+            signatureAlgorithm: "FAKE-SIGNATURE-V1",
+            keyId: "key-1",
+            keyVersion: "v1",
+            provider: "fake-provider",
+            signedUtc: CapabilityGrantNow);
+
+        return SignedGovernanceArtifacts.FromSigningMetadata(grant, payload, hash, signingMetadata);
     }
 }
 

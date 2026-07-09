@@ -77,7 +77,7 @@ The BenchmarkDotNet runner captures latency and allocation measurements for repr
 | `policy.first_denial_short_circuit` | Measures the optional first-denial fast-abort path from issue #345. |
 | `policy.acknowledgment_required` | Measures constraint evaluation followed by acknowledgment-required decision-policy composition. |
 | `policy.escalation_recommended` | Measures constraint evaluation followed by escalation-recommended decision-policy composition. |
-| `policy.constraint_exception_as_denial` | Measures the opt-in fail-closed constraint exception path that emits a synthetic denied decision. |
+| `policy.constraint_exception_as_denial` | Measures the fail-closed constraint exception path that emits a synthetic denied decision. |
 | `endpoint_governance.policy_allow` | Measures `DefaultAsiBackboneEndpointGovernanceService.EvaluateAsync` with a host policy evaluator returning allow. |
 | `endpoint_governance.policy_warning` | Measures `DefaultAsiBackboneEndpointGovernanceService.EvaluateAsync` with a host policy evaluator returning warning. |
 | `endpoint_governance.policy_deny` | Measures `DefaultAsiBackboneEndpointGovernanceService.EvaluateAsync` with a host policy evaluator returning deny. |
@@ -92,6 +92,14 @@ The BenchmarkDotNet runner captures latency and allocation measurements for repr
 The endpoint governance scenarios use test doubles for the host policy evaluator so the measured path stays focused on the ASP.NET Core adapter, metadata descriptor, request-correlation resolution, decision mapping, and safe allow/block result handling.
 
 The outbox drain scenarios use provider-neutral fake outbox storage and the no-op governance emitter. They are designed to measure framework drain behavior and allocations without adding provider SDK, network, database, or exporter variability.
+
+## Exception-as-denial benchmark interpretation
+
+`policy.constraint_exception_as_denial` exists to measure fail-closed evaluator behavior when a constraint unexpectedly throws and `TreatConstraintExceptionAsDenial` converts that fault into a synthetic denied governance decision.
+
+Do not interpret this benchmark as a recommended denial authoring pattern. Expected policy blocks should return `ConstraintEvaluationResult.Deny(...)` from the constraint. Throwing an exception only to deny a request forces the evaluator through the abnormal failure path, makes the denial less semantically precise, and can add avoidable latency and allocation pressure compared with ordinary returned denial results.
+
+Use the benchmark to verify that the safety boundary remains bounded and observable, not to justify exceptions as control flow. If this path becomes hot in a consumer workload, the first remediation should be to fix the constraint so expected denials are returned explicitly. Optimize the framework path only after profiling shows genuine unexpected constraint faults are frequent enough to matter and cannot be addressed at the host-owned constraint layer.
 
 ## Output fields
 
@@ -217,10 +225,5 @@ This keeps optimization work evidence-driven and avoids adding complexity before
 ## Related documentation
 
 - [Policy Evaluator Pipeline](policy-evaluator-pipeline.md)
+- [Constraint Exception Policy](constraint-exception-policy.md)
 - [ASP.NET Core Endpoint Governance](aspnetcore-endpoint-governance.md)
-- [Hosted Governance Outbox Drain](hosted-governance-outbox-drain.md)
-- [Outbox Drain Reliability and Alerting](outbox-drain-reliability-and-alerting.md)
-- [High-Throughput Host Service Guidance](high-throughput-host-services.md)
-- [Audit Residue Observability Schema](audit-residue-observability-schema.md)
-- [API Baseline and Boundary Checks](api-baseline-and-boundary-checks.md)
-- [Release Validation](release-validation.md)

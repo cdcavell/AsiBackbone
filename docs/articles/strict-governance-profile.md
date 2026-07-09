@@ -1,14 +1,14 @@
 # Strict Governance Profile
 
-`AddAsiBackboneStrictGovernance()` is the explicit fail-closed governance profile for hosts that want production-oriented defaults without hiding those choices behind implicit package behavior.
+`AddAsiBackboneStrictGovernance()` is the explicit fail-closed governance profile for hosts that want production-oriented defaults to be visible in startup configuration and code review.
 
 The helper does not register authentication, authorization, host policy rules, audit persistence, endpoint middleware, or business execution. It configures the high-consequence AsiBackbone options that decide whether missing policy structure, policy exceptions, threat-contributor failures, and ungoverned endpoints fail open or fail closed.
 
 ## Why this exists
 
-The current `3.x` line keeps strict posture explicit. A host can still construct an intentionally permissive evaluator for local validation, tests, samples, or explicitly unconstrained flows, but production hosts often want the opposite posture: missing governance structure should stop execution visibly instead of allowing the operation quietly.
+The `3.x` line now defaults the Core evaluator toward fail-closed behavior for empty policy structure, eligible ordinary constraint exceptions, threat-contributor exceptions, and threat-assessment downgrade protection. The strict profile still matters because it applies the same posture explicitly through DI and also configures ASP.NET Core endpoint-governance fail-closed options.
 
-The strict profile gives that posture one discoverable registration call while keeping final execution authority with the host application.
+Use it when production hosts want a single, discoverable registration call for the complete fail-closed governance posture while keeping final execution authority with the host application.
 
 ## Registration
 
@@ -50,9 +50,9 @@ Configuration order still matters. Later `Configure<TOptions>(...)` calls can in
 
 ## Empty-policy behavior
 
-Without the strict profile, an evaluator with no constraints can preserve permissive evaluation behavior and emit an empty-policy warning when a logger is supplied.
+With the `3.x` defaults or the strict profile applied, empty-policy evaluation returns a denied decision with the default `asibackbone.policy.no_constraints` reason code.
 
-With the strict profile applied, hosts should pass the configured `AsiBackbonePolicyEvaluatorOptions` into evaluator registrations. Empty-policy evaluation then returns a denied decision with the default `asibackbone.policy.no_constraints` reason code.
+If a host intentionally needs an unconstrained local validation flow, it must opt out explicitly with `DenyWhenNoConstraints = false`. That opt-out should be limited to tests, samples, migration steps, or separately protected local flows.
 
 ```csharp
 builder.Services.AddSingleton<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>>(serviceProvider =>
@@ -72,9 +72,11 @@ If a host constructs `DefaultAsiBackbonePolicyEvaluator<TContext>` manually with
 
 ## Constraint-exception behavior
 
-With the strict profile applied, eligible ordinary constraint failures are converted into denied governance decisions using the default `asibackbone.policy.constraint_exception` reason code and safe public reason message. Exception details remain in host logging/exception handling paths and are not copied into public decision reasons.
+With the `3.x` defaults or the strict profile applied, eligible ordinary constraint failures are converted into denied governance decisions using the default `asibackbone.policy.constraint_exception` reason code and safe public reason message. Exception details remain in host logging/exception handling paths and are not copied into public decision reasons.
 
 `OperationCanceledException` and critical host/runtime failures continue to propagate. The strict profile is a governance failure policy, not a corrupted-process recovery mechanism.
+
+Hosts that intentionally need fail-fast propagation can set `TreatConstraintExceptionAsDenial = false`, but should document that exception-to-audit handling is owned by the host boundary.
 
 ## Threat-contributor behavior
 

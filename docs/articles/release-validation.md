@@ -4,7 +4,7 @@ This article documents the reusable release-blocking validation path for stable 
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. Release validation should confirm that the package family remains practical governance infrastructure and that implementation claims stay within the documented software boundary. See [Release Cadence and Readiness](release-cadence-and-readiness.md) for the release-stream and stabilization guidance that complements this checklist.
 
-The [3.0.0 Release Readiness Record](release-readiness-300.md) is the current release-candidate control sheet for the `3.0.0` release. Earlier readiness records are retained for traceability.
+The [3.0.0 Release Readiness Record](release-readiness-300.md) is the current release-candidate control sheet for the `3.0.0` release. The [3.0.0 Consumer Verification Guide](consumer-verification-300.md) documents the consumer-facing package-source, package ID, Source Link, SBOM/provenance, and deferred package-signing verification path. Earlier readiness records are retained for traceability.
 
 ## Required checks before tagging a stable release
 
@@ -26,6 +26,7 @@ Before cutting a stable release tag, confirm the following checks have passed on
 | Package metadata asset checklist | release readiness record, generated package inspection | Confirms package icons, packaged README rendering, NuGet metadata, Source Link metadata, SBOM/provenance artifacts, and documentation links are reviewed. |
 | Package SBOM generation | CI, stable release validation, package publish | Generates SPDX JSON SBOM files and an SBOM manifest for generated `.nupkg` artifacts. |
 | Package provenance attestation | CI on non-PR events, stable release validation on non-PR events, package publish | Attests generated package and SBOM artifacts where supported. |
+| Consumer verification guide | README, release notes, release readiness record, docs navigation | Confirms consumers have a copy/paste verification path for package source, package IDs, package version, repository metadata, Source Link, SBOM/provenance, and deferred package signing. |
 | NuGet package signing readiness | release readiness record, `SECURITY.md`, release notes | Confirms package signing is either explicitly deferred as an open supply-chain item or, when available, documented with signing process, verification guidance, and updated public wording before release. |
 | Template package smoke validation | CI, stable release validation | Confirms the packed `AsiBackbone.Templates` package can be installed, generate supported host styles, restore, and build. |
 | Documentation build | publish docs, stable release validation, package publish | Confirms DocFX can build the documentation included in the release posture. |
@@ -103,6 +104,7 @@ For every stable release, the release readiness record should explicitly confirm
 - Source Link repository commit metadata is generated and has a post-publish validation plan when NuGet download is required to confirm it;
 - package SBOM files and `sbom-manifest.json` are generated for produced `.nupkg` artifacts;
 - package and SBOM provenance artifacts are uploaded and attested where the workflow event supports attestation;
+- consumer verification guidance explains package-source, package ID, version, repository metadata, Source Link, SBOM/provenance, and deferred-signing checks without overstating signing or tamper-evidence;
 - public API XML documentation inventory is reviewed, and staged enforcement changes or intentional exceptions are documented;
 - Debug solution build coverage is reviewed so first-party package/test projects stay enabled for default local solution builds;
 - NuGet package signing status is checked against `SECURITY.md`, and release notes/readiness records state whether signing remains deferred or has an adopted signing and verification process;
@@ -132,6 +134,7 @@ NuGet package signing is currently a known open supply-chain readiness item. Unt
 - [Release Cadence and Readiness](release-cadence-and-readiness.md)
 - [Public API XML Documentation](public-api-xml-documentation.md)
 - [Supply-Chain Provenance and Package SBOMs](supply-chain-provenance.md)
+- [3.0.0 Consumer Verification Guide](consumer-verification-300.md)
 - [3.0.0 Release Readiness Record](release-readiness-300.md)
 - [3.0.0 Release Notes](release-notes-300.md)
 - [2.3.0 Release Readiness Record](release-readiness-230.md)

@@ -13,6 +13,7 @@ Consumers should update package references to `3.0.0`, rebuild, and run their no
 ## Added
 
 * Added 3.0.0 release notes and a 3.0.0 release readiness record.
+* Added the [3.0.0 Consumer Verification Guide](consumer-verification-300.md) with package-source, package ID, package version, NuGet metadata, Source Link, SBOM, provenance, deferred-signing, and copy/paste checklist guidance.
 * Added `InMemoryCapabilityGrantUseStore` to `AsiBackbone.Storage.InMemory` as a clearly non-production reference implementation of `ICapabilityGrantUseStore` for tests, samples, local validation, and stable package smoke coverage of first-use/replay-denied behavior.
 * Added Debug solution build coverage validation so first-party package and test projects stay enabled for default local Debug solution builds unless a reviewed exclusion is documented.
 * Promoted current documentation posture around threat-model contributors as governance hardening hooks for suspicious, malformed, replayed, or unsafe command-like inputs.
@@ -39,6 +40,7 @@ Consumers should update package references to `3.0.0`, rebuild, and run their no
 * Fixed ambiguous 3.x constraint-exception posture by documenting fail-closed default behavior and the explicit opt-out path for hosts that intentionally need fail-fast propagation.
 * Fixed the capability-grant replay hardening gap by giving consumers a packaged in-memory use store they can wire before replacing it with durable host-owned replay protection.
 * Fixed the default Debug solution build posture so first-party package and test projects are no longer skipped by `Debug|*` solution exclusions.
+* Fixed stable package integration smoke-test metadata so it no longer labels the current stable smoke path as `1.x`.
 
 ## Compatibility
 
@@ -126,6 +128,14 @@ AsiBackbone remains Accountable Systems Infrastructure for governed .NET decisio
 
 Event Hubs, Purview, Azure-specific SDK adapters, Aspire runtime packages, robotics, immutable-storage, and additional provider packages remain outside the stable package contract unless separately reviewed and released.
 
+## Consumer verification
+
+Consumers can use the [3.0.0 Consumer Verification Guide](consumer-verification-300.md) to confirm package source, package IDs, package version, NuGet repository metadata, Source Link commit metadata, SBOM/provenance artifacts, and the current deferred package-signing posture.
+
+Package SBOMs and package/SBOM provenance artifacts are release evidence for produced package artifacts where supported by the workflow event. They do not prove that packages are maintainer-signed, repository-signed, Authenticode-signed, production tamper-evident after download, legally non-repudiable, vulnerability-free, or approved for a consumer's compliance boundary.
+
+NuGet package signing remains deferred unless a reviewed signing process is adopted and documented before release.
+
 ## Validation
 
 Before tagging `v3.0.0`, the release candidate should pass the repository release gates, including:
@@ -142,6 +152,7 @@ Before tagging `v3.0.0`, the release candidate should pass the repository releas
 * External consumer smoke tests.
 * Version consistency validation for `3.0.0`.
 * Package/SBOM provenance handling where supported by the workflow event.
+* Consumer verification guide review for package source, package IDs, Source Link, SBOM/provenance, deferred signing, and conservative wording.
 
 After packages are published and visible on NuGet, validate Source Link repository commit metadata with:
 

@@ -234,7 +234,7 @@ public sealed class StablePackageIntegrationSmokeTests
             metadata: new Dictionary<string, string>(StringComparer.Ordinal)
             {
                 ["sink"] = "stub",
-                ["release"] = "1.x"
+                ["release"] = "stable-package-smoke"
             });
 
         await auditSink.WriteAsync(residue);

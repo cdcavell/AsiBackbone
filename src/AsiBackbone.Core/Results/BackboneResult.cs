@@ -7,8 +7,7 @@ public sealed class BackboneResult
 {
     private const string DefaultFailureMessage = "Operation failed.";
 
-    private static readonly IReadOnlyList<string> EmptyMessages =
-        Array.AsReadOnly(Array.Empty<string>());
+    private static readonly string[] EmptyMessages = [];
 
     private BackboneResult(bool succeeded, IReadOnlyList<string> messages)
     {

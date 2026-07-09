@@ -14,6 +14,7 @@ Before cutting a stable release tag, confirm the following checks have passed on
 | --- | --- | --- |
 | Release stream classification | Release PR, release readiness record | Confirms the release is correctly classified as patch, minor, major, or preview. |
 | Version metadata validation | stable release validation, package publish | Confirms MSBuild version metadata, citation metadata, Zenodo metadata, optional tag metadata, and generated package filenames align. |
+| Debug solution build coverage validation | CI, stable release validation, developer checklist | Confirms first-party package and test projects remain enabled for default Debug solution builds and that any remaining Debug exclusions are reviewed. |
 | Restore | CI, stable release validation, package publish | Confirms package dependencies resolve for the solution. |
 | Build | CI, stable release validation, package publish | Confirms release projects compile in Release configuration. |
 | Public API XML documentation inventory | CI, release readiness record | Inventories `CS1591` gaps for selected public package projects while staged enforcement is phased in. |
@@ -32,14 +33,36 @@ Before cutting a stable release tag, confirm the following checks have passed on
 | External consumer smoke tests | external consumer smoke workflow, stable release validation | Confirms clean consumer-style projects can reference and wire the package family. |
 | Source Link metadata validation | manual post-publish validation | Confirms published NuGet packages include expected repository type, repository URL, and non-empty repository commit metadata are present. |
 
+## Canonical local release-hardening commands
+
+Use these commands before treating local validation as release evidence:
+
+```bash
+dotnet restore AsiBackbone.slnx
+dotnet build AsiBackbone.slnx --configuration Release --no-restore
+dotnet test AsiBackbone.slnx --configuration Release --no-build --no-restore
+```
+
+The default Debug solution build should include all first-party package and test projects:
+
+```bash
+dotnet build AsiBackbone.slnx
+```
+
+The reviewed Debug exclusion allowlist is enforced by:
+
+```powershell
+./scripts/Validate-DebugSolutionBuildCoverage.ps1
+```
+
 ## Release-blocking workflows
 
 The following workflows form the reusable gate for stable release candidates:
 
-- `CI` validates dependency review for pull requests, solution restore/build/test, public API XML documentation inventory, formatting, package creation, package SBOM generation, template package smoke validation, coverage output, and CodeQL analysis.
+- `CI` validates dependency review for pull requests, Debug solution build coverage, solution restore/build/test, public API XML documentation inventory, formatting, package creation, package SBOM generation, template package smoke validation, coverage output, and CodeQL analysis.
 - `External Consumer Smoke Test` validates package-consumer wiring through the external consumer and stable package integration smoke scripts.
 - `Publish Documentation` validates the DocFX build used for the documentation site.
-- `Stable Release Validation` provides a single release-candidate gate for version metadata, restore, build, formatting, tests, DocFX, package creation, generated package version validation, generated NuGet metadata validation, SBOM generation, package/SBOM provenance attestation where supported, template package smoke validation, and smoke checks.
+- `Stable Release Validation` provides a single release-candidate gate for version metadata, Debug solution build coverage, restore, build, formatting, tests, DocFX, package creation, generated package version validation, generated NuGet metadata validation, SBOM generation, package/SBOM provenance attestation where supported, template package smoke validation, and smoke checks.
 - `Publish AsiBackbone Packages` repeats release-critical validation before package publish.
 
 ## Tagging rule
@@ -52,7 +75,7 @@ If a tag is pushed and package validation fails, do not publish replacement pack
 
 The `Stable Release Validation` workflow runs on pull requests to `main`, pushes to `main`, `v*.*.*` tags, and manual dispatch.
 
-The workflow validates .NET SDK setup, version metadata, restore, Release build, formatting, tests, tool restore, DocFX, package creation, package versions, NuGet metadata, package SBOM generation, template package smoke validation, external consumer smoke tests, stable package integration smoke tests, provenance handling where supported, and artifact upload.
+The workflow validates .NET SDK setup, version metadata, Debug solution build coverage, restore, Release build, formatting, tests, tool restore, DocFX, package creation, package versions, NuGet metadata, package SBOM generation, template package smoke validation, external consumer smoke tests, stable package integration smoke tests, provenance handling where supported, and artifact upload.
 
 ## Package publish validation
 
@@ -81,9 +104,10 @@ For every stable release, the release readiness record should explicitly confirm
 - package SBOM files and `sbom-manifest.json` are generated for produced `.nupkg` artifacts;
 - package and SBOM provenance artifacts are uploaded and attested where the workflow event supports attestation;
 - public API XML documentation inventory is reviewed, and staged enforcement changes or intentional exceptions are documented;
+- Debug solution build coverage is reviewed so first-party package/test projects stay enabled for default local solution builds;
 - NuGet package signing status is checked against `SECURITY.md`, and release notes/readiness records state whether signing remains deferred or has an adopted signing and verification process;
 - README, DocFX navigation, release notes, migration notes, package README links, and GitHub Pages links are current;
-- any intentionally deferred metadata, asset, Source Link, SBOM, provenance, package-signing, public API XML documentation, or documentation-link check is recorded with risk and follow-up.
+- any intentionally deferred metadata, asset, Source Link, SBOM, provenance, package-signing, public API XML documentation, Debug solution build coverage, or documentation-link check is recorded with risk and follow-up.
 
 ## Source Link metadata validation
 

@@ -223,9 +223,13 @@ public sealed class EfCoreAuditLedgerStore : IAsiBackboneAuditLedgerStore
             CapabilityTokenId = record.CapabilityTokenId,
             PreviousRecordHash = record.PreviousRecordHash,
             RecordHash = record.RecordHash,
+            SigningHash = record.SigningHash,
             SignatureKeyId = record.SignatureKeyId,
+            SignatureKeyVersion = record.SignatureKeyVersion,
             SignatureAlgorithm = record.SignatureAlgorithm,
             SignatureValue = record.SignatureValue,
+            SignatureProvider = record.SignatureProvider,
+            SignedUtc = record.SignedUtc,
             MetadataJson = JsonSerializer.Serialize(record.Metadata, JsonOptions)
         };
     }
@@ -309,6 +313,10 @@ public sealed class EfCoreAuditLedgerStore : IAsiBackboneAuditLedgerStore
             entity.SignatureKeyId,
             entity.SignatureAlgorithm,
             entity.SignatureValue,
+            signingHash: entity.SigningHash,
+            signatureKeyVersion: entity.SignatureKeyVersion,
+            signatureProvider: entity.SignatureProvider,
+            signedUtc: entity.SignedUtc,
             schemaVersion: entity.SchemaVersion);
     }
 

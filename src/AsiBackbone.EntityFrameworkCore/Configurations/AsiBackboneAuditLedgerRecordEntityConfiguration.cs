@@ -24,7 +24,9 @@ public sealed class AsiBackboneAuditLedgerRecordEntityConfiguration
     private const int StageMaxLength = 128;
     private const int HashMaxLength = 512;
     private const int SignatureKeyIdMaxLength = 128;
+    private const int SignatureKeyVersionMaxLength = 128;
     private const int SignatureAlgorithmMaxLength = 128;
+    private const int SignatureProviderMaxLength = 128;
     private const int ConcurrencyStampMaxLength = 64;
 
     /// <inheritdoc />
@@ -145,13 +147,24 @@ public sealed class AsiBackboneAuditLedgerRecordEntityConfiguration
         _ = builder.Property(record => record.RecordHash)
             .HasMaxLength(HashMaxLength);
 
+        _ = builder.Property(record => record.SigningHash)
+            .HasMaxLength(HashMaxLength);
+
         _ = builder.Property(record => record.SignatureKeyId)
             .HasMaxLength(SignatureKeyIdMaxLength);
+
+        _ = builder.Property(record => record.SignatureKeyVersion)
+            .HasMaxLength(SignatureKeyVersionMaxLength);
 
         _ = builder.Property(record => record.SignatureAlgorithm)
             .HasMaxLength(SignatureAlgorithmMaxLength);
 
         _ = builder.Property(record => record.SignatureValue);
+
+        _ = builder.Property(record => record.SignatureProvider)
+            .HasMaxLength(SignatureProviderMaxLength);
+
+        _ = builder.Property(record => record.SignedUtc);
 
         _ = builder.Property(record => record.MetadataJson)
             .IsRequired();
@@ -210,6 +223,16 @@ public sealed class AsiBackboneAuditLedgerRecordEntityConfiguration
         _ = builder.HasIndex(record => record.CapabilityTokenId);
 
         _ = builder.HasIndex(record => record.RecordHash);
+
+        _ = builder.HasIndex(record => record.SigningHash);
+
+        _ = builder.HasIndex(record => record.SignatureKeyId);
+
+        _ = builder.HasIndex(record => record.SignatureKeyVersion);
+
+        _ = builder.HasIndex(record => record.SignatureProvider);
+
+        _ = builder.HasIndex(record => record.SignedUtc);
 
         _ = builder.HasIndex(record => new
         {

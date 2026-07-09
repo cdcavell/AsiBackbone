@@ -59,9 +59,20 @@ public sealed class EfCoreAuditLedgerStoreTests
         Assert.Equal(record.CapabilityTokenId, found.CapabilityTokenId);
         Assert.Equal(record.PreviousRecordHash, found.PreviousRecordHash);
         Assert.Equal(record.RecordHash, found.RecordHash);
+        Assert.Equal(record.SigningHash, found.SigningHash);
         Assert.Equal(record.SignatureKeyId, found.SignatureKeyId);
+        Assert.Equal(record.SignatureKeyVersion, found.SignatureKeyVersion);
         Assert.Equal(record.SignatureAlgorithm, found.SignatureAlgorithm);
         Assert.Equal(record.SignatureValue, found.SignatureValue);
+        Assert.Equal(record.SignatureProvider, found.SignatureProvider);
+        Assert.Equal(record.SignedUtc, found.SignedUtc);
+        Assert.Equal(record.SigningMetadata.SigningHash, found.SigningMetadata.SigningHash);
+        Assert.Equal(record.SigningMetadata.KeyId, found.SigningMetadata.KeyId);
+        Assert.Equal(record.SigningMetadata.KeyVersion, found.SigningMetadata.KeyVersion);
+        Assert.Equal(record.SigningMetadata.SignatureAlgorithm, found.SigningMetadata.SignatureAlgorithm);
+        Assert.Equal(record.SigningMetadata.Signature, found.SigningMetadata.Signature);
+        Assert.Equal(record.SigningMetadata.Provider, found.SigningMetadata.Provider);
+        Assert.Equal(record.SigningMetadata.SignedUtc, found.SigningMetadata.SignedUtc);
         Assert.Equal(record.Metadata, found.Metadata);
 
         Assert.Equal(1, await context.AuditLedgerRecords.CountAsync(TestContext.Current.CancellationToken));
@@ -167,7 +178,11 @@ public sealed class EfCoreAuditLedgerStoreTests
             recordHash: "record-hash",
             signatureKeyId: "key-123",
             signatureAlgorithm: "HS256",
-            signatureValue: "signature-value");
+            signatureValue: "signature-value",
+            signingHash: "signing-hash",
+            signatureKeyVersion: "key-version-2026-06",
+            signatureProvider: "local-validation",
+            signedUtc: new DateTimeOffset(2026, 6, 1, 10, 1, 0, TimeSpan.Zero));
     }
 
     private sealed class HostOwnedAuditDbContext(DbContextOptions<HostOwnedAuditDbContext> options)

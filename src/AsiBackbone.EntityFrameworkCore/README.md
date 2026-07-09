@@ -65,6 +65,22 @@ dotnet ef database update \
 
 The project paths are examples only. The host application decides the provider, migration assembly, schema names, deployment workflow, retention policy, backup strategy, and environment-specific configuration.
 
+## Audit ledger signing metadata persistence
+
+`EfCoreAuditLedgerStore` persists the verification-relevant signing fields exposed by `AuditLedgerRecord` into the audit ledger row:
+
+- `SigningHash`
+- `SignatureKeyId`
+- `SignatureKeyVersion`
+- `SignatureAlgorithm`
+- `SignatureValue`
+- `SignatureProvider`
+- `SignedUtc`
+
+This preserves the signing hash, key reference, key version, provider descriptor, signature timestamp, algorithm, and signature value needed for later verification, key-rotation review, and hash-chain investigation. These values are still provider-neutral descriptors; they are not private keys, raw secrets, credentials, or proof of tamper-evidence by themselves.
+
+Hosts upgrading an existing database should generate a host-owned migration after updating the package so the `AsiBackboneAuditLedgerRecords` table receives the new nullable signing columns and related indexes. Review the migration under the same change-control process used for the rest of the application schema, especially in regulated environments where historical audit review depends on durable signature context.
+
 ## Durable governance outbox storage
 
 `EfCoreGovernanceOutboxStore` persists provider-neutral `GovernanceEmissionEnvelope` records before optional downstream provider delivery is attempted. It stores the envelope, status, retry count, next retry UTC, delivered timestamp, provider name, provider record ID, last provider-neutral error fields, dead-letter reason, and safe metadata.

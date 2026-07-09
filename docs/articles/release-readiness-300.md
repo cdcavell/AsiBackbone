@@ -34,6 +34,8 @@ The release updates the binary assembly identity to `3.0.0.0`, aligns package me
 - 3.0.0 release notes, this 3.0.0 release readiness record, and the [3.0.0 Consumer Verification Guide](consumer-verification-300.md) are present.
 - Local release-hardening commands are documented in the developer checklist, and Debug solution builds include all first-party package and test projects.
 - README, documentation home, article index, DocFX article navigation, release validation, release cadence, API compatibility / SemVer guidance, security posture, governance wording, and template guidance are aligned to the `3.x` current-release posture.
+- Public API XML documentation inventory now has a tracked `CS1591` baseline ceiling so inventory debt cannot silently grow.
+- Adapter/provider package coverage now has package-scoped CI artifacts and initial visibility floors for selected consumer-facing integration surfaces.
 - Historical release notes and readiness records remain available for traceability.
 
 ## Required release-candidate checks
@@ -58,6 +60,8 @@ Before tagging `v3.0.0`, confirm:
 - The consumer verification guide states what package/SBOM provenance does and does not prove, preserves Source Link post-publish validation instructions, and provides copy/paste validation checklists.
 - The developer checklist states the canonical local release-hardening commands: restore, Release build, and Release test of `AsiBackbone.slnx`.
 - `./scripts/Validate-DebugSolutionBuildCoverage.ps1` passes, confirming no unreviewed `Debug|*` solution exclusions and keeping all first-party package/test projects enabled for Debug solution builds.
+- `./scripts/Validate-XmlDocumentation.ps1 -Mode Inventory -Configuration Release -NoRestore` passes, confirming the public API XML documentation inventory does not exceed tracked `CS1591` baseline ceilings.
+- `./scripts/Validate-PackageCoverageBaselines.ps1 -Configuration Release -NoBuild -NoRestore` passes after the Release build, confirming selected adapter/provider packages have independent package-scoped coverage output and do not fall below their tracked floors.
 - CI passes on the release-candidate commit.
 - Stable Release Validation passes on the release-candidate commit.
 - Package metadata validation passes for generated `.nupkg` artifacts.
@@ -65,6 +69,20 @@ Before tagging `v3.0.0`, confirm:
 - Template package smoke validation passes.
 - External consumer smoke tests pass.
 - DocFX documentation build passes.
+
+## Quality hardening posture for 3.0.0
+
+`3.0.0` accepts XML documentation and adapter/provider package coverage as **tracked staged debt**, not as closed debt.
+
+The accepted boundary is narrow:
+
+- CI must inventory public API XML documentation gaps and fail if any selected project exceeds its `eng/xml-docs/cs1591-baseline.csv` ceiling.
+- CI must keep Core's 90% branch coverage gate active.
+- CI must produce package-scoped coverage artifacts for the selected adapter/provider surfaces listed in `eng/coverage/package-coverage-baselines.csv`.
+- The initial adapter/provider package floors are visibility gates, not final maturity targets.
+- The next hardening pass should lower XML documentation ceilings from observed inventory and raise package coverage floors from observed package-specific CI artifacts.
+
+This means `3.0.0` can ship only if the debt is explicit, bounded, artifact-producing, and documented. It should not be described as fully closing public API XML documentation enforcement or adapter/provider coverage hardening.
 
 ## Package signing readiness
 

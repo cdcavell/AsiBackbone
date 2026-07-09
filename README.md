@@ -144,6 +144,14 @@ Stable `3.0.x` package family. `3.0.0` establishes the current major release lin
 
 Runtime governance-residue signing remains provider-neutral through `AsiBackbone.Signing.ManagedKey`. AsiBackbone does not ship first-party Azure Key Vault, AWS KMS, GCP Cloud KMS, HSM, certificate-store, enterprise KMS, or production-style signing sample-host implementations. Future Event Hubs, Purview, gateway, robotics, immutable-storage, or other non-signing provider packages are not part of the stable contract unless separately reviewed and released.
 
+## Supported target framework
+
+Stable `3.0.x` packages intentionally target `net10.0`. Consumers should plan on a .NET 10 SDK/runtime or later for the current package line.
+
+The project is not multi-targeting .NET 8 for `3.0.x`. That is an explicit adoption decision, not a defect workaround. The current package family uses a single repository-wide `TargetFramework` of `net10.0`, the EF Core integration is aligned with centrally managed EF Core `10.0.x` dependencies, and backporting the full package, analyzer, template, CI, packaging, and smoke-test surface would add compatibility overhead for a short-lived adoption window.
+
+If meaningful external consumer demand appears, additional TFM support can be reconsidered in a later release with CI, packaging validation, analyzer compatibility, template smoke tests, and documentation updated together. See the [Target Framework Support Decision Record](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/target-framework-support.md).
+
 ## Start here
 
 For **implementation-first adoption**:
@@ -152,6 +160,7 @@ For **implementation-first adoption**:
 - [First 15 Minutes: Standard API Gating](https://cdcavell.github.io/AsiBackbone/articles/quickstart-api-gating.html)
 - [AddAsiBackbone Builder Facade](https://cdcavell.github.io/AsiBackbone/articles/add-asibackbone-builder-facade.html)
 - [dotnet new Templates](https://cdcavell.github.io/AsiBackbone/articles/templates.html)
+- [Target Framework Support Decision Record](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/target-framework-support.md)
 - [Reference Deployment: Plain ASP.NET Core Host Evidence](https://cdcavell.github.io/AsiBackbone/articles/reference-deployment.html)
 - [Testing Harness](https://cdcavell.github.io/AsiBackbone/articles/testing-harness.html)
 - [Strict Governance Profile](https://cdcavell.github.io/AsiBackbone/articles/strict-governance-profile.html)

@@ -130,6 +130,27 @@ var evaluator = new DefaultAsiBackbonePolicyEvaluator<MyPolicyContext>(
 
 If a logger is supplied, the evaluator emits a warning when this permissive empty-policy path is used. Treat that warning as an operational signal, not as a substitute for startup validation.
 
+## Constraint authoring rule
+
+Constraints should return explicit `ConstraintEvaluationResult` values for expected policy outcomes.
+
+Use `ConstraintEvaluationResult.Deny(...)` when a known rule intentionally blocks a request:
+
+```csharp
+return ValueTask.FromResult(ConstraintEvaluationResult.Deny(
+    "policy.region.denied",
+    "The requested region is not permitted by the active policy."));
+```
+
+Do not throw an exception merely to deny a request:
+
+```csharp
+// Avoid this pattern for expected policy outcomes.
+throw new InvalidOperationException("The requested region is not permitted.");
+```
+
+Exception-as-denial exists so the evaluator can fail closed when a constraint unexpectedly faults. It is not a policy-authoring shortcut. A returned denial means the rule intentionally blocked the request; `asibackbone.policy.constraint_exception` means the evaluator denied because a constraint faulted.
+
 ## Constraint exception behavior
 
 The `3.x` default keeps `AsiBackbonePolicyEvaluatorOptions.TreatConstraintExceptionAsDenial` set to `true`. When enabled, a non-cancellation, non-critical exception thrown by a constraint becomes a denied `GovernanceDecision` with reason code:

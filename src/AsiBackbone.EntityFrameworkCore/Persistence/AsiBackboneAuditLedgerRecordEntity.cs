@@ -185,9 +185,19 @@ public sealed class AsiBackboneAuditLedgerRecordEntity : AsiBackboneEntity
     public string? RecordHash { get; set; }
 
     /// <summary>
+    /// Gets or sets the hash value that was signed or is intended to be signed, when supplied by a signing package or host.
+    /// </summary>
+    public string? SigningHash { get; set; }
+
+    /// <summary>
     /// Gets or sets the signature key identifier, when supplied by a signing package or host.
     /// </summary>
     public string? SignatureKeyId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the signature key version, when supplied by a signing package or host.
+    /// </summary>
+    public string? SignatureKeyVersion { get; set; }
 
     /// <summary>
     /// Gets or sets the signature algorithm, when supplied by a signing package or host.
@@ -198,6 +208,16 @@ public sealed class AsiBackboneAuditLedgerRecordEntity : AsiBackboneEntity
     /// Gets or sets the signature value, when supplied by a signing package or host.
     /// </summary>
     public string? SignatureValue { get; set; }
+
+    /// <summary>
+    /// Gets or sets the signing provider descriptor, when supplied by a signing package or host.
+    /// </summary>
+    public string? SignatureProvider { get; set; }
+
+    /// <summary>
+    /// Gets or sets the UTC timestamp when the signature was produced, when supplied by a signing package or host.
+    /// </summary>
+    public DateTimeOffset? SignedUtc { get; set; }
 
     /// <summary>
     /// Gets or sets serialized framework-neutral audit metadata supplied by the host.

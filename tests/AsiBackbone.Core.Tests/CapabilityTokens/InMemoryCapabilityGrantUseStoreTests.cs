@@ -62,22 +62,22 @@ public sealed class InMemoryCapabilityGrantUseStoreTests
             firstGrant,
             maxUseCount: 2,
             usedUtc: Now,
-            TestContext.Current.CancellationToken);
+            cancellationToken: TestContext.Current.CancellationToken);
         CapabilityGrantUseResult secondUse = await store.TryConsumeAsync(
             firstGrant,
             maxUseCount: 2,
             usedUtc: Now,
-            TestContext.Current.CancellationToken);
+            cancellationToken: TestContext.Current.CancellationToken);
         CapabilityGrantUseResult thirdUse = await store.TryConsumeAsync(
             firstGrant,
             maxUseCount: 2,
             usedUtc: Now,
-            TestContext.Current.CancellationToken);
+            cancellationToken: TestContext.Current.CancellationToken);
         CapabilityGrantUseResult otherGrantUse = await store.TryConsumeAsync(
             secondGrant,
             maxUseCount: 2,
             usedUtc: Now,
-            TestContext.Current.CancellationToken);
+            cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Equal(GrantUseState.Accepted, firstUse.State);
         Assert.Equal(1, firstUse.UseCount);
@@ -109,12 +109,12 @@ public sealed class InMemoryCapabilityGrantUseStoreTests
             stoppedGrant,
             maxUseCount: 1,
             usedUtc: Now,
-            TestContext.Current.CancellationToken);
+            cancellationToken: TestContext.Current.CancellationToken);
         CapabilityGrantUseResult cancelled = await store.TryConsumeAsync(
             cancelledGrant,
             maxUseCount: 1,
             usedUtc: Now,
-            TestContext.Current.CancellationToken);
+            cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Equal(GrantUseState.Stopped, stopped.State);
         Assert.Equal("capability.grant-stopped", stopped.FailureCode);

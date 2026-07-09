@@ -74,6 +74,9 @@ jobs:
       - name: Restore
         run: dotnet restore "$SOLUTION_PATH"
 
+      - name: Build Debug solution smoke
+        run: dotnet build "$SOLUTION_PATH" --configuration Debug --no-restore
+
       - name: Build
         run: dotnet build "$SOLUTION_PATH" --configuration "$CONFIGURATION" --no-restore
 

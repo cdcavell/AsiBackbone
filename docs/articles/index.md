@@ -15,7 +15,7 @@ Stable `3.x` is the current package line. `3.0.0` establishes the current major 
 
 Released stable package surfaces include Core, DependencyInjection, Storage.InMemory, EntityFrameworkCore, AspNetCore, Testing, Templates, Analyzers, OpenTelemetry, Signing.LocalDevelopment, and Signing.ManagedKey. OpenTelemetry is the concrete released governance-emission provider. Event Hubs, Purview, Azure-specific SDK adapters, Aspire runtime packages, robotics, immutable-storage, and additional provider packages remain design-only, strategy-only, sample-only, host-owned, or future-provider work unless a later stable release explicitly ships them.
 
-The release process includes explicit [Release Cadence and Readiness](release-cadence-and-readiness.md) guidance for patch/minor/major release selection, early-major stabilization, package metadata assets, Source Link, SBOM/provenance, documentation links, and future package identity or namespace changes.
+The release process includes explicit [Release Cadence and Readiness](release-cadence-and-readiness.md) guidance for patch/minor/major release selection, early-major stabilization, package metadata assets, Source Link, SBOM/provenance, documentation links, and future package identity or namespace changes. The [3.0.0 Consumer Verification Guide](consumer-verification-300.md) gives consumers a conservative package-source, package ID, Source Link, SBOM/provenance, and deferred-signing verification path.
 
 ## Start here / implementation-first usage
 
@@ -31,6 +31,7 @@ The release process includes explicit [Release Cadence and Readiness](release-ca
 * [dotnet new Templates](templates.md)
 * [Why AsiBackbone?](why-asi-backbone.md)
 * [3.0.0 Release Notes](release-notes-300.md)
+* [3.0.0 Consumer Verification Guide](consumer-verification-300.md)
 * [2.3.0 Release Notes](release-notes-230.md)
 * [2.2.1 Release Notes](release-notes-221.md)
 * [2.2.0 Release Notes](release-notes-220.md)
@@ -124,6 +125,7 @@ These pages describe signing, verification, capability, and cryptographic-harden
 * [Project Boundaries and Non-Claims](project-boundaries.md)
 * [Production Wording and Stable Signing Boundaries](production-wording-and-alpha-limitations.md)
 * [Supply-Chain Provenance and Package SBOMs](supply-chain-provenance.md)
+* [3.0.0 Consumer Verification Guide](consumer-verification-300.md)
 * [Signing-Ready Receipts and Key Handling](signing-ready-receipts-and-key-handling.md)
 * [Signed Audit and Outbox Records](signed-audit-and-outbox-records.md)
 * [Verification Policy and Result Handling](verification-policy-and-result-handling.md)
@@ -158,6 +160,7 @@ Scenario pages describe applied patterns. They remain optional and do not imply 
 * [Release Cadence and Readiness](release-cadence-and-readiness.md)
 * [Release Validation](release-validation.md)
 * [Supply-Chain Provenance and Package SBOMs](supply-chain-provenance.md)
+* [3.0.0 Consumer Verification Guide](consumer-verification-300.md)
 * [3.0.0 Release Readiness Record](release-readiness-300.md)
 * [2.3.0 Release Readiness Record](release-readiness-230.md)
 * [2.2.1 Release Readiness Record](release-readiness-221.md)

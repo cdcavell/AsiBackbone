@@ -14,6 +14,7 @@ Consumers should update package references to `3.0.0`, rebuild, and run their no
 
 * Added 3.0.0 release notes and a 3.0.0 release readiness record.
 * Added `InMemoryCapabilityGrantUseStore` to `AsiBackbone.Storage.InMemory` as a clearly non-production reference implementation of `ICapabilityGrantUseStore` for tests, samples, local validation, and stable package smoke coverage of first-use/replay-denied behavior.
+* Added Debug solution build coverage validation so first-party package and test projects stay enabled for default local Debug solution builds unless a reviewed exclusion is documented.
 * Promoted current documentation posture around threat-model contributors as governance hardening hooks for suspicious, malformed, replayed, or unsafe command-like inputs.
 * Promoted strict-governance profile guidance for hosts that want explicit fail-closed configuration through `AddAsiBackboneStrictGovernance()` or `UseStrictGovernanceProfile()`.
 * Included current EF Core JSON metadata storage guidance, production placeholder guardrails, policy-input hardening guidance, and release-validation guidance in the 3.0.0 documentation map.
@@ -37,6 +38,7 @@ Consumers should update package references to `3.0.0`, rebuild, and run their no
 * Fixed strict-governance documentation so it no longer frames `3.0.0` as a future possible migration target.
 * Fixed ambiguous 3.x constraint-exception posture by documenting fail-closed default behavior and the explicit opt-out path for hosts that intentionally need fail-fast propagation.
 * Fixed the capability-grant replay hardening gap by giving consumers a packaged in-memory use store they can wire before replacing it with durable host-owned replay protection.
+* Fixed the default Debug solution build posture so first-party package and test projects are no longer skipped by `Debug|*` solution exclusions.
 
 ## Compatibility
 
@@ -128,8 +130,9 @@ Event Hubs, Purview, Azure-specific SDK adapters, Aspire runtime packages, robot
 
 Before tagging `v3.0.0`, the release candidate should pass the repository release gates, including:
 
-* CI restore, build, formatting, tests, and coverage gates.
+* CI restore, Debug build smoke, Release build, formatting, tests, and coverage gates.
 * Stable Release Validation.
+* Debug solution build coverage validation.
 * DocFX documentation build.
 * Package creation.
 * Generated NuGet metadata validation.

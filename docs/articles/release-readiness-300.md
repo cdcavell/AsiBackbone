@@ -32,6 +32,7 @@ The release updates the binary assembly identity to `3.0.0.0`, aligns package me
 - Template fallback package references use `3.0.0`.
 - Source Link post-publish validation defaults to `3.0.0`.
 - 3.0.0 release notes and this 3.0.0 release readiness record are present.
+- Local release-hardening commands are documented in the developer checklist, and Debug solution builds include all first-party package and test projects.
 - README, documentation home, article index, DocFX article navigation, release validation, release cadence, API compatibility / SemVer guidance, security posture, governance wording, and template guidance are aligned to the `3.x` current-release posture.
 - Historical release notes and readiness records remain available for traceability.
 
@@ -53,6 +54,8 @@ Before tagging `v3.0.0`, confirm:
 - Release notes state that the new major line changes binary assembly identity and consumers should rebuild and validate host deployments.
 - Release notes preserve the project boundary: governance spine, not intelligence engine, AI model host, robot controller, compliance certification, or production tamper-evident ledger by default.
 - Release notes state that NuGet package signing remains deferred unless a reviewed package-signing process is adopted before release.
+- The developer checklist states the canonical local release-hardening commands: restore, Release build, and Release test of `AsiBackbone.slnx`.
+- `./scripts/Validate-DebugSolutionBuildCoverage.ps1` passes, confirming no unreviewed `Debug|*` solution exclusions and keeping all first-party package/test projects enabled for Debug solution builds.
 - CI passes on the release-candidate commit.
 - Stable Release Validation passes on the release-candidate commit.
 - Package metadata validation passes for generated `.nupkg` artifacts.

@@ -67,8 +67,15 @@ jobs:
       - name: Display .NET information
         run: dotnet --info
 
+      - name: Validate Debug solution build coverage
+        shell: pwsh
+        run: ./scripts/Validate-DebugSolutionBuildCoverage.ps1 -SolutionPath "$env:SOLUTION_PATH"
+
       - name: Restore
         run: dotnet restore "$SOLUTION_PATH"
+
+      - name: Build Debug solution smoke
+        run: dotnet build "$SOLUTION_PATH" --configuration Debug --no-restore
 
       - name: Build
         run: dotnet build "$SOLUTION_PATH" --configuration "$CONFIGURATION" --no-restore

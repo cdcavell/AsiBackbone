@@ -1,32 +1,16 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/AsiBackbone.Analyzers/AsiBackbone.Analyzers.csproj" />
-    <Project Path="src/AsiBackbone.AspNetCore/AsiBackbone.AspNetCore.csproj">
-      <Build Solution="Debug|*" Project="false" />
-    </Project>
-    <Project Path="src/AsiBackbone.Core/AsiBackbone.Core.csproj">
-      <Build Solution="Debug|*" Project="false" />
-    </Project>
+    <Project Path="src/AsiBackbone.AspNetCore/AsiBackbone.AspNetCore.csproj" />
+    <Project Path="src/AsiBackbone.Core/AsiBackbone.Core.csproj" />
     <Project Path="src/AsiBackbone.DependencyInjection/AsiBackbone.DependencyInjection.csproj" />
-    <Project Path="src/AsiBackbone.EntityFrameworkCore/AsiBackbone.EntityFrameworkCore.csproj">
-      <Build Solution="Debug|*" Project="false" />
-    </Project>
-    <Project Path="src/AsiBackbone.OpenTelemetry/AsiBackbone.OpenTelemetry.csproj">
-      <Build Solution="Debug|*" Project="false" />
-    </Project>
-    <Project Path="src/AsiBackbone.Signing.LocalDevelopment/AsiBackbone.Signing.LocalDevelopment.csproj">
-      <Build Solution="Debug|*" Project="false" />
-    </Project>
+    <Project Path="src/AsiBackbone.EntityFrameworkCore/AsiBackbone.EntityFrameworkCore.csproj" />
+    <Project Path="src/AsiBackbone.OpenTelemetry/AsiBackbone.OpenTelemetry.csproj" />
+    <Project Path="src/AsiBackbone.Signing.LocalDevelopment/AsiBackbone.Signing.LocalDevelopment.csproj" />
     <Project Path="src/AsiBackbone.Signing.ManagedKey/AsiBackbone.Signing.ManagedKey.csproj" />
-    <Project Path="src/AsiBackbone.Storage.InMemory/AsiBackbone.Storage.InMemory.csproj">
-      <Build Solution="Debug|*" Project="false" />
-    </Project>
-    <Project Path="src/AsiBackbone.Templates/AsiBackbone.Templates.csproj">
-      <Build Solution="Debug|*" Project="false" />
-    </Project>
-    <Project Path="src/AsiBackbone.Testing/AsiBackbone.Testing.csproj">
-      <Build Solution="Debug|*" Project="false" />
-    </Project>
+    <Project Path="src/AsiBackbone.Storage.InMemory/AsiBackbone.Storage.InMemory.csproj" />
+    <Project Path="src/AsiBackbone.Templates/AsiBackbone.Templates.csproj" />
+    <Project Path="src/AsiBackbone.Testing/AsiBackbone.Testing.csproj" />
   </Folder>
   <Folder Name="/benchmarks/">
     <Project Path="benchmarks/AsiBackbone.Benchmarks/AsiBackbone.Benchmarks.csproj">
@@ -44,25 +28,13 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/AsiBackbone.Analyzers.Tests/AsiBackbone.Analyzers.Tests.csproj" />
-    <Project Path="tests/AsiBackbone.AspNetCore.Tests/AsiBackbone.AspNetCore.Tests.csproj">
-      <Build Solution="Debug|*" Project="false" />
-    </Project>
-    <Project Path="tests/AsiBackbone.Core.Tests/AsiBackbone.Core.Tests.csproj">
-      <Build Solution="Debug|*" Project="false" />
-    </Project>
+    <Project Path="tests/AsiBackbone.AspNetCore.Tests/AsiBackbone.AspNetCore.Tests.csproj" />
+    <Project Path="tests/AsiBackbone.Core.Tests/AsiBackbone.Core.Tests.csproj" />
     <Project Path="tests/AsiBackbone.DependencyInjection.Tests/AsiBackbone.DependencyInjection.Tests.csproj" />
-    <Project Path="tests/AsiBackbone.EntityFrameworkCore.Tests/AsiBackbone.EntityFrameworkCore.Tests.csproj">
-      <Build Solution="Debug|*" Project="false" />
-    </Project>
-    <Project Path="tests/AsiBackbone.OpenTelemetry.Tests/AsiBackbone.OpenTelemetry.Tests.csproj">
-      <Build Solution="Debug|*" Project="false" />
-    </Project>
-    <Project Path="tests/AsiBackbone.Signing.LocalDevelopment.Tests/AsiBackbone.Signing.LocalDevelopment.Tests.csproj">
-      <Build Solution="Debug|*" Project="false" />
-    </Project>
+    <Project Path="tests/AsiBackbone.EntityFrameworkCore.Tests/AsiBackbone.EntityFrameworkCore.Tests.csproj" />
+    <Project Path="tests/AsiBackbone.OpenTelemetry.Tests/AsiBackbone.OpenTelemetry.Tests.csproj" />
+    <Project Path="tests/AsiBackbone.Signing.LocalDevelopment.Tests/AsiBackbone.Signing.LocalDevelopment.Tests.csproj" />
     <Project Path="tests/AsiBackbone.Signing.ManagedKey.Tests/AsiBackbone.Signing.ManagedKey.Tests.csproj" />
-    <Project Path="tests/AsiBackbone.Testing.Tests/AsiBackbone.Testing.Tests.csproj">
-      <Build Solution="Debug|*" Project="false" />
-    </Project>
+    <Project Path="tests/AsiBackbone.Testing.Tests/AsiBackbone.Testing.Tests.csproj" />
   </Folder>
 </Solution>

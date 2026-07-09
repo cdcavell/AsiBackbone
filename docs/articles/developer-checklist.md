@@ -4,49 +4,41 @@ Use this checklist before opening a pull request against the stable AsiBackbone 
 
 ## Local validation
 
+Use the release-hardening path when you need evidence that the repository source and test surface has been built and tested:
+
 ```bash
 dotnet restore AsiBackbone.slnx
-dotnet build AsiBackbone.slnx --configuration Release
+dotnet build AsiBackbone.slnx --configuration Release --no-restore
 dotnet test AsiBackbone.slnx --configuration Release --no-build --no-restore
+```
+
+A default local Debug solution build is also expected to build all first-party package and test projects:
+
+```bash
+dotnet build AsiBackbone.slnx
 ```
 
 ## Solution build configurations
 
-`AsiBackbone.slnx` intentionally treats `Release` as the full validation configuration. Use the `Release` commands above when you need evidence that the repository source and test surface has been built and tested.
+`AsiBackbone.slnx` includes all first-party package projects under `src/` and all first-party test projects under `tests/` in Debug solution builds. This keeps the common default `dotnet build AsiBackbone.slnx` command from appearing healthy while skipping package or test project compile coverage.
 
-Do not treat a `Debug` solution build as a complete repository validation pass. Several projects include solution-level entries such as:
+`Release` remains the canonical release-hardening validation configuration because CI, stable release validation, package creation, documentation, and smoke-test gates run against the release posture. Use the Release commands above before tagging, publishing, or treating local results as release evidence.
 
-```xml
-<Build Solution="Debug|*" Project="false" />
-```
-
-Those entries remove the project as an explicit top-level target for `Debug|*` solution builds. They do not necessarily prevent MSBuild from building the project transitively when another included project references it. The practical rule is:
-
-- `Debug` solution builds are local inner-loop or IDE convenience builds only.
-- `Release` solution builds are the canonical local validation path.
-- CI and stable release validation also use `Release` for solution restore, build, test, formatting, package, documentation, and smoke-test checks.
-
-The current `Debug|*` exclusions were reviewed for documentation clarity. No exclusion is treated as accidental in this checklist; if a project becomes part of the normal Debug inner loop later, remove the corresponding solution entry and update this table in the same change.
+Only non-package/non-test convenience surfaces are intentionally excluded from `Debug|*` solution builds:
 
 | Excluded project | Why it is excluded from `Debug|*` solution builds | Full validation path |
 | --- | --- | --- |
-| `src/AsiBackbone.AspNetCore/AsiBackbone.AspNetCore.csproj` | Host adapter package; not required for the smallest solution-level Debug inner loop. | `dotnet build AsiBackbone.slnx --configuration Release` and `dotnet test AsiBackbone.slnx --configuration Release`. |
-| `src/AsiBackbone.Core/AsiBackbone.Core.csproj` | Core package is still validated by the canonical Release path; Debug exclusion avoids implying Debug is the repository-wide validation configuration. | Release solution build/test plus the CI Core branch coverage gate. |
-| `src/AsiBackbone.EntityFrameworkCore/AsiBackbone.EntityFrameworkCore.csproj` | EF Core persistence integration is host-owned infrastructure and should be validated through the full Release path. | Release solution build/test and EF Core integration tests. |
-| `src/AsiBackbone.OpenTelemetry/AsiBackbone.OpenTelemetry.csproj` | Optional governance-emission provider; not part of the minimal Debug inner loop. | Release solution build/test and OpenTelemetry tests. |
-| `src/AsiBackbone.Signing.LocalDevelopment/AsiBackbone.Signing.LocalDevelopment.csproj` | Local-development signing provider; not production key custody and not required for the minimal Debug inner loop. | Release solution build/test and local-development signing tests. |
-| `src/AsiBackbone.Storage.InMemory/AsiBackbone.Storage.InMemory.csproj` | Non-durable storage helper for tests, samples, and local validation; not required for the smallest Debug solution target set. | Release solution build/test and storage-related tests. |
-| `src/AsiBackbone.Templates/AsiBackbone.Templates.csproj` | Template package validation is handled through package and template smoke checks instead of Debug solution builds. | Release build/pack plus `eng/smoke-tests/template-package-smoke.sh`. |
-| `src/AsiBackbone.Testing/AsiBackbone.Testing.csproj` | Test-harness package; validated with the full Release test surface rather than the partial Debug solution target set. | Release solution build/test and testing-harness tests. |
 | `benchmarks/AsiBackbone.Benchmarks/AsiBackbone.Benchmarks.csproj` | Benchmark harness; benchmarks are not normal Debug solution validation. | Build/run the benchmark project intentionally, normally in Release. |
 | `benchmarks/AsiBackbone.Benchmarks.BenchmarkDotNet/AsiBackbone.Benchmarks.BenchmarkDotNet.csproj` | BenchmarkDotNet project; benchmark execution should be an explicit performance activity, not a default Debug solution build. | Build/run the BenchmarkDotNet project intentionally, normally in Release. |
-| `samples/PlainAspNetCoreHost/AsiBackbone.Samples.PlainAspNetCoreHost.csproj` | Sample host; samples demonstrate adoption paths and should not be confused with package validation from a Debug solution build. | Release solution build and sample/smoke validation when sample behavior changes. |
-| `tests/AsiBackbone.AspNetCore.Tests/AsiBackbone.AspNetCore.Tests.csproj` | ASP.NET Core integration tests belong to the full Release validation surface. | `dotnet test AsiBackbone.slnx --configuration Release`. |
-| `tests/AsiBackbone.Core.Tests/AsiBackbone.Core.Tests.csproj` | Core tests and coverage are canonical CI validation, not partial Debug solution evidence. | Release solution test plus the CI Core branch coverage gate. |
-| `tests/AsiBackbone.EntityFrameworkCore.Tests/AsiBackbone.EntityFrameworkCore.Tests.csproj` | EF Core integration tests belong to the full Release validation surface. | `dotnet test AsiBackbone.slnx --configuration Release`. |
-| `tests/AsiBackbone.OpenTelemetry.Tests/AsiBackbone.OpenTelemetry.Tests.csproj` | Provider tests belong to the full Release validation surface. | `dotnet test AsiBackbone.slnx --configuration Release`. |
-| `tests/AsiBackbone.Signing.LocalDevelopment.Tests/AsiBackbone.Signing.LocalDevelopment.Tests.csproj` | Local-development signing tests belong to the full Release validation surface. | `dotnet test AsiBackbone.slnx --configuration Release`. |
-| `tests/AsiBackbone.Testing.Tests/AsiBackbone.Testing.Tests.csproj` | Testing-harness tests belong to the full Release validation surface. | `dotnet test AsiBackbone.slnx --configuration Release`. |
+| `samples/PlainAspNetCoreHost/AsiBackbone.Samples.PlainAspNetCoreHost.csproj` | Optional sample host; samples demonstrate adoption paths and should not be confused with package/test validation from a Debug solution build. | Release solution build and sample/smoke validation when sample behavior changes. |
+
+The Debug coverage posture is guarded by:
+
+```powershell
+./scripts/Validate-DebugSolutionBuildCoverage.ps1
+```
+
+That script fails if new `Debug|*` solution exclusions appear outside the reviewed allowlist above. Update the script and this table together if a future exclusion is intentional.
 
 When package-consumer behavior changes, run the smoke checks when possible:
 
@@ -117,5 +109,7 @@ Documentation should be updated when a change affects package installation, publ
 - Public docs and README links resolve.
 - Known limitations are documented.
 - Stable API and schema boundaries are reviewed.
+- Local release-hardening commands are documented and point to the canonical Release restore/build/test path.
+- Debug solution build coverage keeps all first-party package and test projects enabled, with only reviewed non-package/non-test exclusions.
 - Package-consumer smoke tests pass or failures are explained.
 - Future provider work is not presented as already stable.

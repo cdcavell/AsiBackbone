@@ -6,13 +6,14 @@ This release keeps the existing `AsiBackbone.*` package IDs and public namespace
 
 ## Release summary
 
-`3.0.0` is a major release because it starts a new stable binary identity line and makes the Core evaluator's constraint-exception behavior fail closed by default. The public package IDs and namespaces do **not** change from the `2.x` line.
+`3.0.0` is a major release because it starts a new stable binary identity line, makes the Core evaluator's constraint-exception behavior fail closed by default, and adds a non-durable reference capability-grant use store for local replay validation. The public package IDs and namespaces do **not** change from the `2.x` line.
 
 Consumers should update package references to `3.0.0`, rebuild, and run their normal host validation. No broad package rename or `using` namespace migration is intended for this release.
 
 ## Added
 
 * Added 3.0.0 release notes and a 3.0.0 release readiness record.
+* Added `InMemoryCapabilityGrantUseStore` to `AsiBackbone.Storage.InMemory` as a clearly non-production reference implementation of `ICapabilityGrantUseStore` for tests, samples, local validation, and stable package smoke coverage of first-use/replay-denied behavior.
 * Promoted current documentation posture around threat-model contributors as governance hardening hooks for suspicious, malformed, replayed, or unsafe command-like inputs.
 * Promoted strict-governance profile guidance for hosts that want explicit fail-closed configuration through `AddAsiBackboneStrictGovernance()` or `UseStrictGovernanceProfile()`.
 * Included current EF Core JSON metadata storage guidance, production placeholder guardrails, policy-input hardening guidance, and release-validation guidance in the 3.0.0 documentation map.
@@ -35,6 +36,7 @@ Consumers should update package references to `3.0.0`, rebuild, and run their no
 * Fixed Source Link post-publish validation defaults so the validation script targets `3.0.0` unless another version is supplied.
 * Fixed strict-governance documentation so it no longer frames `3.0.0` as a future possible migration target.
 * Fixed ambiguous 3.x constraint-exception posture by documenting fail-closed default behavior and the explicit opt-out path for hosts that intentionally need fail-fast propagation.
+* Fixed the capability-grant replay hardening gap by giving consumers a packaged in-memory use store they can wire before replacing it with durable host-owned replay protection.
 
 ## Compatibility
 
@@ -59,6 +61,8 @@ AsiBackbone.Signing.ManagedKey
 The release does not intentionally remove or rename public APIs, package IDs, or namespaces. The strict governance profile remains explicit host opt-in; hosts remain responsible for authentication, authorization, execution enforcement, persistence, signing/key custody, monitoring, compliance review, and operational controls.
 
 The Core evaluator now defaults eligible ordinary constraint exceptions to denied governance decisions. Hosts that intentionally require fail-fast exception propagation can set `TreatConstraintExceptionAsDenial = false` and should ensure their host boundary still records the failed governed attempt.
+
+`InMemoryCapabilityGrantUseStore` is a non-durable local-validation helper. It can show first-use and replay-denied behavior in one process, but production replay protection remains host/provider-owned.
 
 ## Migration notes
 
@@ -91,6 +95,13 @@ new AsiBackbonePolicyEvaluatorOptions
 };
 ```
 
+For local capability-grant replay validation, hosts can wire the packaged in-memory reference store before replacing it with durable production storage:
+
+```csharp
+services.AddAsiBackbone(builder =>
+    builder.UseInMemoryCapabilityGrantUseStore());
+```
+
 For production-oriented hosts, review whether the explicit strict profile should be enabled for endpoint-governance fail-closed settings as well:
 
 ```csharp
@@ -109,7 +120,7 @@ builder.Services.AddAsiBackbone(backbone =>
 
 ## Release boundary
 
-AsiBackbone remains Accountable Systems Infrastructure for governed .NET decision flow: a governance spine, not an intelligence engine. It does not host, train, or run AI models; it does not control physical systems by itself; and it does not provide end-to-end legal, compliance, production tamper-evidence, or package-signing guarantees by default.
+AsiBackbone remains Accountable Systems Infrastructure for governed .NET decision flow: a governance spine, not an intelligence engine. It does not host, train, or run AI models; it does not control physical systems by itself; and it does not provide end-to-end legal, compliance, production tamper-evidence, replay-protection, or package-signing guarantees by default.
 
 Event Hubs, Purview, Azure-specific SDK adapters, Aspire runtime packages, robotics, immutable-storage, and additional provider packages remain outside the stable package contract unless separately reviewed and released.
 

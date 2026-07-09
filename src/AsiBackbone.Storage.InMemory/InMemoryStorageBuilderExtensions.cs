@@ -1,7 +1,9 @@
 using AsiBackbone.Core.Audit;
+using AsiBackbone.Core.CapabilityTokens;
 using AsiBackbone.Core.Outbox;
 using AsiBackbone.DependencyInjection;
 using AsiBackbone.Storage.InMemory.Audit;
+using AsiBackbone.Storage.InMemory.CapabilityTokens;
 using AsiBackbone.Storage.InMemory.Outbox;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -45,6 +47,20 @@ public static class InMemoryStorageBuilderExtensions
         ArgumentNullException.ThrowIfNull(builder);
 
         _ = builder.Services.AddSingleton<IAsiBackboneGovernanceOutboxStore, InMemoryGovernanceOutboxStore>();
+        return builder;
+    }
+
+    /// <summary>
+    /// Adds the non-durable in-memory capability grant use store through the AsiBackbone builder facade.
+    /// </summary>
+    public static IAsiBackboneBuilder UseInMemoryCapabilityGrantUseStore(this IAsiBackboneBuilder builder)
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        _ = builder.Services.AddSingleton<InMemoryCapabilityGrantUseStore>();
+        _ = builder.Services.AddSingleton<ICapabilityGrantUseStore>(serviceProvider =>
+            serviceProvider.GetRequiredService<InMemoryCapabilityGrantUseStore>());
+
         return builder;
     }
 }

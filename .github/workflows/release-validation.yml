@@ -60,6 +60,10 @@ jobs:
 
           ./scripts/Validate-VersionConsistency.ps1 @arguments
 
+      - name: Validate Debug solution build coverage
+        shell: pwsh
+        run: ./scripts/Validate-DebugSolutionBuildCoverage.ps1 -SolutionPath "$env:SOLUTION_PATH"
+
       - name: Restore dependencies
         run: dotnet restore "$SOLUTION_PATH"
 

@@ -67,6 +67,9 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore "$SOLUTION_PATH"
 
+      - name: Build Debug solution smoke
+        run: dotnet build "$SOLUTION_PATH" --configuration Debug --no-restore
+
       - name: Build solution
         run: dotnet build "$SOLUTION_PATH" --configuration "$CONFIGURATION" --no-restore /p:ContinuousIntegrationBuild=true
 

@@ -89,10 +89,10 @@ builder.Services.AddSingleton<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintE
             // For real API gating, fail closed if the host expected constraints but none were registered.
             DenyWhenNoConstraints = true,
 
-            // Keep host exception handling visible by default.
-            // Set true only when the host intentionally wants eligible constraint failures
-            // converted into denied governance decisions with monitored reason codes.
-            TreatConstraintExceptionAsDenial = false
+            // 3.x defaults eligible ordinary constraint exceptions to denied GovernanceDecision results
+            // with stable reason codes. Set false only when the host intentionally wants exceptions
+            // to propagate to an existing exception, transaction, retry, telemetry, or incident path.
+            TreatConstraintExceptionAsDenial = true
         }));
 
 WebApplication app = builder.Build();
@@ -291,9 +291,9 @@ The important boundary is that AsiBackbone does not perform the order approval. 
 This quickstart makes two evaluator choices explicit:
 
 - `DenyWhenNoConstraints = true` because governed production surfaces should fail closed if expected constraints are missing.
-- `TreatConstraintExceptionAsDenial = false` because the safest default is to keep unexpected constraint exceptions visible to the host's existing exception, transaction, retry, telemetry, and incident-response path.
+- `TreatConstraintExceptionAsDenial = true` because the `3.x` stable line defaults eligible ordinary constraint failures into denied governance decisions with the monitored `asibackbone.policy.constraint_exception` reason code.
 
-Set `TreatConstraintExceptionAsDenial = true` only when the host has intentionally decided that eligible policy/constraint failures should become denied governance decisions and the host is monitoring the `asibackbone.policy.constraint_exception` reason code plus evaluator error logs.
+Set `TreatConstraintExceptionAsDenial = false` only when the host has intentionally decided that constraint exceptions should propagate to an existing exception, transaction, retry, telemetry, or incident-response path and the host still records enough audit evidence for governed attempts.
 
 ## Where endpoint metadata fits
 

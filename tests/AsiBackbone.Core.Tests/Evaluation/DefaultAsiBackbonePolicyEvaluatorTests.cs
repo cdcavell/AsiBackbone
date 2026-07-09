@@ -352,19 +352,57 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorTests
     }
 
     /// <summary>
-    /// Verifies that the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}.EvaluateAsync"/> method propagates constraint exceptions by default.
+    /// Verifies that the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}.EvaluateAsync"/> method produces a denied governance decision for constraint exceptions by default.
     /// </summary>
     /// <returns>
     /// A task representing the asynchronous operation.
     /// </returns>
     [Fact]
-    public async Task EvaluateWithConstraintExceptionPropagatesByDefault()
+    public async Task EvaluateWithConstraintExceptionProducesDeniedDecisionByDefault()
+    {
+        TestPolicyContext context = CreateContext();
+        var expectedException = new InvalidOperationException("Sensitive exception details should stay with the host.");
+        var logger = new CapturingLogger<DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>>();
+
+        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
+            constraints: [new ThrowingConstraint(expectedException)],
+            decisionPolicy: null,
+            options: null,
+            logger: logger);
+
+        GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
+
+        Assert.True(decision.IsDenied);
+        Assert.False(decision.CanProceed);
+        Assert.Equal(
+            AsiBackbonePolicyEvaluatorOptions.DefaultConstraintExceptionReasonCode,
+            Assert.Single(decision.ReasonCodes));
+        Assert.DoesNotContain("Sensitive", Assert.Single(decision.Reasons).Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal(context.CorrelationId, decision.CorrelationId);
+        Assert.Equal(context.PolicyVersion, decision.PolicyVersion);
+        Assert.Equal(context.PolicyHash, decision.PolicyHash);
+        Assert.Same(expectedException, Assert.Single(logger.Entries).Exception);
+    }
+
+    /// <summary>
+    /// Verifies that the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}.EvaluateAsync"/> method propagates constraint exceptions when fail-closed conversion is explicitly disabled.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
+    [Fact]
+    public async Task EvaluateWithConstraintExceptionPropagatesWhenFailClosedDisabled()
     {
         TestPolicyContext context = CreateContext();
         var expectedException = new InvalidOperationException("Sensitive exception details should stay with the host.");
 
         var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
-            [new ThrowingConstraint(expectedException)]);
+            [new ThrowingConstraint(expectedException)],
+            decisionPolicy: null,
+            options: new AsiBackbonePolicyEvaluatorOptions
+            {
+                TreatConstraintExceptionAsDenial = false
+            });
 
         InvalidOperationException exception = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken));

@@ -10,11 +10,9 @@ public class OperationResult
     private const string DefaultFailureCode = "operation.failed";
     private const string DefaultFailureMessage = "Operation failed.";
 
-    private static readonly IReadOnlyList<OperationReason> EmptyReasons =
-        Array.AsReadOnly(Array.Empty<OperationReason>());
+    private static readonly OperationReason[] EmptyReasons = [];
 
-    private static readonly IReadOnlyList<string> EmptyWarnings =
-        Array.AsReadOnly(Array.Empty<string>());
+    private static readonly string[] EmptyWarnings = [];
 
     private static readonly ReadOnlyCollection<string> EmptyReasonCodes =
         Array.AsReadOnly(Array.Empty<string>());

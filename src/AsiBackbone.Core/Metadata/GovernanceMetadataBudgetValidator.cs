@@ -20,8 +20,7 @@ public static class GovernanceMetadataBudgetValidator
         new ReadOnlyDictionary<string, string>(
             new Dictionary<string, string>(StringComparer.Ordinal));
 
-    private static readonly IReadOnlyList<string> EmptyViolations =
-        Array.AsReadOnly(Array.Empty<string>());
+    private static readonly string[] EmptyViolations = [];
 
     /// <summary>
     /// Normalizes metadata by trimming keys and values, removing blank keys, and using ordinal key comparison.

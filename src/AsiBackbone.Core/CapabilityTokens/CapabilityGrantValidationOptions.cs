@@ -2,7 +2,7 @@ namespace AsiBackbone.Core.CapabilityTokens;
 
 public sealed class CapabilityGrantValidationOptions
 {
-    private static readonly IReadOnlyList<string> EmptyScopes = Array.AsReadOnly(Array.Empty<string>());
+    private static readonly string[] EmptyScopes = [];
 
     private CapabilityGrantValidationOptions(
         string? issuer,

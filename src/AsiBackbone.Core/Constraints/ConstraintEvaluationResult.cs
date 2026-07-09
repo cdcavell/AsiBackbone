@@ -13,8 +13,7 @@ public sealed class ConstraintEvaluationResult
     private const string DefaultWarningCode = "constraint.warning";
     private const string DefaultWarningMessage = "Constraint produced a warning.";
 
-    private static readonly IReadOnlyList<OperationReason> EmptyReasons =
-        Array.AsReadOnly(Array.Empty<OperationReason>());
+    private static readonly OperationReason[] EmptyReasons = [];
 
     private static readonly ReadOnlyCollection<string> EmptyReasonCodes =
         Array.AsReadOnly(Array.Empty<string>());

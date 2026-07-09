@@ -67,7 +67,7 @@ builder.Services.AddSingleton<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintE
     new DefaultAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>(
         sp.GetServices<IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>>(),
         decisionPolicy: null,
-        options: new AsiBackbonePolicyEvaluatorOptions { DenyWhenNoConstraints = true }));
+        options: new AsiBackbonePolicyEvaluatorOptions()));
 
 app.MapPost("/api/orders/{region}/approve", async (
     string region,
@@ -119,6 +119,8 @@ app.MapPost("/api/orders/{region}/approve", async (
     });
 });
 ```
+
+The `3.x` evaluator defaults are intentionally fail-closed for governed surfaces: empty policy structures deny, eligible ordinary constraint exceptions deny with `asibackbone.policy.constraint_exception`, and threat-contributor exceptions deny. Set `TreatConstraintExceptionAsDenial = false` only when a host intentionally wants fail-fast exception propagation through its own exception, transaction, retry, telemetry, or incident-response boundary.
 
 For production-style hosts, add durable audit/outbox persistence, signing or verification, DLP/classification, provider emission, and operational monitoring only where the host has explicitly chosen and configured those boundaries.
 

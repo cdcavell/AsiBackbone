@@ -6,7 +6,7 @@ This release keeps the existing `AsiBackbone.*` package IDs and public namespace
 
 ## Release summary
 
-`3.0.0` is a major release because it starts a new stable binary identity line. The public package IDs and namespaces do **not** change from the `2.x` line.
+`3.0.0` is a major release because it starts a new stable binary identity line and makes the Core evaluator's constraint-exception behavior fail closed by default. The public package IDs and namespaces do **not** change from the `2.x` line.
 
 Consumers should update package references to `3.0.0`, rebuild, and run their normal host validation. No broad package rename or `using` namespace migration is intended for this release.
 
@@ -23,6 +23,7 @@ Consumers should update package references to `3.0.0`, rebuild, and run their no
 * Updates `AssemblyVersion` from `2.0.0.0` to `3.0.0.0` for the new major line.
 * Updates `FileVersion` to `3.0.0.0`.
 * Updates `CITATION.cff` and `.zenodo.json` for the `3.0.0` release.
+* Changes `AsiBackbonePolicyEvaluatorOptions.TreatConstraintExceptionAsDenial` to default to `true` for the `3.x` line so eligible ordinary constraint exceptions become denied governance decisions with stable reason codes and auditable policy metadata.
 * Updates README, documentation home, article index, DocFX article navigation, release validation guidance, API compatibility / SemVer guidance, release cadence guidance, security posture, governance wording, template documentation, generated template fallback package versions, and Source Link validation defaults for the `3.0.0` package family.
 * Updates stale documentation that still described `2.3.0` or the `2.x` line as the current stable release line.
 * Refreshes the historical stable API review so it no longer describes the historical `1.2.1` package family as current.
@@ -33,6 +34,7 @@ Consumers should update package references to `3.0.0`, rebuild, and run their no
 * Fixed template fallback package references so generated fallback `.csproj` files use `3.0.0` when repository project references are unavailable.
 * Fixed Source Link post-publish validation defaults so the validation script targets `3.0.0` unless another version is supplied.
 * Fixed strict-governance documentation so it no longer frames `3.0.0` as a future possible migration target.
+* Fixed ambiguous 3.x constraint-exception posture by documenting fail-closed default behavior and the explicit opt-out path for hosts that intentionally need fail-fast propagation.
 
 ## Compatibility
 
@@ -56,6 +58,8 @@ AsiBackbone.Signing.ManagedKey
 
 The release does not intentionally remove or rename public APIs, package IDs, or namespaces. The strict governance profile remains explicit host opt-in; hosts remain responsible for authentication, authorization, execution enforcement, persistence, signing/key custody, monitoring, compliance review, and operational controls.
 
+The Core evaluator now defaults eligible ordinary constraint exceptions to denied governance decisions. Hosts that intentionally require fail-fast exception propagation can set `TreatConstraintExceptionAsDenial = false` and should ensure their host boundary still records the failed governed attempt.
+
 ## Migration notes
 
 Update package references from `2.3.0` to `3.0.0`:
@@ -67,7 +71,27 @@ Update package references from `2.3.0` to `3.0.0`:
 
 No namespace update is expected for consumers already using the `AsiBackbone.*` package family.
 
-For production-oriented hosts, review whether the explicit strict profile should be enabled:
+Review evaluator exception handling during the upgrade. The `3.x` default is:
+
+```csharp
+new AsiBackbonePolicyEvaluatorOptions
+{
+    DenyWhenNoConstraints = true,
+    TreatConstraintExceptionAsDenial = true,
+    TreatThreatContributorExceptionAsDenial = true
+};
+```
+
+Hosts that rely on propagated constraint exceptions should opt out intentionally:
+
+```csharp
+new AsiBackbonePolicyEvaluatorOptions
+{
+    TreatConstraintExceptionAsDenial = false
+};
+```
+
+For production-oriented hosts, review whether the explicit strict profile should be enabled for endpoint-governance fail-closed settings as well:
 
 ```csharp
 builder.Services.AddAsiBackboneStrictGovernance();

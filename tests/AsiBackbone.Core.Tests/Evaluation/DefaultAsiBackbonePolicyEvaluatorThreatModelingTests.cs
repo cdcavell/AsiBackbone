@@ -321,13 +321,13 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
     }
 
     /// <summary>
-    /// Verifies that a threat contributor that returns a warning outcome results in a warning decision when there are no constraints and the policy allows warnings.
+    /// Verifies that a threat contributor that returns a warning outcome results in a warning decision when there are no constraints and the policy explicitly allows warnings.
     /// </summary>
     /// <returns>
-    /// A task that represents the asynchronous operation of evaluating the policy with a threat contributor that returns a warning outcome, ensuring that it results in a warning decision when there are no constraints and the policy allows warnings.
+    /// A task that represents the asynchronous operation of evaluating the policy with a threat contributor that returns a warning outcome, ensuring that it results in a warning decision when there are no constraints and the policy explicitly allows warnings.
     /// </returns>
     [Fact]
-    public async Task EvaluateThreatWarningWithoutConstraintsReturnsWarningWhenEmptyPolicyAllows()
+    public async Task EvaluateThreatWarningWithoutConstraintsReturnsWarningWhenEmptyPolicyExplicitlyAllows()
     {
         TestPolicyContext context = CreateContext();
         var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
@@ -339,7 +339,12 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingTests
                     ThreatCategories.AuditIntegrityRisk,
                     "threat.audit_integrity_risk",
                     "Audit integrity risk was reported.",
-                    GovernanceDecisionOutcome.Warning))]);
+                    GovernanceDecisionOutcome.Warning))],
+            decisionPolicy: null,
+            new AsiBackbonePolicyEvaluatorOptions
+            {
+                DenyWhenNoConstraints = false
+            });
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
 

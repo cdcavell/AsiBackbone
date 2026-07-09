@@ -102,7 +102,7 @@ public sealed class InMemoryCapabilityGrantUseStore : ICapabilityGrantUseStore
                 return ValueTask.FromResult(CapabilityGrantUseResult.Cancelled("The in-memory capability grant use store marked this grant as cancelled."));
             }
 
-            useCounts.TryGetValue(grant.TokenId, out int currentCount);
+            _ = useCounts.TryGetValue(grant.TokenId, out int currentCount);
 
             if (currentCount >= maxUseCount)
             {

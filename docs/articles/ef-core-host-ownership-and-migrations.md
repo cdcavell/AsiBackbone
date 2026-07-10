@@ -126,6 +126,17 @@ Hosts upgrading an existing database should generate and review a host-owned mig
 
 Persisted signing metadata does not make the database tamper-evident by itself. Verification still requires a concrete signing provider or verifier, protected key-management process, durable storage controls, retention policy, monitoring, and operational procedures supplied by the host environment.
 
+## Persistence failure diagnostics
+
+`EfCoreAuditLedgerStore.AppendAsync` returns a stable sanitized failure reason when EF Core reports an append failure:
+
+- reason code: `asi_backbone.audit_ledger.append_failed`
+- message: `The audit ledger record could not be persisted by the configured EF Core store.`
+
+Raw `DbUpdateException` messages are not returned through public `OperationResult` values because provider messages may contain database names, schema details, connection descriptors, constraint names, SQL fragments, or other implementation details inappropriate for consumer-visible compliance artifacts, API responses, or forwarded telemetry.
+
+If a host supplies an `ILogger<EfCoreAuditLedgerStore>`, exception details are logged inside the host-controlled diagnostics boundary. The host owns logger configuration, redaction, routing, retention, access control, and any decision to forward detailed persistence diagnostics outside the application boundary.
+
 ## Durable governance outbox tables
 
 The EF Core adapter now includes durable local storage for provider-neutral governance outbox entries and audit residue lifecycle events. The durable tables are intended to prove local persistence before optional downstream provider emission is attempted.
@@ -223,6 +234,7 @@ When integrating ASI Backbone EF Core persistence, the host application should d
 8. Which background service, hosted worker, or provider package drains the governance outbox.
 9. How failed, deferred, retryable, and dead-lettered entries are monitored and escalated.
 10. How signing metadata is protected, reviewed, verified, and correlated during key rotation or audit-chain investigation.
+11. How sanitized persistence failures are surfaced while detailed EF Core diagnostics remain inside host-owned logging and operational review boundaries.
 
 The ASI Backbone package should remain a clean integration layer inside that host-owned plan.
 

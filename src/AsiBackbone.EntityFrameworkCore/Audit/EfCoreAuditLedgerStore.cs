@@ -5,6 +5,7 @@ using AsiBackbone.Core.Audit;
 using AsiBackbone.Core.Results;
 using AsiBackbone.EntityFrameworkCore.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace AsiBackbone.EntityFrameworkCore.Audit;
 
@@ -17,19 +18,34 @@ namespace AsiBackbone.EntityFrameworkCore.Audit;
 /// </remarks>
 public sealed class EfCoreAuditLedgerStore : IAsiBackboneAuditLedgerStore
 {
+    private const string AppendFailedReasonCode = "asi_backbone.audit_ledger.append_failed";
+    private const string AppendFailedReasonMessage =
+        "The audit ledger record could not be persisted by the configured EF Core store.";
+
+    private static readonly Action<ILogger, string, Exception?> LogAuditLedgerAppendFailed =
+        LoggerMessage.Define<string>(
+            LogLevel.Error,
+            new EventId(1001, nameof(LogAuditLedgerAppendFailed)),
+            "EF Core audit ledger append failed for record {AuditLedgerRecordId}.");
+
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
 
     private readonly DbContext dbContext;
+    private readonly ILogger<EfCoreAuditLedgerStore>? logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EfCoreAuditLedgerStore" /> class.
     /// </summary>
     /// <param name="dbContext">The host-owned database context.</param>
-    public EfCoreAuditLedgerStore(DbContext dbContext)
+    /// <param name="logger">The optional host-owned logger used for internal persistence diagnostics.</param>
+    public EfCoreAuditLedgerStore(
+        DbContext dbContext,
+        ILogger<EfCoreAuditLedgerStore>? logger = null)
     {
         ArgumentNullException.ThrowIfNull(dbContext);
 
         this.dbContext = dbContext;
+        this.logger = logger;
     }
 
     /// <inheritdoc />
@@ -71,9 +87,14 @@ public sealed class EfCoreAuditLedgerStore : IAsiBackboneAuditLedgerStore
         {
             dbContext.ChangeTracker.Clear();
 
+            if (logger is not null)
+            {
+                LogAuditLedgerAppendFailed(logger, record.RecordId, ex);
+            }
+
             return OperationResult.Failure<AuditLedgerRecord>(
-                "asi_backbone.audit_ledger.append_failed",
-                ex.Message);
+                AppendFailedReasonCode,
+                AppendFailedReasonMessage);
         }
 
         return OperationResult.Success(record);

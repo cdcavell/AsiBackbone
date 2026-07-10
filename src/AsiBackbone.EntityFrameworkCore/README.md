@@ -81,6 +81,12 @@ This preserves the signing hash, key reference, key version, provider descriptor
 
 Hosts upgrading an existing database should generate a host-owned migration after updating the package so the `AsiBackboneAuditLedgerRecords` table receives the new nullable signing columns and related indexes. Review the migration under the same change-control process used for the rest of the application schema, especially in regulated environments where historical audit review depends on durable signature context.
 
+## Persistence failure diagnostics
+
+`EfCoreAuditLedgerStore.AppendAsync` returns the stable reason code `asi_backbone.audit_ledger.append_failed` with the sanitized message `The audit ledger record could not be persisted by the configured EF Core store.` when EF Core reports an append failure. Raw provider exception messages are not returned through the public `OperationResult` because they may contain database, schema, connection, or provider implementation details.
+
+When a host supplies an `ILogger<EfCoreAuditLedgerStore>`, exception details are logged inside the host-controlled diagnostics boundary. Hosts own log routing, redaction, access control, retention, and any decision to forward detailed persistence diagnostics outside the application boundary.
+
 ## Durable governance outbox storage
 
 `EfCoreGovernanceOutboxStore` persists provider-neutral `GovernanceEmissionEnvelope` records before optional downstream provider delivery is attempted. It stores the envelope, status, retry count, next retry UTC, delivered timestamp, provider name, provider record ID, last provider-neutral error fields, dead-letter reason, and safe metadata.

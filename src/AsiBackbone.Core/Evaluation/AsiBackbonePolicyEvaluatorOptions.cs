@@ -18,18 +18,6 @@ public sealed class AsiBackbonePolicyEvaluatorOptions
 
     private const string DefaultThreatContributorExceptionReasonMessage =
         "A threat model contributor failed during evaluation. The operation was denied by the evaluator failure policy.";
-
-    private bool denyWhenNoConstraints = true;
-    private bool shortCircuitOnFirstDenial;
-    private bool treatConstraintExceptionAsDenial = true;
-    private bool treatThreatContributorExceptionAsDenial = true;
-    private bool preventThreatAssessmentAllowDowngrade = true;
-    private string noConstraintsReasonCode = DefaultNoConstraintsReasonCode;
-    private string noConstraintsReasonMessage = DefaultNoConstraintsReasonMessage;
-    private string constraintExceptionReasonCode = DefaultConstraintExceptionReasonCode;
-    private string constraintExceptionReasonMessage = DefaultConstraintExceptionReasonMessage;
-    private string threatContributorExceptionReasonCode = DefaultThreatContributorExceptionReasonCode;
-    private string threatContributorExceptionReasonMessage = DefaultThreatContributorExceptionReasonMessage;
     private bool isFrozen;
 
     /// <summary>
@@ -52,24 +40,24 @@ public sealed class AsiBackbonePolicyEvaluatorOptions
     /// </summary>
     public bool DenyWhenNoConstraints
     {
-        get => denyWhenNoConstraints;
+        get;
         set
         {
             ThrowIfFrozen();
-            denyWhenNoConstraints = value;
+            field = value;
         }
-    }
+    } = true;
 
     /// <summary>
     /// Gets or sets a value indicating whether evaluation should stop after the first denied constraint result.
     /// </summary>
     public bool ShortCircuitOnFirstDenial
     {
-        get => shortCircuitOnFirstDenial;
+        get;
         set
         {
             ThrowIfFrozen();
-            shortCircuitOnFirstDenial = value;
+            field = value;
         }
     }
 
@@ -78,117 +66,117 @@ public sealed class AsiBackbonePolicyEvaluatorOptions
     /// </summary>
     public bool TreatConstraintExceptionAsDenial
     {
-        get => treatConstraintExceptionAsDenial;
+        get;
         set
         {
             ThrowIfFrozen();
-            treatConstraintExceptionAsDenial = value;
+            field = value;
         }
-    }
+    } = true;
 
     /// <summary>
     /// Gets or sets a value indicating whether threat contributor exceptions should be converted into denied governance decisions.
     /// </summary>
     public bool TreatThreatContributorExceptionAsDenial
     {
-        get => treatThreatContributorExceptionAsDenial;
+        get;
         set
         {
             ThrowIfFrozen();
-            treatThreatContributorExceptionAsDenial = value;
+            field = value;
         }
-    }
+    } = true;
 
     /// <summary>
     /// Gets or sets a value indicating whether threat assessment outcomes should be protected from being downgraded to pure allow decisions.
     /// </summary>
     public bool PreventThreatAssessmentAllowDowngrade
     {
-        get => preventThreatAssessmentAllowDowngrade;
+        get;
         set
         {
             ThrowIfFrozen();
-            preventThreatAssessmentAllowDowngrade = value;
+            field = value;
         }
-    }
+    } = true;
 
     /// <summary>
     /// Gets or sets the machine-readable reason code used when <see cref="DenyWhenNoConstraints" /> denies an empty policy.
     /// </summary>
     public string NoConstraintsReasonCode
     {
-        get => noConstraintsReasonCode;
+        get;
         set
         {
             ThrowIfFrozen();
-            noConstraintsReasonCode = value;
+            field = value;
         }
-    }
+    } = DefaultNoConstraintsReasonCode;
 
     /// <summary>
     /// Gets or sets the reason message used when <see cref="DenyWhenNoConstraints" /> denies an empty policy.
     /// </summary>
     public string NoConstraintsReasonMessage
     {
-        get => noConstraintsReasonMessage;
+        get;
         set
         {
             ThrowIfFrozen();
-            noConstraintsReasonMessage = value;
+            field = value;
         }
-    }
+    } = DefaultNoConstraintsReasonMessage;
 
     /// <summary>
     /// Gets or sets the machine-readable reason code used when <see cref="TreatConstraintExceptionAsDenial" /> denies a constraint exception.
     /// </summary>
     public string ConstraintExceptionReasonCode
     {
-        get => constraintExceptionReasonCode;
+        get;
         set
         {
             ThrowIfFrozen();
-            constraintExceptionReasonCode = value;
+            field = value;
         }
-    }
+    } = DefaultConstraintExceptionReasonCode;
 
     /// <summary>
     /// Gets or sets the reason message used when <see cref="TreatConstraintExceptionAsDenial" /> denies a constraint exception.
     /// </summary>
     public string ConstraintExceptionReasonMessage
     {
-        get => constraintExceptionReasonMessage;
+        get;
         set
         {
             ThrowIfFrozen();
-            constraintExceptionReasonMessage = value;
+            field = value;
         }
-    }
+    } = DefaultConstraintExceptionReasonMessage;
 
     /// <summary>
     /// Gets or sets the machine-readable reason code used when <see cref="TreatThreatContributorExceptionAsDenial" /> denies a contributor exception.
     /// </summary>
     public string ThreatContributorExceptionReasonCode
     {
-        get => threatContributorExceptionReasonCode;
+        get;
         set
         {
             ThrowIfFrozen();
-            threatContributorExceptionReasonCode = value;
+            field = value;
         }
-    }
+    } = DefaultThreatContributorExceptionReasonCode;
 
     /// <summary>
     /// Gets or sets the reason message used when <see cref="TreatThreatContributorExceptionAsDenial" /> denies a contributor exception.
     /// </summary>
     public string ThreatContributorExceptionReasonMessage
     {
-        get => threatContributorExceptionReasonMessage;
+        get;
         set
         {
             ThrowIfFrozen();
-            threatContributorExceptionReasonMessage = value;
+            field = value;
         }
-    }
+    } = DefaultThreatContributorExceptionReasonMessage;
 
     /// <summary>
     /// Validates evaluator options and freezes the instance for evaluator use.

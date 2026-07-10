@@ -17,7 +17,7 @@ namespace AsiBackbone.Core.Outbox;
 /// <param name="outboxStore">The provider-neutral outbox store.</param>
 /// <param name="emitter">The provider-neutral governance emitter.</param>
 /// <param name="logger">The logger used to record local operational diagnostics for drain failures.</param>
-/// <param name="outboxOptions">The provider-neutral retry timing options used by the drain.</param>
+/// <param name="outboxOptions">The provider-neutral retry, poison-message, and claim options used by the drain.</param>
 public sealed class AsiBackboneGovernanceOutboxDrain(
     IAsiBackboneGovernanceOutboxStore outboxStore,
     IAsiBackboneGovernanceEmitter emitter,
@@ -261,8 +261,8 @@ public sealed class AsiBackboneGovernanceOutboxDrain(
             LogEmissionException(entry, nextRetryUtc, ex);
             GovernanceEmissionError governanceEmissionError = CreateExceptionError(ex);
 
-            return await outboxStore.MarkFailedAsync(
-                entry.OutboxEntryId,
+            return await ApplyFailureAsync(
+                entry,
                 governanceEmissionError,
                 nextRetryUtc,
                 cancellationToken)
@@ -294,7 +294,8 @@ public sealed class AsiBackboneGovernanceOutboxDrain(
             LogEmissionException(claim.Entry, nextRetryUtc, ex);
             GovernanceEmissionError governanceEmissionError = CreateExceptionError(ex);
 
-            return await claimStore.MarkClaimFailedAsync(
+            return await ApplyClaimFailureAsync(
+                claimStore,
                 claim,
                 governanceEmissionError,
                 nextRetryUtc,
@@ -357,8 +358,8 @@ public sealed class AsiBackboneGovernanceOutboxDrain(
             isRetryable: result.ShouldRetry,
             providerName: result.ProviderName);
 
-        return await outboxStore.MarkFailedAsync(
-            entry.OutboxEntryId,
+        return await ApplyFailureAsync(
+            entry,
             failure,
             result.RetryAfterUtc,
             cancellationToken)
@@ -418,12 +419,79 @@ public sealed class AsiBackboneGovernanceOutboxDrain(
             isRetryable: result.ShouldRetry,
             providerName: result.ProviderName);
 
-        return await claimStore.MarkClaimFailedAsync(
+        return await ApplyClaimFailureAsync(
+            claimStore,
             claim,
             failure,
             result.RetryAfterUtc,
             cancellationToken)
             .ConfigureAwait(false);
+    }
+
+    private async ValueTask<GovernanceOutboxEntry> ApplyFailureAsync(
+        GovernanceOutboxEntry entry,
+        GovernanceEmissionError failure,
+        DateTimeOffset? nextRetryUtc,
+        CancellationToken cancellationToken)
+    {
+        if (ShouldDeadLetter(entry))
+        {
+            GovernanceEmissionError deadLetterError = CreateMaxRetryError(failure);
+            return await outboxStore.MarkDeadLetteredAsync(
+                entry.OutboxEntryId,
+                deadLetterError,
+                retryOptions.DeadLetterReasonMessage,
+                cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        return await outboxStore.MarkFailedAsync(
+            entry.OutboxEntryId,
+            failure,
+            nextRetryUtc,
+            cancellationToken)
+            .ConfigureAwait(false);
+    }
+
+    private async ValueTask<GovernanceOutboxEntry> ApplyClaimFailureAsync(
+        IAsiBackboneGovernanceOutboxClaimStore claimStore,
+        GovernanceOutboxClaim claim,
+        GovernanceEmissionError failure,
+        DateTimeOffset? nextRetryUtc,
+        CancellationToken cancellationToken)
+    {
+        if (ShouldDeadLetter(claim.Entry))
+        {
+            GovernanceEmissionError deadLetterError = CreateMaxRetryError(failure);
+            return await claimStore.MarkClaimDeadLetteredAsync(
+                claim,
+                deadLetterError,
+                retryOptions.DeadLetterReasonMessage,
+                cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        return await claimStore.MarkClaimFailedAsync(
+            claim,
+            failure,
+            nextRetryUtc,
+            cancellationToken)
+            .ConfigureAwait(false);
+    }
+
+    private bool ShouldDeadLetter(GovernanceOutboxEntry entry)
+    {
+        return retryOptions.DeadLetterOnMaxRetryAttempts
+            && entry.RetryCount + 1 >= retryOptions.MaxRetryAttempts;
+    }
+
+    private GovernanceEmissionError CreateMaxRetryError(GovernanceEmissionError failure)
+    {
+        return GovernanceEmissionError.Create(
+            retryOptions.DeadLetterReasonCode,
+            retryOptions.DeadLetterReasonMessage,
+            providerName: failure.ProviderName,
+            providerErrorCode: failure.Code);
     }
 
     private void LogEmissionException(GovernanceOutboxEntry entry, DateTimeOffset nextRetryUtc, Exception exception)
@@ -467,6 +535,10 @@ public sealed class AsiBackboneGovernanceOutboxDrain(
         {
             RetryDelay = resolved.RetryDelay,
             DeferredDelay = resolved.DeferredDelay,
+            MaxRetryAttempts = resolved.MaxRetryAttempts,
+            DeadLetterOnMaxRetryAttempts = resolved.DeadLetterOnMaxRetryAttempts,
+            DeadLetterReasonCode = resolved.DeadLetterReasonCode.Trim(),
+            DeadLetterReasonMessage = resolved.DeadLetterReasonMessage.Trim(),
             UseClaimLeases = resolved.UseClaimLeases,
             ClaimWorkerId = string.IsNullOrWhiteSpace(resolved.ClaimWorkerId) ? null : resolved.ClaimWorkerId.Trim(),
             ClaimLeaseDuration = resolved.ClaimLeaseDuration

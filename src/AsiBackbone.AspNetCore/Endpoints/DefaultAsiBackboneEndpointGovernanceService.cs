@@ -7,6 +7,8 @@ using AsiBackbone.Core.Audit;
 using AsiBackbone.Core.Constraints;
 using AsiBackbone.Core.Decisions;
 using AsiBackbone.Core.Evaluation;
+using AsiBackbone.Core.Metadata;
+using AsiBackbone.Core.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -18,6 +20,10 @@ namespace AsiBackbone.AspNetCore.Endpoints;
 /// </summary>
 public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEndpointGovernanceService
 {
+    private const string MetadataSanitizationDeniedReasonCode = "endpoint.metadata_sanitization.denied";
+    private const string MetadataSanitizationDeniedReasonMessage =
+        "Endpoint governance metadata was denied by the configured sanitation policy.";
+
     private readonly IServiceProvider serviceProvider;
     private readonly IAsiBackboneHttpActorContextResolver actorContextResolver;
     private readonly IAsiBackboneHttpRequestCorrelationResolver requestCorrelationResolver;
@@ -64,6 +70,22 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
         var optionalServices = new EndpointGovernanceOptionalServiceResolver(httpContext.RequestServices, serviceProvider);
         AsiBackboneHttpRequestCorrelation correlation = requestCorrelationResolver.ResolveRequestCorrelation();
         IReadOnlyDictionary<string, string> endpointMetadata = descriptor.ToMetadata(endpointOptions.MetadataMode);
+        IGovernanceMetadataSanitizer? metadataSanitizer = optionalServices.GetMetadataSanitizer();
+
+        if (metadataSanitizer is not null)
+        {
+            GovernanceMetadataSanitizationResult sanitizationResult = await metadataSanitizer
+                .SanitizeAsync(endpointMetadata, cancellationToken)
+                .ConfigureAwait(false);
+
+            if (!sanitizationResult.CanProceed)
+            {
+                return CreateMetadataSanitizationFailure(correlation, sanitizationResult);
+            }
+
+            endpointMetadata = sanitizationResult.SanitizedMetadata;
+        }
+
         AsiBackboneConstraintEvaluationContext evaluationContext = correlation.ToEvaluationContext(
             endpointOptions.PolicyVersion,
             endpointOptions.PolicyHash,
@@ -174,6 +196,28 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
             : CreateBlockedDecisionResult(decision);
     }
 
+    private AsiBackboneEndpointGovernanceResult CreateMetadataSanitizationFailure(
+        AsiBackboneHttpRequestCorrelation correlation,
+        GovernanceMetadataSanitizationResult sanitizationResult)
+    {
+        var reasons = new List<OperationReason>(sanitizationResult.Reasons.Count + 1)
+        {
+            OperationReason.Create(
+                MetadataSanitizationDeniedReasonCode,
+                MetadataSanitizationDeniedReasonMessage)
+        };
+        reasons.AddRange(sanitizationResult.Reasons);
+
+        var decision = GovernanceDecision.Deny(
+            reasons,
+            correlationId: correlation.CorrelationId,
+            traceId: correlation.TraceId,
+            policyVersion: endpointOptions.PolicyVersion,
+            policyHash: endpointOptions.PolicyHash);
+
+        return CreateBlockedDecisionResult(decision);
+    }
+
     private static GovernanceDecision CreateAllowDecision(
         AsiBackboneConstraintEvaluationContext evaluationContext,
         string? traceId)
@@ -192,9 +236,11 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
         private IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>? policyEvaluator;
         private IAsiBackboneEndpointCapabilityGrantValidator? capabilityValidator;
         private IAsiBackboneAuditSink? auditSink;
+        private IGovernanceMetadataSanitizer? metadataSanitizer;
         private bool policyEvaluatorResolved;
         private bool capabilityValidatorResolved;
         private bool auditSinkResolved;
+        private bool metadataSanitizerResolved;
 
         public IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>? GetPolicyEvaluator()
         {
@@ -227,6 +273,17 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
             }
 
             return auditSink;
+        }
+
+        public IGovernanceMetadataSanitizer? GetMetadataSanitizer()
+        {
+            if (!metadataSanitizerResolved)
+            {
+                metadataSanitizer = requestServices.GetService<IGovernanceMetadataSanitizer>();
+                metadataSanitizerResolved = true;
+            }
+
+            return metadataSanitizer;
         }
     }
 

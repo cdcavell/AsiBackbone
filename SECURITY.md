@@ -74,17 +74,26 @@ Signing-ready metadata, signed records, verification results, hash chains, and e
 
 ## Package signing status
 
-AsiBackbone NuGet packages are not currently Authenticode-signed or repository-signed by the project maintainer.
+AsiBackbone NuGet packages are intentionally published without Authenticode or repository signing.
 
-This status is tracked as an open supply-chain readiness item until a reviewed package-signing process is adopted. Treat this section as the authoritative public security wording unless a later release note and release-readiness record explicitly state that package signing is available.
+This is a deliberate governance decision while the project is independently maintained, balancing operational complexity against practical value. At this stage, the project prioritizes transparent source code, deterministic build and release practices, GitHub releases, Source Link, SBOM generation, and package provenance over maintaining signing certificates and supporting release-signing infrastructure.
 
-Published packages include NuGet repository metadata and Source Link commit metadata where applicable, but package signing is not currently part of the release process. Consumers should validate package identity through the official NuGet package source, package version, repository metadata, checksums supplied by NuGet tooling, and the corresponding GitHub release/tag.
+Consumers should validate package identity through the official NuGet package source, package version, repository metadata, Source Link information, GitHub release tags, and available integrity metadata provided by NuGet tooling.
 
-If AsiBackbone is accepted into the .NET Foundation, package signing may transition to .NET Foundation-supported release infrastructure or another reviewed signing process as part of project onboarding.
+Package signing remains under consideration for the long-term roadmap and will be reconsidered as the project's community, governance, and operational requirements evolve. Until package signing is formally adopted and documented, AsiBackbone should not be described as providing signed release artifacts, repository-signed packages, or Authenticode-signed packages.
 
-When package signing becomes available, update this section, stable release validation guidance, the current release-readiness record, and the affected release notes before using public language such as `signed packages`, `repository-signed packages`, or `maintainer-signed packages`.
+### Current trust model
 
-Until such signing is adopted and documented, AsiBackbone should not be described as providing signed release artifacts, tamper-evident packages, or non-repudiable distribution guarantees by default.
+Current package trust is established through:
+
+- Official NuGet package publication
+- Public GitHub source repository
+- GitHub release tags
+- Source Link integration
+- Software Bill of Materials (SBOM)
+- Package provenance and repository metadata
+
+These mechanisms provide transparency and traceability while package signing remains deferred.
 
 ## Sensitive data guidance for reports
 

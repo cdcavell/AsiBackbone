@@ -1,4 +1,5 @@
 using AsiBackbone.AspNetCore.DependencyInjection;
+using AsiBackbone.AspNetCore.Endpoints;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,6 +15,7 @@ public sealed class AsiBackboneEndpointGovernanceApplicationBuilderExtensionsTes
     /// <summary>
     /// Verifies that endpoint-governance middleware is added to the pipeline and the same application builder is returned.
     /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task UseAsiBackboneEndpointGovernanceAddsMiddlewareAndReturnsSameBuilder()
     {

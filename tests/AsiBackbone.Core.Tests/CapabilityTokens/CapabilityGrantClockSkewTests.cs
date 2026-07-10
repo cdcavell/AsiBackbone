@@ -12,7 +12,7 @@ public sealed class CapabilityGrantClockSkewTests
     [Fact]
     public void CreateDefaultsToZeroClockSkew()
     {
-        CapabilityGrantValidationOptions options = CapabilityGrantValidationOptions.Create();
+        var options = CapabilityGrantValidationOptions.Create();
 
         Assert.Equal(TimeSpan.Zero, options.AllowedClockSkew);
     }
@@ -29,7 +29,7 @@ public sealed class CapabilityGrantClockSkewTests
     {
         DateTimeOffset localValidationUtc = new(2026, 7, 10, 10, 0, 0, TimeSpan.FromHours(-5));
 
-        CapabilityGrantValidationOptions options = CapabilityGrantValidationOptions.Create(
+        var options = CapabilityGrantValidationOptions.Create(
             validationUtc: localValidationUtc,
             allowedClockSkew: Skew);
 
@@ -130,7 +130,7 @@ public sealed class CapabilityGrantClockSkewTests
         DateTimeOffset expiresUtc,
         TimeSpan allowedClockSkew)
     {
-        CapabilityTokenGrant grant = CapabilityTokenGrant.Create(
+        var grant = CapabilityTokenGrant.Create(
             tokenId: "grant-clock-skew",
             issuer: "issuer-1",
             audience: "gateway-1",
@@ -152,7 +152,7 @@ public sealed class CapabilityGrantClockSkewTests
 
     private static SignedGovernanceArtifact<CapabilityTokenGrant> CreateSignedGrant(CapabilityTokenGrant grant)
     {
-        CanonicalPayload payload = CanonicalPayload.Create(
+        var payload = CanonicalPayload.Create(
             CanonicalArtifactTypes.CapabilityTokenGrant,
             grant.TokenId,
             grant.SchemaVersion,
@@ -165,7 +165,7 @@ public sealed class CapabilityGrantClockSkewTests
                 ["scopes"] = grant.Scopes.ToArray()
             });
         CanonicalPayloadHash hash = CanonicalPayloadHasher.ComputeHash(payload);
-        SigningMetadata signingMetadata = SigningMetadata.Create(
+        var signingMetadata = SigningMetadata.Create(
             signingHash: hash.HashValue,
             hashAlgorithm: hash.HashAlgorithm,
             signature: "fake-signature",

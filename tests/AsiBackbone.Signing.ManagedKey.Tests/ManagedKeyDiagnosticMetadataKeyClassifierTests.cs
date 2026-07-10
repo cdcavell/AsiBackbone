@@ -43,11 +43,7 @@ public sealed class ManagedKeyDiagnosticMetadataKeyClassifierTests
     {
         get
         {
-            TheoryData<string> data = new();
-            foreach (string key in ReservedKeyValues)
-            {
-                data.Add(key);
-            }
+            TheoryData<string> data = [.. ReservedKeyValues];
 
             return data;
         }
@@ -130,7 +126,7 @@ public sealed class ManagedKeyDiagnosticMetadataKeyClassifierTests
         var service = new ManagedKeySigningService(
             CreateOptions(),
             new MetadataManagedKeySigningClient(new Dictionary<string, string>(StringComparer.Ordinal)));
-        var request = CreateRequest(requestMetadata);
+        SigningRequest request = CreateRequest(requestMetadata);
 
         SigningResult result = await service.SignAsync(request, TestContext.Current.CancellationToken);
 

@@ -24,7 +24,7 @@ public sealed class AsiBackboneEndpointGovernanceApplicationBuilderExtensionsTes
         bool terminalCalled = false;
 
         IApplicationBuilder result = app.UseAsiBackboneEndpointGovernance();
-        _ = app.Run(context =>
+        app.Run(context =>
         {
             terminalCalled = true;
             context.Response.StatusCode = StatusCodes.Status204NoContent;

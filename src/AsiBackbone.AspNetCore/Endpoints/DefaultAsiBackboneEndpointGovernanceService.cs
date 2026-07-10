@@ -125,12 +125,9 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
             capabilityStage.Decision,
             cancellationToken).ConfigureAwait(false);
 
-        if (auditStage.TerminalResult is not null)
-        {
-            return auditStage.TerminalResult;
-        }
-
-        return CreateCompletedResult(
+        return auditStage.TerminalResult is not null
+            ? auditStage.TerminalResult
+            : CreateCompletedResult(
             descriptor,
             endpointMetadata,
             capabilityStage.Decision,

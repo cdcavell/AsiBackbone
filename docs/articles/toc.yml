@@ -164,6 +164,8 @@
       href: signed-audit-and-outbox-records.md
     - name: Verification Policy and Result Handling
       href: verification-policy-and-result-handling.md
+    - name: Regulated Storage and Signing Verification Checklist
+      href: regulated-storage-and-signing-verification-checklist.md
     - name: Key Rotation and Retired-Key Verification
       href: key-rotation-and-retired-key-verification.md
     - name: Capability Grant Hardening

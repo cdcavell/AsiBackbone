@@ -134,7 +134,7 @@ public sealed class DefaultAsiBackboneEndpointGovernanceServiceBranchTests
             "policy.acknowledgment",
             new RequireGovernancePolicyAttribute(typeof(SamplePolicy)),
             new RequireLiabilityHandshakeAttribute());
-        AsiBackboneEndpointGovernanceDescriptor descriptor =
+        var descriptor =
             AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(endpoint);
         IAsiBackboneEndpointGovernanceService service = scope.ServiceProvider
             .GetRequiredService<IAsiBackboneEndpointGovernanceService>();
@@ -168,7 +168,7 @@ public sealed class DefaultAsiBackboneEndpointGovernanceServiceBranchTests
         using ServiceProvider services = CreateServices(evaluator);
         using IServiceScope scope = services.CreateScope();
         DefaultHttpContext httpContext = CreateHttpContext(scope.ServiceProvider);
-        AsiBackboneEndpointGovernanceDescriptor descriptor =
+        var descriptor =
             AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(
                 CreateEndpoint(
                     "policy.canceled",
@@ -197,7 +197,7 @@ public sealed class DefaultAsiBackboneEndpointGovernanceServiceBranchTests
         using ServiceProvider services = CreateServices(evaluator);
         using IServiceScope scope = services.CreateScope();
         DefaultHttpContext httpContext = CreateHttpContext(scope.ServiceProvider);
-        AsiBackboneEndpointGovernanceDescriptor descriptor =
+        var descriptor =
             AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(
                 CreateEndpoint(
                     "policy.exception",
@@ -224,7 +224,7 @@ public sealed class DefaultAsiBackboneEndpointGovernanceServiceBranchTests
         using ServiceProvider services = CreateServices();
         using IServiceScope scope = services.CreateScope();
         DefaultHttpContext httpContext = CreateHttpContext(scope.ServiceProvider);
-        AsiBackboneEndpointGovernanceDescriptor descriptor =
+        var descriptor =
             AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(
                 CreateEndpoint(
                     "policy.missing",
@@ -253,7 +253,7 @@ public sealed class DefaultAsiBackboneEndpointGovernanceServiceBranchTests
             configure: static options => options.FailClosedWhenPolicyEvaluatorMissing = false);
         using IServiceScope scope = services.CreateScope();
         DefaultHttpContext httpContext = CreateHttpContext(scope.ServiceProvider);
-        AsiBackboneEndpointGovernanceDescriptor descriptor =
+        var descriptor =
             AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(
                 CreateEndpoint(
                     "policy.missing.fail-open",
@@ -281,7 +281,7 @@ public sealed class DefaultAsiBackboneEndpointGovernanceServiceBranchTests
         using ServiceProvider services = CreateServices();
         using IServiceScope scope = services.CreateScope();
         DefaultHttpContext httpContext = CreateHttpContext(scope.ServiceProvider);
-        AsiBackboneEndpointGovernanceDescriptor descriptor =
+        var descriptor =
             AsiBackboneEndpointGovernanceDescriptor.FromEndpoint(
                 CreateEndpoint("audit.missing", new EmitGovernanceAuditAttribute()));
         IAsiBackboneEndpointGovernanceService service = scope.ServiceProvider
@@ -305,14 +305,13 @@ public sealed class DefaultAsiBackboneEndpointGovernanceServiceBranchTests
         ServiceCollection services = new();
         if (configure is not null)
         {
-            _ = services.Configure<AsiBackboneEndpointGovernanceOptions>(configure);
+            _ = services.Configure(configure);
         }
 
         _ = services.AddAsiBackboneAspNetCore();
         if (evaluator is not null)
         {
-            _ = services.AddSingleton<
-                IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>>(evaluator);
+            _ = services.AddSingleton(evaluator);
         }
 
         return services.BuildServiceProvider(validateScopes: true);

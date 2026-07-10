@@ -29,7 +29,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorConcurrencyTests
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(
             CreateContext(),
-            TestContext.Current.CancellationToken);
+            global::Xunit.TestContext.Current.CancellationToken);
 
         Assert.True(decision.IsAllowed);
     }
@@ -56,7 +56,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorConcurrencyTests
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(
             CreateContext(),
-            TestContext.Current.CancellationToken);
+            global::Xunit.TestContext.Current.CancellationToken);
 
         Assert.True(decision.IsDenied);
         Assert.Equal(["warning.first", "denial.second"], decision.ReasonCodes);
@@ -82,7 +82,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorConcurrencyTests
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(
             CreateContext(),
-            TestContext.Current.CancellationToken);
+            global::Xunit.TestContext.Current.CancellationToken);
 
         Assert.True(decision.IsWarning);
         Assert.Equal(["threat.first", "threat.second"], decision.ReasonCodes);
@@ -102,7 +102,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorConcurrencyTests
             .Select(index => evaluator
                 .EvaluateAsync(
                     CreateContext($"correlation-{index}"),
-                    TestContext.Current.CancellationToken)
+                    global::Xunit.TestContext.Current.CancellationToken)
                 .AsTask())
             .ToArray();
 

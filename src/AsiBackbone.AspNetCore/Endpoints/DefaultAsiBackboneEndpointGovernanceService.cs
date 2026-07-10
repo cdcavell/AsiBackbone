@@ -208,7 +208,7 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
         };
         reasons.AddRange(sanitizationResult.Reasons);
 
-        GovernanceDecision decision = GovernanceDecision.Deny(
+        var decision = GovernanceDecision.Deny(
             reasons,
             correlationId: correlation.CorrelationId,
             traceId: correlation.TraceId,

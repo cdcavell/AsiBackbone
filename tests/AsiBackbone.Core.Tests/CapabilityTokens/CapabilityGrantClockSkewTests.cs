@@ -4,11 +4,17 @@ using Xunit;
 
 namespace AsiBackbone.Core.Tests.CapabilityTokens;
 
+/// <summary>
+/// Tests for clock skew validation in capability grants.
+/// </summary>
 public sealed class CapabilityGrantClockSkewTests
 {
     private static readonly DateTimeOffset Now = new(2026, 7, 10, 15, 0, 0, TimeSpan.Zero);
     private static readonly TimeSpan Skew = TimeSpan.FromSeconds(30);
 
+    /// <summary>
+    /// Tests that <see cref="CapabilityGrantValidationOptions.Create"/> defaults to zero clock skew.
+    /// </summary>
     [Fact]
     public void CreateDefaultsToZeroClockSkew()
     {
@@ -17,6 +23,9 @@ public sealed class CapabilityGrantClockSkewTests
         Assert.Equal(TimeSpan.Zero, options.AllowedClockSkew);
     }
 
+    /// <summary>
+    /// Tests that <see cref="CapabilityGrantValidationOptions.Create"/> rejects negative clock skew.
+    /// </summary>
     [Fact]
     public void CreateRejectsNegativeClockSkew()
     {
@@ -24,6 +33,9 @@ public sealed class CapabilityGrantClockSkewTests
             CapabilityGrantValidationOptions.Create(allowedClockSkew: TimeSpan.FromTicks(-1)));
     }
 
+    /// <summary>
+    /// Tests that <see cref="CapabilityGrantValidationOptions.Create"/> preserves UTC normalization with clock skew.
+    /// </summary>
     [Fact]
     public void CreatePreservesUtcNormalizationWithClockSkew()
     {
@@ -37,6 +49,9 @@ public sealed class CapabilityGrantClockSkewTests
         Assert.Equal(Skew, options.AllowedClockSkew);
     }
 
+    /// <summary>
+    /// Tests that validation preserves strict zero-skew behavior.
+    /// </summary>
     [Fact]
     public async Task ValidateAsyncPreservesStrictZeroSkewBehavior()
     {
@@ -48,6 +63,9 @@ public sealed class CapabilityGrantClockSkewTests
         AssertFailure(result, CapabilityTokenValidationCategory.NotYetValid, "capability.not-yet-valid");
     }
 
+    /// <summary>
+    /// Tests that validation allows a grant just inside the not-before tolerance.
+    /// </summary>
     [Fact]
     public async Task ValidateAsyncAllowsGrantJustInsideNotBeforeTolerance()
     {
@@ -59,6 +77,9 @@ public sealed class CapabilityGrantClockSkewTests
         Assert.True(result.ShouldAllow);
     }
 
+    /// <summary>
+    /// Tests that validation rejects a grant just outside the not-before tolerance.
+    /// </summary>
     [Fact]
     public async Task ValidateAsyncRejectsGrantJustOutsideNotBeforeTolerance()
     {
@@ -70,6 +91,9 @@ public sealed class CapabilityGrantClockSkewTests
         AssertFailure(result, CapabilityTokenValidationCategory.NotYetValid, "capability.not-yet-valid");
     }
 
+    /// <summary>
+    /// Tests that validation allows a grant at the exact not-before tolerance boundary.
+    /// </summary>
     [Fact]
     public async Task ValidateAsyncAllowsGrantAtExactNotBeforeToleranceBoundary()
     {
@@ -81,6 +105,9 @@ public sealed class CapabilityGrantClockSkewTests
         Assert.True(result.ShouldAllow);
     }
 
+    /// <summary>
+    /// Tests that validation allows a grant just inside the expiration tolerance.
+    /// </summary>
     [Fact]
     public async Task ValidateAsyncAllowsGrantJustInsideExpirationTolerance()
     {
@@ -92,6 +119,9 @@ public sealed class CapabilityGrantClockSkewTests
         Assert.True(result.ShouldAllow);
     }
 
+    /// <summary>
+    /// Tests that validation rejects a grant just outside the expiration tolerance.
+    /// </summary>
     [Fact]
     public async Task ValidateAsyncRejectsGrantJustOutsideExpirationTolerance()
     {
@@ -103,6 +133,9 @@ public sealed class CapabilityGrantClockSkewTests
         AssertFailure(result, CapabilityTokenValidationCategory.Expired, "capability.expired");
     }
 
+    /// <summary>
+    /// Tests that validation rejects a grant at the exact expiration tolerance boundary.
+    /// </summary>
     [Fact]
     public async Task ValidateAsyncRejectsGrantAtExactExpirationToleranceBoundary()
     {
@@ -114,6 +147,9 @@ public sealed class CapabilityGrantClockSkewTests
         AssertFailure(result, CapabilityTokenValidationCategory.Expired, "capability.expired");
     }
 
+    /// <summary>
+    /// Tests that validation rejects a grant at expiration with zero skew.
+    /// </summary>
     [Fact]
     public async Task ValidateAsyncRejectsGrantAtExpirationWithZeroSkew()
     {

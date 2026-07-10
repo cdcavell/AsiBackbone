@@ -70,6 +70,7 @@ public static class AsiBackboneStrictGovernanceServiceCollectionExtensions
         options.FailClosedWhenCapabilityValidatorMissing = true;
         options.FailClosedWhenAuditSinkMissing = true;
         options.RequireGovernanceMetadata = true;
+        options.IncludeDevelopmentDiagnosticsMetadataValues = false;
     }
 
     private static bool ValidateOptions(AsiBackbonePolicyEvaluatorOptions options)

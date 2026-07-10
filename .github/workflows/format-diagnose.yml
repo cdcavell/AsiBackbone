@@ -5,6 +5,10 @@ on:
     branches:
       - issue-555-managed-key-metadata-classification
 
+  pull_request:
+    branches:
+      - main
+
 permissions:
   contents: read
 

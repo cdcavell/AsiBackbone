@@ -325,28 +325,7 @@ public sealed class ManagedKeySigningService : IAsiBackboneSigningService
 
     private static bool IsReservedDiagnosticMetadataKey(string key)
     {
-        return !string.IsNullOrWhiteSpace(key) && key.Trim() switch
-        {
-            "failure_code" => true,
-            "failure_exception_type" => true,
-            "failure_message" => true,
-            "failure_retryable" => true,
-            "last_retry_failure_code" => true,
-            "last_retry_failure_exception_type" => true,
-            "max_retry_attempts" => true,
-            "provider_attempts" => true,
-            "provider_kind" => true,
-            "provider_operation_id" => true,
-            "raw_private_key_loaded" => true,
-            "remote_key_material" => true,
-            "retry_attempts" => true,
-            "retry_delay_applied" => true,
-            "retry_delay_configured" => true,
-            "retry_delay_milliseconds" => true,
-            "signature_algorithm" => true,
-            "signing_status" => true,
-            _ => false
-        };
+        return ManagedKeyDiagnosticMetadataKeyClassifier.IsReserved(key);
     }
 
     private static string NormalizeRequired(string? value, string fallback)

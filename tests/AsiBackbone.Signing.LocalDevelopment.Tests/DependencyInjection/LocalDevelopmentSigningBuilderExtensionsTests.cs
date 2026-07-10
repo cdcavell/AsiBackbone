@@ -49,7 +49,7 @@ public sealed class LocalDevelopmentSigningBuilderExtensionsTests
     {
         ServiceCollection services = new();
         IAsiBackboneBuilder builder = new AsiBackboneBuilder(services);
-        LocalDevelopmentSigningOptions configured = LocalDevelopmentSigningOptions.Create(
+        var configured = LocalDevelopmentSigningOptions.Create(
             providerName: "local-test-provider",
             keyId: "local-test-key",
             keyVersion: "v2",
@@ -101,7 +101,7 @@ public sealed class LocalDevelopmentSigningBuilderExtensionsTests
     public void UseLocalDevelopmentSigningConfiguredOverloadRejectsNullBuilder()
     {
         IAsiBackboneBuilder? builder = null;
-        LocalDevelopmentSigningOptions options = LocalDevelopmentSigningOptions.Create();
+        var options = LocalDevelopmentSigningOptions.Create();
 
         ArgumentNullException exception = Assert.Throws<ArgumentNullException>(
             () => builder!.UseLocalDevelopmentSigning(options));

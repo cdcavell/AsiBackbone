@@ -3,6 +3,11 @@ namespace AsiBackbone.Core.Evaluation;
 /// <summary>
 /// Provides host-configurable options for the default AsiBackbone policy evaluator.
 /// </summary>
+/// <remarks>
+/// Options remain mutable while a host is configuring them. The default evaluator validates and freezes the supplied
+/// instance during construction so later caller mutation cannot change evaluator behavior. Configure a separate options
+/// instance for each evaluator posture that must differ.
+/// </remarks>
 public sealed class AsiBackbonePolicyEvaluatorOptions
 {
     private const string DefaultNoConstraintsReasonMessage =
@@ -13,6 +18,7 @@ public sealed class AsiBackbonePolicyEvaluatorOptions
 
     private const string DefaultThreatContributorExceptionReasonMessage =
         "A threat model contributor failed during evaluation. The operation was denied by the evaluator failure policy.";
+    private bool isFrozen;
 
     /// <summary>
     /// Gets the default machine-readable reason code used when strict empty-policy evaluation denies execution.
@@ -32,93 +38,153 @@ public sealed class AsiBackbonePolicyEvaluatorOptions
     /// <summary>
     /// Gets or sets a value indicating whether evaluation should deny when no constraints are registered or supplied.
     /// </summary>
-    /// <remarks>
-    /// The default value is <see langword="true" /> so empty policy structures fail closed by default. Set this to
-    /// <see langword="false" /> only when the host intentionally runs a permissive or explicitly unconstrained evaluation flow.
-    /// </remarks>
-    public bool DenyWhenNoConstraints { get; set; } = true;
+    public bool DenyWhenNoConstraints
+    {
+        get;
+        set
+        {
+            ThrowIfFrozen();
+            field = value;
+        }
+    } = true;
 
     /// <summary>
     /// Gets or sets a value indicating whether evaluation should stop after the first denied constraint result.
     /// </summary>
-    /// <remarks>
-    /// The default value is <see langword="false" /> so the evaluator continues to collect all constraint results
-    /// and denial reasons for audit visibility. In that full-evaluation mode, denied decisions intentionally remain
-    /// denial-focused and do not include warning-only audit messages. Set this to <see langword="true" /> only when
-    /// the host intentionally prefers latency-optimized fast-abort behavior; fast-abort decisions preserve warning
-    /// reasons produced before the first denial because later constraints are not evaluated.
-    /// </remarks>
-    public bool ShortCircuitOnFirstDenial { get; set; }
+    public bool ShortCircuitOnFirstDenial
+    {
+        get;
+        set
+        {
+            ThrowIfFrozen();
+            field = value;
+        }
+    }
 
     /// <summary>
     /// Gets or sets a value indicating whether constraint exceptions should be converted into denied governance decisions.
     /// </summary>
-    /// <remarks>
-    /// The default value is <see langword="true" /> so eligible ordinary policy constraint exceptions fail closed as
-    /// denied governance decisions with stable reason codes and auditable policy metadata. Set this to
-    /// <see langword="false" /> only when the host intentionally wants constraint exceptions to propagate to an
-    /// existing exception, transaction, retry, telemetry, or incident-response boundary. Cancellation and critical
-    /// host/runtime failures are not converted into policy denials and continue to propagate. This option is intended
-    /// for ordinary policy and contributor failures; it does not make corrupted process state recoverable, and modern
-    /// .NET may not deliver some runtime failures to ordinary catch filters.
-    /// </remarks>
-    public bool TreatConstraintExceptionAsDenial { get; set; } = true;
+    public bool TreatConstraintExceptionAsDenial
+    {
+        get;
+        set
+        {
+            ThrowIfFrozen();
+            field = value;
+        }
+    } = true;
 
     /// <summary>
     /// Gets or sets a value indicating whether threat contributor exceptions should be converted into denied governance decisions.
     /// </summary>
-    /// <remarks>
-    /// The default value is <see langword="true" /> because threat-modeling extensions are expected to fail closed when
-    /// they are explicitly registered. Set this to <see langword="false" /> only when the host intentionally wants contributor
-    /// exceptions to propagate instead of producing a stable denied decision. Cancellation and critical host/runtime failures
-    /// are not converted into policy denials and continue to propagate. This option is intended for ordinary policy and
-    /// contributor failures; it does not make corrupted process state recoverable, and modern .NET may not deliver some
-    /// runtime failures to ordinary catch filters.
-    /// </remarks>
-    public bool TreatThreatContributorExceptionAsDenial { get; set; } = true;
+    public bool TreatThreatContributorExceptionAsDenial
+    {
+        get;
+        set
+        {
+            ThrowIfFrozen();
+            field = value;
+        }
+    } = true;
 
     /// <summary>
     /// Gets or sets a value indicating whether threat assessment outcomes should be protected from being downgraded to pure allow decisions.
     /// </summary>
-    /// <remarks>
-    /// When enabled, an actionable threat assessment that produced a warning or blocking decision remains traceable even if a custom
-    /// decision policy would otherwise return <c>Allow</c>.
-    /// </remarks>
-    public bool PreventThreatAssessmentAllowDowngrade { get; set; } = true;
+    public bool PreventThreatAssessmentAllowDowngrade
+    {
+        get;
+        set
+        {
+            ThrowIfFrozen();
+            field = value;
+        }
+    } = true;
 
     /// <summary>
     /// Gets or sets the machine-readable reason code used when <see cref="DenyWhenNoConstraints" /> denies an empty policy.
     /// </summary>
-    public string NoConstraintsReasonCode { get; set; } = DefaultNoConstraintsReasonCode;
+    public string NoConstraintsReasonCode
+    {
+        get;
+        set
+        {
+            ThrowIfFrozen();
+            field = value;
+        }
+    } = DefaultNoConstraintsReasonCode;
 
     /// <summary>
     /// Gets or sets the reason message used when <see cref="DenyWhenNoConstraints" /> denies an empty policy.
     /// </summary>
-    public string NoConstraintsReasonMessage { get; set; } = DefaultNoConstraintsReasonMessage;
+    public string NoConstraintsReasonMessage
+    {
+        get;
+        set
+        {
+            ThrowIfFrozen();
+            field = value;
+        }
+    } = DefaultNoConstraintsReasonMessage;
 
     /// <summary>
     /// Gets or sets the machine-readable reason code used when <see cref="TreatConstraintExceptionAsDenial" /> denies a constraint exception.
     /// </summary>
-    public string ConstraintExceptionReasonCode { get; set; } = DefaultConstraintExceptionReasonCode;
+    public string ConstraintExceptionReasonCode
+    {
+        get;
+        set
+        {
+            ThrowIfFrozen();
+            field = value;
+        }
+    } = DefaultConstraintExceptionReasonCode;
 
     /// <summary>
     /// Gets or sets the reason message used when <see cref="TreatConstraintExceptionAsDenial" /> denies a constraint exception.
     /// </summary>
-    public string ConstraintExceptionReasonMessage { get; set; } = DefaultConstraintExceptionReasonMessage;
+    public string ConstraintExceptionReasonMessage
+    {
+        get;
+        set
+        {
+            ThrowIfFrozen();
+            field = value;
+        }
+    } = DefaultConstraintExceptionReasonMessage;
 
     /// <summary>
     /// Gets or sets the machine-readable reason code used when <see cref="TreatThreatContributorExceptionAsDenial" /> denies a contributor exception.
     /// </summary>
-    public string ThreatContributorExceptionReasonCode { get; set; } = DefaultThreatContributorExceptionReasonCode;
+    public string ThreatContributorExceptionReasonCode
+    {
+        get;
+        set
+        {
+            ThrowIfFrozen();
+            field = value;
+        }
+    } = DefaultThreatContributorExceptionReasonCode;
 
     /// <summary>
     /// Gets or sets the reason message used when <see cref="TreatThreatContributorExceptionAsDenial" /> denies a contributor exception.
     /// </summary>
-    public string ThreatContributorExceptionReasonMessage { get; set; } = DefaultThreatContributorExceptionReasonMessage;
+    public string ThreatContributorExceptionReasonMessage
+    {
+        get;
+        set
+        {
+            ThrowIfFrozen();
+            field = value;
+        }
+    } = DefaultThreatContributorExceptionReasonMessage;
 
     /// <summary>
-    /// Validates evaluator options.
+    /// Validates evaluator options and freezes the instance for evaluator use.
     /// </summary>
+    /// <remarks>
+    /// The method is idempotent. After successful validation, attempts to change any option throw an
+    /// <see cref="InvalidOperationException" /> so a constructed evaluator cannot observe configuration drift.
+    /// </remarks>
     public void Validate()
     {
         if (string.IsNullOrWhiteSpace(NoConstraintsReasonCode))
@@ -149,6 +215,17 @@ public sealed class AsiBackbonePolicyEvaluatorOptions
         if (string.IsNullOrWhiteSpace(ThreatContributorExceptionReasonMessage))
         {
             throw new InvalidOperationException($"{nameof(ThreatContributorExceptionReasonMessage)} must not be empty.");
+        }
+
+        isFrozen = true;
+    }
+
+    private void ThrowIfFrozen()
+    {
+        if (isFrozen)
+        {
+            throw new InvalidOperationException(
+                "Evaluator options cannot be changed after they have been validated for evaluator construction.");
         }
     }
 }

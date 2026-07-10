@@ -9,6 +9,7 @@ public sealed class CapabilityGrantValidationOptions
         string? audience,
         IReadOnlyList<string> scopes,
         DateTimeOffset? validationUtc,
+        TimeSpan allowedClockSkew,
         string? policyVersion,
         string? policyHash,
         string? acknowledgmentId,
@@ -20,6 +21,14 @@ public sealed class CapabilityGrantValidationOptions
         bool requireUseCheck,
         int maxUseCount)
     {
+        if (allowedClockSkew < TimeSpan.Zero)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(allowedClockSkew),
+                allowedClockSkew,
+                "Allowed clock skew must be greater than or equal to zero.");
+        }
+
         if (maxUseCount < 1)
         {
             throw new ArgumentOutOfRangeException(nameof(maxUseCount), maxUseCount, "Maximum use count must be greater than zero.");
@@ -29,6 +38,7 @@ public sealed class CapabilityGrantValidationOptions
         Audience = NormalizeOptional(audience);
         Scopes = scopes;
         ValidationUtc = validationUtc?.ToUniversalTime();
+        AllowedClockSkew = allowedClockSkew;
         PolicyVersion = NormalizeOptional(policyVersion);
         PolicyHash = NormalizeOptional(policyHash);
         AcknowledgmentId = NormalizeOptional(acknowledgmentId);
@@ -45,6 +55,7 @@ public sealed class CapabilityGrantValidationOptions
     public string? Audience { get; }
     public IReadOnlyList<string> Scopes { get; }
     public DateTimeOffset? ValidationUtc { get; }
+    public TimeSpan AllowedClockSkew { get; }
     public string? PolicyVersion { get; }
     public string? PolicyHash { get; }
     public string? AcknowledgmentId { get; }
@@ -70,13 +81,15 @@ public sealed class CapabilityGrantValidationOptions
         bool requireProof = false,
         bool requireAcknowledgmentReference = false,
         bool requireUseCheck = false,
-        int maxUseCount = 1)
+        int maxUseCount = 1,
+        TimeSpan allowedClockSkew = default)
     {
         return new CapabilityGrantValidationOptions(
             issuer,
             audience,
             NormalizeScopes(scopes),
             validationUtc,
+            allowedClockSkew,
             policyVersion,
             policyHash,
             acknowledgmentId,

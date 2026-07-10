@@ -12,6 +12,9 @@ namespace AsiBackbone.Core.Tests.Evaluation;
 /// </summary>
 public sealed class DefaultAsiBackbonePolicyEvaluatorConcurrencyTests
 {
+    /// <summary>
+    /// Tests that the constructor freezes options and preserves configured behavior.
+    /// </summary>
     [Fact]
     public async Task ConstructorFreezesOptionsAndPreservesConfiguredBehavior()
     {
@@ -29,11 +32,14 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorConcurrencyTests
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(
             CreateContext(),
-            global::Xunit.TestContext.Current.CancellationToken);
+            Xunit.TestContext.Current.CancellationToken);
 
         Assert.True(decision.IsAllowed);
     }
 
+    /// <summary>
+    /// Tests that the constructor snapshots the constraint collection and ordering.
+    /// </summary>
     [Fact]
     public async Task ConstructorSnapshotsConstraintCollectionAndOrdering()
     {
@@ -56,12 +62,15 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorConcurrencyTests
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(
             CreateContext(),
-            global::Xunit.TestContext.Current.CancellationToken);
+            Xunit.TestContext.Current.CancellationToken);
 
         Assert.True(decision.IsDenied);
         Assert.Equal(["warning.first", "denial.second"], decision.ReasonCodes);
     }
 
+    /// <summary>
+    /// Tests that the constructor snapshots the threat contributor collection and ordering.
+    /// </summary>
     [Fact]
     public async Task ConstructorSnapshotsThreatContributorCollectionAndOrdering()
     {
@@ -82,12 +91,15 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorConcurrencyTests
 
         GovernanceDecision decision = await evaluator.EvaluateAsync(
             CreateContext(),
-            global::Xunit.TestContext.Current.CancellationToken);
+            Xunit.TestContext.Current.CancellationToken);
 
         Assert.True(decision.IsWarning);
         Assert.Equal(["threat.first", "threat.second"], decision.ReasonCodes);
     }
 
+    /// <summary>
+    /// Tests that concurrent evaluation with stateless extensions produces deterministic results.
+    /// </summary>
     [Fact]
     public async Task ConcurrentEvaluationWithStatelessExtensionsProducesDeterministicResults()
     {
@@ -98,13 +110,12 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorConcurrencyTests
                 new FixedConstraint("allow", ConstraintEvaluationResult.Allow())
             ]);
 
-        Task<GovernanceDecision>[] evaluations = Enumerable.Range(0, 64)
+        Task<GovernanceDecision>[] evaluations = [.. Enumerable.Range(0, 64)
             .Select(index => evaluator
                 .EvaluateAsync(
                     CreateContext($"correlation-{index}"),
-                    global::Xunit.TestContext.Current.CancellationToken)
-                .AsTask())
-            .ToArray();
+                    Xunit.TestContext.Current.CancellationToken)
+                .AsTask())];
 
         GovernanceDecision[] decisions = await Task.WhenAll(evaluations);
 
@@ -136,9 +147,24 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorConcurrencyTests
 
     private sealed class TestContext(string correlationId) : IAsiBackboneConstraintEvaluationContext
     {
+        /// <summary>
+        /// Gets the correlation ID for the test context.
+        /// </summary>
         public string? CorrelationId { get; } = correlationId;
+
+        /// <summary>
+        /// Gets the policy version for the test context.
+        /// </summary>
         public string? PolicyVersion { get; } = "policy-v1";
+
+        /// <summary>
+        /// Gets the policy hash for the test context.
+        /// </summary>
         public string? PolicyHash { get; } = "policy-hash";
+
+        /// <summary>
+        /// Gets the metadata for the test context.
+        /// </summary>
         public IReadOnlyDictionary<string, string> Metadata { get; } =
             new Dictionary<string, string>(StringComparer.Ordinal);
     }
@@ -147,8 +173,17 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorConcurrencyTests
         string name,
         ConstraintEvaluationResult result) : IAsiBackboneConstraint<TestContext>
     {
+        /// <summary>
+        /// Gets the name of the constraint.
+        /// </summary>
         public string Name { get; } = name;
 
+        /// <summary>
+        /// Evaluates the constraint asynchronously.
+        /// </summary>
+        /// <param name="context">The evaluation context.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The constraint evaluation result.</returns>
         public ValueTask<ConstraintEvaluationResult> EvaluateAsync(
             TestContext context,
             CancellationToken cancellationToken = default)
@@ -163,8 +198,17 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorConcurrencyTests
         string name,
         ThreatAssessment assessment) : IThreatModelContributor<TestContext>
     {
+        /// <summary>
+        /// Gets the name of the threat contributor.
+        /// </summary>
         public string Name { get; } = name;
 
+        /// <summary>
+        /// Assesses the threat asynchronously.
+        /// </summary>
+        /// <param name="context">The evaluation context.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The threat assessment.</returns>
         public ValueTask<ThreatAssessment> AssessAsync(
             TestContext context,
             CancellationToken cancellationToken = default)

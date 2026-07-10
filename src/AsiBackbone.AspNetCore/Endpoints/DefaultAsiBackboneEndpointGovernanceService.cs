@@ -68,4 +68,315 @@ public sealed class DefaultAsiBackboneEndpointGovernanceService : IAsiBackboneEn
         }
 
         var optionalServices = new EndpointGovernanceOptionalServiceResolver(httpContext.RequestServices, serviceProvider);
-        Asi
+        AsiBackboneHttpRequestCorrelation correlation = requestCorrelationResolver.ResolveRequestCorrelation();
+        IReadOnlyDictionary<string, string> endpointMetadata = descriptor.ToMetadata(endpointOptions.MetadataMode);
+        IGovernanceMetadataSanitizer? metadataSanitizer = optionalServices.GetMetadataSanitizer();
+
+        if (metadataSanitizer is not null)
+        {
+            GovernanceMetadataSanitizationResult sanitizationResult = await metadataSanitizer
+                .SanitizeAsync(endpointMetadata, cancellationToken)
+                .ConfigureAwait(false);
+
+            if (!sanitizationResult.CanProceed)
+            {
+                return CreateMetadataSanitizationFailure(correlation, sanitizationResult);
+            }
+
+            endpointMetadata = sanitizationResult.SanitizedMetadata;
+        }
+
+        AsiBackboneConstraintEvaluationContext evaluationContext = correlation.ToEvaluationContext(
+            endpointOptions.PolicyVersion,
+            endpointOptions.PolicyHash,
+            endpointMetadata);
+
+        GovernanceDecision decision;
+
+        if (descriptor.PolicyTypes.Count > 0)
+        {
+            IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>? evaluator = optionalServices.GetPolicyEvaluator();
+
+            if (evaluator is null)
+            {
+                GovernanceDecision allowedDecision = CreateAllowDecision(evaluationContext, correlation.TraceId);
+
+                return endpointOptions.FailClosedWhenPolicyEvaluatorMissing
+                    ? CreateConfigurationFailure(
+                        httpContext,
+                        descriptor,
+                        endpointMetadata,
+                        "endpoint.policy_evaluator.missing",
+                        "Endpoint governance policy metadata was present, but no AsiBackbone policy evaluator was registered.",
+                        allowedDecision,
+                        "aspnetcore.endpoint.governance.configuration.policy_evaluator")
+                    : AsiBackboneEndpointGovernanceResult.Allow(allowedDecision);
+            }
+
+            decision = await evaluator
+                .EvaluateAsync(evaluationContext, cancellationToken)
+                .ConfigureAwait(false);
+        }
+        else
+        {
+            decision = CreateAllowDecision(evaluationContext, correlation.TraceId);
+        }
+
+        if (decision.CanProceed && descriptor.CapabilityScopes.Count > 0)
+        {
+            IAsiBackboneEndpointCapabilityGrantValidator? capabilityValidator = optionalServices.GetCapabilityValidator();
+
+            if (capabilityValidator is null)
+            {
+                return endpointOptions.FailClosedWhenCapabilityValidatorMissing
+                    ? CreateCapabilityFailure(
+                        httpContext,
+                        descriptor,
+                        endpointMetadata,
+                        "endpoint.capability_validator.missing",
+                        "Endpoint capability metadata was present, but no host-owned endpoint capability validator was registered.",
+                        decision,
+                        "aspnetcore.endpoint.governance.capability.configuration")
+                    : AsiBackboneEndpointGovernanceResult.Allow(decision);
+            }
+
+            decision = await capabilityValidator
+                .ValidateAsync(httpContext, descriptor, decision, cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        IAsiBackboneActorContext? actor = null;
+
+        if (descriptor.EmitGovernanceAudit)
+        {
+            IAsiBackboneAuditSink? auditSink = optionalServices.GetAuditSink();
+            if (auditSink is null)
+            {
+                return endpointOptions.FailClosedWhenAuditSinkMissing
+                    ? CreateConfigurationFailure(
+                        httpContext,
+                        descriptor,
+                        endpointMetadata,
+                        "endpoint.audit_sink.missing",
+                        "Endpoint governance audit emission was requested, but no host-owned audit sink was registered.",
+                        decision,
+                        "aspnetcore.endpoint.governance.configuration.audit_sink")
+                    : AsiBackboneEndpointGovernanceResult.Allow(decision);
+            }
+
+            actor = actorContextResolver.ResolveActorContext();
+            var residue = AuditResidue.FromDecision(
+                actor,
+                descriptor.OperationName,
+                decision,
+                metadata: endpointMetadata,
+                decisionStage: "aspnetcore.endpoint.governance");
+
+            await auditSink.WriteAsync(residue, cancellationToken).ConfigureAwait(false);
+        }
+
+        if (decision.RequiresAcknowledgment && descriptor.RequiresLiabilityHandshake)
+        {
+            actor ??= actorContextResolver.ResolveActorContext();
+            AsiBackboneAcknowledgmentChallenge challenge = acknowledgmentChallengeService.CreateChallenge(
+                actor,
+                descriptor.OperationName,
+                decision,
+                endpointMetadata);
+
+            IResult challengeResult = Microsoft.AspNetCore.Http.Results.Json(
+                challenge,
+                statusCode: endpointOptions.AcknowledgmentChallengeStatusCode);
+
+            return AsiBackboneEndpointGovernanceResult.Challenge(challenge, challengeResult, decision);
+        }
+
+        return decision.CanProceed
+            ? AsiBackboneEndpointGovernanceResult.Allow(decision)
+            : CreateBlockedDecisionResult(decision);
+    }
+
+    private AsiBackboneEndpointGovernanceResult CreateMetadataSanitizationFailure(
+        AsiBackboneHttpRequestCorrelation correlation,
+        GovernanceMetadataSanitizationResult sanitizationResult)
+    {
+        var reasons = new List<OperationReason>(sanitizationResult.Reasons.Count + 1)
+        {
+            OperationReason.Create(
+                MetadataSanitizationDeniedReasonCode,
+                MetadataSanitizationDeniedReasonMessage)
+        };
+        reasons.AddRange(sanitizationResult.Reasons);
+
+        GovernanceDecision decision = GovernanceDecision.Deny(
+            reasons,
+            correlationId: correlation.CorrelationId,
+            traceId: correlation.TraceId,
+            policyVersion: endpointOptions.PolicyVersion,
+            policyHash: endpointOptions.PolicyHash);
+
+        return CreateBlockedDecisionResult(decision);
+    }
+
+    private static GovernanceDecision CreateAllowDecision(
+        AsiBackboneConstraintEvaluationContext evaluationContext,
+        string? traceId)
+    {
+        return GovernanceDecision.Allow(
+            correlationId: evaluationContext.CorrelationId,
+            traceId: traceId,
+            policyVersion: evaluationContext.PolicyVersion,
+            policyHash: evaluationContext.PolicyHash);
+    }
+
+    private struct EndpointGovernanceOptionalServiceResolver(
+        IServiceProvider requestServices,
+        IServiceProvider governanceServices)
+    {
+        private IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>? policyEvaluator;
+        private IAsiBackboneEndpointCapabilityGrantValidator? capabilityValidator;
+        private IAsiBackboneAuditSink? auditSink;
+        private IGovernanceMetadataSanitizer? metadataSanitizer;
+        private bool policyEvaluatorResolved;
+        private bool capabilityValidatorResolved;
+        private bool auditSinkResolved;
+        private bool metadataSanitizerResolved;
+
+        public IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>? GetPolicyEvaluator()
+        {
+            if (!policyEvaluatorResolved)
+            {
+                policyEvaluator = requestServices.GetService<IAsiBackbonePolicyEvaluator<AsiBackboneConstraintEvaluationContext>>();
+                policyEvaluatorResolved = true;
+            }
+
+            return policyEvaluator;
+        }
+
+        public IAsiBackboneEndpointCapabilityGrantValidator? GetCapabilityValidator()
+        {
+            if (!capabilityValidatorResolved)
+            {
+                capabilityValidator = requestServices.GetService<IAsiBackboneEndpointCapabilityGrantValidator>();
+                capabilityValidatorResolved = true;
+            }
+
+            return capabilityValidator;
+        }
+
+        public IAsiBackboneAuditSink? GetAuditSink()
+        {
+            if (!auditSinkResolved)
+            {
+                auditSink = governanceServices.GetService<IAsiBackboneAuditSink>();
+                auditSinkResolved = true;
+            }
+
+            return auditSink;
+        }
+
+        public IGovernanceMetadataSanitizer? GetMetadataSanitizer()
+        {
+            if (!metadataSanitizerResolved)
+            {
+                metadataSanitizer = requestServices.GetService<IGovernanceMetadataSanitizer>();
+                metadataSanitizerResolved = true;
+            }
+
+            return metadataSanitizer;
+        }
+    }
+
+    private AsiBackboneEndpointGovernanceResult CreateBlockedDecisionResult(GovernanceDecision decision)
+    {
+        return decision.IsDenied && resultOptions.DeniedStatusCode == StatusCodes.Status403Forbidden
+            ? AsiBackboneEndpointGovernanceResult.BlockWithDefaultFailure(decision)
+            : AsiBackboneEndpointGovernanceResult.Block(decision.ToHttpResult(resultOptions), decision);
+    }
+
+    private AsiBackboneEndpointGovernanceResult CreateConfigurationFailure(
+        HttpContext httpContext,
+        AsiBackboneEndpointGovernanceDescriptor descriptor,
+        IReadOnlyDictionary<string, string> metadata,
+        string code,
+        string message,
+        GovernanceDecision currentDecision,
+        string decisionStage)
+    {
+        var decision = GovernanceDecision.Deny(
+            code,
+            message,
+            correlationId: currentDecision.CorrelationId,
+            traceId: currentDecision.TraceId,
+            policyVersion: currentDecision.PolicyVersion,
+            policyHash: currentDecision.PolicyHash);
+
+        return AsiBackboneEndpointGovernanceDevelopmentDiagnostics.IsEnabled(httpContext, endpointOptions)
+            ? AsiBackboneEndpointGovernanceResult.Block(
+                AsiBackboneEndpointGovernanceDevelopmentDiagnostics.CreateProblem(
+                    httpContext,
+                    endpointOptions,
+                    descriptor,
+                    decision,
+                    decisionStage,
+                    title: "Endpoint governance configuration is incomplete.",
+                    detail: message,
+                    statusCode: endpointOptions.ConfigurationFailureStatusCode,
+                    metadata: metadata),
+                decision)
+            : AsiBackboneEndpointGovernanceResult.Block(
+            Microsoft.AspNetCore.Http.Results.Problem(
+                title: "Endpoint governance configuration is incomplete.",
+                detail: message,
+                statusCode: endpointOptions.ConfigurationFailureStatusCode,
+                extensions: new Dictionary<string, object?>(StringComparer.Ordinal)
+                {
+                    ["reasonCodes"] = decision.ReasonCodes,
+                    ["outcome"] = decision.Outcome.ToString()
+                }),
+            decision);
+    }
+
+    private AsiBackboneEndpointGovernanceResult CreateCapabilityFailure(
+        HttpContext httpContext,
+        AsiBackboneEndpointGovernanceDescriptor descriptor,
+        IReadOnlyDictionary<string, string> metadata,
+        string code,
+        string message,
+        GovernanceDecision currentDecision,
+        string decisionStage)
+    {
+        var decision = GovernanceDecision.Deny(
+            code,
+            message,
+            correlationId: currentDecision.CorrelationId,
+            traceId: currentDecision.TraceId,
+            policyVersion: currentDecision.PolicyVersion,
+            policyHash: currentDecision.PolicyHash);
+
+        return AsiBackboneEndpointGovernanceDevelopmentDiagnostics.IsEnabled(httpContext, endpointOptions)
+            ? AsiBackboneEndpointGovernanceResult.Block(
+                AsiBackboneEndpointGovernanceDevelopmentDiagnostics.CreateProblem(
+                    httpContext,
+                    endpointOptions,
+                    descriptor,
+                    decision,
+                    decisionStage,
+                    title: "Endpoint capability grant validation failed.",
+                    detail: message,
+                    statusCode: endpointOptions.CapabilityFailureStatusCode,
+                    metadata: metadata),
+                decision)
+            : AsiBackboneEndpointGovernanceResult.Block(
+            Microsoft.AspNetCore.Http.Results.Problem(
+                title: "Endpoint capability grant validation failed.",
+                detail: message,
+                statusCode: endpointOptions.CapabilityFailureStatusCode,
+                extensions: new Dictionary<string, object?>(StringComparer.Ordinal)
+                {
+                    ["reasonCodes"] = decision.ReasonCodes,
+                    ["outcome"] = decision.Outcome.ToString()
+                }),
+            decision);
+    }
+}

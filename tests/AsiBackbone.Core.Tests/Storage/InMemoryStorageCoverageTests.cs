@@ -114,8 +114,8 @@ public sealed class InMemoryStorageCoverageTests
 
         using ServiceProvider provider = services.BuildServiceProvider();
         Assert.Same(provider.GetRequiredService<InMemoryAuditLedger>(), provider.GetRequiredService<IAsiBackboneAuditSink>());
-        Assert.IsType<InMemoryAuditResidueLifecycleStore>(provider.GetRequiredService<IAsiBackboneAuditResidueLifecycleStore>());
-        Assert.IsType<InMemoryGovernanceOutboxStore>(provider.GetRequiredService<IAsiBackboneGovernanceOutboxStore>());
+        _ = Assert.IsType<InMemoryAuditResidueLifecycleStore>(provider.GetRequiredService<IAsiBackboneAuditResidueLifecycleStore>());
+        _ = Assert.IsType<InMemoryGovernanceOutboxStore>(provider.GetRequiredService<IAsiBackboneGovernanceOutboxStore>());
         Assert.Same(provider.GetRequiredService<InMemoryCapabilityGrantUseStore>(), provider.GetRequiredService<ICapabilityGrantUseStore>());
     }
 

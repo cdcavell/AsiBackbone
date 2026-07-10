@@ -1,3 +1,4 @@
+using AsiBackbone.AspNetCore.DependencyInjection;
 using AsiBackbone.AspNetCore.Endpoints;
 using AsiBackbone.AspNetCore.Outbox;
 using AsiBackbone.DependencyInjection;

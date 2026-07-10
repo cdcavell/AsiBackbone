@@ -72,23 +72,33 @@ public sealed class InMemoryStorageCoverageTests
     /// <summary>
     /// Verifies lifecycle store argument and cancellation guards.
     /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
-    public void LifecycleStoreRejectsInvalidArgumentsAndCancellation()
+    public async Task LifecycleStoreRejectsInvalidArgumentsAndCancellation()
     {
         var store = new InMemoryAuditResidueLifecycleStore();
-        using var source = new CancellationTokenSource();
+        CancellationToken testCancellationToken = TestContext.Current.CancellationToken;
+        using var source = CancellationTokenSource.CreateLinkedTokenSource(testCancellationToken);
         source.Cancel();
         AuditResidueLifecycleEvent lifecycleEvent = CreateLifecycleEvent(
             "event-1", DateTimeOffset.UtcNow, "correlation-1", "residue-1");
 
-        _ = Assert.Throws<ArgumentNullException>(() => store.AppendAsync(null!).GetAwaiter().GetResult());
-        _ = Assert.ThrowsAny<ArgumentException>(() => store.FindByEventIdAsync(" ").GetAwaiter().GetResult());
-        _ = Assert.ThrowsAny<ArgumentException>(() => store.FindByCorrelationIdAsync(" ").GetAwaiter().GetResult());
-        _ = Assert.ThrowsAny<ArgumentException>(() => store.FindByAuditResidueIdAsync(" ").GetAwaiter().GetResult());
-        _ = Assert.Throws<OperationCanceledException>(() => store.AppendAsync(lifecycleEvent, source.Token).GetAwaiter().GetResult());
-        _ = Assert.Throws<OperationCanceledException>(() => store.FindByEventIdAsync("event-1", source.Token).GetAwaiter().GetResult());
-        _ = Assert.Throws<OperationCanceledException>(() => store.FindByCorrelationIdAsync("correlation-1", source.Token).GetAwaiter().GetResult());
-        _ = Assert.Throws<OperationCanceledException>(() => store.FindByAuditResidueIdAsync("residue-1", source.Token).GetAwaiter().GetResult());
+        _ = await Assert.ThrowsAsync<ArgumentNullException>(async () =>
+            await store.AppendAsync(null!, testCancellationToken));
+        _ = await Assert.ThrowsAnyAsync<ArgumentException>(async () =>
+            await store.FindByEventIdAsync(" ", testCancellationToken));
+        _ = await Assert.ThrowsAnyAsync<ArgumentException>(async () =>
+            await store.FindByCorrelationIdAsync(" ", testCancellationToken));
+        _ = await Assert.ThrowsAnyAsync<ArgumentException>(async () =>
+            await store.FindByAuditResidueIdAsync(" ", testCancellationToken));
+        _ = await Assert.ThrowsAsync<OperationCanceledException>(async () =>
+            await store.AppendAsync(lifecycleEvent, source.Token));
+        _ = await Assert.ThrowsAsync<OperationCanceledException>(async () =>
+            await store.FindByEventIdAsync("event-1", source.Token));
+        _ = await Assert.ThrowsAsync<OperationCanceledException>(async () =>
+            await store.FindByCorrelationIdAsync("correlation-1", source.Token));
+        _ = await Assert.ThrowsAsync<OperationCanceledException>(async () =>
+            await store.FindByAuditResidueIdAsync("residue-1", source.Token));
     }
 
     /// <summary>

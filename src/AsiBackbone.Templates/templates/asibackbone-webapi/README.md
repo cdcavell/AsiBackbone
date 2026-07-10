@@ -39,6 +39,26 @@ The `/sample/decision` endpoint returns the decision outcome, reason codes, corr
 
 `netcoretemplate` keeps the generated project independent from NetCoreApplicationTemplate while using wording and structure that can be adapted toward that enterprise baseline. NetCoreApplicationTemplate is not required by AsiBackbone and is not a dependency of this generated app.
 
+## Regulated governance profile
+
+The generated host uses progressive-adoption registration by default. A host that wants the explicit conservative profile can replace:
+
+```csharp
+builder.Services.AddAsiBackboneAspNetCore();
+```
+
+with:
+
+```csharp
+builder.Services.AddAsiBackboneRegulatedGovernance();
+```
+
+The regulated helper adds the ASP.NET Core adapter, strict fail-closed evaluator and endpoint options, required governance metadata, redacted development-diagnostics metadata values, and the provider-neutral metadata sanitizer with the recommended budget. It does not register host policy rules, metadata classifiers, capability proof verification, durable replay protection, durable audit/outbox persistence, authentication, authorization, or production signing.
+
+After enabling it, explicitly exempt intentionally public endpoints such as health checks with `AllowMissingGovernanceMetadata()`. Register reviewed `IGovernanceMetadataClassifier` implementations and production host dependencies before deployment. See the [Regulated Governance Profile](https://cdcavell.github.io/AsiBackbone/articles/regulated-governance-profile.html).
+
+This profile is a governance posture, not a legal or compliance certification.
+
 ## Production next steps
 
 This generated app uses safe local-development defaults. Before production use, replace or add:
@@ -59,3 +79,4 @@ This scaffold is a runnable adoption starting point. It keeps execution behavior
 - https://cdcavell.github.io/AsiBackbone/articles/templates.html
 - https://cdcavell.github.io/AsiBackbone/articles/quickstart-api-gating.html
 - https://cdcavell.github.io/AsiBackbone/articles/aspnetcore-endpoint-governance.html
+- https://cdcavell.github.io/AsiBackbone/articles/regulated-governance-profile.html

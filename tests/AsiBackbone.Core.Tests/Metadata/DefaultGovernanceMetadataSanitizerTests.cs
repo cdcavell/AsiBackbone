@@ -153,7 +153,7 @@ public sealed class DefaultGovernanceMetadataSanitizerTests
     [Fact]
     public async Task SanitizeAsyncAppliesBudgetAfterRedaction()
     {
-        GovernanceMetadataBudget budget = GovernanceMetadataBudget.Create(
+        var budget = GovernanceMetadataBudget.Create(
             maxValueLength: 4,
             reservedKeyFragments: []);
         var metadata = new Dictionary<string, string>(StringComparer.Ordinal)

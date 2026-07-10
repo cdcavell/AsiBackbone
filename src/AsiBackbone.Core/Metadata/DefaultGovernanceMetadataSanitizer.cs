@@ -129,14 +129,11 @@ public sealed class DefaultGovernanceMetadataSanitizer : IGovernanceMetadataSani
         GovernanceMetadataSanitizationAction current,
         GovernanceMetadataSanitizationAction candidate)
     {
-        if (!Enum.IsDefined(candidate))
-        {
-            throw new ArgumentOutOfRangeException(
+        return !Enum.IsDefined(candidate)
+            ? throw new ArgumentOutOfRangeException(
                 nameof(candidate),
                 candidate,
-                "Metadata sanitation action must be defined.");
-        }
-
-        return candidate > current ? candidate : current;
+                "Metadata sanitation action must be defined.")
+            : candidate > current ? candidate : current;
     }
 }

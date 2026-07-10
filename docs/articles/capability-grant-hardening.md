@@ -34,7 +34,7 @@ Use `CapabilityGrantValidator.ValidateAsync(...)` before follow-on execution. Va
 
 - proof when configured through the existing signing verification seam;
 - issuer and audience;
-- expiration and not-before time;
+- expiration and not-before time, with optional host-selected clock-skew tolerance;
 - required scopes;
 - policy version and policy hash;
 - acknowledgment and handshake references;
@@ -63,6 +63,28 @@ CapabilityGrantValidationResult result = await CapabilityGrantValidator.Validate
 ```
 
 Proceed only when `result.ShouldAllow` is true.
+
+## Clock-skew tolerance
+
+`CapabilityGrantValidationOptions.AllowedClockSkew` lets a host accommodate a small, bounded difference between the issuer clock and the validator clock. The default is `TimeSpan.Zero`, which preserves strict validation behavior.
+
+A distributed host may opt into an explicit tolerance:
+
+```csharp
+CapabilityGrantValidationOptions options = CapabilityGrantValidationOptions.Create(
+    validationUtc: hostClockUtc,
+    allowedClockSkew: TimeSpan.FromSeconds(15));
+```
+
+The boundary semantics are:
+
+- A not-before timestamp is accepted when it is no more than the configured skew ahead of the validator clock. The exact skew boundary is accepted.
+- An expiration timestamp is accepted only while the elapsed time since expiration is less than the configured skew. The exact expiration-skew boundary is rejected.
+- With zero skew, a grant is deferred before `NotBeforeUtc` and denied at or after `ExpiresUtc`, matching the strict default behavior.
+
+Clock skew extends the effective acceptance window at both temporal boundaries. Keep it small, explicit, and selected by the host according to its deployment topology and risk model. It does not synchronize clocks, provide NTP infrastructure, or compensate for persistently incorrect system time. Production hosts should maintain reliable UTC clock synchronization and monitor clock drift rather than using a broad tolerance as a substitute.
+
+Negative clock-skew values are rejected during option creation. The configured tolerance changes only the temporal checks; it does not relax proof, issuer, audience, scope, policy, acknowledgment, handshake, gateway, resource, replay, revocation, cancellation, or use-limit validation.
 
 ## Failure behavior
 

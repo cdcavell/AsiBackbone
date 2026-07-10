@@ -97,9 +97,9 @@ public static class CapabilityGrantValidator
             ? CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.WrongIssuer, VerificationPolicyAction.Deny, "capability.issuer-mismatch")
             : options.Audience is not null && !string.Equals(options.Audience, grant.Audience, StringComparison.Ordinal)
             ? CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.WrongAudience, VerificationPolicyAction.Deny, "capability.audience-mismatch")
-            : grant.NotBeforeUtc.HasValue && validationUtc < grant.NotBeforeUtc.Value
+            : IsNotYetValid(grant, validationUtc, options.AllowedClockSkew)
             ? CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.NotYetValid, VerificationPolicyAction.Defer, "capability.not-yet-valid")
-            : validationUtc >= grant.ExpiresUtc
+            : IsExpired(grant, validationUtc, options.AllowedClockSkew)
             ? CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.Expired, VerificationPolicyAction.Deny, "capability.expired")
             : options.Scopes.Count > 0 && !ContainsRequiredScopes(grant.Scopes, options.Scopes)
             ? CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.WrongScope, VerificationPolicyAction.Deny, "capability.scope-missing")
@@ -117,6 +117,25 @@ public static class CapabilityGrantValidator
             : options.ResourceBinding is not null && !string.Equals(options.ResourceBinding, grant.ResourceBinding, StringComparison.Ordinal)
             ? CapabilityGrantValidationResult.Failed(grant, CapabilityTokenValidationCategory.ResourceMismatch, VerificationPolicyAction.Deny, "capability.resource-mismatch")
             : null;
+    }
+
+    private static bool IsNotYetValid(
+        CapabilityTokenGrant grant,
+        DateTimeOffset validationUtc,
+        TimeSpan allowedClockSkew)
+    {
+        return grant.NotBeforeUtc.HasValue
+            && grant.NotBeforeUtc.Value > validationUtc
+            && grant.NotBeforeUtc.Value - validationUtc > allowedClockSkew;
+    }
+
+    private static bool IsExpired(
+        CapabilityTokenGrant grant,
+        DateTimeOffset validationUtc,
+        TimeSpan allowedClockSkew)
+    {
+        return validationUtc >= grant.ExpiresUtc
+            && validationUtc - grant.ExpiresUtc >= allowedClockSkew;
     }
 
     private static async ValueTask<CapabilityGrantValidationResult?> ValidateUseAsync(

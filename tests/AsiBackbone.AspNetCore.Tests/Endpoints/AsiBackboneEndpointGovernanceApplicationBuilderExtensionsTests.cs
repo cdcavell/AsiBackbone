@@ -22,7 +22,7 @@ public sealed class AsiBackboneEndpointGovernanceApplicationBuilderExtensionsTes
         ServiceCollection services = new();
         _ = services.AddAsiBackboneAspNetCore();
         using ServiceProvider provider = services.BuildServiceProvider();
-        IApplicationBuilder app = new ApplicationBuilder(provider);
+        var app = new ApplicationBuilder(provider);
         bool terminalCalled = false;
 
         IApplicationBuilder result = app.UseAsiBackboneEndpointGovernance();

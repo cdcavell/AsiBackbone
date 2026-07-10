@@ -207,7 +207,7 @@ A consumer should be able to use AsiBackbone in an application generated from Ne
 
 AsiBackbone is a governance spine, not an intelligence engine. It implements governance-oriented software primitives for accountable decision flow and keeps execution authority with the host application. See [Project Boundaries and Non-Claims](https://cdcavell.github.io/AsiBackbone/articles/project-boundaries.html) for the full scope statement and safe wording guidance.
 
-> Current NuGet packages are not signed release artifacts from the project maintainer. Package signing may be adopted later through .NET Foundation-supported infrastructure or another reviewed release-signing process. For current package-source, Source Link, SBOM, and provenance checks, see the [3.0.0 Consumer Verification Guide](https://cdcavell.github.io/AsiBackbone/articles/consumer-verification-300.html).
+> **Current NuGet packages are intentionally published without package signing.** This is a deliberate governance decision while the project is independently maintained, balancing operational complexity against practical value. Instead, the project emphasizes transparent source code, GitHub releases, Source Link, SBOM generation, and package provenance. Package signing remains on the long-term roadmap and will be reconsidered as the project's community, governance, and operational needs evolve. For current package verification guidance, see the [**3.0.0 Consumer Verification Guide**](https://cdcavell.github.io/AsiBackbone/articles/consumer-verification-300.html).
 
 ## Design principles
 

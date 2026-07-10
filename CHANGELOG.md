@@ -49,6 +49,12 @@ The release preserves the existing `AsiBackbone.*` package IDs and public namesp
 * Debug solution build coverage validation helps prevent first-party package or test projects from silently falling out of the common `dotnet build AsiBackbone.slnx` path.
 * Release documentation now more clearly distinguishes stable package guarantees from host-owned responsibilities, future provider plans, package-signing status, production tamper-evidence, legal/compliance review, robotics, AI model hosting, and physical execution.
 
+### Documentation
+
+- Clarified package signing policy.
+- Documented that NuGet package signing is intentionally deferred while ASIBackbone remains a solo-maintained project.
+- Added rationale and future adoption criteria to project documentation.
+
 ### Compatibility notes
 
 * Package IDs remain unchanged.

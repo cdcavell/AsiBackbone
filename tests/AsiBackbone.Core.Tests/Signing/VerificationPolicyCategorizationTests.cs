@@ -35,7 +35,7 @@ public sealed class VerificationPolicyCategorizationTests
         string failureCode,
         SignatureVerificationCategory expectedCategory)
     {
-        SignatureVerificationResult result = SignatureVerificationResult.Failed(failureCode);
+        var result = SignatureVerificationResult.Failed(failureCode);
 
         SignatureVerificationCategory category = VerificationPolicyEvaluator.Categorize(result);
 
@@ -80,7 +80,7 @@ public sealed class VerificationPolicyCategorizationTests
     [Fact]
     public void CategorizeMatchesFailureCodesCaseInsensitively()
     {
-        SignatureVerificationResult result = SignatureVerificationResult.Failed("SIGNATURE.KEY-VERSION-UNKNOWN");
+        var result = SignatureVerificationResult.Failed("SIGNATURE.KEY-VERSION-UNKNOWN");
 
         SignatureVerificationCategory category = VerificationPolicyEvaluator.Categorize(result);
 
@@ -96,7 +96,7 @@ public sealed class VerificationPolicyCategorizationTests
     [InlineData("signature.key-rotation")]
     public void CategorizeRejectsIncompleteUnknownKeyCompositeMatches(string failureCode)
     {
-        SignatureVerificationResult result = SignatureVerificationResult.Failed(failureCode);
+        var result = SignatureVerificationResult.Failed(failureCode);
 
         SignatureVerificationCategory category = VerificationPolicyEvaluator.Categorize(result);
 
@@ -109,7 +109,7 @@ public sealed class VerificationPolicyCategorizationTests
     [Fact]
     public void CategorizeReturnsFailedForUnrecognizedFailureCode()
     {
-        SignatureVerificationResult result = SignatureVerificationResult.Failed("verification.provider-rejected");
+        var result = SignatureVerificationResult.Failed("verification.provider-rejected");
 
         SignatureVerificationCategory category = VerificationPolicyEvaluator.Categorize(result);
 

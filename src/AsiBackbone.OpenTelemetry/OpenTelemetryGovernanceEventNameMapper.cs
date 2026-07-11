@@ -25,14 +25,11 @@ internal static class OpenTelemetryGovernanceEventNameMapper
         GovernanceEmissionEventType eventType,
         string? emitterStatus)
     {
-        if (eventType is GovernanceEmissionEventType.ProviderEmission)
-        {
-            return IsFailureStatus(emitterStatus)
+        return eventType is GovernanceEmissionEventType.ProviderEmission
+            ? IsFailureStatus(emitterStatus)
                 ? OpenTelemetryGovernanceInstrumentation.EmissionFailedEventName
-                : OpenTelemetryGovernanceInstrumentation.EmissionDeliveredEventName;
-        }
-
-        return EventNames.TryGetValue(eventType, out string? eventName)
+                : OpenTelemetryGovernanceInstrumentation.EmissionDeliveredEventName
+            : EventNames.TryGetValue(eventType, out string? eventName)
             ? eventName
             : OpenTelemetryGovernanceInstrumentation.GenericGovernanceEventName;
     }

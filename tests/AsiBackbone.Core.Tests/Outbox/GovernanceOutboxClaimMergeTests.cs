@@ -228,7 +228,7 @@ public sealed class GovernanceOutboxClaimMergeTests
         DateTimeOffset claimExpiresUtc,
         GovernanceEmissionStatus status = GovernanceEmissionStatus.Pending)
     {
-        GovernanceOutboxEntry entry = GovernanceOutboxEntry.Restore(
+        var entry = GovernanceOutboxEntry.Restore(
             CreateEnvelope($"{outboxEntryId}-{claimToken}"),
             status,
             outboxEntryId,
@@ -275,7 +275,7 @@ public sealed class GovernanceOutboxClaimMergeTests
             modifiers: null)
             ?? throw new InvalidOperationException("The outbox drain claim merge method was not found.");
 
-        return (MergeClaimsDelegate)method.CreateDelegate(typeof(MergeClaimsDelegate));
+        return method.CreateDelegate<MergeClaimsDelegate>();
     }
 
     private delegate IReadOnlyList<GovernanceOutboxClaim> MergeClaimsDelegate(

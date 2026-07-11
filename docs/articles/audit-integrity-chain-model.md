@@ -1,7 +1,5 @@
 # Audit Integrity Chain Model
 
-Issue: #224.
-
 This article documents the selected provider-neutral append-only audit integrity model for AsiBackbone audit and outbox records.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone provides canonical hashing, signing, verification, and audit-integrity seams. It does not provide immutable storage, external anchoring, blockchain, transparency logs, legal evidence guarantees, compliance certification, or tamper-evidence by itself.
@@ -11,7 +9,7 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 
 ## Selected model
 
-Issue #224 selects a **per-chain append-only hash chain** as the first Core model.
+The first Core model uses a **per-chain append-only hash chain**.
 
 The model is intentionally simpler than a Merkle tree or external anchoring provider:
 
@@ -181,7 +179,7 @@ Use **tamper-evident** only when the deployed system includes signed/chained rec
 
 ## Non-goals
 
-This issue does not implement:
+The current implementation does not include:
 
 - blockchain storage;
 - external timestamp authorities;

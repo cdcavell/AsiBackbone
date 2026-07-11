@@ -66,7 +66,9 @@ public sealed class OpenTelemetryGovernanceEmitter : IAsiBackboneGovernanceEmitt
 
             cancellationToken.ThrowIfCancellationRequested();
             double latencyMs = stopwatch.Elapsed.TotalMilliseconds;
-            string eventName = GetEventName(envelope);
+            string eventName = OpenTelemetryGovernanceEventNameMapper.GetEventName(
+                envelope.EventType,
+                envelope.EmitterStatus);
             string providerName = options.ProviderName.Trim();
 
             if (options.EmitActivityEvents)
@@ -255,31 +257,5 @@ public sealed class OpenTelemetryGovernanceEmitter : IAsiBackboneGovernanceEmitt
     private static void AddTag(ActivityTagsCollection tags, string key, double value)
     {
         tags.Add(key, value);
-    }
-
-    private static string GetEventName(GovernanceEmissionEnvelope envelope)
-    {
-        return envelope.EventType switch
-        {
-            GovernanceEmissionEventType.Decision => OpenTelemetryGovernanceInstrumentation.DecisionEvaluatedEventName,
-            GovernanceEmissionEventType.Acknowledgment => OpenTelemetryGovernanceInstrumentation.AcknowledgmentRecordedEventName,
-            GovernanceEmissionEventType.CapabilityToken => OpenTelemetryGovernanceInstrumentation.CapabilityTokenIssuedEventName,
-            GovernanceEmissionEventType.Gateway => OpenTelemetryGovernanceInstrumentation.GatewayCompletedEventName,
-            GovernanceEmissionEventType.AuditResidue => OpenTelemetryGovernanceInstrumentation.AuditResidueCreatedEventName,
-            GovernanceEmissionEventType.AuditLifecycle => OpenTelemetryGovernanceInstrumentation.LifecycleRecordedEventName,
-            GovernanceEmissionEventType.Outbox => OpenTelemetryGovernanceInstrumentation.OutboxUpdatedEventName,
-            GovernanceEmissionEventType.ProviderEmission => IsFailureStatus(envelope.EmitterStatus)
-                ? OpenTelemetryGovernanceInstrumentation.EmissionFailedEventName
-                : OpenTelemetryGovernanceInstrumentation.EmissionDeliveredEventName,
-            _ => OpenTelemetryGovernanceInstrumentation.GenericGovernanceEventName
-        };
-    }
-
-    private static bool IsFailureStatus(string? status)
-    {
-        return status is not null
-            && (status.Contains("fail", StringComparison.OrdinalIgnoreCase)
-                || status.Contains("dead", StringComparison.OrdinalIgnoreCase)
-                || status.Contains("retry", StringComparison.OrdinalIgnoreCase));
     }
 }

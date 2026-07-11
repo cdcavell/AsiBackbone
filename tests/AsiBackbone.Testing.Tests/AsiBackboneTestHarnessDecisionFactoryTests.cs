@@ -55,7 +55,7 @@ public sealed class AsiBackboneTestHarnessDecisionFactoryTests
     [Fact]
     public void WithTelemetryPreservesDecisionOwnedTelemetry()
     {
-        GovernanceDecision source = GovernanceDecision.Deny(
+        var source = GovernanceDecision.Deny(
             "test.denied",
             "Denied by the test harness.",
             correlationId: "decision-correlation",

@@ -1,13 +1,11 @@
 # Production Wording and Stable Signing Boundaries
 
-This article defines documentation wording boundaries for the current stable `2.0.x` AsiBackbone package family. It keeps current behavior, host responsibilities, released signing surfaces, provider boundaries, and future-provider strategy clearly separated.
-
-Issue: #148, updated for #253, #306, and #347.
+This article defines documentation wording boundaries for the current stable `3.x` AsiBackbone package family. It keeps current behavior, host responsibilities, released signing surfaces, provider boundaries, and future-provider strategy clearly separated.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a governance spine for consequential software decision flow. It is not an AI model host, autonomous execution engine, key-management product, compliance certification product, immutable audit store, cloud governance platform, or operational guarantee by itself.
 
 > [!IMPORTANT]
-> Documentation should describe only implemented and released behavior as current behavior. The stable `2.0.x` family carries forward Core signing-ready and verification primitives, the local-development signing provider, and the managed-key adapter boundary. These surfaces still have important limits: local-development signing is for tests and samples, the managed-key package is an adapter boundary, and signing alone does not create production-grade audit guarantees without host-owned storage, key management, verification, monitoring, and retention controls.
+> Documentation should describe only implemented and released behavior as current behavior. The stable `3.x` family carries forward Core signing-ready and verification primitives, the local-development signing provider, and the managed-key adapter boundary. These surfaces still have important limits: local-development signing is for tests and samples, the managed-key package is an adapter boundary, and signing alone does not create production-grade audit guarantees without host-owned storage, key management, verification, monitoring, and retention controls.
 
 For sensitive security concerns, use the repository [Security Policy and Vulnerability Disclosure](https://github.com/cdcavell/AsiBackbone/blob/main/SECURITY.md). This article is a public wording guide, not a private reporting channel or certification statement.
 
@@ -27,7 +25,7 @@ For sensitive security concerns, use the repository [Security Policy and Vulnera
 
 ## Released signing categories
 
-Use these categories when documenting current `2.0.x` signing-related behavior.
+Use these categories when documenting current stable signing-related behavior.
 
 | Category | Current status | Safe wording |
 | --- | --- | --- |

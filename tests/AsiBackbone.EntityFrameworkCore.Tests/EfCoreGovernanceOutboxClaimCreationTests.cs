@@ -87,7 +87,7 @@ public sealed class EfCoreGovernanceOutboxClaimCreationTests
     [Fact]
     public void CreateClaimRejectsMissingClaimedTimestamp()
     {
-        GovernanceOutboxEntry entry = CreateClaimEntry(claimedUtc: null);
+        GovernanceOutboxEntry entry = CreateClaimEntry(includeClaimedUtc: false);
 
         AssertCreateClaimFails(entry, "claimed timestamp");
     }
@@ -98,7 +98,7 @@ public sealed class EfCoreGovernanceOutboxClaimCreationTests
     [Fact]
     public void CreateClaimRejectsMissingExpirationTimestamp()
     {
-        GovernanceOutboxEntry entry = CreateClaimEntry(claimExpiresUtc: null);
+        GovernanceOutboxEntry entry = CreateClaimEntry(includeClaimExpiresUtc: false);
 
         AssertCreateClaimFails(entry, "claim expiration timestamp");
     }
@@ -113,8 +113,8 @@ public sealed class EfCoreGovernanceOutboxClaimCreationTests
     private static GovernanceOutboxEntry CreateClaimEntry(
         string? claimOwner = "worker-a",
         string? claimToken = "claim-token",
-        DateTimeOffset? claimedUtc = default,
-        DateTimeOffset? claimExpiresUtc = default)
+        bool includeClaimedUtc = true,
+        bool includeClaimExpiresUtc = true)
     {
         DateTimeOffset timestamp = new(2026, 7, 11, 8, 0, 0, TimeSpan.Zero);
 
@@ -126,8 +126,8 @@ public sealed class EfCoreGovernanceOutboxClaimCreationTests
             timestamp,
             claimOwner: claimOwner,
             claimToken: claimToken,
-            claimedUtc: claimedUtc == default ? timestamp : claimedUtc,
-            claimExpiresUtc: claimExpiresUtc == default ? timestamp.AddMinutes(5) : claimExpiresUtc,
+            claimedUtc: includeClaimedUtc ? timestamp : null,
+            claimExpiresUtc: includeClaimExpiresUtc ? timestamp.AddMinutes(5) : null,
             claimAttemptCount: 1);
     }
 

@@ -1,0 +1,45 @@
+using AsiBackbone.Core.Emissions;
+
+namespace AsiBackbone.OpenTelemetry;
+
+/// <summary>
+/// Maps provider-neutral governance emission categories and provider statuses to stable OpenTelemetry event names.
+/// </summary>
+internal static class OpenTelemetryGovernanceEventNameMapper
+{
+    private static readonly IReadOnlyDictionary<GovernanceEmissionEventType, string> EventNames =
+        new Dictionary<GovernanceEmissionEventType, string>
+        {
+            [GovernanceEmissionEventType.Decision] = OpenTelemetryGovernanceInstrumentation.DecisionEvaluatedEventName,
+            [GovernanceEmissionEventType.Acknowledgment] = OpenTelemetryGovernanceInstrumentation.AcknowledgmentRecordedEventName,
+            [GovernanceEmissionEventType.CapabilityToken] = OpenTelemetryGovernanceInstrumentation.CapabilityTokenIssuedEventName,
+            [GovernanceEmissionEventType.Gateway] = OpenTelemetryGovernanceInstrumentation.GatewayCompletedEventName,
+            [GovernanceEmissionEventType.AuditResidue] = OpenTelemetryGovernanceInstrumentation.AuditResidueCreatedEventName,
+            [GovernanceEmissionEventType.AuditLifecycle] = OpenTelemetryGovernanceInstrumentation.LifecycleRecordedEventName,
+            [GovernanceEmissionEventType.Outbox] = OpenTelemetryGovernanceInstrumentation.OutboxUpdatedEventName
+        };
+
+    private static readonly string[] FailureStatusMarkers = ["fail", "dead", "retry"];
+
+    internal static string GetEventName(
+        GovernanceEmissionEventType eventType,
+        string? emitterStatus)
+    {
+        if (eventType is GovernanceEmissionEventType.ProviderEmission)
+        {
+            return IsFailureStatus(emitterStatus)
+                ? OpenTelemetryGovernanceInstrumentation.EmissionFailedEventName
+                : OpenTelemetryGovernanceInstrumentation.EmissionDeliveredEventName;
+        }
+
+        return EventNames.TryGetValue(eventType, out string? eventName)
+            ? eventName
+            : OpenTelemetryGovernanceInstrumentation.GenericGovernanceEventName;
+    }
+
+    private static bool IsFailureStatus(string? status)
+    {
+        return status is not null
+            && FailureStatusMarkers.Any(marker => status.Contains(marker, StringComparison.OrdinalIgnoreCase));
+    }
+}

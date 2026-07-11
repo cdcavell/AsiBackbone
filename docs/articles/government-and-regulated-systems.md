@@ -7,6 +7,8 @@ These environments often need to understand not only that an action happened, bu
 > [!IMPORTANT]
 > AsiBackbone does not guarantee compliance with any law, regulation, audit framework, security standard, records policy, or organizational policy. It provides governance primitives that can support an organization's auditability and accountability program when the host application and operating organization use them appropriately.
 
+For a versioned, non-certification crosswalk to named external references, see [External Governance, Regulatory, and Standards Mapping](external-framework-and-standards-mapping.md).
+
 ## Where this guidance applies
 
 This guidance may be useful for public-sector applications, education systems, benefits systems, case-management systems, enterprise administrative platforms, AI-agent gateways used in controlled environments, and systems where a reviewer may later need to reconstruct a consequential decision.
@@ -154,6 +156,7 @@ This makes AsiBackbone a practical governance component rather than a broad comp
 
 ## Related documentation
 
+- [External Governance, Regulatory, and Standards Mapping](external-framework-and-standards-mapping.md)
 - [Policy Evaluator Pipeline](policy-evaluator-pipeline.md)
 - [Adoption and Target Use Cases](use-cases.md)
 - [Framework-Neutral Integration and Host-Owned Persistence](integration-boundaries.md)

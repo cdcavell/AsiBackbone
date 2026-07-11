@@ -7,8 +7,8 @@ namespace AsiBackbone.OpenTelemetry;
 /// </summary>
 internal static class OpenTelemetryGovernanceEventNameMapper
 {
-    private static readonly IReadOnlyDictionary<GovernanceEmissionEventType, string> EventNames =
-        new Dictionary<GovernanceEmissionEventType, string>
+    private static readonly Dictionary<GovernanceEmissionEventType, string> EventNames =
+        new()
         {
             [GovernanceEmissionEventType.Decision] = OpenTelemetryGovernanceInstrumentation.DecisionEvaluatedEventName,
             [GovernanceEmissionEventType.Acknowledgment] = OpenTelemetryGovernanceInstrumentation.AcknowledgmentRecordedEventName,

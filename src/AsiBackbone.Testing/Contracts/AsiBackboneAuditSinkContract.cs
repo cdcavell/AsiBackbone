@@ -41,6 +41,10 @@ public abstract class AsiBackboneAuditSinkContract
         {
             throw;
         }
+        catch (AsiBackboneContractViolationException)
+        {
+            throw;
+        }
         catch (Exception exception)
         {
             throw new AsiBackboneContractViolationException(

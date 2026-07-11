@@ -45,7 +45,7 @@ public sealed class GovernanceArtifactProducerClassificationTests
     /// </summary>
     [Theory]
     [InlineData("new GovernanceDecision();")]
-    [InlineData("GovernanceDecision.Current;")]
+    [InlineData("_ = GovernanceDecision.Current;")]
     public async Task ObjectAndPropertyProducersReportDiagnostic(string statement)
     {
         ImmutableArray<Diagnostic> diagnostics = await GetAnalyzerDiagnosticsAsync(SourceWithBody(
@@ -98,9 +98,9 @@ public sealed class GovernanceArtifactProducerClassificationTests
     /// Verifies conditional and coalesce expressions report when either branch produces an artifact.
     /// </summary>
     [Theory]
-    [InlineData("flag ? GovernanceDecision.Create() : existing;")]
-    [InlineData("flag ? existing : GovernanceDecision.Create();")]
-    [InlineData("existing ?? GovernanceDecision.Create();")]
+    [InlineData("_ = flag ? GovernanceDecision.Create() : existing;")]
+    [InlineData("_ = flag ? existing : GovernanceDecision.Create();")]
+    [InlineData("_ = existing ?? GovernanceDecision.Create();")]
     public async Task CompositeProducerExpressionsReportDiagnostic(string statement)
     {
         ImmutableArray<Diagnostic> diagnostics = await GetAnalyzerDiagnosticsAsync(SourceWithBody(

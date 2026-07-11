@@ -1,14 +1,14 @@
 # Mutation Coverage Scope and Deferrals
 
-This page records the historical mutation-testing scope accepted for the `1.0.0` release boundary and the current `1.x` guidance after the `1.2.0` package-family release.
+This page records the historical mutation-testing scope accepted for the `1.0.0` release boundary and the current incremental expansion strategy for the stable package family.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. Mutation testing is used as a quality signal for implemented governance behavior; it is not a compliance certification and does not make the package family an execution engine, AI model host, robot controller, or production audit guarantee.
 
-## Current 1.x quality context
+## Current quality context
 
-The `1.2.0` stable package family carries forward the expanded Core behavior added in `1.1.x` and formalizes additive adoption, diagnostics, testing harness, template, sample, and documentation-alignment surfaces. The expanded Core surface includes provider-neutral governance emission contracts, durable outbox contracts, DLP/classification failure policy primitives, signing-ready metadata, canonical hashing/signing seams, verification-policy primitives, and capability grant hardening.
+The stable package family includes provider-neutral governance emission contracts, durable outbox contracts, DLP/classification failure policy primitives, signing-ready metadata, canonical hashing/signing seams, verification-policy primitives, capability grant hardening, adapter packages, and provider integrations.
 
-Post-`1.1.0` hardening work remains primarily xUnit line and branch coverage work for public Core behavior. It is not automatically a mutation-testing scope expansion. A line or branch coverage issue can improve confidence that public behavior is exercised while mutation scope remains targeted to high-value decision behavior.
+Most hardening work remains xUnit line and branch coverage work for public behavior. It is not automatically a mutation-testing scope expansion. A line or branch coverage issue can improve confidence that public behavior is exercised while mutation scope remains targeted to high-value decision behavior.
 
 Current coverage-hardening references:
 
@@ -18,8 +18,9 @@ Current coverage-hardening references:
 | [#247](https://github.com/cdcavell/AsiBackbone/issues/247) | Signing verifier and verification policy outcome branches. | xUnit line/branch coverage. |
 | [#248](https://github.com/cdcavell/AsiBackbone/issues/248) | Canonical payload builder branches for audit, lifecycle, emission, and outbox artifacts. | xUnit line/branch coverage. |
 | [#249](https://github.com/cdcavell/AsiBackbone/issues/249) | Governance emission and durable outbox domain branches. | xUnit line/branch coverage. |
-| [#250](https://github.com/cdcavell/AsiBackbone/issues/250) | DLP/classification policy branches. | xUnit line/branch coverage. |
+| [#250](https://github.com/cdcavell/AsiBackbone/issues/250) | DLP classification policy branches. | xUnit line/branch coverage. |
 | [#262](https://github.com/cdcavell/AsiBackbone/issues/262) | Core-specific branch coverage quality gate. | CI/reporting coverage gate. |
+| [#563](https://github.com/cdcavell/AsiBackbone/issues/563) | Narrow mutation targets for high-risk package boundaries. | Targeted mutation analysis. |
 
 Mutation scope should expand only when a narrow target adds meaningful assertion-strength signal beyond normal unit, integration, smoke, and release-validation gates.
 
@@ -29,30 +30,45 @@ The release-quality mutation reports are intentionally targeted.
 
 | Report | Current scope | Release interpretation |
 | --- | --- | --- |
-| Core mutation report | `AsiBackbone.Core` governance behavior exercised through the Core test project. The current high-value surface includes evaluator and policy-pipeline behavior, denial precedence, decision outcome selection, reason-code preservation, audit residue/ledger record boundaries, liability handshake request and acknowledgment behavior, and related null/default edge cases. | This is the primary mutation signal for the framework-neutral decision path. It should remain healthy through the `1.x` line, but it is not a claim that every Core type has mutation coverage. |
+| Core mutation report | `AsiBackbone.Core` governance behavior exercised through the Core test project. The current high-value surface includes evaluator and policy-pipeline behavior, denial precedence, decision outcome selection, reason-code preservation, audit residue/ledger record boundaries, liability handshake request and acknowledgment behavior, and related null/default edge cases. | This is the primary mutation signal for the framework-neutral decision path. It is not a claim that every Core type has mutation coverage. |
 | ASP.NET Core mutation report | Targeted acknowledgment challenge behavior in the ASP.NET Core adapter, including safe-default challenge shaping, correlation preservation, validation guards, response conversion, and conversion of host acknowledgment responses back into Core acknowledgment language. | This is a focused adapter signal, not a claim that every ASP.NET Core helper or result-mapping path is mutation-validated. |
+| Managed-key signing mutation report | The reserved diagnostic metadata classifier and its focused signing-path tests. The target protects the exact, ordinal reservation boundary that prevents caller or provider metadata from spoofing framework-owned signing diagnostics. | This is a security-boundary signal for diagnostic provenance. It does not mutation-test the entire managed-key provider, retries, remote service behavior, or key custody implementation. |
+| OpenTelemetry mutation report | The governance event-name mapper and its focused tests for stable event categories, provider failure markers, case-insensitive matching, and generic fallback behavior. | This is a provider-neutral observability contract signal. It does not claim mutation coverage of the complete OpenTelemetry emitter or the external telemetry pipeline. |
 
 The mutation reports are generated by the release/manual quality workflow and published separately under:
 
 - `mutation/core`
 - `mutation/aspnetcore`
+- `mutation/signing-managedkey`
+- `mutation/opentelemetry`
 
 Normal documentation publishing preserves already-deployed mutation reports so the Quality Reports page does not silently drop the heavy release-quality outputs.
 
+## Target selection for Issue #563
+
+The first package expansion deliberately selects two small, deterministic boundaries:
+
+- managed-key diagnostic metadata classification, because a changed exact-match or normalization rule could weaken the distinction between framework-owned diagnostics and untrusted metadata;
+- OpenTelemetry event-name mapping, because downstream dashboards and alerts depend on stable category and failure-name contracts.
+
+Both targets have exhaustive focused tests, small mutation surfaces, no network dependency, and behavior that is valuable beyond ordinary execution coverage. Their Stryker configurations use `break: 0` so the reports begin as inspectable assertion-strength signals rather than new release-blocking score gates. Thresholds can be calibrated after report review.
+
+EF Core outbox persistence remains outside this initial expansion. Although it is high risk, mutating the large provider-backed store as a single file would mix domain decisions with EF Core query translation, concurrency behavior, and database-provider noise. Existing relational integration, branch coverage, concurrency validation, external-consumer smoke tests, and stable-release validation remain the stronger current signals until a smaller provider-owned mutation seam is extracted or identified.
+
 ## Historical pre-`1.0.0` deferrals
 
-The following areas were intentionally not expanded into mutation validation before the stable `1.0.0` tag. They remain useful historical context, but they should not be read as the complete current `1.2.0` quality plan.
+The following areas were intentionally not expanded into mutation validation before the stable `1.0.0` tag. They remain useful historical context, but they should not be read as the complete current quality plan.
 
 | Deferred area | Current validation path | Deferral decision |
 | --- | --- | --- |
-| Correlation helpers outside the targeted acknowledgment challenge path | Unit tests, ASP.NET Core tests, and smoke validation where applicable. | Defer broader mutation targeting to `1.x` after the stable surface is tagged. |
+| Correlation helpers outside the targeted acknowledgment challenge path | Unit tests, ASP.NET Core tests, and smoke validation where applicable. | Defer broader mutation targeting until the surface can be isolated without broad framework noise. |
 | ASP.NET Core result mapping and HTTP result shaping | ASP.NET Core integration tests and external consumer HTTP smoke flows. | Defer until the result-mapping surface can be targeted without broad, noisy host-framework mutation output. |
 | Additional acknowledgment challenge adapters or host-specific challenge presentations | Default challenge service mutation tests plus adapter/unit coverage. | Defer provider/host-specific adapters until concrete adapters become stable package surfaces. |
-| EF Core persistence edge cases | EF Core tests, host-owned persistence documentation, release validation, and external consumer smoke checks. | Defer provider-specific mutation targets because the host owns `DbContext`, provider, migrations, schema lifecycle, and operational persistence behavior. |
-| In-memory storage edge cases | Unit tests and sample/local-validation coverage. | Defer unless a `1.x` defect shows mutation testing would add meaningful signal. |
+| EF Core persistence edge cases | EF Core tests, host-owned persistence documentation, concurrency validation, release validation, and external consumer smoke checks. | Defer broad provider mutation targets because the host owns `DbContext`, provider, migrations, schema lifecycle, and operational persistence behavior. |
+| In-memory storage edge cases | Unit tests and sample/local-validation coverage. | Defer unless a defect or extracted deterministic seam shows mutation testing would add meaningful signal. |
 | Other integration-layer adapters, release/support scripts, and generated package metadata validation scripts | CI, stable release validation, package validation, documentation build, and smoke workflows. | Keep under workflow/script validation unless a narrow mutation target becomes valuable. |
 
-These deferrals were accepted because they were visible, bounded, and backed by other release gates. Stable release documentation should not imply full-repository mutation validation.
+These deferrals are accepted because they are visible, bounded, and backed by other release gates. Stable release documentation should not imply full-repository mutation validation.
 
 ## Coverage targets versus mutation scope
 
@@ -62,7 +78,7 @@ Coverage and mutation serve different release-quality purposes:
 - Branch coverage shows whether decision paths were exercised.
 - Mutation testing shows whether assertions detect selected behavior changes.
 
-The current 75% repository-wide line gate and 90% Core branch gate are coverage gates. The Core and ASP.NET Core Stryker.NET reports are targeted mutation signals. Raising Core line or branch coverage toward 100% does not automatically mean every newly covered branch must enter mutation testing.
+The repository-wide line gate and Core branch gate are coverage gates. The published Stryker.NET reports are targeted mutation signals. Raising line or branch coverage does not automatically mean every newly covered branch must enter mutation testing.
 
 A good future mutation target should be:
 
@@ -70,21 +86,21 @@ A good future mutation target should be:
 - public-behavior focused;
 - narrow enough to avoid framework or provider noise;
 - valuable beyond existing branch coverage;
-- tied to decision correctness, auditability, safe failure handling, signing/verification trust behavior, or host-boundary preservation.
+- tied to decision correctness, auditability, safe failure handling, signing/verification trust behavior, observability contracts, or host-boundary preservation.
 
-## `1.x` follow-up priority
+## Follow-up priority
 
-Mutation expansion should happen incrementally in the `1.x` line:
+Mutation expansion should remain incremental:
 
 1. **P0 — Preserve the Core mutation signal.** Keep the framework-neutral evaluator, decision, audit, acknowledgment, and capability-boundary behavior mutation-tested when public APIs change.
-2. **P1 — Expand ASP.NET Core adapter mutation coverage.** Prioritize HTTP result mapping, correlation helper behavior, and acknowledgment challenge extension seams that have stable, deterministic test targets.
-3. **P2 — Add focused Core mutation targets only where useful.** Consider signing/verification, DLP/classification, governance emission, outbox, and canonical payload behavior only where mutation testing adds signal beyond branch coverage.
-4. **P3 — Add focused EF Core mutation targets where useful.** Prefer provider-neutral persistence edge cases around entity mapping, schema-version propagation, audit/handshake record construction, and failure behavior that the package actually owns.
-5. **P4 — Review storage and integration adapters.** Add mutation tests only where they catch meaningful behavior changes beyond existing unit, integration, smoke, and release-validation gates.
-6. **P5 — Keep deferrals explicit.** If a `1.x` release keeps a known mutation gap, document the gap in quality documentation, release notes, or a follow-up issue before publishing.
+2. **P1 — Preserve focused adapter/provider targets.** Keep acknowledgment challenge, managed-key diagnostic classification, and OpenTelemetry event mapping narrow and deterministic.
+3. **P2 — Expand ASP.NET Core mutation coverage where useful.** Prioritize HTTP result mapping and correlation behavior only after isolating stable seams.
+4. **P3 — Add focused Core targets only where useful.** Consider signing/verification, DLP/classification, governance emission, outbox, and canonical payload behavior only where mutation testing adds signal beyond branch coverage.
+5. **P4 — Add focused EF Core or storage targets where useful.** Prefer extracted provider-owned decisions over mutating large framework-heavy stores.
+6. **P5 — Keep deferrals explicit.** If a release keeps a known mutation gap, document the gap before publishing.
 
 ## Release decision
 
-Issue #178 remains a transparency record for mutation-scope deferral. It did not block `1.0.0` while the regular test suite, coverage publication, external consumer smoke tests, stable release validation, generated package validation, and documentation build remained passing.
+Issue #178 remains a transparency record for the original mutation-scope deferral. It did not block `1.0.0` while the regular test suite, coverage publication, external consumer smoke tests, stable release validation, generated package validation, and documentation build remained passing.
 
-For the post-`1.1.0` line, known-and-deferred remains acceptable when it is visible and backed by appropriate quality gates. Silent mutation-scope gaps are not acceptable.
+Known-and-deferred remains acceptable when it is visible and backed by appropriate quality gates. Silent mutation-scope gaps are not acceptable.

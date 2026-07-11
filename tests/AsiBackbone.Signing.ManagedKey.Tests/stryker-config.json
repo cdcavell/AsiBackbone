@@ -1,0 +1,24 @@
+{
+  "stryker-config": {
+    "solution": "../../AsiBackbone.slnx",
+    "project": "AsiBackbone.Signing.ManagedKey.csproj",
+    "target-framework": "net10.0",
+    "configuration": "Release",
+    "test-runner": "mtp",
+    "coverage-analysis": "off",
+    "test-case-filter": "FullyQualifiedName~ManagedKeyDiagnosticMetadataKeyClassifierTests",
+    "reporters": [
+      "html",
+      "cleartext"
+    ],
+    "report-file-name": "index",
+    "thresholds": {
+      "high": 80,
+      "low": 60,
+      "break": 0
+    },
+    "mutate": [
+      "ManagedKeyDiagnosticMetadataKeyClassifier.cs"
+    ]
+  }
+}

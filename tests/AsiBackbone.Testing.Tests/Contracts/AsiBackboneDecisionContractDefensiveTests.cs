@@ -1,5 +1,3 @@
-using System.Reflection;
-using System.Runtime.CompilerServices;
 using AsiBackbone.Core.Actors;
 using AsiBackbone.Core.Audit;
 using AsiBackbone.Core.Constraints;
@@ -15,10 +13,13 @@ namespace AsiBackbone.Testing.Tests.Contracts;
 /// </summary>
 public sealed class AsiBackboneDecisionContractDefensiveTests
 {
+    /// <summary>
+    /// Verifies that VerifySafeDecision throws for an unsupported outcome.
+    /// </summary>
     [Fact]
     public void VerifySafeDecisionRejectsUnsupportedOutcome()
     {
-        GovernanceDecision decision = GovernanceDecision.Allow();
+        var decision = GovernanceDecision.Allow();
         SetAutoProperty(decision, nameof(GovernanceDecision.Outcome), (GovernanceDecisionOutcome)int.MaxValue);
 
         AsiBackboneContractViolationException exception = Assert.Throws<AsiBackboneContractViolationException>(
@@ -27,6 +28,9 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
         Assert.Contains("unsupported outcome", exception.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Verifies that outcomes requiring reasons are rejected when none are provided.
+    /// </summary>
     [Theory]
     [InlineData(GovernanceDecisionOutcome.Warning)]
     [InlineData(GovernanceDecisionOutcome.Denied)]
@@ -35,7 +39,7 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
     [InlineData(GovernanceDecisionOutcome.EscalationRecommended)]
     public void VerifySafeDecisionRejectsReasonRequiredOutcomeWithoutReasons(GovernanceDecisionOutcome outcome)
     {
-        GovernanceDecision decision = GovernanceDecision.Allow();
+        var decision = GovernanceDecision.Allow();
         SetAutoProperty(decision, nameof(GovernanceDecision.Outcome), outcome);
 
         AsiBackboneContractViolationException exception = Assert.Throws<AsiBackboneContractViolationException>(
@@ -44,11 +48,14 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
         Assert.Contains("at least one reason code", exception.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Verifies that a null reason inside a decision is rejected.
+    /// </summary>
     [Fact]
     public void VerifySafeDecisionRejectsNullReason()
     {
-        GovernanceDecision decision = GovernanceDecision.Warning("contract.warning", "Warning.");
-        SetAutoProperty(decision, nameof(GovernanceDecision.Reasons), new OperationReason?[] { null! });
+        var decision = GovernanceDecision.Warning("contract.warning", "Warning.");
+        SetAutoProperty(decision, nameof(GovernanceDecision.Reasons), new OperationReason?[] { null });
 
         AsiBackboneContractViolationException exception = Assert.Throws<AsiBackboneContractViolationException>(
             () => AsiBackboneDecisionContract.VerifySafeDecision(decision, "null-reason decision"));
@@ -56,6 +63,9 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
         Assert.Contains("null reason", exception.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Verifies that blank reason codes or messages are rejected.
+    /// </summary>
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
@@ -64,7 +74,7 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
         OperationReason reason = CreateMalformedReason(
             blankCode ? " " : "contract.reason",
             blankCode ? "Reason message." : " ");
-        GovernanceDecision decision = GovernanceDecision.Warning("contract.warning", "Warning.");
+        var decision = GovernanceDecision.Warning("contract.warning", "Warning.");
         SetAutoProperty(decision, nameof(GovernanceDecision.Reasons), new[] { reason });
 
         AsiBackboneContractViolationException exception = Assert.Throws<AsiBackboneContractViolationException>(
@@ -73,6 +83,9 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
         Assert.Contains(blankCode ? "empty code" : "empty message", exception.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Verifies that invalid capability grants must not return Allow.
+    /// </summary>
     [Fact]
     public void VerifyInvalidCapabilityGrantRejectsAllow()
     {
@@ -82,11 +95,14 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
         Assert.Contains("must not return Allow", exception.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Verifies telemetry correlation ID preservation is enforced.
+    /// </summary>
     [Fact]
     public void VerifyTelemetryRejectsCorrelationMismatch()
     {
         var context = new AsiBackboneConstraintEvaluationContext(correlationId: "expected-correlation");
-        GovernanceDecision decision = GovernanceDecision.Allow(correlationId: "different-correlation");
+        var decision = GovernanceDecision.Allow(correlationId: "different-correlation");
 
         AsiBackboneContractViolationException exception = Assert.Throws<AsiBackboneContractViolationException>(
             () => AsiBackboneDecisionContract.VerifyTelemetryFromContext(decision, context));
@@ -94,6 +110,9 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
         Assert.Contains("preserve the supplied correlation ID", exception.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Verifies required policy telemetry presence is enforced when expected.
+    /// </summary>
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
@@ -109,17 +128,23 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
         Assert.Contains(requireVersion ? "policy version" : "policy hash", exception.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Verifies that absent optional telemetry does not cause failure.
+    /// </summary>
     [Fact]
     public void VerifyTelemetryAcceptsAbsentOptionalTelemetry()
     {
         var context = new AsiBackboneConstraintEvaluationContext();
-        GovernanceDecision decision = GovernanceDecision.Allow();
+        var decision = GovernanceDecision.Allow();
 
         GovernanceDecision verified = AsiBackboneDecisionContract.VerifyTelemetryFromContext(decision, context);
 
         Assert.Same(decision, verified);
     }
 
+    /// <summary>
+    /// Verifies that null context argument triggers ArgumentNullException.
+    /// </summary>
     [Fact]
     public void VerifyTelemetryRejectsNullContext()
     {
@@ -129,6 +154,9 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
                 null!));
     }
 
+    /// <summary>
+    /// Verifies that VerifyAuditResidue rejects null input.
+    /// </summary>
     [Fact]
     public void VerifyAuditResidueRejectsNull()
     {
@@ -138,6 +166,9 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
         Assert.Contains("must not be null", exception.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Verifies required string properties on audit residue are validated.
+    /// </summary>
     [Theory]
     [InlineData(nameof(TestAuditResidue.EventId), "event ID")]
     [InlineData(nameof(TestAuditResidue.ActorId), "actor ID")]
@@ -154,6 +185,9 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
         Assert.Contains(expectedMessagePart, exception.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Verifies audit residue rejects null reason-code collection.
+    /// </summary>
     [Fact]
     public void VerifyAuditResidueRejectsNullReasonCodes()
     {
@@ -165,6 +199,9 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
         Assert.Contains("reason-code collection", exception.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Verifies audit residue rejects blank reason codes.
+    /// </summary>
     [Fact]
     public void VerifyAuditResidueRejectsBlankReasonCode()
     {
@@ -176,6 +213,9 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
         Assert.Contains("empty reason code at index 1", exception.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Verifies audit residue rejects null metadata collection.
+    /// </summary>
     [Fact]
     public void VerifyAuditResidueRejectsNullMetadata()
     {
@@ -187,6 +227,9 @@ public sealed class AsiBackboneDecisionContractDefensiveTests
         Assert.Contains("metadata collection", exception.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Verifies VerifyAuditResidue returns the original valid residue instance.
+    /// </summary>
     [Fact]
     public void VerifyAuditResidueReturnsOriginalValidResidue()
     {

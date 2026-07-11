@@ -35,6 +35,7 @@ public sealed class GovernanceOutboxClaimReleaseTests
             TestContext.Current.CancellationToken);
 
         Assert.NotNull(released);
+        Assert.NotNull(repeated);
         Assert.False(released.HasClaim);
         Assert.Null(released.ClaimOwner);
         Assert.Null(released.ClaimToken);
@@ -128,6 +129,7 @@ public sealed class GovernanceOutboxClaimReleaseTests
             cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.NotNull(ownerResult);
+        Assert.NotNull(tokenResult);
         Assert.Same(ownerResult, tokenResult);
         Assert.True(tokenResult.HasClaim);
         Assert.Equal(activeClaim.WorkerId, tokenResult.ClaimOwner);
@@ -170,9 +172,38 @@ public sealed class GovernanceOutboxClaimReleaseTests
             terminalClaim,
             cancellationToken: TestContext.Current.CancellationToken);
 
+        Assert.NotNull(result);
         Assert.Same(terminal, result);
         Assert.True(result.IsDelivered);
         Assert.False(result.HasClaim);
+    }
+
+    /// <summary>
+    /// Verifies null claims and pre-canceled release operations are rejected before mutation.
+    /// </summary>
+    [Fact]
+    public async Task ReleaseClaimRejectsNullClaimAndCancellation()
+    {
+        var store = new InMemoryGovernanceOutboxStore();
+        DateTimeOffset claimedUtc = new(2026, 7, 11, 6, 0, 0, TimeSpan.Zero);
+        _ = await store.EnqueueAsync(CreateEnvelope("release-canceled"), TestContext.Current.CancellationToken);
+        GovernanceOutboxClaim claim = Assert.Single(await store.ClaimPendingAsync(
+            GovernanceOutboxClaimRequest.Create("worker-canceled", claimedUtc, TimeSpan.FromMinutes(5)),
+            TestContext.Current.CancellationToken));
+        using var source = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
+        source.Cancel();
+
+        _ = await Assert.ThrowsAsync<ArgumentNullException>(async () =>
+            await store.ReleaseClaimAsync(null!, cancellationToken: TestContext.Current.CancellationToken));
+        _ = await Assert.ThrowsAsync<OperationCanceledException>(async () =>
+            await store.ReleaseClaimAsync(claim, cancellationToken: source.Token));
+
+        GovernanceOutboxEntry? persisted = await store.FindByOutboxEntryIdAsync(
+            claim.OutboxEntryId,
+            TestContext.Current.CancellationToken);
+        Assert.NotNull(persisted);
+        Assert.True(persisted.HasClaim);
+        Assert.Equal(claim.ClaimToken, persisted.ClaimToken);
     }
 
     private static GovernanceEmissionEnvelope CreateEnvelope(string eventId)

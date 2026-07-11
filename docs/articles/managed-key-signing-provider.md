@@ -1,7 +1,5 @@
 # Managed-Key Signing Provider
 
-Issue: #210, updated for #253, #408, #465, and #512.
-
 This article documents the released `AsiBackbone.Signing.ManagedKey` provider package.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone provides provider-neutral signing, verification, and audit metadata seams. It does not provide immutable storage, external anchoring, blockchain, legal evidence guarantees, compliance certification, production key management, or tamper-evidence by itself.

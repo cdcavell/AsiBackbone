@@ -73,13 +73,9 @@ GET /sample/ledger/{correlationId}
 
 ## Relationship to NetCoreApplicationTemplate
 
-This sample covers issue #12.
+AsiBackbone provides the plain ASP.NET Core sample as the canonical integration baseline. `NetCoreApplicationTemplate` is documented separately as an optional external validation host for developers who want to test AsiBackbone against a fuller enterprise-style application baseline.
 
-`NetCoreApplicationTemplate` should remain a separate issue #11 documentation path. It is useful as a fuller external local validation app, but it is not required by AsiBackbone.
-
-Recommended boundary statement:
-
-> AsiBackbone provides a plain ASP.NET Core sample as the canonical integration baseline. NetCoreApplicationTemplate is documented separately as an optional external validation host for developers who want to test AsiBackbone against a fuller enterprise-style application baseline.
+The external validation path is useful for compatibility checks, but it is not required by AsiBackbone and does not change the package dependency direction.
 
 ## Boundary notes
 

@@ -1,19 +1,19 @@
 # API Baseline and Architecture Boundary Checks
 
-This page records the post-`1.0` guardrail plan for the stable AsiBackbone package line.
+This page documents the current guardrails used to protect the stable AsiBackbone package line.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. These checks protect the implemented package contracts; they do not turn AsiBackbone into an artificial superintelligence implementation, AI model host, robot controller, compliance product, signing system, or production audit guarantee.
+In this software project, **ASI** means **Accountable Systems Infrastructure**. These checks protect implemented package contracts; they do not turn AsiBackbone into an artificial superintelligence implementation, AI model host, robot controller, compliance product, signing system, or production audit guarantee.
 
 ## Purpose
 
-The initial `1.0.0` release uses a documented stable API review and package-boundary review as the release-blocking API control. Post-`1.0`, additional automation should make the same contract easier to protect during normal `1.x` development.
+The stable `3.x` package line uses documented API compatibility rules, package-boundary tests, release validation, and review of public surface changes. Additional automated API-drift tooling may be added later when it can be introduced without creating noisy or poorly tuned release gates.
 
 The guardrails have two different jobs:
 
-| Guardrail | Purpose | Current decision |
+| Guardrail | Purpose | Current posture |
 | --- | --- | --- |
-| Public API drift detection | Detect unreviewed changes to stable public types, members, namespaces, and extension points. | Explicitly deferred to a later `1.x` milestone until the preferred analyzer/package-validation approach is selected. |
-| Core architecture boundary checks | Fail if the Core package starts depending on integration or provider concerns such as ASP.NET Core, EF Core, cloud providers, robotics packages, or AI model packages. | Implemented as test coverage for the stable package project files. |
+| Public API drift detection | Detect unreviewed changes to stable public types, members, namespaces, and extension points. | Governed through SemVer review, release validation, and public-surface review; generated public API baseline files are not currently used. |
+| Core architecture boundary checks | Fail if the Core package starts depending on integration or provider concerns such as ASP.NET Core, EF Core, cloud providers, robotics packages, or AI model packages. | Implemented through test coverage for stable package project files. |
 
 ## Implemented boundary check
 
@@ -34,28 +34,28 @@ AsiBackbone.Core
   <- AsiBackbone.AspNetCore
 ```
 
-## Explicitly deferred API drift detection
+## Public API drift posture
 
-Generated public API baselines remain deferred for the first post-`1.0` follow-up pass.
+Generated public API baselines are not currently part of the repository guardrail set.
 
-Accepted deferral:
+The current posture is:
 
-- no `PublicAPI.Shipped.txt` / `PublicAPI.Unshipped.txt` files are added in this issue;
-- no analyzer-based public API compatibility gate is added in this issue;
-- no package-level binary compatibility tool is selected in this issue.
+- no `PublicAPI.Shipped.txt` / `PublicAPI.Unshipped.txt` files are maintained;
+- no analyzer-based public API compatibility gate is enabled;
+- no package-level binary compatibility tool is enforced as a release-blocking check.
 
-The deferral is intentional because the project should choose one stable process and avoid adding a noisy or poorly tuned baseline gate immediately after the first stable package publication.
+This is an intentional tooling decision, not permission to change public APIs casually. Public surface changes still require SemVer review, package-boundary review, documentation updates, and release validation.
 
-## Preferred `1.x` implementation path
+## Future automation criteria
 
-When public API drift detection is added, prefer an approach that:
+Any future public API drift tool should:
 
-1. runs in CI for pull requests touching stable package projects;
-2. records approved public API additions through the normal SemVer process;
-3. distinguishes additive minor-version APIs from breaking changes;
-4. documents how maintainers update the baseline after review;
-5. avoids treating samples, tests, docs, scripts, and non-public implementation details as stable API;
-6. keeps future preview/provider packages out of the stable Core compatibility gate until they are explicitly promoted.
+1. run in CI for pull requests touching stable package projects;
+2. record approved public API additions through the normal SemVer process;
+3. distinguish additive minor-version APIs from breaking changes;
+4. document how maintainers update the baseline after review;
+5. avoid treating samples, tests, docs, scripts, and non-public implementation details as stable API;
+6. keep preview, provider-specific, or experimental packages outside the stable Core compatibility gate until explicitly promoted.
 
 Candidate approaches include:
 
@@ -67,23 +67,19 @@ The project should select the smallest tool that reliably protects the stable pa
 
 ## SemVer alignment
 
-Public API drift checks should enforce the compatibility guidance in [API Compatibility and SemVer](api-compatibility-and-semver.md):
+Public API review follows the compatibility guidance in [API Compatibility and SemVer](api-compatibility-and-semver.md):
 
 - patch releases should not intentionally break stable public APIs;
 - minor releases may add compatible APIs, options, adapters, and behavior;
 - major releases are reserved for breaking changes;
 - preview/provider packages may follow their own stability path before being promoted.
 
-Architecture boundary checks should enforce the same package-boundary rule documented by the stable API review: Core remains framework-neutral, while ASP.NET Core, EF Core, storage, gateway, signing, cloud, robotics, and provider concerns stay in their own packages or host applications.
+Architecture boundary checks enforce the same package rule: Core remains framework-neutral, while ASP.NET Core, EF Core, storage, gateway, signing, cloud, robotics, and provider concerns stay in their own packages or host applications.
 
-## Release decision
+## Current decision
 
-Issue #177 is a post-`1.0` guardrail record.
+- Core dependency-boundary checks are implemented in the test suite.
+- Public API drift remains governed through SemVer, review, and release validation rather than generated baseline files.
+- Future automation should be added only when its maintenance and failure behavior are clear.
 
-For this issue:
-
-- Core dependency-boundary checks are implemented in the test suite;
-- public API drift detection is explicitly deferred to a later `1.x` milestone;
-- the deferral is compatible with the existing stable API review, release readiness checklist, and API compatibility documentation.
-
-The remaining API-baseline work should be prioritized before broad `1.x` API expansion, especially before adding new stable provider packages or new stable integration surfaces.
+Broad stable API expansion should continue to receive explicit compatibility review, especially when adding new provider packages or integration surfaces.

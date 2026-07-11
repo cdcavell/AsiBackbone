@@ -27,9 +27,9 @@ Warning and denial reason ordering must also remain stable. In fast-abort mode, 
 - `policy_evaluator.first_denial_with_decision_policy`;
 - `policy_evaluator.first_denial_reason_composition`.
 
-These scenarios complement the broader `AsiBackboneHotPathBenchmarks` suite by isolating the issue #484 review paths.
+These scenarios complement the broader `AsiBackboneHotPathBenchmarks` suite by isolating decision-policy visibility and reason-composition paths.
 
-`FirstDenialShortCircuitBenchmarks` adds the issue #498 follow-up scenarios for:
+`FirstDenialShortCircuitBenchmarks` adds follow-up scenarios for:
 
 - `policy_evaluator.first_denial_expensive_tail_full`;
 - `policy_evaluator.first_denial_expensive_tail_short_circuit`.
@@ -50,7 +50,7 @@ dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks.BenchmarkDotNe
 
 ## Code-change posture
 
-This issue is an incremental performance review, not a correctness bug. The first pass intentionally avoids changing public API and pins the sensitive behavior with regression tests before any deeper evaluator refactor.
+This review treats allocation work as incremental performance analysis rather than a correctness defect. The current posture avoids changing public API and pins sensitive behavior with regression tests before any deeper evaluator refactor.
 
 The current implementation already avoids constraint-result list allocation when no decision policy is registered. When a decision policy is registered, at least one evaluated result normally has to be retained for policy visibility, so a broad "remove the list" change would risk hiding information from the policy layer.
 
@@ -60,7 +60,7 @@ Future optimization work should compare benchmark results before and after any i
 - evaluated constraint-result visibility;
 - read-only result surfaces for policy consumers;
 - warning/denial reason ordering;
-- no public API changes unless a separate issue justifies them.
+- no public API changes unless separately justified.
 
 ## Regression coverage
 

@@ -59,9 +59,4 @@ That allows the AsiBackbone EF Core package to contribute model configuration wi
 
 ## Relationship to NetCoreApplicationTemplate
 
-Issue #12 is covered by this in-repository plain ASP.NET Core host sample.
-Issue #11 should remain a separate documentation path that explains how to validate AsiBackbone against a local `NetCoreApplicationTemplate` host.
-
-Recommended wording:
-
-> AsiBackbone provides a plain ASP.NET Core sample as the canonical integration baseline. NetCoreApplicationTemplate is documented separately as an optional external validation host for developers who want to test AsiBackbone against a fuller enterprise-style application baseline.
+AsiBackbone provides this plain ASP.NET Core sample as the canonical integration baseline. `NetCoreApplicationTemplate` is documented separately as an optional external validation host for developers who want to test AsiBackbone against a fuller enterprise-style application baseline.

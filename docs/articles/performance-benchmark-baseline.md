@@ -6,14 +6,14 @@ The benchmark baseline is measurement-first. It exists to help maintainers decid
 
 ## Benchmark entry points
 
-The repository now has two benchmark entry points:
+The repository has two benchmark entry points:
 
 | Project | Purpose |
 | --- | --- |
 | `benchmarks/AsiBackbone.Benchmarks.BenchmarkDotNet` | Primary optimization baseline with BenchmarkDotNet `MemoryDiagnoser` allocation output. |
 | `benchmarks/AsiBackbone.Benchmarks` | Lightweight manual runner for quick smoke checks and local trend checks. |
 
-Use the BenchmarkDotNet runner for optimization PR before/after evidence.
+Use the BenchmarkDotNet runner for optimization PR before/after evidence:
 
 ```powershell
 dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks.BenchmarkDotNet -- --filter "*"
@@ -28,19 +28,17 @@ dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks.BenchmarkDotNe
 # OperationResult success/failure reason normalization paths
 dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks.BenchmarkDotNet -- --filter "*OperationResult*"
 
-# Outbox drain batch 25, batch 100, and scoped batch 100
+# Outbox drain batch and scoped-drain paths
 dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks.BenchmarkDotNet -- --filter "*OutboxDrain*"
 
 # ASP.NET Core endpoint governance allow, warning, and deny paths
 dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks.BenchmarkDotNet -- --filter "*EndpointGovernance*"
 
-# Policy evaluation zero, simple, mixed, acknowledgment, escalation, and exception-as-denial paths
+# Policy evaluation and constraint exception paths
 dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks.BenchmarkDotNet -- --filter "*Policy*"
-
-# Constraint exception-as-denial path only
 dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks.BenchmarkDotNet -- --filter "*ConstraintException*"
 
-# Audit residue creation from a governance decision and builder metadata variants
+# Audit residue construction and metadata variants
 dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks.BenchmarkDotNet -- --filter "*AuditResidue*"
 ```
 
@@ -50,7 +48,7 @@ The manual runner remains useful for quick checks while editing:
 dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks -- --iterations 200000 --warmup 10000
 ```
 
-Use smaller iteration counts when checking the manual path locally after code changes:
+Use smaller iteration counts for local smoke checks:
 
 ```powershell
 dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks -- --iterations 1000 --warmup 100
@@ -64,142 +62,121 @@ The BenchmarkDotNet runner captures latency and allocation measurements for repr
 
 | Scenario | Purpose |
 | --- | --- |
-| `decision.allow_no_reasons` | Measures direct allowed decision construction with no reason collection. |
-| `decision.deny_one_reason` | Measures direct denied decision construction with one prebuilt reason. |
-| `decision.deny_multiple_reasons` | Measures direct denied decision construction and reason-code projection for multiple reasons. |
-| `decision.escalate_one_reason` | Measures direct escalation-recommended decision construction. |
-| `operation_result.success_no_reasons` | Measures successful `OperationResult` construction with no reasons or warnings. |
-| `operation_result.failure_one_reason` | Measures failed `OperationResult` construction with one prebuilt reason. |
-| `operation_result.failure_multiple_reasons` | Measures failed `OperationResult` reason normalization and reason-code projection with multiple reasons. |
-| `policy.zero_constraints` | Measures the empty policy-evaluation path. |
-| `policy.all_allow_8` | Measures a common all-allow path with several constraints. |
-| `policy.warning_and_denial_full` | Measures full aggregation with allow, warning, and denial results. |
-| `policy.first_denial_short_circuit` | Measures the optional first-denial fast-abort path from issue #345. |
-| `policy.acknowledgment_required` | Measures constraint evaluation followed by acknowledgment-required decision-policy composition. |
-| `policy.escalation_recommended` | Measures constraint evaluation followed by escalation-recommended decision-policy composition. |
-| `policy.constraint_exception_as_denial` | Measures the fail-closed constraint exception path that emits a synthetic denied decision. |
-| `endpoint_governance.policy_allow` | Measures `DefaultAsiBackboneEndpointGovernanceService.EvaluateAsync` with a host policy evaluator returning allow. |
-| `endpoint_governance.policy_warning` | Measures `DefaultAsiBackboneEndpointGovernanceService.EvaluateAsync` with a host policy evaluator returning warning. |
-| `endpoint_governance.policy_deny` | Measures `DefaultAsiBackboneEndpointGovernanceService.EvaluateAsync` with a host policy evaluator returning deny. |
-| `outbox_drain.small_batch_25` | Measures provider-neutral governance outbox drain processing for a small batch of 25 pending entries. |
-| `outbox_drain.medium_batch_100` | Measures provider-neutral governance outbox drain processing for a medium batch of 100 pending entries. |
-| `outbox_drain.scoped_medium_batch_100` | Measures DI scope creation, scoped `AsiBackboneGovernanceOutboxDrain` resolution, and medium-batch drain processing. |
-| `audit_residue.from_decision` | Measures decision receipt / audit residue creation from a governance decision. |
-| `audit_residue.builder_no_metadata` | Measures fluent audit residue builder construction with no metadata supplied. |
-| `audit_residue.builder_one_metadata` | Measures fluent audit residue builder construction with one metadata entry. |
-| `audit_residue.builder_many_metadata` | Measures fluent audit residue builder construction with multiple metadata entries. |
+| `decision.allow_no_reasons` | Direct allowed decision construction with no reason collection. |
+| `decision.deny_one_reason` | Denied decision construction with one prebuilt reason. |
+| `decision.deny_multiple_reasons` | Denied decision construction and reason-code projection for multiple reasons. |
+| `decision.escalate_one_reason` | Escalation-recommended decision construction. |
+| `operation_result.success_no_reasons` | Successful `OperationResult` construction with no reasons or warnings. |
+| `operation_result.failure_one_reason` | Failed `OperationResult` construction with one prebuilt reason. |
+| `operation_result.failure_multiple_reasons` | Failed result normalization and reason-code projection with multiple reasons. |
+| `policy.zero_constraints` | Empty policy-evaluation path. |
+| `policy.all_allow_8` | Common all-allow path with several constraints. |
+| `policy.warning_and_denial_full` | Full aggregation with allow, warning, and denial results. |
+| `policy.first_denial_short_circuit` | Optional first-denial fast-abort path. |
+| `policy.acknowledgment_required` | Constraint evaluation followed by acknowledgment-required decision-policy composition. |
+| `policy.escalation_recommended` | Constraint evaluation followed by escalation-recommended decision-policy composition. |
+| `policy.constraint_exception_as_denial` | Fail-closed constraint exception path that emits a synthetic denied decision. |
+| `endpoint_governance.policy_allow` | Endpoint governance with a host policy evaluator returning allow. |
+| `endpoint_governance.policy_warning` | Endpoint governance with a host policy evaluator returning warning. |
+| `endpoint_governance.policy_deny` | Endpoint governance with a host policy evaluator returning deny. |
+| `outbox_drain.small_batch_25` | Provider-neutral drain processing for 25 pending entries. |
+| `outbox_drain.medium_batch_100` | Provider-neutral drain processing for 100 pending entries. |
+| `outbox_drain.scoped_medium_batch_100` | DI scope creation, scoped drain resolution, and medium-batch processing. |
+| `audit_residue.from_decision` | Audit residue creation from a governance decision. |
+| `audit_residue.builder_no_metadata` | Fluent audit residue builder with no metadata. |
+| `audit_residue.builder_one_metadata` | Fluent builder with one metadata entry. |
+| `audit_residue.builder_many_metadata` | Fluent builder with multiple metadata entries. |
 
-The endpoint governance scenarios use test doubles for the host policy evaluator so the measured path stays focused on the ASP.NET Core adapter, metadata descriptor, request-correlation resolution, decision mapping, and safe allow/block result handling.
+The endpoint-governance scenarios use test doubles for the host policy evaluator so the measured path stays focused on the ASP.NET Core adapter, metadata descriptor, request-correlation resolution, decision mapping, and safe allow/block result handling.
 
-The outbox drain scenarios use provider-neutral fake outbox storage and the no-op governance emitter. They are designed to measure framework drain behavior and allocations without adding provider SDK, network, database, or exporter variability.
+The outbox-drain scenarios use provider-neutral fake storage and a no-op emitter. They measure framework drain behavior and allocations without provider SDK, network, database, or exporter variability.
 
 ## Exception-as-denial benchmark interpretation
 
-`policy.constraint_exception_as_denial` exists to measure fail-closed evaluator behavior when a constraint unexpectedly throws and `TreatConstraintExceptionAsDenial` converts that fault into a synthetic denied governance decision.
+`policy.constraint_exception_as_denial` measures fail-closed evaluator behavior when a constraint unexpectedly throws and `TreatConstraintExceptionAsDenial` converts that fault into a synthetic denied governance decision.
 
-Do not interpret this benchmark as a recommended denial authoring pattern. Expected policy blocks should return `ConstraintEvaluationResult.Deny(...)` from the constraint. Throwing an exception only to deny a request forces the evaluator through the abnormal failure path, makes the denial less semantically precise, and can add avoidable latency and allocation pressure compared with ordinary returned denial results.
+Do not interpret this benchmark as a recommended denial-authoring pattern. Expected policy blocks should return `ConstraintEvaluationResult.Deny(...)`. Throwing an exception only to deny a request forces the evaluator through an abnormal failure path and can add avoidable latency and allocation pressure.
 
-Use the benchmark to verify that the safety boundary remains bounded and observable, not to justify exceptions as control flow. If this path becomes hot in a consumer workload, the first remediation should be to fix the constraint so expected denials are returned explicitly. Optimize the framework path only after profiling shows genuine unexpected constraint faults are frequent enough to matter and cannot be addressed at the host-owned constraint layer.
+Use the benchmark to verify that the safety boundary remains bounded and observable. When this path becomes hot in a consumer workload, first fix the constraint so expected denials are returned explicitly. Optimize the framework path only after profiling demonstrates that genuine unexpected faults are frequent enough to matter.
 
 ## Output fields
 
 BenchmarkDotNet output includes timing statistics and memory columns. With `MemoryDiagnoser`, the important columns are:
 
-- `Mean`: average time per operation for the selected benchmark job;
-- `Median`: midpoint time value when present in the generated report or artifacts;
+- `Mean`: average time per operation;
+- `Median`: midpoint time value when present;
 - `Gen0`: generation 0 collection activity normalized by BenchmarkDotNet;
 - `Allocated`: allocated bytes per operation.
 
-The lightweight manual runner prints a Markdown table containing:
-
-- scenario name;
-- scenario description;
-- measurement iterations;
-- mean nanoseconds per operation;
-- allocated bytes per operation;
-- total allocated bytes;
-- Gen0 collection count;
-- elapsed milliseconds.
-
-Both runners also print runtime, operating-system, process-architecture, warmup, and measurement context so results can be interpreted later.
+The lightweight manual runner prints scenario name, description, iterations, mean nanoseconds, allocated bytes, total allocated bytes, Gen0 count, and elapsed milliseconds. Both runners include runtime, operating-system, architecture, warmup, and measurement context.
 
 ## Interpretation guidance
 
-Benchmark results are for trend detection, not absolute guarantees.
-
-Use results only when comparing:
+Benchmark results are for trend detection, not absolute guarantees. Compare results only across:
 
 - the same machine or comparable CI runner type;
 - the same build configuration, preferably Release;
 - the same .NET runtime family;
 - comparable repository revisions;
-- comparable benchmark filters, iteration settings, and warmup settings.
+- comparable filters, iteration settings, and warmup settings.
 
-Prefer at least three repeated BenchmarkDotNet runs before deciding that a small delta is meaningful. When results are noisy, use the median or repeated-run direction instead of a single run's best or worst number.
+Prefer at least three repeated BenchmarkDotNet runs before treating a small delta as meaningful. Use median or repeated-run direction when results are noisy.
 
-Do not use these numbers to promise consumer latency. Host applications should run their own benchmarks with their actual constraints, decision policies, persistence, middleware, logging, telemetry emitters, durable stores, network providers, and deployment topology.
+Do not use these numbers to promise consumer latency. Host applications should benchmark their actual constraints, decision policies, persistence, middleware, logging, telemetry emitters, durable stores, network providers, and deployment topology.
 
-Outbox drain benchmarks are especially sensitive to host-owned infrastructure. Real durable stores, provider SDKs, exporters, retry policies, batch sizes, row claiming, and network conditions can dominate drain runtime even if the provider-neutral drain path is lightweight.
+Outbox drain benchmarks are especially sensitive to host-owned infrastructure. Real durable stores, provider SDKs, exporters, retry policies, batch sizes, row claiming, and network conditions can dominate runtime.
 
 ## Threat-contributor exception metadata allocation
 
-Issue #486 reviewed the metadata dictionary allocated when a threat model contributor throws and `TreatThreatContributorExceptionAsDenial` converts that failure into a denied governance decision. This remains a profiling-gated failure path, not a routine evaluator hot path.
+The metadata dictionary allocated when a threat-model contributor throws remains a profiling-gated failure path, not a routine evaluator hot path.
 
-No code optimization is warranted without evidence that threat-contributor exceptions are frequent enough to dominate incident traffic. The current allocation is intentionally local to the single denied decision so the evaluator does not introduce shared mutable metadata, pooling complexity, or public API churn for an exceptional path.
+No optimization is warranted without evidence that contributor exceptions dominate incident traffic. The allocation is intentionally local to the denied decision so the evaluator avoids shared mutable metadata, pooling complexity, and public API churn for an exceptional path.
 
-Preserve the current safety boundary when revisiting this area:
+Preserve these boundaries when revisiting the area:
 
 - keep the public reason code and message configured by evaluator options;
 - include only bounded diagnostic metadata such as contributor identity and exception type;
 - do not copy exception messages, stack traces, secrets, raw payloads, prompts, protected content, or user input into decisions;
-- preserve logger behavior for operational diagnostics, where the exception object is available to the logging pipeline;
+- preserve logger behavior for operational diagnostics;
 - prefer fixing, disabling, circuit-breaking, or isolating unstable host-owned contributors before optimizing framework metadata construction.
 
-Reopen optimization work only after BenchmarkDotNet output, `dotnet-trace`, `dotnet-counters`, `dotnet-gcdump`, or production-equivalent host profiling shows this exception path is materially hot for a target workload. If that happens, add a focused benchmark or trace evidence first, then consider a low-allocation representation only if `OperationReason` and the decision model can support it without public API churn.
+Revisit optimization only after BenchmarkDotNet output, `dotnet-trace`, `dotnet-counters`, `dotnet-gcdump`, or production-equivalent profiling shows the path is materially hot.
 
 ## Allocation profiling plan
 
-Start with BenchmarkDotNet `MemoryDiagnoser` output. If `Allocated`, `Gen0`, or run-to-run variance points to a hot scenario, move to process-level profiling.
+Start with BenchmarkDotNet `MemoryDiagnoser` output. When `Allocated`, `Gen0`, or run-to-run variance identifies a hot scenario, move to process-level profiling.
 
 ### dotnet-counters
-
-Use counters for a live view of allocation rate and GC activity while a focused benchmark is running:
 
 ```powershell
 dotnet-counters monitor --process-id <PID> System.Runtime
 ```
 
-Watch `alloc-rate`, `gen-0-gc-count`, `gc-heap-size`, and `% time in GC` while running focused filters such as `*OutboxDrain*` or `*EndpointGovernance*`.
+Watch `alloc-rate`, `gen-0-gc-count`, `gc-heap-size`, and `% time in GC` while running focused benchmark filters.
 
 ### dotnet-trace
-
-Use trace collection when allocation pressure needs call-stack evidence:
 
 ```powershell
 dotnet-trace collect --process-id <PID> --providers Microsoft-Windows-DotNETRuntime:0x1C000080018:5 --output artifacts/perf/asi-backbone-hotpath.nettrace
 ```
 
-Open the `.nettrace` file in Visual Studio, PerfView, or another trace viewer and inspect allocation stacks for the focused benchmark process.
+Inspect the trace in Visual Studio, PerfView, or another trace viewer.
 
 ### dotnet-gcdump
-
-Use a GC dump when the question is what object types dominate the managed heap during a long or focused run:
 
 ```powershell
 dotnet-gcdump collect --process-id <PID> --output artifacts/perf/asi-backbone-hotpath.gcdump
 ```
 
-Then inspect the dump with Visual Studio or another GC dump viewer.
+Use a GC dump to identify object types dominating the managed heap during a focused run.
 
 ### PerfView
-
-On Windows, PerfView can collect GC allocation stacks for deeper investigation:
 
 ```powershell
 PerfView.exe /AcceptEula /NoGui /Collect:GCCollectOnly /MaxCollectSec:120 /DataFile:artifacts/perf/asi-backbone-hotpath.etl.zip collect
 ```
 
-Use PerfView when BenchmarkDotNet allocation output identifies a scenario but `dotnet-trace` does not give enough allocation-stack detail.
+Use PerfView when BenchmarkDotNet identifies a scenario but lighter tools do not provide enough allocation-stack detail.
 
 ## Optimization decision rule
 
@@ -208,22 +185,14 @@ Before adding caching, pooling, shared mutable state, or specialized fast paths,
 1. the scenario under pressure;
 2. the before/after latency and allocation deltas;
 3. whether the change improves common paths without making auditability or host-owned boundaries harder to reason about;
-4. whether an existing option, such as `ShortCircuitOnFirstDenial`, is sufficient for the target workload;
-5. whether the measured bottleneck is framework orchestration or host-owned I/O, storage, telemetry, or provider behavior.
+4. whether an existing option, such as `ShortCircuitOnFirstDenial`, is sufficient;
+5. whether the bottleneck is framework orchestration or host-owned I/O, storage, telemetry, or provider behavior.
 
 This keeps optimization work evidence-driven and avoids adding complexity before the hot path is measured.
-
-## Related issues
-
-- Issue #345 introduced optional first-denial short-circuit behavior.
-- Issue #362 introduced the initial benchmark baseline.
-- Issue #383 extended the baseline to endpoint governance and outbox drain paths.
-- Issue #394 added BenchmarkDotNet allocation baselines and this profiling plan.
-- Issue #456 extended BenchmarkDotNet coverage for decision/result normalization, audit residue builder metadata paths, and exception-as-denial evaluation.
-- Issue #486 documented the profiling-gated decision to leave threat-contributor exception metadata allocation local to the exceptional denial path.
 
 ## Related documentation
 
 - [Policy Evaluator Pipeline](policy-evaluator-pipeline.md)
+- [Policy Evaluator Allocation Review](policy-evaluator-allocation-review.md)
 - [Constraint Exception Policy](constraint-exception-policy.md)
 - [ASP.NET Core Endpoint Governance](aspnetcore-endpoint-governance.md)

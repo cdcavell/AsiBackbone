@@ -217,12 +217,3 @@ For a minimal validation, the response should prove these fields are flowing:
 The NetCoreApplicationTemplate validation endpoint should remain local-only or development-only unless the consuming application intentionally exposes a supported diagnostics path.
 
 Do not ship a temporary validation endpoint in production without host-owned authorization, logging, rate limiting, and exposure review.
-
-## Acceptance boundary
-
-This issue is complete when developers can understand how to validate AsiBackbone inside a NetCoreApplicationTemplate-generated host while preserving these boundaries:
-
-- NetCoreApplicationTemplate is optional.
-- AsiBackbone does not depend on NetCoreApplicationTemplate.
-- The plain ASP.NET Core sample remains the canonical in-repository sample.
-- NetCoreApplicationTemplate is an external local validation app, not a required parent framework.

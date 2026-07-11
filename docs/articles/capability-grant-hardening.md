@@ -1,7 +1,5 @@
 # Capability Grant Hardening
 
-Issue: #225. Related release-hardening: #506.
-
 This article documents provider-neutral capability grant validation, proof handling, and bounded-use checks for AsiBackbone.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone can model short-lived, scoped grants for governed execution, but it does not replace host authentication, host authorization, resource authorization, or external execution controls.

@@ -108,13 +108,13 @@ public sealed class GovernanceOutboxClaimReleaseTests
         GovernanceOutboxClaim activeClaim = Assert.Single(await store.ClaimPendingAsync(
             GovernanceOutboxClaimRequest.Create("worker-a", claimedUtc, TimeSpan.FromMinutes(5)),
             TestContext.Current.CancellationToken));
-        GovernanceOutboxClaim wrongOwner = GovernanceOutboxClaim.Create(
+        var wrongOwner = GovernanceOutboxClaim.Create(
             activeClaim.Entry,
             "worker-b",
             activeClaim.ClaimToken,
             activeClaim.ClaimedUtc,
             activeClaim.ClaimExpiresUtc);
-        GovernanceOutboxClaim wrongToken = GovernanceOutboxClaim.Create(
+        var wrongToken = GovernanceOutboxClaim.Create(
             activeClaim.Entry,
             activeClaim.WorkerId,
             "different-token",
@@ -148,7 +148,7 @@ public sealed class GovernanceOutboxClaimReleaseTests
             CreateEnvelope("release-missing"),
             "missing-entry",
             claimedUtc).MarkClaimed("worker-missing", "missing-token", claimedUtc, TimeSpan.FromMinutes(5));
-        GovernanceOutboxClaim missingClaim = GovernanceOutboxClaim.Create(
+        var missingClaim = GovernanceOutboxClaim.Create(
             missingEntry,
             "worker-missing",
             "missing-token",

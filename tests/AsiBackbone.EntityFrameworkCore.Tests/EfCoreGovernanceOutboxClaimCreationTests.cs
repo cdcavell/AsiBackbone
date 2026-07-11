@@ -32,7 +32,7 @@ public sealed class EfCoreGovernanceOutboxClaimCreationTests
         var store = new EfCoreGovernanceOutboxStore(context);
         DateTimeOffset claimedUtc = new(2026, 7, 11, 7, 0, 0, TimeSpan.Zero);
         DateTimeOffset offsetClaimedUtc = claimedUtc.ToOffset(TimeSpan.FromHours(-5));
-        GovernanceOutboxEntry entry = GovernanceOutboxEntry.Create(
+        var entry = GovernanceOutboxEntry.Create(
             CreateEnvelope("claim-create-success"),
             "claim-create-entry",
             claimedUtc.AddMinutes(-1));

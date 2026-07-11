@@ -1,23 +1,23 @@
 # Privacy, Metadata, and Signing Boundaries
 
-This article documents the current `1.2.x` stable boundary for metadata privacy, identifier handling, signing-ready fields, released signing providers, host responsibilities, and future provider work.
+This article documents the current stable `3.x` boundary for metadata privacy, identifier handling, signing-ready fields, released signing providers, host responsibilities, and future provider work.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone provides governance-oriented software building blocks. It does not provide legal, compliance, privacy, security, or cryptographic guarantees by itself.
 
 > [!IMPORTANT]
-> The current `1.2.x` package family includes signing-ready Core metadata, released local-development signing, and a managed-key adapter boundary. These surfaces do not provide production key custody, tamper-evidence, immutable storage, privacy classification, legal non-repudiation, or compliance certification by themselves.
+> The stable `3.x` package family includes metadata budget and sanitation primitives, signing-ready Core metadata, released local-development signing, and a managed-key adapter boundary. These surfaces do not provide production key custody, tamper-evidence, immutable storage, automatic privacy classification, legal non-repudiation, or compliance certification by themselves.
 
-## Current `1.2.x` boundary summary
+## Current stable boundary summary
 
-The current stable package family focuses on explicit governance records, host-owned integration seams, released local-development signing, managed-key adapter boundaries, provider-neutral emission, and optional provider projection.
+The stable package family focuses on explicit governance records, host-owned integration seams, metadata minimization and sanitation boundaries, released local-development signing, managed-key adapter boundaries, provider-neutral emission, and optional provider projection.
 
-| Area | Current `1.2.x` behavior | Still not provided by default |
+| Area | Current stable behavior | Still not provided by default |
 | --- | --- | --- |
-| Metadata | Host-provided dictionaries and values can flow into contexts, decisions, audit residue, and ledger records. Optional metadata budget helpers can normalize and validate count, key length, value length, estimated serialized size, and reserved key fragments. | Automatic classification, redaction, encryption, tokenization, privacy scanning, or proof that bounded metadata is non-sensitive. |
+| Metadata | Host-provided dictionaries and values can flow into contexts, decisions, audit residue, and ledger records. Optional budget and sanitation helpers can normalize, classify through host-owned classifiers, redact, drop, warn, deny, and validate shape limits and reserved key fragments. | Automatic domain-specific classification, encryption, tokenization, external DLP scanning, or proof that sanitized metadata is non-sensitive. |
 | Identifiers | Correlation IDs, trace IDs, event IDs, record IDs, actor IDs, policy versions, and policy hashes are available for linking records. | Automatic pseudonymization, identity-proofing, cross-system identity governance, or secret handling. |
 | Signing and verification boundaries | Core records can carry signing-ready metadata and canonical hashing inputs. Released local-development signing and managed-key adapter packages support test/sample signing and host-owned managed-key integration. | Production key custody, automatic key rotation, concrete Azure Key Vault/HSM/KMS implementation, immutable storage, tamper-evidence, legal non-repudiation, or compliance guarantees. |
 | Persistence | EF Core integration supports host-owned persistence through the host application database. | Package-owned database lifecycle, retention policy, encryption-at-rest enforcement, backup policy, or immutable storage. |
-| Audit | Audit residue and ledger records make decision flow easier to inspect. | Tamper-evidence, regulatory audit certification, legal evidence guarantees, or automated compliance approval. |
+| Audit | Audit residue, ledger records, and provider-neutral integrity seams make decision flow easier to inspect. | Regulatory audit certification, legal evidence guarantees, automated compliance approval, or production tamper-evidence by default. |
 
 ## Metadata privacy boundary
 
@@ -57,10 +57,12 @@ The package exposes optional helper APIs under `AsiBackbone.Core.Metadata`:
 - `GovernanceMetadataBudget` defines host-owned limits.
 - `GovernanceMetadataBudget.Recommended` uses 32 entries, 64-character keys, 512-character values, and an 8,192-byte estimated serialized-size limit.
 - `GovernanceMetadataBudgetValidator` trims metadata, drops blank keys, preserves ordinal key comparison, reports budget violations, and flags reserved or discouraged key fragments.
+- `IGovernanceMetadataClassifier` lets hosts add provider-neutral classification logic.
+- `DefaultGovernanceMetadataSanitizer` coordinates classification, redaction, dropping, denial, and post-sanitation budget validation.
 
 Recommended reserved or discouraged key fragments include secrets, credentials, passwords, API keys, access tokens, refresh tokens, bearer/authorization headers, private keys, connection strings, SSNs, and social-security identifiers. Store opaque references, classification codes, hashes, or provider record IDs instead.
 
-A passing budget check is not a privacy guarantee. Budget validation only confirms shape and key-pattern guidance; it does not classify, redact, encrypt, tokenize, or certify values.
+A passing budget or sanitation result is not a privacy guarantee. These helpers enforce configured shape and policy behavior; they do not independently discover every sensitive value, encrypt data, tokenize content, or certify compliance.
 
 ```csharp
 using AsiBackbone.Core.Metadata;
@@ -74,6 +76,8 @@ if (!budgetResult.IsValid)
 
 metadata = budgetResult.NormalizedMetadata;
 ```
+
+See [Governance Metadata Sanitization](governance-metadata-sanitization.md) for the classifier and sanitation pipeline.
 
 ## Canonical signing metadata boundary
 
@@ -114,7 +118,7 @@ Host guidance:
 
 ## Signing-ready, local-development signing, and managed-key boundaries
 
-The current `1.2.x` package family separates signing-related behavior into explicit boundaries:
+The stable package family separates signing-related behavior into explicit boundaries:
 
 - Core records may carry signing-ready metadata and canonical hashing inputs.
 - `AsiBackbone.Signing.LocalDevelopment` provides local/test/sample signing and verification proof paths.
@@ -166,7 +170,7 @@ See [EF Core Host Ownership and Migrations](ef-core-host-ownership-and-migration
 
 ## ASP.NET Core boundary
 
-`AsiBackbone.AspNetCore` provides thin host adapters for request correlation, actor context, HTTP result mapping, and acknowledgment challenge helpers.
+`AsiBackbone.AspNetCore` provides thin host adapters for request correlation, actor context, HTTP result mapping, acknowledgment challenge helpers, endpoint governance, and hosted outbox drain integration.
 
 The ASP.NET Core package does not own:
 
@@ -185,11 +189,11 @@ The host must decide which requests are allowed to reach AsiBackbone and which a
 
 ## Released, host-owned, and future provider work
 
-The current `1.2.x` stable package family includes released provider or provider-adjacent surfaces for OpenTelemetry governance emission, local-development signing, and managed-key signing adapter boundaries.
+The stable `3.x` package family includes released provider or provider-adjacent surfaces for OpenTelemetry governance emission, local-development signing, and managed-key signing adapter boundaries.
 
 Other provider areas remain host-owned, strategy-only, design-only, sample-only, preview, or future-provider work unless a later stable release explicitly ships them.
 
-Future provider documentation should state whether a provider is:
+Provider documentation should state whether a provider is:
 
 - stable;
 - preview;
@@ -199,22 +203,23 @@ Future provider documentation should state whether a provider is:
 
 ## Release wording checklist
 
-Use this checklist when preparing current stable release notes or documentation:
+Use this checklist when preparing stable release notes or documentation:
 
 - State that AsiBackbone provides Accountable Systems Infrastructure, not artificial superintelligence.
 - State that metadata is host-owned.
 - State that hosts must classify, minimize, redact, or omit sensitive metadata before passing it into package APIs.
-- State that metadata budgets are optional shape guardrails, not DLP, privacy classification, or compliance certification.
+- State that metadata budgets and sanitation helpers are policy guardrails, not automatic DLP, privacy certification, or compliance certification.
 - State that canonical signing payload metadata remains allow-list only.
 - State that signing-ready fields, local-development signing, and managed-key adapter boundaries are available where released, but production key custody, tamper-evidence, immutability, legal non-repudiation, and compliance certification remain host-owned.
-- Avoid claims of tamper-evidence unless signing or immutable storage is actually implemented and documented.
+- Avoid claims of tamper-evidence unless signing, verification, durable storage, and operational controls are actually implemented and documented.
 - Avoid claims of regulatory compliance or legal non-repudiation.
-- Keep provider, cloud, signing, outbox, and gateway behavior separate from the current stable package boundary unless explicitly released as stable.
+- Keep provider, cloud, signing, outbox, and gateway behavior separate from the stable package boundary unless explicitly released as stable.
 
 ## Related documentation
 
-- [1.2.1 Release Notes](release-notes-121.md)
+- [3.0.0 Release Notes](release-notes-300.md)
 - [Production Wording and Stable Signing Boundaries](production-wording-and-alpha-limitations.md)
+- [Governance Metadata Sanitization](governance-metadata-sanitization.md)
 - [Signing-Ready Receipts and Key Handling](signing-ready-receipts-and-key-handling.md)
 - [Signing Provider Package Boundary](signing-provider-package-boundary.md)
 - [Managed-Key Signing Provider](managed-key-signing-provider.md)
@@ -223,4 +228,3 @@ Use this checklist when preparing current stable release notes or documentation:
 - [Schema Versioning](schema-versioning.md)
 - [EF Core Host Ownership and Migrations](ef-core-host-ownership-and-migrations.md)
 - [ASP.NET Core Integration Boundary](aspnetcore-integration-boundary.md)
-- [Historical 1.0.0 Quickstart](quickstart-100.md)

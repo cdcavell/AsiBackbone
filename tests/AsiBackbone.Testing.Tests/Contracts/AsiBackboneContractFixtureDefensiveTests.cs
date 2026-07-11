@@ -186,24 +186,40 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
     [Fact]
     public async Task ConstraintRejectsNullAndBlankReasonMembers()
     {
+        ConstraintEvaluationResult nullReasonResult = CreateConstraintResult(
+            ConstraintEvaluationOutcome.Denied,
+            new[]
+            {
+                OperationReason.Create("contract.reason", "Reason.")
+            });
+
+        SetAutoProperty(
+            nullReasonResult,
+            nameof(ConstraintEvaluationResult.Reasons),
+            new OperationReason?[] { null });
+
         var nullReason = new ConstraintContract(
-            new MalformedConstraint(CreateConstraintResult(ConstraintEvaluationOutcome.Denied, new OperationReason[] { null! })),
+            new MalformedConstraint(nullReasonResult),
             CreateContext());
+
         Assert.Contains(
             "null reason",
             (await Assert.ThrowsAsync<AsiBackboneContractViolationException>(
-                async () => await nullReason.VerifyConstraintReturnsSafeResultAsync(TestContext.Current.CancellationToken))).Message,
+                async () => await nullReason.VerifyConstraintReturnsSafeResultAsync(
+                    TestContext.Current.CancellationToken))).Message,
             StringComparison.Ordinal);
 
         var blankCode = new ConstraintContract(
             new MalformedConstraint(CreateConstraintResult(
-            ConstraintEvaluationOutcome.Warning,
+                ConstraintEvaluationOutcome.Warning,
                 new[] { CreateMalformedReason(" ", "Message") })),
             CreateContext());
+
         Assert.Contains(
             "empty reason code",
             (await Assert.ThrowsAsync<AsiBackboneContractViolationException>(
-                async () => await blankCode.VerifyConstraintReturnsSafeResultAsync(TestContext.Current.CancellationToken))).Message,
+                async () => await blankCode.VerifyConstraintReturnsSafeResultAsync(
+                    TestContext.Current.CancellationToken))).Message,
             StringComparison.Ordinal);
 
         var blankMessage = new ConstraintContract(
@@ -211,10 +227,12 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
                 ConstraintEvaluationOutcome.Warning,
                 new[] { CreateMalformedReason("contract.reason", " ") })),
             CreateContext());
+
         Assert.Contains(
             "empty reason message",
             (await Assert.ThrowsAsync<AsiBackboneContractViolationException>(
-                async () => await blankMessage.VerifyConstraintReturnsSafeResultAsync(TestContext.Current.CancellationToken))).Message,
+                async () => await blankMessage.VerifyConstraintReturnsSafeResultAsync(
+                    TestContext.Current.CancellationToken))).Message,
             StringComparison.Ordinal);
     }
 

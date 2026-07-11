@@ -1,5 +1,3 @@
-using System.Reflection;
-using System.Runtime.CompilerServices;
 using AsiBackbone.AspNetCore.Endpoints;
 using AsiBackbone.Core.Actors;
 using AsiBackbone.Core.Audit;
@@ -127,11 +125,6 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
         AsiBackboneContractViolationException actual = await Assert.ThrowsAsync<AsiBackboneContractViolationException>(
             async () => await violating.VerifyDecisionPolicyReturnsSafeDecisionAsync(TestContext.Current.CancellationToken));
 
-        AsiBackboneContractViolationException actual =
-            await Assert.ThrowsAsync<AsiBackboneContractViolationException>(
-                async () => await violating.VerifyDecisionPolicyReturnsSafeDecisionAsync(
-                    TestContext.Current.CancellationToken));
-
         Assert.Same(expected, actual);
     }
 
@@ -194,7 +187,7 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
     public async Task ConstraintRejectsNullAndBlankReasonMembers()
     {
         var nullReason = new ConstraintContract(
-            new MalformedConstraint(CreateConstraintResult(ConstraintEvaluationOutcome.Denied, new OperationReason?[] { null! })),
+            new MalformedConstraint(CreateConstraintResult(ConstraintEvaluationOutcome.Denied, new OperationReason[] { null! })),
             CreateContext());
         Assert.Contains(
             "null reason",

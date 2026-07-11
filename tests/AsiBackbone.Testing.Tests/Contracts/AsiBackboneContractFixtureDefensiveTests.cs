@@ -1,3 +1,5 @@
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using AsiBackbone.AspNetCore.Endpoints;
 using AsiBackbone.Core.Actors;
 using AsiBackbone.Core.Audit;
@@ -125,6 +127,11 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
         AsiBackboneContractViolationException actual = await Assert.ThrowsAsync<AsiBackboneContractViolationException>(
             async () => await violating.VerifyDecisionPolicyReturnsSafeDecisionAsync(TestContext.Current.CancellationToken));
 
+        AsiBackboneContractViolationException actual =
+            await Assert.ThrowsAsync<AsiBackboneContractViolationException>(
+                async () => await violating.VerifyDecisionPolicyReturnsSafeDecisionAsync(
+                    TestContext.Current.CancellationToken));
+
         Assert.Same(expected, actual);
     }
 
@@ -197,7 +204,7 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
 
         var blankCode = new ConstraintContract(
             new MalformedConstraint(CreateConstraintResult(
-                ConstraintEvaluationOutcome.Warning,
+            ConstraintEvaluationOutcome.Warning,
                 new[] { CreateMalformedReason(" ", "Message") })),
             CreateContext());
         Assert.Contains(
@@ -356,6 +363,7 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
             types: [typeof(ConstraintEvaluationOutcome), typeof(IReadOnlyList<OperationReason>)],
             modifiers: null)
             ?? throw new InvalidOperationException("Constraint result constructor was not found.");
+
         return (ConstraintEvaluationResult)constructor.Invoke([outcome, reasons]);
     }
 
@@ -377,6 +385,7 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
             $"<{propertyName}>k__BackingField",
             BindingFlags.Instance | BindingFlags.NonPublic)
             ?? throw new InvalidOperationException($"Backing field for '{propertyName}' was not found.");
+
         field.SetValue(target, value);
     }
 
@@ -565,6 +574,7 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
     private sealed class AllowingConstraint : IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>
     {
         public string Name => "contract.allow";
+
         public ValueTask<ConstraintEvaluationResult> EvaluateAsync(
             AsiBackboneConstraintEvaluationContext context,
             CancellationToken cancellationToken = default)
@@ -588,6 +598,7 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
     private sealed class CancelingConstraint : IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>
     {
         public string Name => "contract.cancel";
+
         public ValueTask<ConstraintEvaluationResult> EvaluateAsync(
             AsiBackboneConstraintEvaluationContext context,
             CancellationToken cancellationToken = default)
@@ -600,6 +611,7 @@ public sealed class AsiBackboneContractFixtureDefensiveTests
         : IAsiBackboneConstraint<AsiBackboneConstraintEvaluationContext>
     {
         public string Name => "contract.violation";
+
         public ValueTask<ConstraintEvaluationResult> EvaluateAsync(
             AsiBackboneConstraintEvaluationContext context,
             CancellationToken cancellationToken = default)

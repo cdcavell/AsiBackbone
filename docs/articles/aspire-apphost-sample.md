@@ -7,7 +7,7 @@ The Aspire AppHost sample explores local orchestration for AsiBackbone-enabled s
 
 ## Decision: sample first, package later only if justified
 
-Issue #244 asks whether Aspire should be a package, sample, or both. The current repository boundary points to a **sample-first** approach:
+The current repository boundary uses a **sample-first** approach:
 
 - Core must remain framework-neutral and free of ASP.NET Core, EF Core, Aspire, cloud SDK, and test-package dependencies.
 - The stable package family already has separate provider packages for ASP.NET Core, EF Core, OpenTelemetry, signing, testing, and analyzers.

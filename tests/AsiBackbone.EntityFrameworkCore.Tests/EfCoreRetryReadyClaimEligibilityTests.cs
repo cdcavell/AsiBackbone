@@ -174,7 +174,7 @@ public sealed class EfCoreRetryReadyClaimEligibilityTests
             CreateRetryEntry("retry-retryable", GovernanceEmissionStatus.RetryableFailure, utcNow, nextRetryUtc: utcNow));
         context.ChangeTracker.Clear();
 
-        GovernanceOutboxClaimRequest request = GovernanceOutboxClaimRequest.Create(
+        var request = GovernanceOutboxClaimRequest.Create(
             "  worker-boundary  ",
             offsetNow,
             TimeSpan.FromMinutes(2),
@@ -241,7 +241,7 @@ public sealed class EfCoreRetryReadyClaimEligibilityTests
                 claimExpiresUtc: utcNow.AddMinutes(1)));
         context.ChangeTracker.Clear();
 
-        GovernanceOutboxClaimRequest request = GovernanceOutboxClaimRequest.Create(
+        var request = GovernanceOutboxClaimRequest.Create(
             "worker-a",
             utcNow,
             TimeSpan.FromMinutes(3),
@@ -306,7 +306,7 @@ public sealed class EfCoreRetryReadyClaimEligibilityTests
                 claimExpiresUtc: null));
         context.ChangeTracker.Clear();
 
-        GovernanceOutboxClaimRequest request = GovernanceOutboxClaimRequest.Create(
+        var request = GovernanceOutboxClaimRequest.Create(
             "replacement-worker",
             utcNow,
             TimeSpan.FromMinutes(4),
@@ -336,20 +336,20 @@ public sealed class EfCoreRetryReadyClaimEligibilityTests
     [Fact]
     public async Task ClaimRetryReadyRejectsNullRequestAndCancellation()
     {
-        var options = new DbContextOptionsBuilder<HostOwnedGovernanceDbContext>()
+        DbContextOptions<HostOwnedGovernanceDbContext> options = new DbContextOptionsBuilder<HostOwnedGovernanceDbContext>()
             .UseInMemoryDatabase($"retry-claim-guards-{Guid.NewGuid():N}")
             .Options;
         await using HostOwnedGovernanceDbContext context = new(options);
         var store = new EfCoreGovernanceOutboxStore(context);
 
-        await Assert.ThrowsAsync<ArgumentNullException>(() =>
+        _ = await Assert.ThrowsAsync<ArgumentNullException>(() =>
             store.ClaimRetryReadyAsync(null!, TestContext.Current.CancellationToken).AsTask());
 
         using var source = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
         source.Cancel();
-        GovernanceOutboxClaimRequest request = GovernanceOutboxClaimRequest.Create("worker-cancelled");
+        var request = GovernanceOutboxClaimRequest.Create("worker-cancelled");
 
-        await Assert.ThrowsAsync<OperationCanceledException>(() =>
+        _ = await Assert.ThrowsAsync<OperationCanceledException>(() =>
             store.ClaimRetryReadyAsync(request, source.Token).AsTask());
     }
 

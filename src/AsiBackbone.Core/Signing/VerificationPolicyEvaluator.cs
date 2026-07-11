@@ -5,6 +5,21 @@ namespace AsiBackbone.Core.Signing;
 /// </summary>
 public static class VerificationPolicyEvaluator
 {
+    private static readonly CategoryRule[] FailureCodeCategoryRules =
+    [
+        new(SignatureVerificationCategory.MissingSignature, ["missing"]),
+        new(SignatureVerificationCategory.HashMismatch, ["hash"]),
+        new(SignatureVerificationCategory.CanonicalizationMismatch, ["canonicalization", "payload-schema", "artifact"]),
+        new(SignatureVerificationCategory.UnsupportedAlgorithm, ["unsupported", "algorithm"]),
+        new(SignatureVerificationCategory.RevokedKey, ["revoked", "disabled"]),
+        new(
+            SignatureVerificationCategory.UnknownKeyVersion,
+            ["key-version", "key.mismatch", "key-mismatch"],
+            ["unknown", "key"]),
+        new(SignatureVerificationCategory.ProviderUnavailable, ["provider-unavailable", "unavailable", "timeout", "network"]),
+        new(SignatureVerificationCategory.InvalidSignature, ["invalid", "malformed", "signature"])
+    ];
+
     /// <summary>
     /// Evaluates a signed governance artifact and verification result against verification policy.
     /// </summary>
@@ -38,36 +53,58 @@ public static class VerificationPolicyEvaluator
             return SignatureVerificationCategory.Valid;
         }
 
-        string failureCode = verificationResult.FailureCode ?? string.Empty;
-        string status = verificationResult.Status ?? string.Empty;
+        if (Matches(verificationResult.Status, "MissingSignature"))
+        {
+            return SignatureVerificationCategory.MissingSignature;
+        }
 
-        return Matches(status, "MissingSignature") || Matches(failureCode, "missing")
-            ? SignatureVerificationCategory.MissingSignature
-            : Matches(failureCode, "hash")
-            ? SignatureVerificationCategory.HashMismatch
-            : Matches(failureCode, "canonicalization") || Matches(failureCode, "payload-schema") || Matches(failureCode, "artifact")
-            ? SignatureVerificationCategory.CanonicalizationMismatch
-            : Matches(failureCode, "unsupported") || Matches(failureCode, "algorithm")
-            ? SignatureVerificationCategory.UnsupportedAlgorithm
-            : Matches(failureCode, "revoked") || Matches(failureCode, "disabled")
-            ? SignatureVerificationCategory.RevokedKey
-            : (Matches(failureCode, "unknown") && Matches(failureCode, "key"))
-            || Matches(failureCode, "key-version")
-            || Matches(failureCode, "key.mismatch")
-            || Matches(failureCode, "key-mismatch")
-            ? SignatureVerificationCategory.UnknownKeyVersion
-            : Matches(failureCode, "provider-unavailable")
-            || Matches(failureCode, "unavailable")
-            || Matches(failureCode, "timeout")
-            || Matches(failureCode, "network")
-            ? SignatureVerificationCategory.ProviderUnavailable
-            : Matches(failureCode, "invalid") || Matches(failureCode, "malformed") || Matches(failureCode, "signature")
-            ? SignatureVerificationCategory.InvalidSignature
-            : SignatureVerificationCategory.Failed;
+        string failureCode = verificationResult.FailureCode ?? string.Empty;
+
+        foreach (CategoryRule rule in FailureCodeCategoryRules)
+        {
+            if (rule.IsMatch(failureCode))
+            {
+                return rule.Category;
+            }
+        }
+
+        return SignatureVerificationCategory.Failed;
     }
 
     private static bool Matches(string value, string pattern)
     {
         return value.Contains(pattern, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private readonly record struct CategoryRule(
+        SignatureVerificationCategory Category,
+        string[] AnyPatterns,
+        string[]? AllPatterns = null)
+    {
+        public bool IsMatch(string failureCode)
+        {
+            foreach (string pattern in AnyPatterns)
+            {
+                if (Matches(failureCode, pattern))
+                {
+                    return true;
+                }
+            }
+
+            if (AllPatterns is null)
+            {
+                return false;
+            }
+
+            foreach (string pattern in AllPatterns)
+            {
+                if (!Matches(failureCode, pattern))
+                {
+                    return false;
+                }
+            }
+
+            return AllPatterns.Length > 0;
+        }
     }
 }

@@ -34,17 +34,13 @@ jobs:
   dependency-review:
     name: Dependency review
     runs-on: ubuntu-latest
-
     if: github.event_name == 'pull_request'
-
     permissions:
       contents: read
       pull-requests: read
-
     steps:
       - name: Checkout source
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-
       - name: Review dependency changes
         uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v4
         with:
@@ -53,37 +49,26 @@ jobs:
   build-test-pack:
     name: Build, test, and pack
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           fetch-depth: 0
-
       - name: Setup .NET
         uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
         with:
           global-json-file: global.json
-
       - name: Display .NET information
         run: dotnet --info
-
       - name: Validate Debug solution build coverage
         shell: pwsh
         run: ./scripts/Validate-DebugSolutionBuildCoverage.ps1 -SolutionPath "$env:SOLUTION_PATH"
-
       - name: Restore
         run: dotnet restore "$SOLUTION_PATH"
-
       - name: Build Debug solution smoke
-        shell: bash
-        run: |
-          set -o pipefail
-          dotnet build "$SOLUTION_PATH" --configuration Debug --no-restore 2>&1 | tee build-debug.log
-
+        run: dotnet build "$SOLUTION_PATH" --configuration Debug --no-restore
       - name: Build
         run: dotnet build "$SOLUTION_PATH" --configuration "$CONFIGURATION" --no-restore
-
       - name: Inventory public API XML documentation gaps
         shell: pwsh
         run: >
@@ -92,10 +77,14 @@ jobs:
           -Configuration "$env:CONFIGURATION"
           -NoRestore
           -OutputPath "$env:XML_DOCS_OUTPUT/cs1591-inventory.md"
-
       - name: Verify formatting
-        run: dotnet format "$SOLUTION_PATH" --verify-no-changes --verbosity minimal
-
+        shell: bash
+        run: |
+          set +e
+          dotnet format "$SOLUTION_PATH" --verify-no-changes --verbosity diagnostic > format-diagnostics.log 2>&1
+          status=$?
+          cat format-diagnostics.log
+          exit $status
       - name: Test with coverage gate
         run: >
           dotnet test "$SOLUTION_PATH"
@@ -108,7 +97,6 @@ jobs:
           /p:Threshold=75
           /p:ThresholdType=line
           /p:ThresholdStat=total
-
       - name: Test Core with branch coverage gate
         run: >
           dotnet test "$CORE_TEST_PROJECT"
@@ -123,7 +111,6 @@ jobs:
           /p:Threshold="$CORE_BRANCH_COVERAGE_THRESHOLD"
           /p:ThresholdType=branch
           /p:ThresholdStat=total
-
       - name: Test adapter and provider package coverage baselines
         shell: pwsh
         run: >
@@ -132,21 +119,16 @@ jobs:
           -NoBuild
           -NoRestore
           -OutputRoot "$env:PACKAGE_COVERAGE_OUTPUT"
-
       - name: Pack packages
         shell: bash
         run: |
           set -euo pipefail
-
           mkdir -p "$PACKAGE_OUTPUT"
-
           mapfile -t package_projects < <(find ./src -name '*.csproj' -type f -not -path '*/templates/*' | sort)
-
           if [ "${#package_projects[@]}" -eq 0 ]; then
             echo "No package projects were found under ./src."
             exit 1
           fi
-
           for project in "${package_projects[@]}"; do
             echo "Packing $project"
             dotnet pack "$project" \
@@ -154,62 +136,52 @@ jobs:
               --output "$PACKAGE_OUTPUT" \
               /p:ContinuousIntegrationBuild=true
           done
-
       - name: Generate package SBOMs
         shell: pwsh
         run: ./scripts/New-NuGetPackageSbom.ps1 -PackageDirectory "$env:PACKAGE_OUTPUT" -OutputDirectory "$env:SBOM_OUTPUT"
-
       - name: Validate dotnet new templates
         shell: bash
         run: bash ./eng/smoke-tests/template-package-smoke.sh "$PACKAGE_OUTPUT"
-
       - name: Attest package provenance
         if: github.event_name != 'pull_request'
         uses: actions/attest-build-provenance@0f67c3f4856b2e3261c31976d6725780e5e4c373 # v4
         with:
           subject-path: ${{ env.PACKAGE_OUTPUT }}/*.nupkg
-
       - name: Attest package SBOM provenance
         if: github.event_name != 'pull_request'
         uses: actions/attest-build-provenance@0f67c3f4856b2e3261c31976d6725780e5e4c373 # v4
         with:
           subject-path: ${{ env.SBOM_OUTPUT }}/*.json
-
       - name: Upload package artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: asi-backbone-packages
           path: ${{ env.PACKAGE_OUTPUT }}/*.nupkg
           if-no-files-found: error
-
       - name: Upload package SBOM artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: asi-backbone-package-sboms
           path: ${{ env.SBOM_OUTPUT }}/*.json
           if-no-files-found: error
-
       - name: Upload coverage artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: asi-backbone-coverage
           path: ${{ env.COVERAGE_OUTPUT }}/coverage.cobertura.xml
           if-no-files-found: error
-
       - name: Upload Core branch coverage artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: asi-backbone-core-branch-coverage
           path: ${{ env.CORE_COVERAGE_OUTPUT }}/coverage.cobertura.xml
           if-no-files-found: error
-
       - name: Upload adapter and provider package coverage artifacts
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: asi-backbone-package-coverage-baselines
           path: ${{ env.PACKAGE_COVERAGE_OUTPUT }}/**
           if-no-files-found: error
-
       - name: Upload XML documentation inventory artifact
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
@@ -217,40 +189,33 @@ jobs:
           name: asi-backbone-cs1591-inventory
           path: |
             ${{ env.XML_DOCS_OUTPUT }}/cs1591-inventory.md
-            build-debug.log
+            format-diagnostics.log
           if-no-files-found: warn
 
   codeql-analysis:
     name: CodeQL analysis
     runs-on: ubuntu-latest
-
     permissions:
       actions: read
       contents: read
       security-events: write
-
     steps:
       - name: Checkout source
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           fetch-depth: 0
-
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
         with:
           global-json-file: global.json
-
       - name: Initialize CodeQL
         uses: github/codeql-action/init@54f647b7e1bb85c95cddabcd46b0c578ec92bc1a # v4
         with:
           languages: 'actions,csharp'
           build-mode: none
-
       - name: Restore dependencies
         run: dotnet restore ${{ env.SOLUTION_PATH }}
-
       - name: Build solution for CodeQL
         run: dotnet build ${{ env.SOLUTION_PATH }} --configuration ${{ env.CONFIGURATION }} --no-restore /p:ContinuousIntegrationBuild=true
-
       - name: Perform CodeQL analysis
         uses: github/codeql-action/analyze@54f647b7e1bb85c95cddabcd46b0c578ec92bc1a # v4

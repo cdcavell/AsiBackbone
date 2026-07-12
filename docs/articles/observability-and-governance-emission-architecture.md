@@ -140,9 +140,9 @@ Telemetry payloads should remain metadata-minimized. Do not place secrets, raw t
 
 ## Azure Monitor / Log Analytics guidance
 
-Azure Monitor and Log Analytics are backend targets reached through the host-owned OpenTelemetry exporter pipeline. No Azure Monitor-specific AsiBackbone package is included in `1.1.0`.
+Azure Monitor and Log Analytics are backend targets reached through the host-owned OpenTelemetry exporter pipeline. No Azure Monitor-specific AsiBackbone package is included in `3.0.0`.
 
-Accurate `1.1.0` wording:
+Accurate `3.0.0` wording:
 
 ```text
 AsiBackbone.OpenTelemetry
@@ -161,7 +161,7 @@ Boundary limits:
 
 ## Design-only: Event Hubs streaming provider path
 
-Event Hubs is a design-only future provider strategy in the current documentation set. It is not a released AsiBackbone NuGet package in `1.1.0`.
+Event Hubs is a design-only future provider strategy in the current documentation set. It is not a released AsiBackbone NuGet package in `3.0.0`.
 
 Appropriate future Event Hubs usage:
 
@@ -179,7 +179,7 @@ Boundary limits:
 
 ## Strategy-only: Purview governance and lineage enrichment
 
-Purview is a strategy-only future enrichment direction in the current documentation set. It is not a released AsiBackbone NuGet package in `1.1.0`.
+Purview is a strategy-only future enrichment direction in the current documentation set. It is not a released AsiBackbone NuGet package in `3.0.0`.
 
 Appropriate future Purview usage:
 
@@ -214,7 +214,7 @@ DLP and classification are host-owned responsibilities unless a future package e
 
 ## Signing-ready and current limitations
 
-The `1.1.0` package family includes signing-ready abstractions and provider signing boundaries, but signing alone does not prove tamper-evidence.
+The `3.0.0` package family includes signing-ready abstractions and provider signing boundaries, but signing alone does not prove tamper-evidence.
 
 Do not describe records as:
 

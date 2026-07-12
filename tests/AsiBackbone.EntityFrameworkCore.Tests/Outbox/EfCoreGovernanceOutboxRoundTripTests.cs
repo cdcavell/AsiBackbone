@@ -7,7 +7,7 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace AsiBackbone.EntityFrameworkCore.Tests;
+namespace AsiBackbone.EntityFrameworkCore.Tests.Outbox;
 
 /// <summary>
 /// Focused persistence coverage for complete and sparse EF Core governance outbox records.
@@ -44,7 +44,7 @@ public sealed class EfCoreGovernanceOutboxRoundTripTests
                 ["EnvelopeKey"] = "upper-envelope",
                 ["envelopekey"] = "lower-envelope"
             });
-        GovernanceEmissionError error = GovernanceEmissionError.Create(
+        var error = GovernanceEmissionError.Create(
             "provider.rate-limited",
             "Provider rate limit was reached.",
             isRetryable: true,

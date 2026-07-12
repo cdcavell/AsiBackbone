@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Xunit;
 
-namespace AsiBackbone.EntityFrameworkCore.Tests;
+namespace AsiBackbone.EntityFrameworkCore.Tests.Outbox;
 
 /// <summary>
 /// Deterministic relational coverage for EF Core outbox claim races and optimistic-concurrency recovery.
@@ -92,7 +92,7 @@ public sealed class EfCoreGovernanceOutboxConcurrencyRecoveryTests
         Assert.Equal(outboxEntryId, retryClaim.OutboxEntryId);
         Assert.Equal("worker-retry", retryClaim.WorkerId);
         Assert.Equal(2, retryClaim.Entry.ClaimAttemptCount);
-        Assert.Single(losingContext.ChangeTracker.Entries<AsiBackboneGovernanceOutboxEntryEntity>());
+        _ = Assert.Single(losingContext.ChangeTracker.Entries<AsiBackboneGovernanceOutboxEntryEntity>());
     }
 
     /// <summary>
@@ -111,7 +111,7 @@ public sealed class EfCoreGovernanceOutboxConcurrencyRecoveryTests
             keeperConnection.ConnectionString,
             interceptor);
         DateTimeOffset claimUtc = new(2026, 7, 12, 17, 15, 0, TimeSpan.Zero);
-        GovernanceEmissionError winningError = GovernanceEmissionError.Create(
+        var winningError = GovernanceEmissionError.Create(
             "provider.concurrent-winner",
             "A concurrent worker persisted the durable failure.",
             isRetryable: false,

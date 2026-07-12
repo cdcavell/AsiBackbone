@@ -5,7 +5,7 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
-namespace AsiBackbone.EntityFrameworkCore.Tests;
+namespace AsiBackbone.EntityFrameworkCore.Tests.Outbox;
 
 internal static class EfCoreGovernanceOutboxTestHost
 {
@@ -32,7 +32,7 @@ internal static class EfCoreGovernanceOutboxTestHost
     {
         ArgumentNullException.ThrowIfNull(connection);
 
-        var builder = new DbContextOptionsBuilder<GovernanceOutboxTestDbContext>()
+        DbContextOptionsBuilder<GovernanceOutboxTestDbContext> builder = new DbContextOptionsBuilder<GovernanceOutboxTestDbContext>()
             .UseSqlite(connection);
 
         if (interceptor is not null)
@@ -49,7 +49,7 @@ internal static class EfCoreGovernanceOutboxTestHost
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(connectionString);
 
-        var builder = new DbContextOptionsBuilder<GovernanceOutboxTestDbContext>()
+        DbContextOptionsBuilder<GovernanceOutboxTestDbContext> builder = new DbContextOptionsBuilder<GovernanceOutboxTestDbContext>()
             .UseSqlite(connectionString);
 
         if (interceptor is not null)

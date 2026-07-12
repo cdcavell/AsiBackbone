@@ -76,7 +76,10 @@ jobs:
         run: dotnet restore "$SOLUTION_PATH"
 
       - name: Build Debug solution smoke
-        run: dotnet build "$SOLUTION_PATH" --configuration Debug --no-restore
+        shell: bash
+        run: |
+          set -o pipefail
+          dotnet build "$SOLUTION_PATH" --configuration Debug --no-restore 2>&1 | tee build-debug.log
 
       - name: Build
         run: dotnet build "$SOLUTION_PATH" --configuration "$CONFIGURATION" --no-restore
@@ -212,7 +215,9 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: asi-backbone-cs1591-inventory
-          path: ${{ env.XML_DOCS_OUTPUT }}/cs1591-inventory.md
+          path: |
+            ${{ env.XML_DOCS_OUTPUT }}/cs1591-inventory.md
+            build-debug.log
           if-no-files-found: warn
 
   codeql-analysis:

@@ -1,5 +1,4 @@
 using AsiBackbone.Core.Metadata;
-using AsiBackbone.Core.Results;
 using Xunit;
 
 namespace AsiBackbone.Core.Tests.Metadata;
@@ -12,7 +11,7 @@ public sealed class GovernanceMetadataResultTests
     [Fact]
     public void ClassificationAllowHasNoReasonOrReplacement()
     {
-        GovernanceMetadataClassificationResult result = GovernanceMetadataClassificationResult.Allow();
+        var result = GovernanceMetadataClassificationResult.Allow();
 
         Assert.Equal(GovernanceMetadataSanitizationAction.Allow, result.Action);
         Assert.Null(result.Reason);
@@ -43,7 +42,7 @@ public sealed class GovernanceMetadataResultTests
     [Fact]
     public void RedactUsesDefaultReplacementWhenOmitted()
     {
-        GovernanceMetadataClassificationResult result = GovernanceMetadataClassificationResult.Redact(
+        var result = GovernanceMetadataClassificationResult.Redact(
             "metadata.redact",
             "Redact message.");
 
@@ -56,7 +55,7 @@ public sealed class GovernanceMetadataResultTests
     [Fact]
     public void RedactPreservesCustomReplacement()
     {
-        GovernanceMetadataClassificationResult result = GovernanceMetadataClassificationResult.Redact(
+        var result = GovernanceMetadataClassificationResult.Redact(
             "metadata.redact",
             "Redact message.",
             "safe-value");
@@ -90,6 +89,7 @@ public sealed class GovernanceMetadataResultTests
             GovernanceMetadataSanitizationAction.Redact => GovernanceMetadataClassificationResult.Redact(code!, message!),
             GovernanceMetadataSanitizationAction.Drop => GovernanceMetadataClassificationResult.Drop(code!, message!),
             GovernanceMetadataSanitizationAction.Deny => GovernanceMetadataClassificationResult.Deny(code!, message!),
+            GovernanceMetadataSanitizationAction.Allow => throw new NotImplementedException(),
             _ => throw new InvalidOperationException("Unsupported test action.")
         });
     }
@@ -182,7 +182,7 @@ public sealed class GovernanceMetadataResultTests
         bool canProceed,
         bool isDenied)
     {
-        GovernanceMetadataSanitizationResult result = GovernanceMetadataSanitizationResult.Create(
+        var result = GovernanceMetadataSanitizationResult.Create(
             action,
             new Dictionary<string, string>(),
             Array.Empty<OperationReason>(),
@@ -199,7 +199,7 @@ public sealed class GovernanceMetadataResultTests
     [InlineData(GovernanceMetadataSanitizationAction.Drop)]
     public void ThrowIfDeniedIsNoOpForNonDeniedResults(GovernanceMetadataSanitizationAction action)
     {
-        GovernanceMetadataSanitizationResult result = GovernanceMetadataSanitizationResult.Create(
+        var result = GovernanceMetadataSanitizationResult.Create(
             action,
             new Dictionary<string, string>(),
             Array.Empty<OperationReason>(),
@@ -214,7 +214,7 @@ public sealed class GovernanceMetadataResultTests
     [InlineData("   ")]
     public void DeniedResultWithoutReasonsUsesFallbackMessageAndParameter(string? parameterName)
     {
-        GovernanceMetadataSanitizationResult result = GovernanceMetadataSanitizationResult.Create(
+        var result = GovernanceMetadataSanitizationResult.Create(
             GovernanceMetadataSanitizationAction.Deny,
             new Dictionary<string, string>(),
             Array.Empty<OperationReason>(),
@@ -229,7 +229,7 @@ public sealed class GovernanceMetadataResultTests
     [Fact]
     public void DeniedResultComposesMultipleReasonMessagesAndPreservesParameterName()
     {
-        GovernanceMetadataSanitizationResult result = GovernanceMetadataSanitizationResult.Create(
+        var result = GovernanceMetadataSanitizationResult.Create(
             GovernanceMetadataSanitizationAction.Deny,
             new Dictionary<string, string>(),
             [
@@ -254,7 +254,7 @@ public sealed class GovernanceMetadataResultTests
         IReadOnlyList<OperationReason> reasons = [OperationReason.Create("metadata.warning", "Warning.")];
         GovernanceMetadataBudgetValidationResult budget = CreateValidBudgetValidation();
 
-        GovernanceMetadataSanitizationResult result = GovernanceMetadataSanitizationResult.Create(
+        var result = GovernanceMetadataSanitizationResult.Create(
             GovernanceMetadataSanitizationAction.Warn,
             metadata,
             reasons,

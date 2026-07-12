@@ -29,6 +29,8 @@ public sealed class GovernanceMetadataResultTests
             GovernanceMetadataSanitizationAction.Warn => GovernanceMetadataClassificationResult.Warn(" metadata.warn ", " Warning message. "),
             GovernanceMetadataSanitizationAction.Drop => GovernanceMetadataClassificationResult.Drop(" metadata.drop ", " Drop message. "),
             GovernanceMetadataSanitizationAction.Deny => GovernanceMetadataClassificationResult.Deny(" metadata.deny ", " Deny message. "),
+            GovernanceMetadataSanitizationAction.Allow => throw new NotImplementedException(),
+            GovernanceMetadataSanitizationAction.Redact => throw new NotImplementedException(),
             _ => throw new InvalidOperationException("Unsupported test action.")
         };
 

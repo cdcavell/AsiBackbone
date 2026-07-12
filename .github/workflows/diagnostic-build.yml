@@ -10,8 +10,12 @@ permissions:
 
 jobs:
   build:
-    name: Diagnostic build tail
+    name: Capture build diagnostics
     runs-on: ubuntu-latest
+
+    outputs:
+      diagnostics: ${{ steps.build.outputs.diagnostics }}
+      exit-code: ${{ steps.build.outputs.exit-code }}
 
     steps:
       - name: Checkout repository
@@ -25,8 +29,32 @@ jobs:
       - name: Restore
         run: dotnet restore AsiBackbone.slnx
 
-      - name: Build and show diagnostics
+      - name: Capture build diagnostics
+        id: build
         shell: bash
         run: |
-          set -o pipefail
-          dotnet build AsiBackbone.slnx --configuration Debug --no-restore 2>&1 | tail -n 120
+          set +e
+          dotnet build AsiBackbone.slnx --configuration Debug --no-restore > build.log 2>&1
+          exit_code=$?
+
+          {
+            echo 'diagnostics<<EOF'
+            grep -E 'error [A-Z]+[0-9]+|Build FAILED|error:' build.log | tail -n 80
+            echo 'EOF'
+            echo "exit-code=$exit_code"
+          } >> "$GITHUB_OUTPUT"
+
+  report:
+    name: Report build diagnostics
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Show build diagnostics
+        env:
+          DIAGNOSTICS: ${{ needs.build.outputs.diagnostics }}
+          EXIT_CODE: ${{ needs.build.outputs.exit-code }}
+        shell: bash
+        run: |
+          printf '%s\n' "$DIAGNOSTICS"
+          test "$EXIT_CODE" = '0'

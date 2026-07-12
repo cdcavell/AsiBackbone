@@ -26,6 +26,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
         using WorkerHarness harness = CreateHarness(options);
 
         await harness.Service.StartAsync(TestContext.Current.CancellationToken);
+        await WaitAsync(harness.Logger.WaitForEventAsync(19803));
         await StopAsync(harness.Service);
 
         Assert.Equal(0, harness.ScopeFactory.CreateScopeCallCount);
@@ -631,6 +632,27 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
     {
         private readonly Lock sync = new();
         private readonly List<LogEntry> entries = [];
+        private readonly List<LogWaiter> logWaiters = [];
+
+        public Task WaitForEventAsync(int eventId)
+        {
+            lock (sync)
+            {
+                foreach (LogEntry entry in entries)
+                {
+                    if (entry.EventId.Id == eventId)
+                    {
+                        return Task.CompletedTask;
+                    }
+                }
+
+                var completion = new TaskCompletionSource(
+                    TaskCreationOptions.RunContinuationsAsynchronously);
+
+                logWaiters.Add(new LogWaiter(eventId, completion));
+                return completion.Task;
+            }
+        }
 
         public IReadOnlyList<LogEntry> Entries
         {
@@ -665,9 +687,29 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
 
             lock (sync)
             {
-                entries.Add(new LogEntry(logLevel, eventId, exception, formatter(state, exception)));
+                entries.Add(
+                    new LogEntry(
+                        logLevel,
+                        eventId,
+                        exception,
+                        formatter(state, exception)));
+
+                for (int index = logWaiters.Count - 1; index >= 0; index--)
+                {
+                    LogWaiter waiter = logWaiters[index];
+
+                    if (waiter.EventId == eventId.Id)
+                    {
+                        logWaiters.RemoveAt(index);
+                        _ = waiter.Completion.TrySetResult();
+                    }
+                }
             }
         }
+
+        private sealed record LogWaiter(
+            int EventId,
+            TaskCompletionSource Completion);
     }
 
     private sealed record LogEntry(

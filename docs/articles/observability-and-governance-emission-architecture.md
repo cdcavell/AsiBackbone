@@ -1,6 +1,6 @@
 # Observability and Governance Emission Architecture
 
-This article documents the released `1.1.0` observability, durable outbox, signing, and governance emission architecture boundary plus the future provider directions that remain design-only.
+This article documents the released `3.0.0` observability, durable outbox, signing, and governance emission architecture boundary plus the future provider directions that remain design-only.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a governance spine for consequential software decision flow. It is not an artificial superintelligence implementation, AI model host, robot controller, compliance product, signing product, or cloud governance platform by itself.
 
@@ -9,7 +9,7 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 >
 > `AsiBackbone.Core` remains framework-neutral and vendor-neutral. Observability platforms, streaming systems, governance catalogs, signing systems, storage providers, and cloud-specific enrichment belong in optional packages or host applications.
 >
-> `AsiBackbone.OpenTelemetry` is the only concrete released governance emission provider package in `1.1.0`. Event Hubs, Purview, Azure Monitor-specific SDK adapters, immutable-storage providers, and additional Azure-specific packages remain design-only or host-owned guidance unless a future release separately reviews and ships them. See [1.1.0 Release Notes - Accepted deferrals](release-notes-110.md#accepted-deferrals).
+> `AsiBackbone.OpenTelemetry` is the only concrete released governance emission provider package in `3.0.0`. Event Hubs, Purview, Azure Monitor-specific SDK adapters, immutable-storage providers, and additional Azure-specific packages remain design-only or host-owned guidance unless a future release separately reviews and ships them. See [1.1.0 Release Notes - Accepted deferrals](release-notes-110.md#accepted-deferrals).
 
 ## Purpose
 
@@ -31,12 +31,12 @@ This sequence keeps the source-of-truth governance record local and durable befo
 
 ## Released versus design-only provider boundary
 
-| Provider path | `1.1.0` status | Appropriate responsibility | Not appropriate responsibility |
+| Provider path | `3.0.0` status | Appropriate responsibility | Not appropriate responsibility |
 | --- | --- | --- | --- |
 | OpenTelemetry | **Released package**: `AsiBackbone.OpenTelemetry`. | Convert neutral governance emission envelopes into .NET diagnostics through `ActivitySource`, activity events, tags, and `Meter` metrics. | Configure exporters, redefine Core decision semantics, or require Core to reference OpenTelemetry packages. |
 | Azure Monitor / Log Analytics | **Host-configured exporter guidance** through OpenTelemetry. No Azure Monitor-specific AsiBackbone package is released. | Receive telemetry through the host's OpenTelemetry exporter pipeline. | Become the only audit store or force Azure SDK dependencies into Core. |
-| Event Hubs | **Design-only future provider strategy.** No Event Hubs package is released in `1.1.0`. | Future optional streaming adapter for minimized governance events after durable outbox persistence. | Replace local durability or imply a current Event Hubs NuGet package exists. |
-| Purview | **Strategy-only future enrichment direction.** No Purview package is released in `1.1.0`. | Future optional governance/catalog/lineage enrichment for selected, summarized, classified events. | Store raw audit records by default, become the primary audit ledger, or imply a current Purview NuGet package exists. |
+| Event Hubs | **Design-only future provider strategy.** No Event Hubs package is released in `3.0.0`. | Future optional streaming adapter for minimized governance events after durable outbox persistence. | Replace local durability or imply a current Event Hubs NuGet package exists. |
+| Purview | **Strategy-only future enrichment direction.** No Purview package is released in `3.0.0`. | Future optional governance/catalog/lineage enrichment for selected, summarized, classified events. | Store raw audit records by default, become the primary audit ledger, or imply a current Purview NuGet package exists. |
 | Signing providers | **Released package boundaries** for local-development and managed-key adapter packages. | Attach signing/verification behavior through provider packages and host-owned key operations. | Claim tamper-evidence without deployed signing, verification, key management, storage, and retention controls. |
 
 Provider-specific packages must depend on Core. Core must not depend on provider packages.

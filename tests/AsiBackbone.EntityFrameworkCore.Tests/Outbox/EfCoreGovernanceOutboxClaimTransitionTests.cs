@@ -5,7 +5,7 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace AsiBackbone.EntityFrameworkCore.Tests;
+namespace AsiBackbone.EntityFrameworkCore.Tests.Outbox;
 
 /// <summary>
 /// Focused coverage for claim-owned EF Core outbox transitions, stale claims, terminal no-ops, and defensive guards.
@@ -31,7 +31,7 @@ public sealed class EfCoreGovernanceOutboxClaimTransitionTests
             "claim-delivered",
             new DateTimeOffset(2026, 7, 12, 12, 0, 0, TimeSpan.Zero),
             cancellationToken);
-        GovernanceEmissionResult result = GovernanceEmissionResult.Delivered(
+        var result = GovernanceEmissionResult.Delivered(
             "provider-delivered",
             "provider-record-delivered",
             new Dictionary<string, string>(StringComparer.Ordinal)
@@ -83,7 +83,7 @@ public sealed class EfCoreGovernanceOutboxClaimTransitionTests
             new DateTimeOffset(2026, 7, 12, 12, 10, 0, TimeSpan.Zero),
             cancellationToken);
         DateTimeOffset nextRetryUtc = new(2026, 7, 12, 12, 15, 0, TimeSpan.Zero);
-        GovernanceEmissionError error = GovernanceEmissionError.Create(
+        var error = GovernanceEmissionError.Create(
             isRetryable ? "provider.retryable" : "provider.failed",
             isRetryable ? "Provider requested retry." : "Provider rejected the emission.",
             isRetryable,
@@ -136,7 +136,7 @@ public sealed class EfCoreGovernanceOutboxClaimTransitionTests
             $"claim-dead-letter-{deadLetterReason ?? "fallback"}",
             new DateTimeOffset(2026, 7, 12, 12, 20, 0, TimeSpan.Zero),
             cancellationToken);
-        GovernanceEmissionError error = GovernanceEmissionError.Create(
+        var error = GovernanceEmissionError.Create(
             "provider.terminal",
             "Provider reported a terminal failure.",
             isRetryable: false,
@@ -183,7 +183,7 @@ public sealed class EfCoreGovernanceOutboxClaimTransitionTests
             new DateTimeOffset(2026, 7, 12, 12, 30, 0, TimeSpan.Zero),
             cancellationToken);
         DateTimeOffset nextRetryUtc = new(2026, 7, 12, 12, 45, 0, TimeSpan.Zero);
-        GovernanceEmissionError error = GovernanceEmissionError.Create(
+        var error = GovernanceEmissionError.Create(
             "provider.deferred",
             "Provider deferred processing.",
             isRetryable: true,
@@ -280,13 +280,13 @@ public sealed class EfCoreGovernanceOutboxClaimTransitionTests
             $"claim-mismatch-{mismatchOwner}-{mismatchToken}",
             new DateTimeOffset(2026, 7, 12, 13, 10, 0, TimeSpan.Zero),
             cancellationToken);
-        GovernanceOutboxClaim mismatchedClaim = GovernanceOutboxClaim.Create(
+        var mismatchedClaim = GovernanceOutboxClaim.Create(
             currentClaim.Entry,
             mismatchOwner ? "worker-other" : currentClaim.WorkerId,
             mismatchToken ? "claim-token-other" : currentClaim.ClaimToken,
             currentClaim.ClaimedUtc,
             currentClaim.ClaimExpiresUtc);
-        GovernanceEmissionError error = GovernanceEmissionError.Create(
+        var error = GovernanceEmissionError.Create(
             "provider.should-not-persist",
             "This stale update must not persist.",
             providerName: "provider-stale");
@@ -345,7 +345,7 @@ public sealed class EfCoreGovernanceOutboxClaimTransitionTests
             "claim-terminal-dead-letter",
             new DateTimeOffset(2026, 7, 12, 13, 30, 0, TimeSpan.Zero),
             cancellationToken);
-        GovernanceEmissionError terminalError = GovernanceEmissionError.Create(
+        var terminalError = GovernanceEmissionError.Create(
             "provider.dead",
             "Permanent failure.",
             providerName: "provider-dead");
@@ -392,18 +392,18 @@ public sealed class EfCoreGovernanceOutboxClaimTransitionTests
                 "guard-claim-entry",
                 claimedUtc.AddMinutes(-1))
             .MarkClaimed("worker-guard", "token-guard", claimedUtc, TimeSpan.FromMinutes(5));
-        GovernanceOutboxClaim claim = GovernanceOutboxClaim.Create(
+        var claim = GovernanceOutboxClaim.Create(
             claimedEntry,
             "worker-guard",
             "token-guard",
             claimedUtc,
             claimedUtc.AddMinutes(5));
-        GovernanceOutboxEntry differentEntry = GovernanceOutboxEntry.Create(
+        var differentEntry = GovernanceOutboxEntry.Create(
             EfCoreGovernanceOutboxTestHost.CreateEnvelope("guard-other"),
             "guard-other-entry",
             claimedUtc);
-        GovernanceEmissionResult result = GovernanceEmissionResult.Delivered("provider-guard", "record-guard");
-        GovernanceEmissionError error = GovernanceEmissionError.Create("provider.guard", "Guard failure.");
+        var result = GovernanceEmissionResult.Delivered("provider-guard", "record-guard");
+        var error = GovernanceEmissionError.Create("provider.guard", "Guard failure.");
 
         _ = await Assert.ThrowsAsync<ArgumentNullException>(async () =>
             await store.MarkClaimDeliveredAsync(null!, result, cancellationToken));
@@ -446,7 +446,7 @@ public sealed class EfCoreGovernanceOutboxClaimTransitionTests
                 "missing-claim-entry",
                 claimedUtc.AddMinutes(-1))
             .MarkClaimed("worker-missing", "token-missing", claimedUtc, TimeSpan.FromMinutes(5));
-        GovernanceOutboxClaim claim = GovernanceOutboxClaim.Create(
+        var claim = GovernanceOutboxClaim.Create(
             claimedEntry,
             "worker-missing",
             "token-missing",

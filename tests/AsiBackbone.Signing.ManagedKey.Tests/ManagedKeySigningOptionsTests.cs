@@ -116,9 +116,9 @@ public sealed class ManagedKeySigningOptionsTests
     [Fact]
     public void CreateTrimsSuppliedValuesAndPreservesBehaviorSettings()
     {
-        TimeSpan retryDelay = TimeSpan.FromMilliseconds(17);
+        var retryDelay = TimeSpan.FromMilliseconds(17);
 
-        ManagedKeySigningOptions options = ManagedKeySigningOptions.Create(
+        var options = ManagedKeySigningOptions.Create(
             keyId: "  managed-key-1  ",
             keyVersion: "  v7  ",
             providerName: "  provider-test  ",
@@ -146,7 +146,7 @@ public sealed class ManagedKeySigningOptionsTests
     [Fact]
     public void CreateUsesDefaultsForBlankOptionalDescriptors()
     {
-        ManagedKeySigningOptions options = ManagedKeySigningOptions.Create(
+        var options = ManagedKeySigningOptions.Create(
             keyId: " managed-key-1 ",
             keyVersion: " ",
             providerName: "\t",
@@ -170,7 +170,7 @@ public sealed class ManagedKeySigningOptionsTests
     [Fact]
     public void CreateNormalizesNullKeyVersionToNull()
     {
-        ManagedKeySigningOptions options = ManagedKeySigningOptions.Create(
+        var options = ManagedKeySigningOptions.Create(
             keyId: "managed-key-1",
             keyVersion: null,
             requireKeyVersion: false,
@@ -186,9 +186,9 @@ public sealed class ManagedKeySigningOptionsTests
     [Fact]
     public void CreateLocalValidationForcesUnsignedFailuresAndPreservesOtherOptions()
     {
-        TimeSpan retryDelay = TimeSpan.FromMilliseconds(23);
+        var retryDelay = TimeSpan.FromMilliseconds(23);
 
-        ManagedKeySigningOptions options = ManagedKeySigningOptions.CreateLocalValidation(
+        var options = ManagedKeySigningOptions.CreateLocalValidation(
             keyId: " managed-key-local ",
             keyVersion: " local-v2 ",
             providerName: " local-provider ",

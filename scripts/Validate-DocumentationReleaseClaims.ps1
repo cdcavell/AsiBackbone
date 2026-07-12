@@ -95,7 +95,8 @@ if (Test-Path -LiteralPath $configurationFilePath -PathType Leaf) {
             try {
                 $lineRegex = [regex]::new(
                     [string]$linePatternProperty.Value,
-                    [System.Text.RegularExpressions.RegexOptions]::CultureInvariant)
+                    [System.Text.RegularExpressions.RegexOptions]::IgnoreCase -bor
+                        [System.Text.RegularExpressions.RegexOptions]::CultureInvariant)
             }
             catch {
                 throw "Allowed claim linePattern '$($linePatternProperty.Value)' is not a valid regular expression. $($_.Exception.Message)"
@@ -173,7 +174,10 @@ function Add-DocumentationFile {
     }
 }
 
-Add-DocumentationFile (Join-Path $repoRoot 'README.md')
+foreach ($topLevelDocument in @('README.md', 'CONTRIBUTING.md', 'GOVERNANCE.md', 'SECURITY.md')) {
+    Add-DocumentationFile (Join-Path $repoRoot $topLevelDocument)
+}
+
 Add-DocumentationFile (Join-Path $repoRoot 'docs/index.md')
 
 $articlesRoot = Join-Path $repoRoot 'docs/articles'
@@ -197,15 +201,18 @@ $regexOptions = [System.Text.RegularExpressions.RegexOptions]::IgnoreCase -bor
     [System.Text.RegularExpressions.RegexOptions]::CultureInvariant
 $claimPatterns = @(
     [regex]::new(
-        '\b(?:current|stable|active|canonical)\b(?:\s+[`*_~]*)+(?:(?:released?|supported|package|major|minor|release|version|line|family|lineup)\s+){0,3}[`*_~]*v?(?<version>' + $versionPattern + ')[`*_~]*',
+        '\b(?:current|active|canonical)\b[^\r\n]{0,80}?[`*_~]*v?(?<version>' + $versionPattern + ')[`*_~]*',
         $regexOptions),
     [regex]::new(
-        '[`*_~]*v?(?<version>' + $versionPattern + ')[`*_~]*\s+(?:is|remains|represents|defines|establishes)\s+(?:the\s+)?(?:current|stable|active|canonical)\b',
+        '[`*_~]*v?(?<version>' + $versionPattern + ')[`*_~]*[^\r\n]{0,80}?\b(?:is|remains|represents|defines|establishes)\s+(?:the\s+)?(?:current|active|canonical)\b',
         $regexOptions),
     [regex]::new(
-        '\b(?:current|stable|active|canonical)\b(?:\s+(?:released?|supported|package|major|minor|release|version|line|family|lineup|stable)){1,5}\s+(?:is|remains|equals)\s+[`*_~]*v?(?<version>' + $versionPattern + ')[`*_~]*',
+        '\bstable\b[^\r\n]{0,50}?[`*_~]*v?(?<version>' + $versionPattern + ')[`*_~]*[^\r\n]{0,50}?\b(?:package\s+family|package\s+lineup|release\s+line|stable\s+line|major\s+release)\b',
         $regexOptions)
 )
+$historicalContextPattern = [regex]::new(
+    '\b(?:historical|original|initial|previous|prior|superseded|final stable patch|releases? expanded|release established)\b',
+    $regexOptions)
 
 $failures = [System.Collections.Generic.List[object]]::new()
 $reportedMatches = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
@@ -227,7 +234,7 @@ foreach ($documentationFile in @($documentationFiles | Sort-Object FullName)) {
             continue
         }
 
-        if ($insideCodeFence) {
+        if ($insideCodeFence -or $historicalContextPattern.IsMatch($line)) {
             continue
         }
 
@@ -237,7 +244,7 @@ foreach ($documentationFile in @($documentationFiles | Sort-Object FullName)) {
                 $versionToken = $versionGroup.Value
                 $expectedToken = Get-ExpectedVersionToken $versionToken
 
-                if ($versionToken -eq $expectedToken) {
+                if ([string]::Equals($versionToken, $expectedToken, [System.StringComparison]::OrdinalIgnoreCase)) {
                     continue
                 }
 

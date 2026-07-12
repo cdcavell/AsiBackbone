@@ -17,7 +17,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainWorkerOptionsTests
     [InlineData(-1)]
     public void ValidateRejectsNonPositiveBatchSize(int batchSize)
     {
-        var options = CreateValidOptions();
+        AsiBackboneGovernanceOutboxDrainWorkerOptions options = CreateValidOptions();
         options.BatchSize = batchSize;
 
         InvalidOperationException exception = Assert.Throws<InvalidOperationException>(options.Validate);
@@ -34,7 +34,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainWorkerOptionsTests
     [InlineData(-1L)]
     public void ValidateRejectsNonPositivePollingInterval(long ticks)
     {
-        var options = CreateValidOptions();
+        AsiBackboneGovernanceOutboxDrainWorkerOptions options = CreateValidOptions();
         options.PollingInterval = TimeSpan.FromTicks(ticks);
 
         InvalidOperationException exception = Assert.Throws<InvalidOperationException>(options.Validate);
@@ -51,7 +51,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainWorkerOptionsTests
     [InlineData(-1L)]
     public void ValidateRejectsNonPositiveFailureDelay(long ticks)
     {
-        var options = CreateValidOptions();
+        AsiBackboneGovernanceOutboxDrainWorkerOptions options = CreateValidOptions();
         options.FailureDelay = TimeSpan.FromTicks(ticks);
 
         InvalidOperationException exception = Assert.Throws<InvalidOperationException>(options.Validate);
@@ -68,7 +68,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainWorkerOptionsTests
     [InlineData(-1L)]
     public void ValidateRejectsNonPositiveShutdownDrainTimeout(long ticks)
     {
-        var options = CreateValidOptions();
+        AsiBackboneGovernanceOutboxDrainWorkerOptions options = CreateValidOptions();
         options.ShutdownDrainTimeout = TimeSpan.FromTicks(ticks);
 
         InvalidOperationException exception = Assert.Throws<InvalidOperationException>(options.Validate);
@@ -82,7 +82,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainWorkerOptionsTests
     [Fact]
     public void ValidateRejectsNullRetryClock()
     {
-        var options = CreateValidOptions();
+        AsiBackboneGovernanceOutboxDrainWorkerOptions options = CreateValidOptions();
         options.RetryClock = null!;
 
         InvalidOperationException exception = Assert.Throws<InvalidOperationException>(options.Validate);

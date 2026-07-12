@@ -209,7 +209,9 @@ AsiBackbone is a governance spine, not an intelligence engine. It implements gov
 
 > **Current NuGet packages are intentionally published without package signing.** This is a deliberate governance decision while the project is independently maintained, balancing operational complexity against practical value. Instead, the project emphasizes transparent source code, GitHub releases, Source Link, SBOM generation, and package provenance. Package signing remains on the long-term roadmap and will be reconsidered as the project's community, governance, and operational needs evolve. For current package verification guidance, see the [**3.0.0 Consumer Verification Guide**](https://cdcavell.github.io/AsiBackbone/articles/consumer-verification-300.html).
 
-## Design principles
+## Core design principles
+
+The package family is developed according to the following principles:
 
 - Keep Core small.
 - Keep Core dependency-light.

@@ -33,7 +33,7 @@ public sealed class GovernanceMetadataResultTests
     {
         GovernanceMetadataClassificationResult result = action switch
         {
-            GovernanceMetadataSanitizationAction.Warn => GovernanceMetadataClassificationResult.Warn(" metadata.warn ", " Warning message. "),
+            GovernanceMetadataSanitizationAction.Warn => GovernanceMetadataClassificationResult.Warn(" metadata.warn ", " Warn message. "),
             GovernanceMetadataSanitizationAction.Drop => GovernanceMetadataClassificationResult.Drop(" metadata.drop ", " Drop message. "),
             GovernanceMetadataSanitizationAction.Deny => GovernanceMetadataClassificationResult.Deny(" metadata.deny ", " Deny message. "),
             GovernanceMetadataSanitizationAction.Allow => throw new NotImplementedException(),

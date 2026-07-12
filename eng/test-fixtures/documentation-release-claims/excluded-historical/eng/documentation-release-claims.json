@@ -1,0 +1,6 @@
+{
+  "excludedPaths": [
+    "docs/articles/release-notes-*.md"
+  ],
+  "allowedClaims": []
+}

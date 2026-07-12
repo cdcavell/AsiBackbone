@@ -353,7 +353,6 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
     {
         private readonly Lock sync = new();
         private readonly List<ObservedVersionWaiter> observedVersionWaiters = [];
-        private TOptions currentValue = initialValue;
         private int currentVersion;
         private int observedVersion = -1;
 
@@ -365,10 +364,12 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
                 {
                     observedVersion = Math.Max(observedVersion, currentVersion);
                     CompleteObservedVersionWaiters();
-                    return currentValue;
+                    return field;
                 }
             }
-        }
+
+            private set;
+        } = initialValue;
 
         public TOptions Get(string? name)
         {
@@ -387,7 +388,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
 
             lock (sync)
             {
-                currentValue = value;
+                CurrentValue = value;
                 return ++currentVersion;
             }
         }

@@ -246,7 +246,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
 
         await WaitAsync(harness.Service.StopAsync(CancellationToken.None));
 
-        LogEntry logEntry = Assert.Single(harness.Logger.Entries.Where(entry => entry.EventId.Id == 19802));
+        LogEntry logEntry = Assert.Single(harness.Logger.Entries, entry => entry.EventId.Id == 19802);
         Assert.Equal(LogLevel.Warning, logEntry.LogLevel);
         Assert.Same(failure, logEntry.Exception);
     }
@@ -295,8 +295,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
         {
             _ = services.AddSingleton<IAsiBackboneGovernanceOutboxStore>(store);
             _ = services.AddSingleton<IAsiBackboneGovernanceEmitter>(NoOpGovernanceEmitter.Instance);
-            _ = services.AddSingleton<IOptions<AsiBackboneGovernanceOutboxOptions>>(
-                Options.Create(new AsiBackboneGovernanceOutboxOptions()));
+            _ = services.AddSingleton(Options.Create(new AsiBackboneGovernanceOutboxOptions()));
             _ = services.AddScoped<AsiBackboneGovernanceOutboxDrain>();
         }
 
@@ -352,9 +351,8 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
     private sealed class ControllableOptionsMonitor<TOptions>(TOptions initialValue) : IOptionsMonitor<TOptions>
         where TOptions : class
     {
-        private readonly object sync = new();
+        private readonly Lock sync = new();
         private readonly List<ObservedVersionWaiter> observedVersionWaiters = [];
-        private TOptions currentValue = initialValue;
         private int currentVersion;
         private int observedVersion = -1;
 
@@ -366,10 +364,12 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
                 {
                     observedVersion = Math.Max(observedVersion, currentVersion);
                     CompleteObservedVersionWaiters();
-                    return currentValue;
+                    return field;
                 }
             }
-        }
+
+            private set;
+        } = initialValue;
 
         public TOptions Get(string? name)
         {
@@ -388,7 +388,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
 
             lock (sync)
             {
-                currentValue = value;
+                CurrentValue = value;
                 return ++currentVersion;
             }
         }
@@ -426,7 +426,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
 
     private sealed class RecordingScopeFactory(IServiceScopeFactory innerScopeFactory) : IServiceScopeFactory
     {
-        private readonly object sync = new();
+        private readonly Lock sync = new();
         private readonly List<ScopeCountWaiter> scopeCountWaiters = [];
         private int createScopeCallCount;
 
@@ -475,20 +475,15 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
         private sealed record ScopeCountWaiter(int ExpectedCount, TaskCompletionSource Completion);
     }
 
-    private sealed class RecordingOutboxStore : IAsiBackboneGovernanceOutboxStore
+    private sealed class RecordingOutboxStore(
+        Func<int, CancellationToken, ValueTask<IReadOnlyList<GovernanceOutboxEntry>>>? findPending = null) : IAsiBackboneGovernanceOutboxStore
     {
-        private readonly object sync = new();
-        private readonly Func<int, CancellationToken, ValueTask<IReadOnlyList<GovernanceOutboxEntry>>> findPending;
+        private readonly Lock sync = new();
+        private readonly Func<int, CancellationToken, ValueTask<IReadOnlyList<GovernanceOutboxEntry>>> findPending = findPending ?? EmptyPendingAsync;
         private readonly List<PendingCountWaiter> pendingCountWaiters = [];
         private readonly TaskCompletionSource<DateTimeOffset> retryReadyCompletion = new(TaskCreationOptions.RunContinuationsAsynchronously);
         private int findPendingCallCount;
         private DateTimeOffset? lastRetryReadyUtc;
-
-        public RecordingOutboxStore(
-            Func<int, CancellationToken, ValueTask<IReadOnlyList<GovernanceOutboxEntry>>>? findPending = null)
-        {
-            this.findPending = findPending ?? EmptyPendingAsync;
-        }
 
         public int FindPendingCallCount => Volatile.Read(ref findPendingCallCount);
 
@@ -634,7 +629,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
 
     private sealed class RecordingLogger<T> : ILogger<T>
     {
-        private readonly object sync = new();
+        private readonly Lock sync = new();
         private readonly List<LogEntry> entries = [];
 
         public IReadOnlyList<LogEntry> Entries

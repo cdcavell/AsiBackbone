@@ -185,7 +185,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
         var enteredDrain = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var store = new RecordingOutboxStore(async (attempt, cancellationToken) =>
         {
-            enteredDrain.TrySetResult();
+            _ = enteredDrain.TrySetResult();
             await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
             return Array.Empty<GovernanceOutboxEntry>();
         });
@@ -212,7 +212,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
         var enteredDrain = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var store = new RecordingOutboxStore(async (attempt, cancellationToken) =>
         {
-            enteredDrain.TrySetResult();
+            _ = enteredDrain.TrySetResult();
             await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
             return Array.Empty<GovernanceOutboxEntry>();
         });
@@ -415,7 +415,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
                 if (observedVersion >= waiter.Version)
                 {
                     observedVersionWaiters.RemoveAt(index);
-                    waiter.Completion.TrySetResult();
+                    _ = waiter.Completion.TrySetResult();
                 }
             }
         }
@@ -443,7 +443,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
                     if (count >= waiter.ExpectedCount)
                     {
                         scopeCountWaiters.RemoveAt(index);
-                        waiter.Completion.TrySetResult();
+                        _ = waiter.Completion.TrySetResult();
                     }
                 }
             }
@@ -521,7 +521,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
                     if (count >= waiter.ExpectedCount)
                     {
                         pendingCountWaiters.RemoveAt(index);
-                        waiter.Completion.TrySetResult();
+                        _ = waiter.Completion.TrySetResult();
                     }
                 }
             }
@@ -539,7 +539,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
             lock (sync)
             {
                 lastRetryReadyUtc = utcNow;
-                retryReadyCompletion.TrySetResult(utcNow);
+                _ = retryReadyCompletion.TrySetResult(utcNow);
             }
 
             return ValueTask.FromResult<IReadOnlyList<GovernanceOutboxEntry>>(Array.Empty<GovernanceOutboxEntry>());

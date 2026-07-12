@@ -1,3 +1,4 @@
+using System.Globalization;
 using AsiBackbone.Core.Signing;
 using Xunit;
 
@@ -158,8 +159,12 @@ public sealed class ManagedKeySigningServiceBranchTests
         Assert.False(result.IsSigned);
         Assert.Equal("provider.test.failure", result.Metadata.Metadata["failure_code"]);
         Assert.Equal("safe provider failure", result.Metadata.Metadata["failure_message"]);
-        Assert.Equal(expectedProviderAttempts.ToString(), result.Metadata.Metadata["provider_attempts"]);
-        Assert.Equal(maxRetryAttempts.ToString(), result.Metadata.Metadata["retry_attempts"]);
+        Assert.Equal(
+            expectedProviderAttempts.ToString(CultureInfo.InvariantCulture),
+            result.Metadata.Metadata["provider_attempts"]);
+        Assert.Equal(
+            maxRetryAttempts.ToString(CultureInfo.InvariantCulture),
+            result.Metadata.Metadata["retry_attempts"]);
         Assert.Equal(expectedRetryable, result.Metadata.Metadata["failure_retryable"]);
         Assert.Equal(expectedProviderAttempts, client.CallCount);
     }

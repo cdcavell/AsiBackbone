@@ -51,10 +51,10 @@ public sealed class EfCoreGovernanceOutboxRoundTripTests
             providerName: "provider-round-trip",
             providerErrorCode: "429");
         DateTimeOffset createdUtc = new(2026, 7, 12, 15, 0, 0, TimeSpan.Zero);
-        DateTimeOffset updatedUtc = createdUtc.AddMinutes(5);
-        DateTimeOffset nextRetryUtc = createdUtc.AddMinutes(20);
+        var updatedUtc = createdUtc.AddMinutes(5);
+        var nextRetryUtc = createdUtc.AddMinutes(20);
         var claimedUtc = createdUtc.AddMinutes(4);
-        DateTimeOffset claimExpiresUtc = createdUtc.AddMinutes(14);
+        var claimExpiresUtc = createdUtc.AddMinutes(14);
         GovernanceOutboxEntry entry = GovernanceOutboxEntry.Restore(
             envelope,
             GovernanceEmissionStatus.RetryableFailure,

@@ -9,11 +9,11 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 >
 > `AsiBackbone.Core` remains framework-neutral and vendor-neutral. Observability platforms, streaming systems, governance catalogs, signing systems, storage providers, and cloud-specific enrichment belong in optional packages or host applications.
 >
-> `AsiBackbone.OpenTelemetry` is the only concrete released governance emission provider package in `3.0.0`. Event Hubs, Purview, Azure Monitor-specific SDK adapters, immutable-storage providers, and additional Azure-specific packages remain design-only or host-owned guidance unless a future release separately reviews and ships them. See [1.1.0 Release Notes - Accepted deferrals](release-notes-110.md#accepted-deferrals).
+> `AsiBackbone.OpenTelemetry` is the only concrete released governance emission provider package in `3.0.0`. Event Hubs, Purview, Azure Monitor-specific SDK adapters, immutable-storage providers, and additional Azure-specific packages remain design-only or host-owned guidance unless a future release separately reviews and ships them. 
 
 ## Purpose
 
-The `1.1.0` integration direction preserves AsiBackbone's neutral governance spine while allowing host applications to emit structured decision records into operational and governance systems.
+The `3.0.0` integration direction preserves AsiBackbone's neutral governance spine while allowing host applications to emit structured decision records into operational and governance systems.
 
 The primary architecture path is:
 
@@ -122,7 +122,7 @@ Audit residue / lifecycle event
 
 ## OpenTelemetry as the released governance emission provider
 
-`AsiBackbone.OpenTelemetry` is the concrete released governance emission provider package for `1.1.0`.
+`AsiBackbone.OpenTelemetry` is the concrete released governance emission provider package for current release.
 
 Preferred placement:
 
@@ -258,16 +258,15 @@ Use this checklist when documenting provider work:
 - State that Core remains vendor-neutral and framework-neutral.
 - State that provider packages depend on Core, never the reverse.
 - State that durable local/outbox persistence is the reliability baseline before external emission.
-- State that OpenTelemetry is the concrete released governance emission provider in `1.1.0`.
+- State that OpenTelemetry is the concrete released governance emission provider in current release.
 - State that Azure Monitor / Log Analytics is reached through host-configured OpenTelemetry exporter guidance unless a future package says otherwise.
-- State that Event Hubs is design-only future streaming provider strategy, not a released package in `1.1.0`.
-- State that Purview is strategy-only future governance/lineage enrichment, not a released package in `1.1.0`.
+- State that Event Hubs is design-only future streaming provider strategy, not a released package in current release.
+- State that Purview is strategy-only future governance/lineage enrichment, not a released package in current release.
 - State that DLP/classification policy is host-owned unless a future provider explicitly implements it.
 - State that signed does not automatically mean verified, tamper-evident, immutable, or legally non-repudiable.
 
 ## Related documentation
 
-- [1.1.0 Release Notes - Accepted deferrals](release-notes-110.md#accepted-deferrals)
 - [Released: OpenTelemetry Governance Emission Provider](opentelemetry-governance-emission-provider.md)
 - [Design-Only: Event Hubs Governance Emission Provider](event-hubs-governance-emission-provider-design.md)
 - [Strategy-Only: Purview Governance and Lineage Enrichment](purview-governance-lineage-enrichment-strategy.md)

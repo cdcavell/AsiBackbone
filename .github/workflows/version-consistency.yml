@@ -39,3 +39,11 @@ jobs:
           }
 
           ./scripts/Validate-VersionConsistency.ps1 @arguments
+
+      - name: Test documentation release-claim validator
+        shell: pwsh
+        run: ./scripts/Test-DocumentationReleaseClaims.ps1
+
+      - name: Validate documentation release claims
+        shell: pwsh
+        run: ./scripts/Validate-DocumentationReleaseClaims.ps1

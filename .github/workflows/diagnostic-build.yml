@@ -1,0 +1,32 @@
+name: Diagnostic Build
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Diagnostic build tail
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
+        with:
+          global-json-file: global.json
+
+      - name: Restore
+        run: dotnet restore AsiBackbone.slnx
+
+      - name: Build and show diagnostics
+        shell: bash
+        run: |
+          set -o pipefail
+          dotnet build AsiBackbone.slnx --configuration Debug --no-restore 2>&1 | tail -n 120

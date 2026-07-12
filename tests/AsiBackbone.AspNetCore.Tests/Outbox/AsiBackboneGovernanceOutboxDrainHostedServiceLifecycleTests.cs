@@ -183,9 +183,9 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
     public async Task ShutdownDrainTimeoutIsSwallowedAndLogged()
     {
         var enteredDrain = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-        var store = new RecordingOutboxStore(async (_, cancellationToken) =>
+        var store = new RecordingOutboxStore(async (attempt, cancellationToken) =>
         {
-            _ = enteredDrain.TrySetResult();
+            enteredDrain.TrySetResult();
             await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
             return Array.Empty<GovernanceOutboxEntry>();
         });
@@ -210,9 +210,9 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
     public async Task ShutdownDrainCancellationIsSwallowedAndLogged()
     {
         var enteredDrain = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-        var store = new RecordingOutboxStore(async (_, cancellationToken) =>
+        var store = new RecordingOutboxStore(async (attempt, cancellationToken) =>
         {
-            _ = enteredDrain.TrySetResult();
+            enteredDrain.TrySetResult();
             await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
             return Array.Empty<GovernanceOutboxEntry>();
         });
@@ -239,7 +239,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
     public async Task UnexpectedShutdownDrainFailureIsSwallowedAndLogged()
     {
         var failure = new InvalidOperationException("shutdown drain failed");
-        var store = new RecordingOutboxStore((_, _) => throw failure);
+        var store = new RecordingOutboxStore((attempt, cancellationToken) => throw failure);
         AsiBackboneGovernanceOutboxDrainWorkerOptions options = CreateOptions();
         options.DrainOnShutdown = true;
         using WorkerHarness harness = CreateHarness(options, store);
@@ -353,6 +353,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
     {
         private readonly Lock sync = new();
         private readonly List<ObservedVersionWaiter> observedVersionWaiters = [];
+        private TOptions currentValue = initialValue;
         private int currentVersion;
         private int observedVersion = -1;
 
@@ -364,12 +365,10 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
                 {
                     observedVersion = Math.Max(observedVersion, currentVersion);
                     CompleteObservedVersionWaiters();
-                    return field;
+                    return currentValue;
                 }
             }
-
-            private set;
-        } = initialValue;
+        }
 
         public TOptions Get(string? name)
         {
@@ -388,7 +387,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
 
             lock (sync)
             {
-                CurrentValue = value;
+                currentValue = value;
                 return ++currentVersion;
             }
         }
@@ -416,7 +415,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
                 if (observedVersion >= waiter.Version)
                 {
                     observedVersionWaiters.RemoveAt(index);
-                    _ = waiter.Completion.TrySetResult();
+                    waiter.Completion.TrySetResult();
                 }
             }
         }
@@ -444,7 +443,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
                     if (count >= waiter.ExpectedCount)
                     {
                         scopeCountWaiters.RemoveAt(index);
-                        _ = waiter.Completion.TrySetResult();
+                        waiter.Completion.TrySetResult();
                     }
                 }
             }
@@ -522,7 +521,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
                     if (count >= waiter.ExpectedCount)
                     {
                         pendingCountWaiters.RemoveAt(index);
-                        _ = waiter.Completion.TrySetResult();
+                        waiter.Completion.TrySetResult();
                     }
                 }
             }
@@ -540,7 +539,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedServiceLifecycleTests
             lock (sync)
             {
                 lastRetryReadyUtc = utcNow;
-                _ = retryReadyCompletion.TrySetResult(utcNow);
+                retryReadyCompletion.TrySetResult(utcNow);
             }
 
             return ValueTask.FromResult<IReadOnlyList<GovernanceOutboxEntry>>(Array.Empty<GovernanceOutboxEntry>());

@@ -80,7 +80,7 @@ public sealed class ManagedKeyProviderMetadataFilterTests
 
         IReadOnlyDictionary<string, string> result = ManagedKeyProviderMetadataFilter.Filter(source);
 
-        Assert.Single(result);
+        _ = Assert.Single(result);
         Assert.Equal("kms", result["provider_service"]);
     }
 
@@ -96,7 +96,7 @@ public sealed class ManagedKeyProviderMetadataFilterTests
             ["authorization"] = "Bearer secret"
         };
 
-        ManagedKeySignResult result = ManagedKeySignResult.Create(
+        var result = ManagedKeySignResult.Create(
             "signature",
             "TEST-SIGNATURE",
             "managed-key-1",
@@ -107,7 +107,7 @@ public sealed class ManagedKeyProviderMetadataFilterTests
         source["provider_region"] = "west";
         source["provider_service"] = "late-change";
 
-        Assert.Single(result.Metadata);
+        _ = Assert.Single(result.Metadata);
         Assert.Equal("east", result.Metadata["provider_region"]);
         Assert.DoesNotContain("authorization", result.Metadata.Keys);
         Assert.DoesNotContain("provider_service", result.Metadata.Keys);

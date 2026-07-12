@@ -7,10 +7,10 @@ namespace AsiBackbone.Signing.ManagedKey;
 /// </summary>
 internal static class ManagedKeyProviderMetadataFilter
 {
-    internal const int MaxMetadataCount = 16;
+    internal const int MaxMetadataCount = 6;
     internal const int MaxKeyLength = 64;
     internal const int MaxValueLength = 256;
-    internal const int MaxAggregateLength = 2048;
+    internal const int MaxAggregateLength = 1024;
 
     private static readonly ReadOnlyDictionary<string, string> EmptyMetadata =
         new(new Dictionary<string, string>(StringComparer.Ordinal));
@@ -46,7 +46,7 @@ internal static class ManagedKeyProviderMetadataFilter
                 break;
             }
 
-            string candidateKey = item.Key?.Trim() ?? string.Empty;
+            string candidateKey = item.Key.Trim();
             if (candidateKey.Length == 0 || candidateKey.Length > MaxKeyLength)
             {
                 continue;

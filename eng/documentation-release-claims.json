@@ -21,6 +21,11 @@
       "reason": "Existing stale release-line wording discovered while introducing the guard; tracked with the other documentation-currency corrections in issue #596."
     },
     {
+      "path": "GOVERNANCE.md",
+      "linePattern": "`2\\.x` is the canonical package identity line|on the `2\\.x` line",
+      "reason": "Existing stale governance release-line wording discovered by the new validator; tracked for correction by issue #596."
+    },
+    {
       "path": "docs/articles/api-compatibility-and-semver.md",
       "linePattern": "^(?:### Original|The initial stable|### Expanded|The `1\\.[12]\\.x` and `1\\.[12]\\.x` releases expanded the stable)",
       "reason": "Explicitly historical compatibility sections retain their original release identities inside an otherwise current article."

@@ -74,8 +74,8 @@ public sealed class EfCoreGovernanceOutboxRoundTripTests
             },
             claimOwner: "worker-round-trip",
             claimToken: "claim-token-round-trip",
-            claimedUtc,
-            claimExpiresUtc,
+            claimedUtc: claimedUtc,
+            claimExpiresUtc: claimExpiresUtc,
             claimAttemptCount: 3);
 
         await using GovernanceOutboxTestDbContext context = new(options);

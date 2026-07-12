@@ -1,6 +1,6 @@
 # Observability and Governance Emission Architecture
 
-This article documents the released `1.1.0` observability, durable outbox, signing, and governance emission architecture boundary plus the future provider directions that remain design-only.
+This article documents the released `3.0.0` observability, durable outbox, signing, and governance emission architecture boundary plus the future provider directions that remain design-only.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a governance spine for consequential software decision flow. It is not an artificial superintelligence implementation, AI model host, robot controller, compliance product, signing product, or cloud governance platform by itself.
 
@@ -9,11 +9,11 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 >
 > `AsiBackbone.Core` remains framework-neutral and vendor-neutral. Observability platforms, streaming systems, governance catalogs, signing systems, storage providers, and cloud-specific enrichment belong in optional packages or host applications.
 >
-> `AsiBackbone.OpenTelemetry` is the only concrete released governance emission provider package in `1.1.0`. Event Hubs, Purview, Azure Monitor-specific SDK adapters, immutable-storage providers, and additional Azure-specific packages remain design-only or host-owned guidance unless a future release separately reviews and ships them. See [1.1.0 Release Notes - Accepted deferrals](release-notes-110.md#accepted-deferrals).
+> `AsiBackbone.OpenTelemetry` is the only concrete released governance emission provider package in `3.0.0`. Event Hubs, Purview, Azure Monitor-specific SDK adapters, immutable-storage providers, and additional Azure-specific packages remain design-only or host-owned guidance unless a future release separately reviews and ships them. 
 
 ## Purpose
 
-The `1.1.0` integration direction preserves AsiBackbone's neutral governance spine while allowing host applications to emit structured decision records into operational and governance systems.
+The `3.0.0` integration direction preserves AsiBackbone's neutral governance spine while allowing host applications to emit structured decision records into operational and governance systems.
 
 The primary architecture path is:
 
@@ -31,12 +31,12 @@ This sequence keeps the source-of-truth governance record local and durable befo
 
 ## Released versus design-only provider boundary
 
-| Provider path | `1.1.0` status | Appropriate responsibility | Not appropriate responsibility |
+| Provider path | `3.0.0` status | Appropriate responsibility | Not appropriate responsibility |
 | --- | --- | --- | --- |
 | OpenTelemetry | **Released package**: `AsiBackbone.OpenTelemetry`. | Convert neutral governance emission envelopes into .NET diagnostics through `ActivitySource`, activity events, tags, and `Meter` metrics. | Configure exporters, redefine Core decision semantics, or require Core to reference OpenTelemetry packages. |
 | Azure Monitor / Log Analytics | **Host-configured exporter guidance** through OpenTelemetry. No Azure Monitor-specific AsiBackbone package is released. | Receive telemetry through the host's OpenTelemetry exporter pipeline. | Become the only audit store or force Azure SDK dependencies into Core. |
-| Event Hubs | **Design-only future provider strategy.** No Event Hubs package is released in `1.1.0`. | Future optional streaming adapter for minimized governance events after durable outbox persistence. | Replace local durability or imply a current Event Hubs NuGet package exists. |
-| Purview | **Strategy-only future enrichment direction.** No Purview package is released in `1.1.0`. | Future optional governance/catalog/lineage enrichment for selected, summarized, classified events. | Store raw audit records by default, become the primary audit ledger, or imply a current Purview NuGet package exists. |
+| Event Hubs | **Design-only future provider strategy.** No Event Hubs package is released in `3.0.0`. | Future optional streaming adapter for minimized governance events after durable outbox persistence. | Replace local durability or imply a current Event Hubs NuGet package exists. |
+| Purview | **Strategy-only future enrichment direction.** No Purview package is released in `3.0.0`. | Future optional governance/catalog/lineage enrichment for selected, summarized, classified events. | Store raw audit records by default, become the primary audit ledger, or imply a current Purview NuGet package exists. |
 | Signing providers | **Released package boundaries** for local-development and managed-key adapter packages. | Attach signing/verification behavior through provider packages and host-owned key operations. | Claim tamper-evidence without deployed signing, verification, key management, storage, and retention controls. |
 
 Provider-specific packages must depend on Core. Core must not depend on provider packages.
@@ -122,7 +122,7 @@ Audit residue / lifecycle event
 
 ## OpenTelemetry as the released governance emission provider
 
-`AsiBackbone.OpenTelemetry` is the concrete released governance emission provider package for `1.1.0`.
+`AsiBackbone.OpenTelemetry` is the concrete released governance emission provider package for current release.
 
 Preferred placement:
 
@@ -140,9 +140,9 @@ Telemetry payloads should remain metadata-minimized. Do not place secrets, raw t
 
 ## Azure Monitor / Log Analytics guidance
 
-Azure Monitor and Log Analytics are backend targets reached through the host-owned OpenTelemetry exporter pipeline. No Azure Monitor-specific AsiBackbone package is included in `1.1.0`.
+Azure Monitor and Log Analytics are backend targets reached through the host-owned OpenTelemetry exporter pipeline. No Azure Monitor-specific AsiBackbone package is included in `3.0.0`.
 
-Accurate `1.1.0` wording:
+Accurate `3.0.0` wording:
 
 ```text
 AsiBackbone.OpenTelemetry
@@ -161,7 +161,7 @@ Boundary limits:
 
 ## Design-only: Event Hubs streaming provider path
 
-Event Hubs is a design-only future provider strategy in the current documentation set. It is not a released AsiBackbone NuGet package in `1.1.0`.
+Event Hubs is a design-only future provider strategy in the current documentation set. It is not a released AsiBackbone NuGet package in `3.0.0`.
 
 Appropriate future Event Hubs usage:
 
@@ -179,7 +179,7 @@ Boundary limits:
 
 ## Strategy-only: Purview governance and lineage enrichment
 
-Purview is a strategy-only future enrichment direction in the current documentation set. It is not a released AsiBackbone NuGet package in `1.1.0`.
+Purview is a strategy-only future enrichment direction in the current documentation set. It is not a released AsiBackbone NuGet package in `3.0.0`.
 
 Appropriate future Purview usage:
 
@@ -214,7 +214,7 @@ DLP and classification are host-owned responsibilities unless a future package e
 
 ## Signing-ready and current limitations
 
-The `1.1.0` package family includes signing-ready abstractions and provider signing boundaries, but signing alone does not prove tamper-evidence.
+The `3.0.0` package family includes signing-ready abstractions and provider signing boundaries, but signing alone does not prove tamper-evidence.
 
 Do not describe records as:
 
@@ -258,16 +258,15 @@ Use this checklist when documenting provider work:
 - State that Core remains vendor-neutral and framework-neutral.
 - State that provider packages depend on Core, never the reverse.
 - State that durable local/outbox persistence is the reliability baseline before external emission.
-- State that OpenTelemetry is the concrete released governance emission provider in `1.1.0`.
+- State that OpenTelemetry is the concrete released governance emission provider in current release.
 - State that Azure Monitor / Log Analytics is reached through host-configured OpenTelemetry exporter guidance unless a future package says otherwise.
-- State that Event Hubs is design-only future streaming provider strategy, not a released package in `1.1.0`.
-- State that Purview is strategy-only future governance/lineage enrichment, not a released package in `1.1.0`.
+- State that Event Hubs is design-only future streaming provider strategy, not a released package in current release.
+- State that Purview is strategy-only future governance/lineage enrichment, not a released package in current release.
 - State that DLP/classification policy is host-owned unless a future provider explicitly implements it.
 - State that signed does not automatically mean verified, tamper-evident, immutable, or legally non-repudiable.
 
 ## Related documentation
 
-- [1.1.0 Release Notes - Accepted deferrals](release-notes-110.md#accepted-deferrals)
 - [Released: OpenTelemetry Governance Emission Provider](opentelemetry-governance-emission-provider.md)
 - [Design-Only: Event Hubs Governance Emission Provider](event-hubs-governance-emission-provider-design.md)
 - [Strategy-Only: Purview Governance and Lineage Enrichment](purview-governance-lineage-enrichment-strategy.md)

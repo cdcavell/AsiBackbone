@@ -89,7 +89,7 @@ public sealed class ManagedKeySigningOptions
     {
         var options = new ManagedKeySigningOptions
         {
-            KeyId = keyId,
+            KeyId = NormalizeRequired(keyId, string.Empty),
             KeyVersion = NormalizeOptional(keyVersion),
             ProviderName = NormalizeRequired(providerName, DefaultProviderName),
             SignatureAlgorithm = NormalizeRequired(signatureAlgorithm, DefaultSignatureAlgorithm),

@@ -25,7 +25,7 @@ public sealed class ManagedKeyProviderMetadataAggregateTests
 
         IReadOnlyDictionary<string, string> result = ManagedKeyProviderMetadataFilter.Filter(source);
 
-        Assert.Equal(3, result.Count);
+        Assert.Equal(4, result.Count);
         Assert.Contains("provider_region", result.Keys);
         Assert.Contains("provider_zone", result.Keys);
         Assert.Contains("provider_service", result.Keys);

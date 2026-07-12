@@ -1,0 +1,45 @@
+name: Issue 578 Build Diagnostics
+
+on:
+  push:
+    branches:
+      - issue-578-efcore-outbox-claim-concurrency
+
+permissions:
+  contents: read
+
+jobs:
+  diagnostics:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
+        with:
+          global-json-file: global.json
+
+      - name: Restore
+        run: dotnet restore AsiBackbone.slnx
+
+      - name: Capture build diagnostics
+        shell: bash
+        run: |
+          set +e
+          dotnet build AsiBackbone.slnx --configuration Debug --no-restore > issue-578-build.log 2>&1
+          status=$?
+          printf '%s\n' "$status" > issue-578-exit-code.txt
+          cat issue-578-build.log
+          exit 0
+
+      - name: Upload diagnostics
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: issue-578-build-diagnostics
+          path: |
+            issue-578-build.log
+            issue-578-exit-code.txt
+          if-no-files-found: error

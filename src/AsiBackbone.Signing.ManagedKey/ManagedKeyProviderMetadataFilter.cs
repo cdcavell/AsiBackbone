@@ -47,7 +47,7 @@ internal static class ManagedKeyProviderMetadataFilter
             }
 
             string candidateKey = item.Key.Trim();
-            if (candidateKey.Length == 0 || candidateKey.Length > MaxKeyLength)
+            if (candidateKey.Length is 0 or > MaxKeyLength)
             {
                 continue;
             }

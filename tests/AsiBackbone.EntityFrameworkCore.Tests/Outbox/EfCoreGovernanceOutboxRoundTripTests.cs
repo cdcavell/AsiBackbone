@@ -63,8 +63,8 @@ public sealed class EfCoreGovernanceOutboxRoundTripTests
             updatedUtc,
             retryCount: 2,
             maxRetryCount: 7,
-            nextRetryUtc,
-            error,
+            nextRetryUtc: nextRetryUtc,
+            lastError: error,
             providerName: "provider-round-trip",
             providerRecordId: "provider-record-round-trip",
             metadata: new Dictionary<string, string>(StringComparer.Ordinal)
@@ -133,7 +133,7 @@ public sealed class EfCoreGovernanceOutboxRoundTripTests
         Assert.Equal("actor-issue-578", persistedEnvelope.ActorId);
         Assert.Equal("queued", persistedEnvelope.EmitterStatus);
         Assert.Equal("efcore-outbox", persistedEnvelope.EmitterProvider);
-        Assert.Equal(77, persistedEnvelope.OutboxSequence);
+        Assert.Equal(77L, persistedEnvelope.OutboxSequence);
         Assert.Equal("gateway-issue-578", persistedEnvelope.GatewayExecutionId);
         Assert.Equal("ExternalEmissionQueued", persistedEnvelope.DecisionStage);
         Assert.Equal(2, persistedEnvelope.Metadata.Count);
@@ -146,7 +146,7 @@ public sealed class EfCoreGovernanceOutboxRoundTripTests
         Assert.Equal("2.0.0", persistedPayload.SchemaVersion);
         Assert.Equal("application/vnd.asibackbone.audit+json", persistedPayload.ContentType);
         Assert.Equal("payload-hash-round-trip", persistedPayload.ContentHash);
-        Assert.Equal(2048, persistedPayload.SizeBytes);
+        Assert.Equal(2048L, persistedPayload.SizeBytes);
         Assert.Equal(2, persistedPayload.Metadata.Count);
         Assert.Equal("upper-payload", persistedPayload.Metadata["PayloadKey"]);
         Assert.Equal("lower-payload", persistedPayload.Metadata["payloadkey"]);

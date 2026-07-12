@@ -127,7 +127,10 @@ public sealed class ManagedKeySigningServiceCollectionExtensionsTests
     public void RegistrationOverloadsRejectNullArguments()
     {
         ServiceCollection services = new();
-        Func<IServiceProvider, IManagedKeySigningClient> factory = _ => new StubManagedKeySigningClient();
+        static IManagedKeySigningClient factory(IServiceProvider _)
+        {
+            return new StubManagedKeySigningClient();
+        }
 
         Assert.Equal(
             "services",

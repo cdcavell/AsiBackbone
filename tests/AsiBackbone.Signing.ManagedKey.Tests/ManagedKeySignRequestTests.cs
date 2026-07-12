@@ -154,7 +154,7 @@ public sealed class ManagedKeySignRequestTests
 
         ManagedKeySignRequest request = CreateRequest(metadata);
 
-        Assert.Single(metadata);
+        _ = Assert.Single(metadata);
         Assert.Equal(" value ", metadata[" key "]);
         Assert.Equal("value", request.Metadata["key"]);
         Assert.NotSame(metadata, request.Metadata);

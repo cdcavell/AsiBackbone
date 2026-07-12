@@ -84,7 +84,7 @@ public sealed class ManagedKeySigningServiceBranchTests
 
         Assert.True(optionalResult.IsSigned);
         Assert.Null(optionalResult.Metadata.KeyVersion);
-        Assert.Single(optionalClient.Requests);
+        _ = Assert.Single(optionalClient.Requests);
     }
 
     /// <summary>
@@ -96,7 +96,7 @@ public sealed class ManagedKeySigningServiceBranchTests
     [InlineData(typeof(NotSupportedException), "managedkey.signing.unsupported")]
     public async Task SignAsyncMapsHandledProviderExceptions(Type exceptionType, string expectedFailureCode)
     {
-        Exception exception = (Exception)Activator.CreateInstance(exceptionType, "provider failure")!;
+        var exception = (Exception)Activator.CreateInstance(exceptionType, "provider failure")!;
         var service = new ManagedKeySigningService(
             CreateOptions(returnUnsignedOnFailure: true, maxRetryAttempts: 0),
             new ThrowingClient(exception));
@@ -178,7 +178,7 @@ public sealed class ManagedKeySigningServiceBranchTests
             ["connection_string"] = "secret",
             ["signing_status"] = "spoofed"
         };
-        ManagedKeySignResult managedResult = ManagedKeySignResult.Create(
+        var managedResult = ManagedKeySignResult.Create(
             "signature",
             "TEST-SIGNATURE",
             "managed-key-1",
@@ -310,15 +310,12 @@ public sealed class ManagedKeySigningServiceBranchTests
             CancellationToken cancellationToken = default)
         {
             callCount++;
-            if (callCount == 1)
-            {
-                throw new ManagedKeySigningException(
+            return callCount == 1
+                ? throw new ManagedKeySigningException(
                     "provider.retry",
                     "retryable provider failure",
-                    isRetryable: true);
-            }
-
-            return ValueTask.FromResult(result);
+                    isRetryable: true)
+                : ValueTask.FromResult(result);
         }
     }
 }

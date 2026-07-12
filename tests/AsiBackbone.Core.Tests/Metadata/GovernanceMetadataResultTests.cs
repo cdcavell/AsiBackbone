@@ -8,6 +8,9 @@ namespace AsiBackbone.Core.Tests.Metadata;
 /// </summary>
 public sealed class GovernanceMetadataResultTests
 {
+    /// <summary>
+    /// Verifies that an allow classification has no reason or replacement value.
+    /// </summary>
     [Fact]
     public void ClassificationAllowHasNoReasonOrReplacement()
     {
@@ -18,6 +21,10 @@ public sealed class GovernanceMetadataResultTests
         Assert.Null(result.ReplacementValue);
     }
 
+    /// <summary>
+    /// Verifies that non-allow classification factories preserve their action and normalized reason.
+    /// </summary>
+    /// <param name="action">The classification action exercised by the test.</param>
     [Theory]
     [InlineData(GovernanceMetadataSanitizationAction.Warn)]
     [InlineData(GovernanceMetadataSanitizationAction.Drop)]
@@ -41,6 +48,9 @@ public sealed class GovernanceMetadataResultTests
         Assert.Null(result.ReplacementValue);
     }
 
+    /// <summary>
+    /// Verifies that redaction uses the documented default replacement when none is supplied.
+    /// </summary>
     [Fact]
     public void RedactUsesDefaultReplacementWhenOmitted()
     {
@@ -54,6 +64,9 @@ public sealed class GovernanceMetadataResultTests
         Assert.Equal("Redact message.", result.Reason?.Message);
     }
 
+    /// <summary>
+    /// Verifies that redaction preserves a caller-supplied replacement value.
+    /// </summary>
     [Fact]
     public void RedactPreservesCustomReplacement()
     {
@@ -65,6 +78,9 @@ public sealed class GovernanceMetadataResultTests
         Assert.Equal("safe-value", result.ReplacementValue);
     }
 
+    /// <summary>
+    /// Verifies that redaction rejects a null replacement value.
+    /// </summary>
     [Fact]
     public void RedactRejectsNullReplacement()
     {
@@ -74,6 +90,12 @@ public sealed class GovernanceMetadataResultTests
             null!));
     }
 
+    /// <summary>
+    /// Verifies that classification factories reject null, empty, or whitespace reason members.
+    /// </summary>
+    /// <param name="action">The classification action exercised by the test.</param>
+    /// <param name="code">The reason code supplied to the factory.</param>
+    /// <param name="message">The reason message supplied to the factory.</param>
     [Theory]
     [InlineData(GovernanceMetadataSanitizationAction.Warn, null, "message")]
     [InlineData(GovernanceMetadataSanitizationAction.Warn, "", "message")]
@@ -96,6 +118,10 @@ public sealed class GovernanceMetadataResultTests
         });
     }
 
+    /// <summary>
+    /// Verifies that classification contexts reject null, empty, or whitespace metadata keys.
+    /// </summary>
+    /// <param name="key">The metadata key supplied to the context.</param>
     [Theory]
     [InlineData(null)]
     [InlineData("")]
@@ -108,6 +134,9 @@ public sealed class GovernanceMetadataResultTests
             new Dictionary<string, string>()));
     }
 
+    /// <summary>
+    /// Verifies that classification contexts reject null metadata values.
+    /// </summary>
     [Fact]
     public void ClassificationContextRejectsNullValue()
     {
@@ -117,6 +146,9 @@ public sealed class GovernanceMetadataResultTests
             new Dictionary<string, string>()));
     }
 
+    /// <summary>
+    /// Verifies that classification contexts reject a null metadata collection.
+    /// </summary>
     [Fact]
     public void ClassificationContextRejectsNullMetadata()
     {
@@ -126,6 +158,9 @@ public sealed class GovernanceMetadataResultTests
             null!));
     }
 
+    /// <summary>
+    /// Verifies that classification contexts preserve supplied values and the metadata reference.
+    /// </summary>
     [Fact]
     public void ClassificationContextPreservesSuppliedValuesAndReference()
     {
@@ -141,6 +176,9 @@ public sealed class GovernanceMetadataResultTests
         Assert.Same(metadata, context.Metadata);
     }
 
+    /// <summary>
+    /// Verifies that sanitation results reject undefined action values.
+    /// </summary>
     [Fact]
     public void SanitationResultRejectsUndefinedAction()
     {
@@ -151,6 +189,9 @@ public sealed class GovernanceMetadataResultTests
             CreateValidBudgetValidation()));
     }
 
+    /// <summary>
+    /// Verifies that sanitation results reject null metadata, reasons, and budget-validation arguments.
+    /// </summary>
     [Fact]
     public void SanitationResultRejectsNullArguments()
     {
@@ -173,6 +214,12 @@ public sealed class GovernanceMetadataResultTests
             null!));
     }
 
+    /// <summary>
+    /// Verifies continuation and denial state for every defined sanitation action.
+    /// </summary>
+    /// <param name="action">The sanitation action exercised by the test.</param>
+    /// <param name="canProceed">The expected continuation state.</param>
+    /// <param name="isDenied">The expected denial state.</param>
     [Theory]
     [InlineData(GovernanceMetadataSanitizationAction.Allow, true, false)]
     [InlineData(GovernanceMetadataSanitizationAction.Warn, true, false)]
@@ -194,6 +241,10 @@ public sealed class GovernanceMetadataResultTests
         Assert.Equal(isDenied, result.IsDenied);
     }
 
+    /// <summary>
+    /// Verifies that non-denied sanitation results do not throw.
+    /// </summary>
+    /// <param name="action">The non-denied sanitation action exercised by the test.</param>
     [Theory]
     [InlineData(GovernanceMetadataSanitizationAction.Allow)]
     [InlineData(GovernanceMetadataSanitizationAction.Warn)]
@@ -210,6 +261,10 @@ public sealed class GovernanceMetadataResultTests
         result.ThrowIfDenied();
     }
 
+    /// <summary>
+    /// Verifies that denied results without reasons use the stable fallback message and parameter name.
+    /// </summary>
+    /// <param name="parameterName">The optional parameter name supplied to the denial guard.</param>
     [Theory]
     [InlineData(null)]
     [InlineData("")]
@@ -228,6 +283,9 @@ public sealed class GovernanceMetadataResultTests
         Assert.Contains("Governance metadata sanitation denied the metadata collection.", exception.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Verifies that denied results compose multiple reason messages and preserve a supplied parameter name.
+    /// </summary>
     [Fact]
     public void DeniedResultComposesMultipleReasonMessagesAndPreservesParameterName()
     {
@@ -246,6 +304,9 @@ public sealed class GovernanceMetadataResultTests
         Assert.Contains("First reason.; Second reason.", exception.Message, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Verifies that sanitation results preserve supplied metadata, reasons, and budget-validation references.
+    /// </summary>
     [Fact]
     public void SanitationResultPreservesSuppliedReferences()
     {

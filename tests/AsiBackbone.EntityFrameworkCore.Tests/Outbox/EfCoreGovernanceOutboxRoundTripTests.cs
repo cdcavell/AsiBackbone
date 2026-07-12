@@ -53,7 +53,7 @@ public sealed class EfCoreGovernanceOutboxRoundTripTests
         DateTimeOffset createdUtc = new(2026, 7, 12, 15, 0, 0, TimeSpan.Zero);
         DateTimeOffset updatedUtc = createdUtc.AddMinutes(5);
         DateTimeOffset nextRetryUtc = createdUtc.AddMinutes(20);
-        DateTimeOffset claimedUtc = createdUtc.AddMinutes(4);
+        var claimedUtc = createdUtc.AddMinutes(4);
         DateTimeOffset claimExpiresUtc = createdUtc.AddMinutes(14);
         GovernanceOutboxEntry entry = GovernanceOutboxEntry.Restore(
             envelope,

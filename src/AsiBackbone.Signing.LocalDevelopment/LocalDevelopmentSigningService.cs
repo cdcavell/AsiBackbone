@@ -17,6 +17,8 @@ public sealed class LocalDevelopmentSigningService : IAsiBackboneSigningService,
 
     private readonly LocalDevelopmentSigningOptions options;
     private readonly RSA rsa;
+    private readonly object rsaSync = new();
+    private readonly int keySizeBits;
     private bool disposed;
 
     /// <summary>
@@ -30,13 +32,18 @@ public sealed class LocalDevelopmentSigningService : IAsiBackboneSigningService,
     /// <summary>
     /// Initializes a new instance of the <see cref="LocalDevelopmentSigningService" /> class.
     /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when the configured RSA key size is below the supported minimum.
+    /// </exception>
     public LocalDevelopmentSigningService(LocalDevelopmentSigningOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);
+        options.Validate();
 
         this.options = options;
         rsa = RSA.Create();
-        rsa.KeySize = NormalizeKeySize(options.KeySizeBits);
+        rsa.KeySize = options.KeySizeBits;
+        keySizeBits = rsa.KeySize;
     }
 
     /// <inheritdoc />
@@ -55,26 +62,29 @@ public sealed class LocalDevelopmentSigningService : IAsiBackboneSigningService,
 
         try
         {
-            ThrowIfDisposed();
+            lock (rsaSync)
+            {
+                ThrowIfDisposed();
 
-            byte[] data = SigningEncoding.GetBytes(request.SigningHash);
-            byte[] signature = rsa.SignData(data, HashAlgorithmName.SHA256, RSASignaturePadding.Pss);
+                byte[] data = SigningEncoding.GetBytes(request.SigningHash);
+                byte[] signature = rsa.SignData(data, HashAlgorithmName.SHA256, RSASignaturePadding.Pss);
 
-            Dictionary<string, string> metadata = CreateBaseMetadata(request);
-            metadata["signing_status"] = "signed";
+                Dictionary<string, string> metadata = CreateBaseMetadata(request);
+                metadata["signing_status"] = "signed";
 
-            var signingMetadata = SigningMetadata.Create(
-                signingHash: request.SigningHash,
-                hashAlgorithm: NormalizeHashAlgorithm(request.HashAlgorithm),
-                signature: Convert.ToBase64String(signature),
-                signatureAlgorithm: NormalizeRequired(options.SignatureAlgorithm, LocalDevelopmentSigningOptions.DefaultSignatureAlgorithm),
-                keyId: NormalizeRequired(options.KeyId, LocalDevelopmentSigningOptions.DefaultKeyId),
-                keyVersion: NormalizeRequired(options.KeyVersion, LocalDevelopmentSigningOptions.DefaultKeyVersion),
-                provider: NormalizeRequired(options.ProviderName, LocalDevelopmentSigningOptions.DefaultProviderName),
-                signedUtc: DateTimeOffset.UtcNow,
-                metadata: metadata);
+                var signingMetadata = SigningMetadata.Create(
+                    signingHash: request.SigningHash,
+                    hashAlgorithm: NormalizeHashAlgorithm(request.HashAlgorithm),
+                    signature: Convert.ToBase64String(signature),
+                    signatureAlgorithm: NormalizeRequired(options.SignatureAlgorithm, LocalDevelopmentSigningOptions.DefaultSignatureAlgorithm),
+                    keyId: NormalizeRequired(options.KeyId, LocalDevelopmentSigningOptions.DefaultKeyId),
+                    keyVersion: NormalizeRequired(options.KeyVersion, LocalDevelopmentSigningOptions.DefaultKeyVersion),
+                    provider: NormalizeRequired(options.ProviderName, LocalDevelopmentSigningOptions.DefaultProviderName),
+                    signedUtc: DateTimeOffset.UtcNow,
+                    metadata: metadata);
 
-            return ValueTask.FromResult(SigningResult.FromMetadata(signingMetadata));
+                return ValueTask.FromResult(SigningResult.FromMetadata(signingMetadata));
+            }
         }
         catch (Exception exception) when (exception is CryptographicException or ObjectDisposedException or InvalidOperationException)
         {
@@ -125,15 +135,18 @@ public sealed class LocalDevelopmentSigningService : IAsiBackboneSigningService,
 
         try
         {
-            ThrowIfDisposed();
+            lock (rsaSync)
+            {
+                ThrowIfDisposed();
 
-            byte[] signature = Convert.FromBase64String(metadata.Signature!);
-            byte[] data = SigningEncoding.GetBytes(request.SigningHash);
-            bool verified = rsa.VerifyData(data, signature, HashAlgorithmName.SHA256, RSASignaturePadding.Pss);
+                byte[] signature = Convert.FromBase64String(metadata.Signature!);
+                byte[] data = SigningEncoding.GetBytes(request.SigningHash);
+                bool verified = rsa.VerifyData(data, signature, HashAlgorithmName.SHA256, RSASignaturePadding.Pss);
 
-            return ValueTask.FromResult(verified
-                ? SignatureVerificationResult.Verified()
-                : SignatureVerificationResult.Failed("localdev.signature.invalid", "The local-development signature did not verify."));
+                return ValueTask.FromResult(verified
+                    ? SignatureVerificationResult.Verified()
+                    : SignatureVerificationResult.Failed("localdev.signature.invalid", "The local-development signature did not verify."));
+            }
         }
         catch (FormatException)
         {
@@ -148,20 +161,16 @@ public sealed class LocalDevelopmentSigningService : IAsiBackboneSigningService,
     /// <inheritdoc />
     public void Dispose()
     {
-        if (disposed)
+        lock (rsaSync)
         {
-            return;
+            if (disposed)
+            {
+                return;
+            }
+
+            disposed = true;
+            rsa.Dispose();
         }
-
-        rsa.Dispose();
-        disposed = true;
-    }
-
-    private static int NormalizeKeySize(int keySizeBits)
-    {
-        return keySizeBits >= 2048
-            ? keySizeBits
-            : LocalDevelopmentSigningOptions.DefaultKeySizeBits;
     }
 
     private static string NormalizeRequired(string? value, string fallback)
@@ -202,7 +211,7 @@ public sealed class LocalDevelopmentSigningService : IAsiBackboneSigningService,
 
     private string? ValidateSigningRequest(SigningRequest request)
     {
-        if (disposed)
+        if (Volatile.Read(ref disposed))
         {
             return "localdev.signing.disposed";
         }
@@ -249,7 +258,7 @@ public sealed class LocalDevelopmentSigningService : IAsiBackboneSigningService,
             ["provider_kind"] = "local-development",
             ["provider_warning"] = "local-development-only",
             ["key_algorithm"] = "RSA",
-            ["key_size_bits"] = rsa.KeySize.ToString(System.Globalization.CultureInfo.InvariantCulture)
+            ["key_size_bits"] = keySizeBits.ToString(System.Globalization.CultureInfo.InvariantCulture)
         };
 
         if (request.Purpose is not null)

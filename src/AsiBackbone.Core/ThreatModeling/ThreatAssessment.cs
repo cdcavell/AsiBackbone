@@ -33,6 +33,10 @@ public sealed class ThreatAssessment
     /// <param name="recommendedOutcome">The governance outcome recommended by the contributor.</param>
     /// <param name="confidence">The contributor confidence from 0.0 to 1.0.</param>
     /// <param name="metadata">Optional host-supplied metadata retained on generated operation reasons.</param>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when <paramref name="severity" /> or <paramref name="recommendedOutcome" /> is undefined,
+    /// or when <paramref name="confidence" /> is outside the supported range.
+    /// </exception>
     public ThreatAssessment(
         ThreatSeverity severity,
         string category,
@@ -42,6 +46,19 @@ public sealed class ThreatAssessment
         double confidence = MaximumConfidence,
         IReadOnlyDictionary<string, string>? metadata = null)
     {
+        if (!Enum.IsDefined(severity))
+        {
+            throw new ArgumentOutOfRangeException(nameof(severity), severity, "Threat severity must be defined.");
+        }
+
+        if (!Enum.IsDefined(recommendedOutcome))
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(recommendedOutcome),
+                recommendedOutcome,
+                "Recommended governance outcome must be defined.");
+        }
+
         ArgumentException.ThrowIfNullOrWhiteSpace(category);
         ArgumentException.ThrowIfNullOrWhiteSpace(reasonCode);
         ArgumentException.ThrowIfNullOrWhiteSpace(description);
@@ -129,6 +146,10 @@ public sealed class ThreatAssessment
     /// <param name="confidence">The contributor confidence from 0.0 to 1.0.</param>
     /// <param name="metadata">Optional host-supplied metadata retained on generated operation reasons.</param>
     /// <returns>A threat assessment.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when <paramref name="severity" /> or <paramref name="recommendedOutcome" /> is undefined,
+    /// or when <paramref name="confidence" /> is outside the supported range.
+    /// </exception>
     public static ThreatAssessment Create(
         ThreatSeverity severity,
         string category,

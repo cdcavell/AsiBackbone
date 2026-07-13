@@ -97,6 +97,14 @@ The EF Core adapter is durable storage only. It does not drain the outbox by its
 
 `EfCoreGovernanceOutboxStore` participates in EF Core optimistic concurrency through the configured `ConcurrencyStamp` token. That protects state updates from stale writes, but it is not an atomic claim-before-emit mechanism. Multiple workers can still read the same pending row before either worker saves the final delivered/failed state.
 
+### Non-claim mutation concurrency ownership
+
+The non-claim mutation methods `SaveAsync(...)`, `MarkDeliveredAsync(...)`, `MarkFailedAsync(...)`, and `MarkDeadLetteredAsync(...)` intentionally allow `DbUpdateConcurrencyException` to propagate unchanged. The store does not hide, translate, or automatically retry these conflicts.
+
+The caller owns durable-state reload, conflict resolution, retry policy, and idempotency decisions. This prevents the package from silently returning another writer's state as though the current invocation applied it, and it avoids reapplying a stale transition after a newer durable writer has won.
+
+For competing or scaled workers, prefer claim leasing and the outcome-aware claim contract so write ownership is explicit. See [EF Core Outbox Non-Claim Concurrency Ownership](https://cdcavell.github.io/AsiBackbone/articles/efcore-outbox-non-claim-concurrency-ownership.html) and [Outbox Multi-Worker Concurrency Guidance](https://cdcavell.github.io/AsiBackbone/articles/outbox-multi-worker-concurrency.html).
+
 For scaled-out deployments, run one active worker per durable outbox partition unless the host adds provider-specific claim/lease behavior or downstream idempotency. See the DocFX article `Outbox Multi-Worker Concurrency` for the detailed deployment guidance.
 
 ## Registering EF Core stores

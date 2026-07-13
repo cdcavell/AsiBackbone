@@ -16,18 +16,37 @@ public sealed class ManagedKeySigningService : IAsiBackboneSigningService
 
     private readonly ManagedKeySigningOptions options;
     private readonly IManagedKeySigningClient client;
+    private readonly IManagedKeyRetryJitterSource jitterSource;
+    private readonly IManagedKeyRetryDelay retryDelay;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ManagedKeySigningService" /> class.
     /// </summary>
     public ManagedKeySigningService(ManagedKeySigningOptions options, IManagedKeySigningClient client)
+        : this(
+            options,
+            client,
+            SharedRandomManagedKeyRetryJitterSource.Instance,
+            SystemManagedKeyRetryDelay.Instance)
+    {
+    }
+
+    internal ManagedKeySigningService(
+        ManagedKeySigningOptions options,
+        IManagedKeySigningClient client,
+        IManagedKeyRetryJitterSource jitterSource,
+        IManagedKeyRetryDelay retryDelay)
     {
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(client);
+        ArgumentNullException.ThrowIfNull(jitterSource);
+        ArgumentNullException.ThrowIfNull(retryDelay);
 
         options.Validate();
         this.options = options;
         this.client = client;
+        this.jitterSource = jitterSource;
+        this.retryDelay = retryDelay;
     }
 
     /// <inheritdoc />
@@ -61,7 +80,7 @@ public sealed class ManagedKeySigningService : IAsiBackboneSigningService
             {
                 diagnostics.RecordRetry(exception);
                 attempt++;
-                await DelayForRetryAsync(diagnostics, cancellationToken).ConfigureAwait(false);
+                await DelayForRetryAsync(attempt, diagnostics, cancellationToken).ConfigureAwait(false);
             }
             catch (ManagedKeySigningException exception)
             {
@@ -211,9 +230,14 @@ public sealed class ManagedKeySigningService : IAsiBackboneSigningService
         metadata["retry_attempts"] = retryAttempts.ToString(CultureInfo.InvariantCulture);
         metadata["provider_attempts"] = providerAttempts.ToString(CultureInfo.InvariantCulture);
         metadata["max_retry_attempts"] = diagnostics.MaxRetryAttempts.ToString(CultureInfo.InvariantCulture);
-        metadata["retry_delay_milliseconds"] = diagnostics.RetryDelay.TotalMilliseconds.ToString("0.###", CultureInfo.InvariantCulture);
-        metadata["retry_delay_configured"] = ToMetadataBoolean(diagnostics.RetryDelay > TimeSpan.Zero);
-        metadata["retry_delay_applied"] = ToMetadataBoolean(diagnostics.RetryDelayApplied);
+        metadata["retry_delay_milliseconds"] = diagnostics.BaseRetryDelay.TotalMilliseconds.ToString("0.###", CultureInfo.InvariantCulture);
+        metadata["max_retry_delay_milliseconds"] = diagnostics.MaxRetryDelay.TotalMilliseconds.ToString("0.###", CultureInfo.InvariantCulture);
+        metadata["last_retry_delay_milliseconds"] = diagnostics.LastRetryDelay.TotalMilliseconds.ToString("0.###", CultureInfo.InvariantCulture);
+        metadata["total_retry_delay_milliseconds"] = diagnostics.TotalRetryDelay.TotalMilliseconds.ToString("0.###", CultureInfo.InvariantCulture);
+        metadata["retry_delay_count"] = diagnostics.RetryDelayCount.ToString(CultureInfo.InvariantCulture);
+        metadata["retry_backoff_strategy"] = ManagedKeyRetryBackoff.StrategyName;
+        metadata["retry_delay_configured"] = ToMetadataBoolean(diagnostics.BaseRetryDelay > TimeSpan.Zero);
+        metadata["retry_delay_applied"] = ToMetadataBoolean(diagnostics.RetryDelayCount > 0);
         metadata["signature_algorithm"] = NormalizeRequired(options.SignatureAlgorithm, ManagedKeySigningOptions.DefaultSignatureAlgorithm);
 
         if (diagnostics.LastRetryFailureCode is not null)
@@ -298,19 +322,32 @@ public sealed class ManagedKeySigningService : IAsiBackboneSigningService
     }
 
     private async ValueTask DelayForRetryAsync(
+        int retryAttempt,
         ManagedKeySigningAttemptDiagnostics diagnostics,
         CancellationToken cancellationToken)
     {
-        if (options.RetryDelay > TimeSpan.Zero)
+        TimeSpan delay = ManagedKeyRetryBackoff.CalculateDelay(
+            options.RetryDelay,
+            options.MaxRetryDelay,
+            retryAttempt,
+            jitterSource.NextDouble(),
+            diagnostics.LastRetryDelay);
+
+        if (delay <= TimeSpan.Zero)
         {
-            diagnostics.RecordRetryDelayApplied();
-            await Task.Delay(options.RetryDelay, cancellationToken).ConfigureAwait(false);
+            return;
         }
+
+        diagnostics.RecordRetryDelay(delay);
+        await retryDelay.DelayAsync(delay, cancellationToken).ConfigureAwait(false);
     }
 
     private ManagedKeySigningAttemptDiagnostics CreateAttemptDiagnostics()
     {
-        return new ManagedKeySigningAttemptDiagnostics(options.MaxRetryAttempts, options.RetryDelay);
+        return new ManagedKeySigningAttemptDiagnostics(
+            options.MaxRetryAttempts,
+            options.RetryDelay,
+            options.MaxRetryDelay);
     }
 
     private static bool IsSafeProviderMetadataKey(string key)
@@ -343,13 +380,22 @@ public sealed class ManagedKeySigningService : IAsiBackboneSigningService
         return value ? "true" : "false";
     }
 
-    private sealed class ManagedKeySigningAttemptDiagnostics(int maxRetryAttempts, TimeSpan retryDelay)
+    private sealed class ManagedKeySigningAttemptDiagnostics(
+        int maxRetryAttempts,
+        TimeSpan baseRetryDelay,
+        TimeSpan maxRetryDelay)
     {
         public int MaxRetryAttempts { get; } = maxRetryAttempts;
 
-        public TimeSpan RetryDelay { get; } = retryDelay;
+        public TimeSpan BaseRetryDelay { get; } = baseRetryDelay;
 
-        public bool RetryDelayApplied { get; private set; }
+        public TimeSpan MaxRetryDelay { get; } = maxRetryDelay;
+
+        public TimeSpan LastRetryDelay { get; private set; }
+
+        public TimeSpan TotalRetryDelay { get; private set; }
+
+        public int RetryDelayCount { get; private set; }
 
         public bool HasValidationFailure { get; private set; }
 
@@ -372,9 +418,11 @@ public sealed class ManagedKeySigningService : IAsiBackboneSigningService
             LastRetryFailureExceptionType = exception.GetType().Name;
         }
 
-        public void RecordRetryDelayApplied()
+        public void RecordRetryDelay(TimeSpan delay)
         {
-            RetryDelayApplied = true;
+            LastRetryDelay = delay;
+            TotalRetryDelay += delay;
+            RetryDelayCount++;
         }
 
         public void RecordFailure(Exception exception)

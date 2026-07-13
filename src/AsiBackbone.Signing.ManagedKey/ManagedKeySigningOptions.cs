@@ -25,6 +25,11 @@ public sealed class ManagedKeySigningOptions
     public const string DefaultHashAlgorithm = "SHA-256";
 
     /// <summary>
+    /// Gets the default maximum retry delay.
+    /// </summary>
+    public static TimeSpan DefaultMaxRetryDelay { get; } = TimeSpan.FromSeconds(5);
+
+    /// <summary>
     /// Gets or sets the provider descriptor returned in signing metadata.
     /// </summary>
     public string ProviderName { get; set; } = DefaultProviderName;
@@ -69,9 +74,17 @@ public sealed class ManagedKeySigningOptions
     public int MaxRetryAttempts { get; set; } = 2;
 
     /// <summary>
-    /// Gets or sets the delay between retry attempts.
+    /// Gets or sets the base delay used by the exponential retry backoff calculation.
     /// </summary>
+    /// <remarks>
+    /// A zero value keeps retries immediate and disables jittered waiting.
+    /// </remarks>
     public TimeSpan RetryDelay { get; set; } = TimeSpan.FromMilliseconds(200);
+
+    /// <summary>
+    /// Gets or sets the maximum delay applied before any single retry attempt.
+    /// </summary>
+    public TimeSpan MaxRetryDelay { get; set; } = DefaultMaxRetryDelay;
 
     /// <summary>
     /// Creates production-oriented managed-key signing options that fail closed by default when signing cannot complete.
@@ -167,6 +180,16 @@ public sealed class ManagedKeySigningOptions
         if (RetryDelay < TimeSpan.Zero)
         {
             throw new InvalidOperationException("Managed-key signing retry delay must be greater than or equal to zero.");
+        }
+
+        if (MaxRetryDelay < TimeSpan.Zero)
+        {
+            throw new InvalidOperationException("Managed-key signing maximum retry delay must be greater than or equal to zero.");
+        }
+
+        if (MaxRetryDelay < RetryDelay)
+        {
+            throw new InvalidOperationException("Managed-key signing maximum retry delay must be greater than or equal to the base retry delay.");
         }
     }
 

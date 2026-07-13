@@ -20,6 +20,14 @@ The default local-development signature descriptor is `RSASSA-PSS-SHA256-LOCAL-D
 
 Core remains provider-neutral. `AsiBackbone.Core` does not reference this package.
 
+## RSA key size
+
+The generated local-development RSA key defaults to **2048 bits**. Explicit values must be at least `LocalDevelopmentSigningOptions.MinimumKeySizeBits` (currently 2048 bits).
+
+Values below the minimum, including zero and negative values, fail configuration validation. They are not silently replaced with the default. This makes local configuration mistakes visible while preserving the secure default when no key size is supplied.
+
+Supported larger values, such as 3072 or 4096 bits, are passed directly to the platform RSA implementation. Hosts should still use a managed-key or HSM-backed provider for production key custody.
+
 ## Metadata returned
 
 Successful signing results include:
@@ -41,13 +49,22 @@ Signing failures in normal flow return unsigned signing metadata with explicit `
 ```csharp
 var localSigningOptions = LocalDevelopmentSigningOptions.Create(
     keyId: "sample-local-dev-key",
-    keyVersion: "dev");
+    keyVersion: "dev",
+    keySizeBits: 3072);
 
 var localSigningService = new LocalDevelopmentSigningService(localSigningOptions);
 
 builder.Services.AddSingleton(localSigningService);
 builder.Services.AddSingleton<IAsiBackboneSigningService>(localSigningService);
 builder.Services.AddSingleton<IAsiBackboneSignatureVerificationService>(localSigningService);
+```
+
+The builder facade validates configuration during registration:
+
+```csharp
+builder.Services
+    .AddAsiBackbone()
+    .UseLocalDevelopmentSigning(localSigningOptions);
 ```
 
 ## Example flow

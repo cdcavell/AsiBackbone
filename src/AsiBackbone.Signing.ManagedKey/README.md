@@ -42,6 +42,7 @@ services.AddAsiBackboneManagedKeySigning(
         options.ReturnUnsignedOnFailure = false;
         options.MaxRetryAttempts = 2;
         options.RetryDelay = TimeSpan.FromMilliseconds(200);
+        options.MaxRetryDelay = TimeSpan.FromSeconds(5);
     },
     serviceProvider => new HostOwnedManagedKeySigningClient());
 ```
@@ -80,6 +81,11 @@ When `ReturnUnsignedOnFailure` is `true`, signing failures return unsigned `Sign
 - `provider_attempts`
 - `max_retry_attempts`
 - `retry_delay_milliseconds`
+- `max_retry_delay_milliseconds`
+- `last_retry_delay_milliseconds`
+- `total_retry_delay_milliseconds`
+- `retry_delay_count`
+- `retry_backoff_strategy`
 - `retry_delay_configured`
 - `retry_delay_applied`
 
@@ -87,9 +93,17 @@ Unsigned failure metadata is not a successful signature and must not be describe
 
 ## Retry diagnostics
 
-`ManagedKeySigningService` retries only when the host-owned client throws `ManagedKeySigningException` with `IsRetryable = true` and retry attempts remain. `RetryDelay` is applied only between retryable attempts. Set `RetryDelay = TimeSpan.Zero` when a host wants retry attempts without an intentional wait between attempts.
+`ManagedKeySigningService` retries only when the host-owned client throws `ManagedKeySigningException` with `IsRetryable = true` and retry attempts remain. Non-retryable failures are returned or thrown immediately according to `ReturnUnsignedOnFailure`.
 
-Signed and unsigned results include retry diagnostics so operators can see how the managed-key boundary behaved without relying on exception text alone. Request metadata and provider-supplied metadata are not allowed to overwrite service-owned diagnostic keys such as `signing_status`, `retry_attempts`, `provider_attempts`, `provider_operation_id`, or `failure_code`.
+`RetryDelay` is the base delay. Before each retry, the service calculates an exponentially growing delay window and applies jitter inside the upper half of that window. The delay never exceeds `MaxRetryDelay`, and a later retry is never scheduled earlier than the previously applied retry delay. This avoids identical workers repeatedly retrying on the same fixed schedule while keeping backoff bounded and operationally predictable.
+
+The defaults remain two retries, a 200 ms base delay, and a 5 second maximum delay. Existing configurations that set only `RetryDelay` continue to use that value as the base. Set `RetryDelay = TimeSpan.Zero` to retain immediate retries with no waiting or jitter. `MaxRetryDelay` must be greater than or equal to `RetryDelay`.
+
+Delay waits honor the signing cancellation token. Cancellation interrupts a pending backoff and prevents the next provider call.
+
+Signed and unsigned results include the configured base and maximum delay, the last and cumulative applied delays, delay count, and `retry_backoff_strategy = exponential-jitter`. Request metadata and provider-supplied metadata are not allowed to overwrite these service-owned diagnostic keys or other fields such as `signing_status`, `retry_attempts`, `provider_attempts`, `provider_operation_id`, or `failure_code`.
+
+Provider-supplied retry timing is not accepted from the general provider metadata dictionary. A future explicit provider-neutral retry-after contract would require separate validation and bounds rather than trusting arbitrary metadata.
 
 ## Safe metadata
 

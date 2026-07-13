@@ -85,6 +85,7 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 * [Governance Emission Contract](articles/governance-emission-contract.md)
 * [Durable Audit and Outbox Persistence](articles/durable-audit-outbox-persistence.md)
 * [Hosted Governance Outbox Drain](articles/hosted-governance-outbox-drain.md)
+* [EF Core Outbox Bulk-Claim Performance Evaluation](articles/efcore-outbox-bulk-claim-evaluation.md)
 * [OpenTelemetry Governance Emission Provider](articles/opentelemetry-governance-emission-provider.md)
 * [Signing Provider Package Boundary](articles/signing-provider-package-boundary.md)
 * [Managed-Key Signing Provider](articles/managed-key-signing-provider.md)

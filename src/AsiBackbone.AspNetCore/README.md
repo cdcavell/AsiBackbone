@@ -104,10 +104,14 @@ The worker resolves the drain from a scoped service provider so host-owned durab
 The default resolver:
 
 - checks configured correlation headers such as `X-Correlation-ID` and `X-Request-ID`;
-- falls back to `HttpContext.TraceIdentifier` when no configured header is present;
+- trims and preserves valid printable client values up to `AsiBackboneIdentifierLimits.MaximumLength` characters;
+- ignores whitespace-only, oversized, or control-character-bearing values and continues to another configured value or the normal fallback;
+- falls back to `HttpContext.TraceIdentifier` when no acceptable configured header value is available;
 - captures a trace identifier from `Activity.Current` or the ASP.NET Core trace identifier;
 - emits safe request metadata such as method, route pattern, endpoint display name, and route values;
 - excludes sensitive request data such as headers, query strings, request bodies, cookies, and tokens by default.
+
+Invalid correlation headers are not truncated or partially sanitized. The entire client value is discarded so two distinct hostile values cannot collapse into the same accepted identifier and control characters cannot reach logging, governance records, or bounded persistence columns. Server-generated fallback behavior is unchanged.
 
 Example usage:
 

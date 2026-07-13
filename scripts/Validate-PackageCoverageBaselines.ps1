@@ -140,6 +140,14 @@ foreach ($target in $targets) {
     $relativeCoverageReportPath = Get-RepositoryRelativePath -Path $coverageReportPath
 
     if ($exitCode -ne 0) {
+        $failureMessage = 'Package coverage baseline failed for {0}. Test project: {1}; threshold: {2}%; exit code: {3}.' -f `
+            $target.Package,
+            $target.TestProject,
+            $threshold,
+            $exitCode
+
+        Write-Warning $failureMessage
+
         $failures += [pscustomobject]@{
             Package = $target.Package
             TestProject = $target.TestProject

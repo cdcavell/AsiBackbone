@@ -201,11 +201,12 @@ jobs:
           if-no-files-found: error
 
       - name: Upload adapter and provider package coverage artifacts
+        if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: asi-backbone-package-coverage-baselines
           path: ${{ env.PACKAGE_COVERAGE_OUTPUT }}/**
-          if-no-files-found: error
+          if-no-files-found: warn
 
       - name: Upload XML documentation inventory artifact
         if: always()

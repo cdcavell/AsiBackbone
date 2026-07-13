@@ -8,69 +8,156 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ### Release summary
 
-`3.0.0` establishes the current stable `3.x` AsiBackbone package family.
+`3.0.0` establishes the stable `3.x` AsiBackbone package family and advances the project as a provider-neutral Accountable Systems Infrastructure governance spine for governed .NET decision flow.
 
-This is a major release because it starts a new stable binary assembly identity line with `AssemblyVersion` `3.0.0.0`, aligns repository metadata and documentation around the `3.0.0` release posture, and carries forward the current Accountable Systems Infrastructure governance-spine package family.
+This is a major release because it:
 
-The release preserves the existing `AsiBackbone.*` package IDs and public namespaces established by the `2.0.0` line. Consumers should update package references, rebuild, and validate host deployments, but no broad package rename or namespace migration is intended.
+* starts a new binary identity line with `AssemblyVersion` `3.0.0.0`;
+* intentionally targets `.NET 10` through `net10.0`;
+* changes empty-policy and eligible constraint-exception handling to fail closed by default;
+* adds threat-model, metadata-sanitation, regulated-governance, durable outbox coordination, signing, verification, and release-quality hardening.
+
+The existing `AsiBackbone.*` package IDs and public namespaces remain unchanged. Consumers should update package references, rebuild, and validate host behavior, especially policy defaults, durable outbox processing, signing configuration, and assembly-loading assumptions.
 
 ### Added
 
-* Added `3.0.0` release notes and a `3.0.0` release readiness record.
-* Added `InMemoryCapabilityGrantUseStore` to `AsiBackbone.Storage.InMemory` as a non-production reference implementation of `ICapabilityGrantUseStore` for tests, samples, local validation, and package-consumer smoke coverage of first-use/replay-denied behavior.
-* Added Debug solution build coverage validation so first-party package and test projects remain enabled for default local Debug solution builds unless an exclusion is reviewed and documented.
-* Added CI and Stable Release Validation coverage for Debug solution build posture.
-* Promoted current documentation posture around threat-model contributors, strict-governance profile helpers, EF Core JSON metadata storage guidance, policy-input hardening, production placeholder guardrails, capability-grant hardening, package SBOM/provenance, and release-validation guidance for the `3.x` line.
+* Added threat-model extension points through `IThreatModelContributor<TContext>`, `ThreatAssessment`, `ThreatSeverity`, and conventional threat categories.
+* Added provider-neutral governance metadata classification and sanitation abstractions with ordered allow, warn, redact, drop, and deny behavior.
+* Added `DefaultGovernanceMetadataSanitizer` with post-sanitation metadata-budget enforcement and fail-closed denial behavior.
+* Added the regulated governance deployment profile through `AddAsiBackboneRegulatedGovernance()` and `UseRegulatedGovernanceProfile()`.
+* Added explicit strict-governance profile helpers through `AddAsiBackboneStrictGovernance()` and `UseStrictGovernanceProfile()`.
+* Added provider-neutral governance outbox claim and lease models through `IAsiBackboneGovernanceOutboxClaimStore`.
+* Added opt-in claim-based outbox draining with worker identity, opaque claim tokens, lease expiration, and claim-attempt tracking.
+* Added `IAsiBackboneGovernanceOutboxClaimOutcomeStore` with explicit `Applied`, `StaleClaim`, `Terminal`, `ConcurrencyLost`, and `Missing` transition outcomes.
+* Added provider-neutral poison-message and maximum failed-attempt controls for governance outbox draining.
+* Added `InMemoryCapabilityGrantUseStore` as a non-durable reference implementation for tests, samples, smoke tests, and local replay validation.
+* Added configurable `CapabilityGrantValidationOptions.AllowedClockSkew` while preserving zero-skew behavior by default.
+* Added persistence of audit-ledger signing hash, key version, provider, and signing timestamp through the EF Core audit store.
+* Added shared `AsiBackboneIdentifierLimits.MaximumLength` guidance for bounded identifiers.
+* Added bounded exponential managed-key retry backoff with jitter and the `MaxRetryDelay` configuration boundary.
+* Added a provider-neutral managed-key metadata allowlist for safe region, zone, service, request, status, and key-state diagnostics.
+* Added an explicit `LocalDevelopmentSigningOptions.MinimumKeySizeBits` contract for local-development RSA keys.
+* Added reusable framework-neutral contract fixtures under `AsiBackbone.Testing.Contracts`.
+* Added a 3.0.0 consumer verification guide covering package source, package IDs, Source Link, SBOMs, provenance, target framework, and deferred package signing.
+* Added regulated signing and storage verification guidance covering canonical hashing, signature verification, retention, key rotation, revocation, hash chains, and external anchoring.
+* Added a governance and standards crosswalk covering major AI governance, cybersecurity, privacy, and interoperability references without claiming certification.
+* Added Debug solution build coverage validation and reviewed exclusions.
+* Added tracked XML-documentation and package-specific coverage baselines.
+* Added targeted mutation-analysis reports for Core, ASP.NET Core, managed-key metadata boundaries, and OpenTelemetry event-name mapping.
+* Added automated validation for stale evergreen current-release documentation claims.
 
 ### Changed
 
 * Promoted central package version metadata from `2.3.0` to `3.0.0`.
-* Updated `AssemblyVersion` from `2.0.0.0` to `3.0.0.0` for the new stable major line.
+* Updated `AssemblyVersion` from `2.0.0.0` to `3.0.0.0`.
 * Updated `FileVersion` to `3.0.0.0`.
 * Updated `CITATION.cff` and `.zenodo.json` for the `3.0.0` release.
-* Updated README, documentation home, article index, DocFX article navigation, release validation guidance, release cadence guidance, API compatibility / SemVer guidance, security posture, governance wording, template guidance, generated template fallback package versions, Source Link validation defaults, and package-family wording for the current `3.x` release posture.
-* Changed the Core evaluator constraint-exception posture for the `3.x` line so eligible ordinary constraint exceptions default to denied governance decisions with stable reason codes and auditable policy metadata.
-* Updated release-facing documentation so stale `2.3.0` / `2.x` current-release wording is either corrected to `3.0.0` / `3.x` or preserved only in clearly historical release records.
-* Refreshed historical API and release guidance so older `1.x` and `2.x` records remain traceable without being presented as the current stable package line.
+* Confirmed `net10.0` as the intentional target framework for the `3.0.x` package family.
+* Changed `AsiBackbonePolicyEvaluatorOptions.DenyWhenNoConstraints` to default to `true`.
+* Changed `AsiBackbonePolicyEvaluatorOptions.TreatConstraintExceptionAsDenial` to default to `true`.
+* Preserved explicit opt-outs for hosts that intentionally require permissive empty-policy evaluation or propagated constraint exceptions.
+* Hardened threat-contributor exception handling so eligible contributor failures default to denied governance outcomes while cancellation and critical runtime failures continue to propagate.
+* Froze policy-evaluator options after successful validation so constructed evaluators cannot observe later caller-side configuration drift.
+* Changed the default local-development and managed-key signature descriptors to RSA-PSS terminology.
+* Changed local-development signing and verification to use RSA-PSS with SHA-256.
+* Changed local-development signing key configuration so values below 2048 bits fail explicitly instead of being silently replaced with the default.
+* Changed managed-key retries from a fixed delay to bounded exponential backoff with jitter.
+* Changed managed-key provider metadata handling from permissive normalization to a narrow, bounded allowlist.
+* Changed the hosted governance outbox worker so runtime `Enabled` changes can pause, enable, and re-enable draining without restarting the process.
+* Clarified that disabling the hosted drain prevents subsequent cycles but does not cancel a cycle already in progress.
+* Defined non-claim EF Core outbox concurrency conflicts as caller-owned and preserved the original `DbUpdateConcurrencyException`.
+* Retained the provider-neutral EF Core per-row claim implementation after performance evaluation; future bulk-claim optimization remains a provider-specific extension boundary.
+* Updated README, package documentation, DocFX navigation, release guidance, templates, Source Link defaults, security posture, governance wording, and current-release claims for the `3.x` line.
+* Documented that NuGet package signing is intentionally deferred while AsiBackbone remains independently maintained.
 
 ### Fixed
 
-* Fixed consumer-facing version narrative drift between build metadata, README current-release wording, release notes, release readiness guidance, DocFX navigation, and `CHANGELOG.md`.
-* Fixed the changelog gap where `CHANGELOG.md` still presented `2.3.0` as the latest release entry after repository metadata had moved to `3.0.0`.
-* Fixed template fallback package references so generated fallback `.csproj` files use `3.0.0` when repository project references are unavailable.
-* Fixed Source Link post-publish validation defaults so the validation script targets `3.0.0` unless another version is supplied.
-* Fixed the capability-grant replay-hardening gap by providing a packaged in-memory use store that can be wired for local validation before hosts replace it with durable production replay protection.
-* Fixed the default Debug solution build posture so first-party package and test projects are no longer skipped by `Debug|*` solution exclusions.
+* Fixed fail-open empty-policy behavior by making denial the default when no constraints are configured.
+* Fixed ambiguity around ordinary constraint failures by making eligible exceptions auditable denied decisions by default.
+* Fixed local-development hash comparison by using fixed-time comparison for verification hashes.
+* Fixed hostile client correlation values reaching governance, logging, or persistence boundaries by rejecting overlength, whitespace-only, and control-character-containing values.
+* Fixed EF Core audit append failures exposing raw provider exception messages through returned operation results.
+* Fixed EF Core audit persistence so verification-relevant signing metadata survives durable round trips.
+* Fixed outbox claimed-transition attribution so a losing worker cannot report another worker's durable success as its own.
+* Fixed stale, superseded, terminal, deleted-row, and optimistic-concurrency claim-transition handling through explicit durable outcomes.
+* Fixed startup-disabled outbox workers terminating instead of remaining available for runtime re-enablement.
+* Fixed local-development signing key configuration errors being hidden by silent coercion.
+* Fixed local-development signing disposal so repeated and simple concurrent disposal remains idempotent.
+* Fixed managed-key provider metadata exposure by dropping unrecognized, sensitive, malformed, oversized, or control-character-containing fields.
+* Fixed retry coordination pressure caused by fixed managed-key delays.
+* Fixed template fallback package references so generated fallback projects use `3.0.0`.
+* Fixed Source Link validation defaults so post-publication validation targets `3.0.0`.
+* Fixed package publication discovery so template payload projects cannot enter the package publishing candidate set.
+* Fixed stale current-release documentation that still presented historical `1.x` or `2.x` lines as current.
+* Fixed package-signing documentation so SBOMs and provenance are not described as signed-package guarantees.
 
 ### Security and governance hardening
 
-* Core evaluator exception handling is more fail-closed for governed policy surfaces by default in the `3.x` line.
-* Capability-grant use tracking now has a packaged in-memory reference path for local validation and smoke coverage while keeping production replay protection host/provider-owned.
-* Debug solution build coverage validation helps prevent first-party package or test projects from silently falling out of the common `dotnet build AsiBackbone.slnx` path.
-* Release documentation now more clearly distinguishes stable package guarantees from host-owned responsibilities, future provider plans, package-signing status, production tamper-evidence, legal/compliance review, robotics, AI model hosting, and physical execution.
+* Empty policies and eligible policy failures now fail closed by default.
+* Threat-model contributors run ahead of ordinary constraint composition and cannot be silently downgraded from actionable threat results to pure allow decisions.
+* Regulated-profile metadata is sanitized before policy evaluation, capability validation, audit emission, acknowledgment challenge creation, or endpoint execution.
+* Client-supplied correlation identifiers are treated as untrusted boundary data.
+* Managed-key provider metadata is minimized through an explicit allowlist and bounded size limits.
+* Local-development RSA keys require a minimum size of 2048 bits.
+* Audit-ledger signing metadata remains queryable for later signature verification, key-rotation review, and incident analysis.
+* Outbox poison-message handling provides stable terminal reason codes while leaving alerting, replay, incident handling, and manual remediation host-owned.
+* Package signing remains deferred; the current supply-chain trust posture relies on official NuGet publication, the public repository, release tags, Source Link, SBOMs, provenance, and reproducible release practices.
+
+### Reliability and concurrency
+
+* Outbox claim leases provide explicit worker ownership before provider emission.
+* Claimed transitions can distinguish applied writes from stale claims, durable terminal rows, concurrency winners, and deleted entries.
+* Non-claim EF Core mutations continue to surface optimistic-concurrency exceptions without hidden retries.
+* Runtime outbox enable, disable, and re-enable changes do not create scopes or resolve scoped stores while disabled.
+* Managed-key retry waits increase with bounded jitter and remain cancellation-aware.
+* Policy-evaluator configuration is stable after construction.
+* Local-development RSA operations and disposal use synchronized lifecycle access.
+
+### Performance and quality
+
+* Verified that the provider-neutral EF Core claim path uses one candidate query plus one read and one optimistic-concurrency update per successful claim.
+* Documented the resulting `1 + 2N` command shape for uncontended claim batches.
+* Retained provider-neutral behavior rather than adding unverified provider-conditional raw SQL.
+* Reduced policy evaluator, endpoint-governance, audit-residue, reason-normalization, OpenTelemetry mapping, and metadata-classification complexity or allocation pressure.
+* Expanded BenchmarkDotNet coverage for evaluator composition, first-denial short-circuiting, governance decisions, operation results, and audit residue creation.
+* Added deterministic branch and lifecycle coverage across Core, ASP.NET Core, EF Core, OpenTelemetry, analyzers, testing contracts, in-memory storage, and signing packages.
+* Added package-specific line-coverage baselines alongside the repository-wide coverage gate and Core branch-coverage gate.
+* Added tracked XML-documentation debt validation so new public API documentation gaps cannot silently increase.
+* Added release-line documentation validation to detect stale current-version claims.
 
 ### Documentation
 
-- Clarified package signing policy.
-- Documented that NuGet package signing is intentionally deferred while ASIBackbone remains a solo-maintained project.
-- Added rationale and future adoption criteria to project documentation.
+* Added 3.0.0 release notes, release readiness, and consumer verification guidance.
+* Added target-framework support guidance documenting the `.NET 10+` boundary.
+* Added production managed-key integration guidance while preserving provider-neutral key custody.
+* Added regulated deployment, signing verification, storage, metadata sanitation, threat modeling, and outbox-delivery guidance.
+* Added explicit host-responsibility boundaries for authentication, authorization, policy registration, execution enforcement, durable storage, key custody, replay protection, monitoring, incident response, legal review, and compliance interpretation.
+* Clarified that AsiBackbone is a governance spine rather than an intelligence engine, AI model host, robot controller, compliance certification, or complete tamper-evidence platform.
+* Clarified that signed, verified, chained, retained, immutable, externally anchored, legally admissible, and compliance-approved are separate claims.
+* Documented the decision to defer NuGet package signing while the project remains solo-maintained.
 
 ### Compatibility notes
 
 * Package IDs remain unchanged.
 * Public namespaces remain unchanged.
-* No broad package rename is included.
-* No `using` namespace migration is expected for consumers already using the `AsiBackbone.*` package family.
-* `AssemblyVersion` changes to `3.0.0.0`; consumers should rebuild and validate applications that rely on strict assembly loading, plugin discovery, binding redirects, or binary compatibility assumptions.
-* Existing `2.x` consumers should update package references to `3.0.0` and review policy-evaluator exception handling, strict-governance settings, capability-grant replay protection, signing/key custody, durable audit/outbox persistence, and host-owned execution boundaries.
-* `InMemoryCapabilityGrantUseStore` is non-durable and intended only for tests, samples, smoke tests, and local validation. Production replay protection remains host/provider-owned.
-* Event Hubs, Purview, Azure-specific SDK adapters, Aspire runtime packages, robotics, immutable-storage, and additional provider packages remain outside the stable package contract unless separately reviewed and released.
+* No broad package rename or namespace migration is included.
+* The package family intentionally targets `net10.0`; consumers require a .NET 10 SDK/runtime or later.
+* `AssemblyVersion` changes to `3.0.0.0`; consumers should rebuild and validate strict assembly loading, plugin discovery, binding redirects, and binary compatibility assumptions.
+* `DenyWhenNoConstraints` now defaults to `true`. Hosts requiring permissive empty-policy behavior must explicitly set it to `false`.
+* `TreatConstraintExceptionAsDenial` now defaults to `true`. Hosts requiring fail-fast propagation must explicitly set it to `false`.
+* Local-development RSA key sizes below 2048 bits now fail configuration validation rather than silently using 2048 bits.
+* Local-development signing uses RSA-PSS by default; fixtures expecting the previous PKCS#1 v1.5 descriptor should be regenerated or explicitly configured for a test-only compatibility path.
+* Managed-key retry timing is no longer fixed when retry delay is enabled.
+* Existing outbox claim convenience methods remain available; outcome-aware consumers can opt into the new explicit transition-result contract.
+* `InMemoryCapabilityGrantUseStore` remains non-durable and is not production replay protection.
+* Strict and regulated governance profiles do not replace host-owned authentication, authorization, policy, persistence, signing, monitoring, or execution controls.
+* Event Hubs, Purview, Azure-specific non-signing adapters, Aspire runtime packages, robotics, immutable storage, and additional provider packages remain outside the stable contract unless separately reviewed and released.
 
 ### Validation
 
-* Release-candidate validation is expected to pass through CI, Stable Release Validation, Debug solution build coverage validation, Release build/test, formatting, DocFX build, package creation, generated NuGet metadata validation, package SBOM generation, template package smoke validation, external consumer smoke tests, stable package integration smoke tests, version consistency validation for `3.0.0`, and package/SBOM provenance handling where supported.
-* Before tagging `v3.0.0`, release readiness should confirm that `CHANGELOG.md`, README, release notes, release-readiness record, API compatibility / SemVer guidance, DocFX navigation, template guidance, Source Link validation defaults, package metadata, and generated package README metadata all agree on the current `3.0.0` / `3.x` release posture.
-* After packages are published and visible on NuGet, Source Link repository commit metadata should be validated with:
+* Release candidates are validated through Debug and Release solution builds, formatting, unit tests, repository and package coverage gates, Core branch coverage, XML-documentation debt validation, CodeQL, dependency review, package creation, NuGet metadata checks, SBOM generation, template smoke validation, external-consumer smoke tests, stable-package integration tests, version consistency, DocFX generation, documentation release-claim validation, and provenance handling where supported.
+* Release validation confirms that package metadata, README content, release notes, release readiness, templates, Source Link defaults, consumer verification guidance, and this changelog agree on the `3.0.0` / `3.x` release posture.
+* After publication, Source Link repository commit metadata can be validated with:
 
 ```powershell
 ./scripts/Validate-Source-Link-commit-metadata.ps1 -Version 3.0.0

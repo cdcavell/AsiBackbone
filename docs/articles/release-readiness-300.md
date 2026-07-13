@@ -1,12 +1,12 @@
 # AsiBackbone 3.0.0 Release Readiness Record
 
-This record tracks the release-candidate posture for `3.0.0`, the first stable release on the current `3.x` package family.
+This record defines the release-candidate posture for `3.0.0`, the first stable release on the `3.x` package family.
 
 ## Release intent
 
-`3.0.0` establishes the current `3.x` stable release line for AsiBackbone while preserving the existing `AsiBackbone.*` package IDs and public namespaces.
+`3.0.0` establishes the current `3.x` stable release line while preserving the existing `AsiBackbone.*` package IDs and public namespaces.
 
-The release updates the binary assembly identity to `3.0.0.0`, aligns package metadata and documentation around the 3.0.0 release posture, refreshes stale 2.x-current wording, and keeps the project bounded as Accountable Systems Infrastructure for governed .NET decision flow.
+The release advances AsiBackbone as provider-neutral Accountable Systems Infrastructure for governed .NET decision flow. It updates the binary assembly identity to `3.0.0.0`, intentionally targets `net10.0`, makes empty-policy and eligible policy-exception behavior fail closed by default, and incorporates governance, outbox, signing, verification, metadata-boundary, and release-quality hardening.
 
 ## Release classification
 
@@ -15,101 +15,100 @@ The release updates the binary assembly identity to `3.0.0.0`, aligns package me
 | Release | `3.0.0` |
 | Type | Major release / new stable major line |
 | Stable line | `3.x` |
+| Target framework | `net10.0` |
 | Assembly identity | `3.0.0.0` |
 | File version | `3.0.0.0` |
-| Primary purpose | Current major-line alignment, binary identity update, release documentation refresh, template fallback alignment, and stale documentation correction |
-| Public API expansion | Current code includes additive surfaces carried into the 3.x line, including threat-model contributor hooks and strict-governance profile helpers. |
-| Runtime default behavior change | No broad fail-closed default flip is intentionally documented for 3.0.0; strict posture remains explicit host opt-in. |
 | Package ID changes | No |
 | Namespace changes | No |
+| Runtime default changes | Yes: empty policies and eligible constraint exceptions fail closed by default |
+| Package signing | Deferred while the project remains solo-maintained |
 
 ## Included release surfaces
 
-- `Directory.Build.props` uses `VersionPrefix` `3.0.0`.
-- `AssemblyVersion` moves to `3.0.0.0` for the new major line.
-- `FileVersion` moves to `3.0.0.0`.
-- `CITATION.cff` and `.zenodo.json` reference `3.0.0`.
-- Template fallback package references use `3.0.0`.
-- Source Link post-publish validation defaults to `3.0.0`.
-- 3.0.0 release notes, this 3.0.0 release readiness record, and the [3.0.0 Consumer Verification Guide](consumer-verification-300.md) are present.
-- Local release-hardening commands are documented in the developer checklist, and Debug solution builds include all first-party package and test projects.
-- README, documentation home, article index, DocFX article navigation, release validation, release cadence, API compatibility / SemVer guidance, security posture, governance wording, template guidance, and provider-neutral runtime signing guidance are aligned to the `3.x` current-release posture.
-- Public API XML documentation inventory now has a tracked `CS1591` baseline ceiling so inventory debt cannot silently grow.
-- Adapter/provider package coverage now has package-scoped CI artifacts and initial visibility floors for selected consumer-facing integration surfaces.
-- Historical release notes and readiness records remain available for traceability.
+- `Directory.Build.props` uses `VersionPrefix` `3.0.0`, `AssemblyVersion` `3.0.0.0`, and `FileVersion` `3.0.0.0`.
+- `CITATION.cff`, `.zenodo.json`, `CHANGELOG.md`, release notes, and release readiness documentation identify `3.0.0` as the current release.
+- Template fallback package references and Source Link post-publish validation target `3.0.0`.
+- The package family intentionally targets `.NET 10` through `net10.0`.
+- `DenyWhenNoConstraints` defaults to `true`.
+- `TreatConstraintExceptionAsDenial` defaults to `true`.
+- Threat-contributor failures eligible for conversion default to denied governance outcomes.
+- Governance metadata sanitation, regulated and strict governance profiles, claim-based outbox processing, explicit claim-transition outcomes, managed-key retry hardening, provider metadata filtering, client correlation sanitation, and local-development signing key-size validation are included.
+- Public API XML-documentation debt and package-specific coverage floors remain tracked, bounded release debt rather than closed debt.
+- Consumer verification, target-framework support, production managed-key integration, governance standards crosswalk, and release-boundary documentation are present.
+
+## Compatibility boundary
+
+- Existing package IDs and public namespaces remain unchanged.
+- Consumers should update references to `3.0.0`, rebuild, and validate host deployments.
+- Consumers must use a .NET 10 SDK/runtime or later for the `3.0.x` line.
+- Applications relying on strict assembly loading, plugin discovery, binding redirects, or binary identity assumptions should validate the move to `AssemblyVersion` `3.0.0.0`.
+- Hosts that intentionally require permissive empty-policy behavior must set `DenyWhenNoConstraints = false`.
+- Hosts that intentionally require propagated ordinary constraint exceptions must set `TreatConstraintExceptionAsDenial = false`.
+- Local-development RSA key sizes below 2048 bits now fail configuration validation.
+- Existing outbox claim convenience APIs remain available; consumers needing worker-attribution guarantees can use the outcome-aware transition contract.
 
 ## Required release-candidate checks
 
 Before tagging `v3.0.0`, confirm:
 
-- `Directory.Build.props` uses `VersionPrefix` `3.0.0`.
-- `AssemblyVersion` is `3.0.0.0`.
-- `FileVersion` is `3.0.0.0`.
-- `CITATION.cff` references `3.0.0`.
-- `.zenodo.json` references `3.0.0`.
-- `3.0.0` release notes exist and identify the release as the start of the current `3.x` stable line.
-- `CHANGELOG.md` includes a `3.0.0` entry.
-- README, documentation home, article index, DocFX article TOC, release validation, templates guidance, API compatibility / SemVer guidance, security posture, governance wording, and provider-neutral runtime signing guidance reference `3.0.0` or `3.x` where current-release guidance is expected.
-- The [3.0.0 Consumer Verification Guide](consumer-verification-300.md) is linked from README, release validation, release notes, and documentation navigation.
-- The [Production Managed-Key Integration Guide](production-managed-key-integration.md) is linked from README, package documentation, DocFX navigation, and signing-provider boundary documentation.
-- Source Link post-publish validation defaults to `3.0.0`.
-- Template fallback `PackageReference` versions use `3.0.0`.
-- Release notes state that no package ID or namespace changes are included.
-- Release notes state that the new major line changes binary assembly identity and consumers should rebuild and validate host deployments.
-- Release notes preserve the project boundary: governance spine, not intelligence engine, AI model host, robot controller, compliance certification, production key-management platform, production tamper-evident ledger, or production signing provider by default.
-- Release notes state that NuGet package signing remains deferred unless a reviewed package-signing process is adopted before release.
-- The consumer verification guide states what package/SBOM provenance does and does not prove, preserves Source Link post-publish validation instructions, and provides copy/paste validation checklists.
-- The developer checklist states the canonical local release-hardening commands: restore, Release build, and Release test of `AsiBackbone.slnx`.
-- `./scripts/Validate-DebugSolutionBuildCoverage.ps1` passes, confirming no unreviewed `Debug|*` solution exclusions and keeping all first-party package/test projects enabled for Debug solution builds.
-- `./scripts/Validate-XmlDocumentation.ps1 -Mode Inventory -Configuration Release -NoRestore` passes, confirming the public API XML documentation inventory does not exceed tracked `CS1591` baseline ceilings.
-- `./scripts/Validate-PackageCoverageBaselines.ps1 -Configuration Release -NoBuild -NoRestore` passes after the Release build, confirming selected adapter/provider packages have independent package-scoped coverage output and do not fall below their tracked floors.
-- CI passes on the release-candidate commit.
-- Stable Release Validation passes on the release-candidate commit.
-- Package metadata validation passes for generated `.nupkg` artifacts.
-- Package SBOM generation passes for generated `.nupkg` artifacts.
-- Template package smoke validation passes.
-- External consumer smoke tests pass.
-- DocFX documentation build passes.
+- [ ] `Directory.Build.props` reports version `3.0.0`, assembly version `3.0.0.0`, file version `3.0.0.0`, and target framework `net10.0`.
+- [ ] `CITATION.cff`, `.zenodo.json`, `CHANGELOG.md`, release notes, and release readiness records agree on `3.0.0` and the release date.
+- [ ] README, documentation home, article navigation, release validation, API compatibility / SemVer guidance, templates, security posture, and governance wording identify `3.0.0` / `3.x` as current.
+- [ ] The 3.0.0 Consumer Verification Guide is linked from the expected release and documentation surfaces.
+- [ ] The Production Managed-Key Integration Guide remains provider-neutral and keeps concrete production key custody host-owned.
+- [ ] NuGet package signing remains described as deferred; SBOMs and provenance are not presented as signed-package guarantees.
+- [ ] `./scripts/Validate-DebugSolutionBuildCoverage.ps1` passes.
+- [ ] `./scripts/Validate-XmlDocumentation.ps1 -Mode Inventory -Configuration Release -NoRestore` passes.
+- [ ] `./scripts/Validate-PackageCoverageBaselines.ps1 -Configuration Release -NoBuild -NoRestore` passes after the Release build.
+- [ ] CI passes on the release-candidate commit.
+- [ ] Stable Release Validation passes on the release-candidate commit.
+- [ ] Version Consistency and current-release documentation validation pass.
+- [ ] CodeQL and dependency review pass.
+- [ ] Package creation and generated NuGet metadata validation pass.
+- [ ] Package SBOM generation and provenance handling pass where supported by the workflow event.
+- [ ] Template package smoke validation passes.
+- [ ] External consumer smoke tests pass.
+- [ ] Stable-package integration smoke tests pass.
+- [ ] DocFX documentation build and link validation pass.
+- [ ] No open pull request remains intended for inclusion in `3.0.0`.
 
-## Quality hardening posture for 3.0.0
+## Quality posture
 
-`3.0.0` accepts XML documentation and adapter/provider package coverage as **tracked staged debt**, not as closed debt.
+`3.0.0` may ship only with the current quality debt explicit and bounded:
 
-The accepted boundary is narrow:
-
-- CI must inventory public API XML documentation gaps and fail if any selected project exceeds its `eng/xml-docs/cs1591-baseline.csv` ceiling.
-- CI must keep Core's 90% branch coverage gate active.
-- CI must produce package-scoped coverage artifacts for the selected adapter/provider surfaces listed in `eng/coverage/package-coverage-baselines.csv`.
-- The initial adapter/provider package floors are visibility gates, not final maturity targets.
-- The next hardening pass should lower XML documentation ceilings from observed inventory and raise package coverage floors from observed package-specific CI artifacts.
-
-This means `3.0.0` can ship only if the debt is explicit, bounded, artifact-producing, and documented. It should not be described as fully closing public API XML documentation enforcement or adapter/provider coverage hardening.
+- repository-wide line coverage remains gated;
+- Core branch coverage remains gated at 90%;
+- selected adapter/provider packages produce independent package coverage artifacts and meet tracked floors;
+- public API XML-documentation inventory cannot exceed tracked ceilings;
+- targeted mutation reports remain inspectable quality evidence rather than hard release blockers unless the workflow explicitly says otherwise;
+- release-line documentation validation prevents stale historical versions from being described as current.
 
 ## Package signing readiness
 
-NuGet package signing remains an open supply-chain readiness item for `3.0.0` unless the release-preparation PR explicitly adopts and documents a reviewed signing process.
+NuGet package signing is intentionally deferred while AsiBackbone remains solo-maintained. The release may publish repository metadata, Source Link commit metadata, SBOMs, and package/SBOM provenance artifacts where supported, but must not describe packages as maintainer-signed, repository-signed, Authenticode-signed, tamper-evident, or legally non-repudiable by default.
 
-The release may include NuGet repository metadata, Source Link commit metadata, package SBOMs, and package/SBOM provenance artifacts where supported by the workflow event, but it should not describe packages as maintainer-signed, repository-signed, Authenticode-signed, tamper-evident, or legally non-repudiable by default.
+A later release may revisit signing only through a reviewed, documented process that updates security policy, release validation, consumer verification, release notes, and key/certificate custody guidance together.
 
-Consumers should use the [3.0.0 Consumer Verification Guide](consumer-verification-300.md) to verify package source, package IDs, package version, repository metadata, Source Link commit metadata, SBOM files, and package/SBOM provenance artifacts without treating those checks as package-signing evidence.
+## Runtime signing boundary
 
-If package signing becomes available in a later release, the release-preparation PR should update `SECURITY.md`, `Stable Release Validation`, the current release-readiness record, release notes, and consumer verification guidance before public wording claims signed package artifacts.
+Runtime governance-residue signing is separate from NuGet package signing. `AsiBackbone.Signing.ManagedKey` remains provider-neutral. Hosts may connect Azure Key Vault, AWS KMS, GCP Cloud KMS, HSM, certificate-store, or enterprise key-management clients through the managed-key boundary, but the host owns credentials, concrete provider clients, key custody, rotation, verification, monitoring, incident response, and compliance interpretation.
 
-## Runtime governance-residue signing provider roadmap
+## Release boundary
 
-Runtime governance-residue signing is separate from NuGet package signing and GitHub/SBOM provenance.
+AsiBackbone remains a governance spine, not an intelligence engine, AI model host, robot controller, compliance certification, complete tamper-evidence platform, production key-management service, or production replay-protection system by default.
 
-For production runtime signing, AsiBackbone remains provider-neutral through `AsiBackbone.Signing.ManagedKey`. Hosts may connect Azure Key Vault, AWS KMS, GCP Cloud KMS, HSM, certificate-store, or enterprise key-management clients through the `IManagedKeySigningClient` boundary, but the consuming host owns the concrete client, credentials, key custody, key rotation, verification path, monitoring, incident response, and legal/compliance interpretation.
+Event Hubs, Purview, Azure-specific non-signing adapters, Aspire runtime packages, robotics, immutable storage, and additional provider packages remain outside the stable contract unless separately reviewed and released.
 
-AsiBackbone does not ship or maintain first-party production signing providers and does not ship a production-style signing sample host. The approved roadmap is documentation and boundary guidance only. This avoids making the project responsible for consumer key-management maintenance while preserving a clear production integration path.
+## Tag and publish sequence
 
-## Compatibility notes
-
-Consumers already using `AsiBackbone.*` package IDs and namespaces should not need package rename or namespace migration work for `3.0.0`.
-
-Because `AssemblyVersion` moves to `3.0.0.0`, consumers should update package references, rebuild, and validate host deployments, especially where strict assembly loading, plugin discovery, binding redirects, or binary compatibility assumptions are present.
-
-Event Hubs, Purview, Azure-specific non-signing SDK adapters, Aspire runtime packages, robotics, immutable-storage, and additional non-signing provider packages remain outside the stable package contract unless separately reviewed and released. Production runtime signing provider packages remain intentionally out of scope.
+1. Merge the release-preparation PR after all required checks pass.
+2. Confirm the final `main` commit is the intended immutable release source.
+3. Create annotated tag `v3.0.0` from that commit.
+4. Run the release/publish workflow from the tagged commit.
+5. Confirm all expected NuGet packages are visible at version `3.0.0`.
+6. Confirm GitHub release notes, SBOMs, provenance artifacts, and documentation publication are present where expected.
+7. Validate Source Link repository commit metadata after NuGet publication.
+8. Record any immutable publication defect and prepare a patch release rather than overwriting published package metadata.
 
 ## Post-publish checks
 
@@ -119,4 +118,4 @@ After packages are published and visible on NuGet, validate Source Link reposito
 ./scripts/Validate-Source-Link-commit-metadata.ps1 -Version 3.0.0
 ```
 
-If package metadata, Source Link metadata, SBOM artifacts, provenance artifacts, or package-signing documentation are incorrect after publish, document the failure and prepare a follow-up patch rather than attempting to overwrite immutable NuGet package metadata.
+Consumers should then use the 3.0.0 Consumer Verification Guide to validate package source, IDs, versions, repository metadata, Source Link, SBOMs, provenance, target framework, and deferred package-signing posture.

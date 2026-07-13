@@ -148,15 +148,17 @@ public sealed class ManagedKeyRetryBackoffTests
         int maxRetryAttempts,
         bool returnUnsignedOnFailure = false)
     {
-        return ManagedKeySigningOptions.Create(
+        ManagedKeySigningOptions options = ManagedKeySigningOptions.Create(
             keyId: "managed-key-1",
             keyVersion: "v1",
             providerName: "managed-key-test",
             signatureAlgorithm: "TEST-SIGNATURE",
             returnUnsignedOnFailure: returnUnsignedOnFailure,
             maxRetryAttempts: maxRetryAttempts,
-            retryDelay: TimeSpan.FromMilliseconds(100),
-            maxRetryDelay: TimeSpan.FromMilliseconds(500));
+            retryDelay: TimeSpan.FromMilliseconds(100));
+        options.MaxRetryDelay = TimeSpan.FromMilliseconds(500);
+        options.Validate();
+        return options;
     }
 
     private static SigningRequest CreateRequest()

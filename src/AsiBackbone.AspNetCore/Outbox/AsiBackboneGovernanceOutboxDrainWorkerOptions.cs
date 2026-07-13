@@ -13,6 +13,10 @@ public sealed class AsiBackboneGovernanceOutboxDrainWorkerOptions
     /// Gets or sets a value indicating whether the hosted drain worker should run.
     /// </summary>
     /// <remarks>
+    /// Runtime changes supplied through <c>IOptionsMonitor</c> pause or resume new drain cycles without restarting the
+    /// process. A worker that starts disabled remains alive and waits without creating scopes or resolving scoped stores.
+    /// Re-enabling normally takes effect immediately through the options change notification, with the configured
+    /// <see cref="PollingInterval" /> serving as a fallback observation interval.
     /// For multi-replica hosts, enable this only on the selected worker role or partition owner unless the outbox store
     /// provides host-owned claim/lease behavior before provider emission.
     /// </remarks>
@@ -26,6 +30,10 @@ public sealed class AsiBackboneGovernanceOutboxDrainWorkerOptions
     /// <summary>
     /// Gets or sets the interval between drain passes when the worker is enabled.
     /// </summary>
+    /// <remarks>
+    /// While the worker is disabled, this interval is also the fallback check period when the configured options source
+    /// does not raise a change notification.
+    /// </remarks>
     public TimeSpan PollingInterval { get; set; } = TimeSpan.FromSeconds(30);
 
     /// <summary>

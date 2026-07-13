@@ -67,13 +67,28 @@ High-throughput production hosts should load-test the selected `BatchSize`, `Pol
 
 | Option | Default | Purpose |
 | --- | ---: | --- |
-| `Enabled` | `true` | Allows the worker to be registered but disabled by configuration. In scaled deployments, set this to `true` only for the selected worker role or partition owner unless the host has implemented durable claiming. |
+| `Enabled` | `true` | Allows the worker to be registered but disabled by configuration. Runtime changes pause or resume new drain cycles without restarting the process. In scaled deployments, set this to `true` only for the selected worker role or partition owner unless the host has implemented durable claiming. |
 | `BatchSize` | `100` | Maximum number of pending/retry-ready entries attempted per drain pass. |
-| `PollingInterval` | `30s` | Delay between normal drain passes. |
+| `PollingInterval` | `30s` | Delay between normal drain passes and the fallback check interval while disabled when the options source does not raise change notifications. |
 | `FailureDelay` | `30s` | Delay after worker-level failures such as DI or storage exceptions. Provider failures returned through the emitter are still persisted by the Core drain. |
 | `RetryClock` | `DateTimeOffset.UtcNow` | Clock source used for retry-ready lookups. Tests can replace this with a fixed clock. |
 | `DrainOnShutdown` | `false` | Optionally attempts one final drain pass after the background loop has stopped. Do not enable this on many replicas unless duplicate drain behavior is understood. |
 | `ShutdownDrainTimeout` | `5s` | Time budget for the optional shutdown drain. |
+
+## Runtime enable and disable behavior
+
+`AsiBackboneGovernanceOutboxDrainHostedService` uses `IOptionsMonitor<AsiBackboneGovernanceOutboxDrainWorkerOptions>` for runtime configuration. The service remains alive when `Enabled` is `false`, including when the process starts in the disabled state.
+
+When disabled, the worker:
+
+- does not create dependency-injection scopes;
+- does not resolve scoped stores or `DbContext` instances;
+- does not start new drain cycles;
+- waits for an options change notification, the fallback `PollingInterval`, or application shutdown.
+
+When the monitored options change to `Enabled = true`, the worker resumes without a process restart. Options sources that raise `IOptionsMonitor.OnChange(...)` notifications normally wake the worker immediately. If a custom options monitor does not raise change notifications, the worker observes the new value on the next `PollingInterval` fallback check.
+
+Changing `Enabled` to `false` does not cancel a drain cycle already in progress. It prevents the next cycle from starting after the current operation finishes. This preserves existing provider-emission, retry, lease, and shutdown semantics while making runtime pause and resume behavior explicit.
 
 ## Core outbox retry options
 

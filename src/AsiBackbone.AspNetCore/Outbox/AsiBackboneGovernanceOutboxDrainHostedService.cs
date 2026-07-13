@@ -47,6 +47,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedService(
     private readonly ILogger<AsiBackboneGovernanceOutboxDrainHostedService> logger = logger ?? throw new ArgumentNullException(nameof(logger));
     private readonly object optionsChangedSync = new();
     private TaskCompletionSource optionsChanged = CreateOptionsChangedSource();
+    private long optionsVersion;
 
     /// <inheritdoc />
     public override async Task StopAsync(CancellationToken cancellationToken)
@@ -83,6 +84,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedService(
 
         while (!stoppingToken.IsCancellationRequested)
         {
+            (long observedVersion, Task optionsChangedTask) = CaptureOptionsChangeState();
             AsiBackboneGovernanceOutboxDrainWorkerOptions options = optionsMonitor.CurrentValue;
 
             if (!options.Enabled)
@@ -93,7 +95,11 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedService(
                     disabledLogged = true;
                 }
 
-                await WaitForDelayOrOptionsChangeAsync(options.PollingInterval, stoppingToken).ConfigureAwait(false);
+                await WaitForDelayOrOptionsChangeAsync(
+                    options.PollingInterval,
+                    observedVersion,
+                    optionsChangedTask,
+                    stoppingToken).ConfigureAwait(false);
                 continue;
             }
 
@@ -103,7 +109,11 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedService(
             {
                 int drainedCount = await DrainOnceAsync(options, stoppingToken).ConfigureAwait(false);
                 LogDrainAttempted(logger, drainedCount, null);
-                await WaitForDelayOrOptionsChangeAsync(options.PollingInterval, stoppingToken).ConfigureAwait(false);
+                await WaitForDelayOrOptionsChangeAsync(
+                    options.PollingInterval,
+                    observedVersion,
+                    optionsChangedTask,
+                    stoppingToken).ConfigureAwait(false);
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {
@@ -112,7 +122,11 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedService(
             catch (Exception ex)
             {
                 LogWorkerFailed(logger, ex);
-                await WaitForDelayOrOptionsChangeAsync(options.FailureDelay, stoppingToken).ConfigureAwait(false);
+                await WaitForDelayOrOptionsChangeAsync(
+                    options.FailureDelay,
+                    observedVersion,
+                    optionsChangedTask,
+                    stoppingToken).ConfigureAwait(false);
             }
         }
     }
@@ -136,12 +150,18 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedService(
         return drainedEntries.Count;
     }
 
-    private async ValueTask WaitForDelayOrOptionsChangeAsync(TimeSpan delay, CancellationToken cancellationToken)
+    private async ValueTask WaitForDelayOrOptionsChangeAsync(
+        TimeSpan delay,
+        long observedVersion,
+        Task optionsChangedTask,
+        CancellationToken cancellationToken)
     {
-        Task optionsChangedTask;
         lock (optionsChangedSync)
         {
-            optionsChangedTask = optionsChanged.Task;
+            if (optionsVersion != observedVersion)
+            {
+                return;
+            }
         }
 
         Task delayTask = Task.Delay(delay, cancellationToken);
@@ -153,6 +173,14 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedService(
         }
     }
 
+    private (long Version, Task ChangedTask) CaptureOptionsChangeState()
+    {
+        lock (optionsChangedSync)
+        {
+            return (optionsVersion, optionsChanged.Task);
+        }
+    }
+
     private void SignalOptionsChanged()
     {
         TaskCompletionSource completedSource;
@@ -160,6 +188,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedService(
         {
             completedSource = optionsChanged;
             optionsChanged = CreateOptionsChangedSource();
+            optionsVersion++;
         }
 
         _ = completedSource.TrySetResult();

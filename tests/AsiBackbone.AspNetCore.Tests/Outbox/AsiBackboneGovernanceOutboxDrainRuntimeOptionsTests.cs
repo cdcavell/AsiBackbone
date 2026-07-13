@@ -28,19 +28,23 @@ public sealed class AsiBackboneGovernanceOutboxDrainRuntimeOptionsTests
         await Task.Delay(TimeSpan.FromMilliseconds(50), TestContext.Current.CancellationToken);
 
         Assert.Equal(0, harness.ScopeFactory.CreateScopeCallCount);
+        Assert.Equal(0, harness.Store.FindPendingCallCount);
 
         harness.Options.Set(CreateOptions(enabled: true));
-        await harness.ScopeFactory.WaitForCreateScopeCallCountAsync(1)
+        await harness.Store.WaitForFindPendingCallCountAsync(1)
             .WaitAsync(TestTimeout, TestContext.Current.CancellationToken);
 
         harness.Options.Set(CreateOptions(enabled: false));
         int pausedScopeCount = harness.ScopeFactory.CreateScopeCallCount;
+        int pausedFindPendingCount = harness.Store.FindPendingCallCount;
+
         await Task.Delay(TimeSpan.FromMilliseconds(100), TestContext.Current.CancellationToken);
 
         Assert.Equal(pausedScopeCount, harness.ScopeFactory.CreateScopeCallCount);
+        Assert.Equal(pausedFindPendingCount, harness.Store.FindPendingCallCount);
 
         harness.Options.Set(CreateOptions(enabled: true));
-        await harness.ScopeFactory.WaitForCreateScopeCallCountAsync(pausedScopeCount + 1)
+        await harness.Store.WaitForFindPendingCallCountAsync(pausedFindPendingCount + 1)
             .WaitAsync(TestTimeout, TestContext.Current.CancellationToken);
 
         await harness.Service.StopAsync(CancellationToken.None)
@@ -239,9 +243,33 @@ public sealed class AsiBackboneGovernanceOutboxDrainRuntimeOptionsTests
 
     private sealed class RecordingOutboxStore : IAsiBackboneGovernanceOutboxStore
     {
+        private readonly Lock sync = new();
+        private readonly List<(int ExpectedCount, TaskCompletionSource Completion)> waiters = [];
         private int findPendingCallCount;
 
         public int FindPendingCallCount => Volatile.Read(ref findPendingCallCount);
+
+        public Task WaitForFindPendingCallCountAsync(int expectedCount)
+        {
+            if (FindPendingCallCount >= expectedCount)
+            {
+                return Task.CompletedTask;
+            }
+
+            lock (sync)
+            {
+                if (FindPendingCallCount >= expectedCount)
+                {
+                    return Task.CompletedTask;
+                }
+
+                var completion = new TaskCompletionSource(
+                    TaskCreationOptions.RunContinuationsAsynchronously);
+
+                waiters.Add((expectedCount, completion));
+                return completion.Task;
+            }
+        }
 
         public ValueTask<GovernanceOutboxEntry> EnqueueAsync(
             GovernanceEmissionEnvelope envelope,
@@ -269,8 +297,23 @@ public sealed class AsiBackboneGovernanceOutboxDrainRuntimeOptionsTests
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            _ = Interlocked.Increment(ref findPendingCallCount);
-            return ValueTask.FromResult<IReadOnlyList<GovernanceOutboxEntry>>(Array.Empty<GovernanceOutboxEntry>());
+
+            int count = Interlocked.Increment(ref findPendingCallCount);
+
+            lock (sync)
+            {
+                for (int index = waiters.Count - 1; index >= 0; index--)
+                {
+                    if (count >= waiters[index].ExpectedCount)
+                    {
+                        _ = waiters[index].Completion.TrySetResult();
+                        waiters.RemoveAt(index);
+                    }
+                }
+            }
+
+            return ValueTask.FromResult<IReadOnlyList<GovernanceOutboxEntry>>(
+                Array.Empty<GovernanceOutboxEntry>());
         }
 
         public ValueTask<IReadOnlyList<GovernanceOutboxEntry>> FindRetryReadyAsync(

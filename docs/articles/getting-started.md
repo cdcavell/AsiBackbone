@@ -2,7 +2,7 @@
 
 This guide explains the current direction of the AsiBackbone repository and how to begin working with the project.
 
-In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a stable `2.0.x` .NET package family for governance-oriented decision flow. The foundation package is `AsiBackbone.Core`, with optional integration packages for in-memory validation, EF Core host-owned persistence, ASP.NET Core host integration, analyzer guidance, OpenTelemetry projection, and signing-provider boundaries.
+In this software project, **ASI** means **Accountable Systems Infrastructure**. AsiBackbone is a stable `3.x` .NET package family for governance-oriented decision flow. The foundation package is `AsiBackbone.Core`, with optional integration packages for in-memory validation, EF Core host-owned persistence, ASP.NET Core host integration, analyzer guidance, OpenTelemetry projection, and signing-provider boundaries.
 
 > [!IMPORTANT]
 > This project does not implement artificial superintelligence. It provides Accountable Systems Infrastructure: governance-oriented software building blocks inspired by broader Backbone framework concepts.
@@ -11,7 +11,7 @@ In this software project, **ASI** means **Accountable Systems Infrastructure**. 
 
 The repository includes the Core foundation and optional packages for in-memory validation, EF Core host-owned persistence, ASP.NET Core host integration, Roslyn analyzer safety rails, OpenTelemetry governance emission, local-development signing, and managed-key signing adapter wiring.
 
-The stable `2.0.0` package lineup is:
+The current stable package lineup is:
 
 ```text
 AsiBackbone.Core

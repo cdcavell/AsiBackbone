@@ -122,7 +122,7 @@ AsiBackbone does not need to replace Azure Policy, OPA, or Agent Governance Tool
 
 ## Observability and governance emission providers
 
-The current AsiBackbone `1.2.x` package family includes observability, durable outbox, and governance emission provider patterns. These providers should be understood as downstream emission or enrichment surfaces, not as replacements for the core decision pipeline.
+The current AsiBackbone release line includes observability, durable outbox, and governance emission provider patterns. These providers should be understood as downstream emission or enrichment surfaces, not as replacements for the core decision pipeline.
 
 OpenTelemetry is the released governance-emission provider. Azure Monitor can be reached through host-configured OpenTelemetry exporters. Event Hubs, Purview, SIEM, and other downstream systems remain host-owned, strategy-only, design-only, or future-provider integrations unless a later release explicitly ships them as stable packages.
 

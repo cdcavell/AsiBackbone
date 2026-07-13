@@ -1,9 +1,11 @@
 using AsiBackbone.AspNetCore.Correlation;
 using AsiBackbone.AspNetCore.DependencyInjection;
+using AsiBackbone.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Patterns;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
 using Xunit;
 
 namespace AsiBackbone.AspNetCore.Tests.Correlation;
@@ -34,7 +36,107 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverTests
     }
 
     /// <summary>
-    /// Tests that <see cref="HttpContextAsiBackboneRequestCorrelationResolver.ResolveRequestCorrelation"/> falls back to the trace identifier
+    /// Verifies that a valid client correlation identifier at the shared maximum length is preserved.
+    /// </summary>
+    [Fact]
+    public void ResolveRequestCorrelationPreservesMaximumLengthHeader()
+    {
+        string maximumLengthValue = new('a', AsiBackboneIdentifierLimits.MaximumLength);
+        DefaultHttpContext httpContext = new()
+        {
+            TraceIdentifier = "trace-maximum",
+        };
+        httpContext.Request.Headers["X-Correlation-ID"] = maximumLengthValue;
+
+        AsiBackboneHttpRequestCorrelation correlation = CreateResolver(httpContext).ResolveRequestCorrelation();
+
+        Assert.Equal(maximumLengthValue, correlation.CorrelationId);
+    }
+
+    /// <summary>
+    /// Verifies that an oversized client correlation identifier is ignored before it can reach governance persistence.
+    /// </summary>
+    [Fact]
+    public void ResolveRequestCorrelationIgnoresOverlengthHeaderAndUsesFallback()
+    {
+        DefaultHttpContext httpContext = new()
+        {
+            TraceIdentifier = "trace-overlength",
+        };
+        httpContext.Request.Headers["X-Correlation-ID"] = new string(
+            'a',
+            AsiBackboneIdentifierLimits.MaximumLength + 1);
+
+        AsiBackboneHttpRequestCorrelation correlation = CreateResolver(httpContext).ResolveRequestCorrelation();
+
+        Assert.Equal("trace-overlength", correlation.CorrelationId);
+    }
+
+    /// <summary>
+    /// Verifies that control characters cause the client value to be ignored rather than entering logs or governance records.
+    /// </summary>
+    /// <param name="controlCharacter">The control character embedded in the client value.</param>
+    [Theory]
+    [InlineData('\r')]
+    [InlineData('\n')]
+    [InlineData('\t')]
+    [InlineData('\0')]
+    [InlineData('\u001F')]
+    [InlineData('\u007F')]
+    public void ResolveRequestCorrelationIgnoresHeaderContainingControlCharacter(char controlCharacter)
+    {
+        DefaultHttpContext httpContext = new()
+        {
+            TraceIdentifier = "trace-control",
+        };
+        httpContext.Request.Headers["X-Correlation-ID"] = $"correlation{controlCharacter}forged";
+
+        AsiBackboneHttpRequestCorrelation correlation = CreateResolver(httpContext).ResolveRequestCorrelation();
+
+        Assert.Equal("trace-control", correlation.CorrelationId);
+        Assert.DoesNotContain(controlCharacter, correlation.CorrelationId!);
+    }
+
+    /// <summary>
+    /// Verifies that invalid values are skipped when a later value from the configured header is valid.
+    /// </summary>
+    [Fact]
+    public void ResolveRequestCorrelationUsesLaterValidHeaderValue()
+    {
+        DefaultHttpContext httpContext = new()
+        {
+            TraceIdentifier = "trace-multiple",
+        };
+        httpContext.Request.Headers["X-Correlation-ID"] = new StringValues(
+        [
+            "invalid\nvalue",
+            "  valid-correlation  ",
+        ]);
+
+        AsiBackboneHttpRequestCorrelation correlation = CreateResolver(httpContext).ResolveRequestCorrelation();
+
+        Assert.Equal("valid-correlation", correlation.CorrelationId);
+    }
+
+    /// <summary>
+    /// Verifies that whitespace-only client values use the existing trace-identifier fallback.
+    /// </summary>
+    [Fact]
+    public void ResolveRequestCorrelationIgnoresWhitespaceOnlyHeader()
+    {
+        DefaultHttpContext httpContext = new()
+        {
+            TraceIdentifier = "trace-whitespace",
+        };
+        httpContext.Request.Headers["X-Correlation-ID"] = "   ";
+
+        AsiBackboneHttpRequestCorrelation correlation = CreateResolver(httpContext).ResolveRequestCorrelation();
+
+        Assert.Equal("trace-whitespace", correlation.CorrelationId);
+    }
+
+    /// <summary>
+    /// Tests that <see cref="HttpContextAsiBackboneRequestCorrelationResolver.ResolveRequestCorrelation"/> falls back to the trace identifier.
     /// </summary>
     [Fact]
     public void ResolveRequestCorrelationFallsBackToTraceIdentifierByDefault()
@@ -148,7 +250,7 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolverTests
     }
 
     /// <summary>
-    /// Tests that <see cref="HttpContextAsiBackboneRequestCorrelationResolver.ResolveRequestCorrelation"/> returns only the trace identifier
+    /// Tests that <see cref="HttpContextAsiBackboneRequestCorrelationResolver.ResolveRequestCorrelation"/> returns only the trace identifier.
     /// </summary>
     [Fact]
     public void ResolveRequestCorrelationReturnsTraceOnlyForBackgroundScenario()

@@ -139,6 +139,8 @@
       href: governance-outbox-delivery-semantics.md
     - name: Hosted Governance Outbox Drain
       href: hosted-governance-outbox-drain.md
+    - name: EF Core Outbox Bulk-Claim Performance Evaluation
+      href: efcore-outbox-bulk-claim-evaluation.md
     - name: OpenTelemetry Governance Emission Provider
       href: opentelemetry-governance-emission-provider.md
     - name: Signing Provider Package Boundary

@@ -203,21 +203,3 @@ Write-Host (Get-RepositoryRelativePath -Path $summaryPath)
 if ($failures.Count -gt 0) {
     throw ('Found ' + $failures.Count + ' package coverage baseline failure(s).')
 }
-
-if ($exitCode -ne 0) {
-    Write-Error (
-        'Package coverage baseline failed for {0}. ' +
-        'Test project: {1}; threshold: {2}%; exit code: {3}.'
-        -f $target.Package,
-           $target.TestProject,
-           $threshold,
-           $exitCode
-    )
-
-    $failures += [pscustomobject]@{
-        Package       = $target.Package
-        TestProject   = $target.TestProject
-        LineThreshold = $threshold
-        ExitCode      = $exitCode
-    }
-}

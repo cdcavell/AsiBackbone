@@ -259,7 +259,7 @@ public sealed class EfCoreGovernanceOutboxClaimOutcomeTests
         CancellationToken cancellationToken)
     {
         DateTimeOffset claimUtc = new(2026, 7, 13, 13, 0, 0, TimeSpan.Zero);
-        GovernanceOutboxEntry entry = GovernanceOutboxEntry.Create(
+        var entry = GovernanceOutboxEntry.Create(
             EfCoreGovernanceOutboxTestHost.CreateEnvelope($"event-{outboxEntryId}"),
             outboxEntryId,
             claimUtc.AddMinutes(-5));

@@ -235,12 +235,9 @@ public sealed class EfCoreGovernanceOutboxOutcomeStore : IAsiBackboneGovernanceO
     {
         ArgumentNullException.ThrowIfNull(entry);
 
-        if (!string.Equals(claim.OutboxEntryId, entry.OutboxEntryId, StringComparison.Ordinal))
-        {
-            throw new ArgumentException("Claim and entry must reference the same outbox entry ID.", nameof(entry));
-        }
-
-        return TryUpdateClaimAsync(
+        return !string.Equals(claim.OutboxEntryId, entry.OutboxEntryId, StringComparison.Ordinal)
+            ? throw new ArgumentException("Claim and entry must reference the same outbox entry ID.", nameof(entry))
+            : TryUpdateClaimAsync(
             claim,
             () => innerStore.SaveClaimAsync(claim, entry, cancellationToken),
             cancellationToken);
@@ -274,7 +271,11 @@ public sealed class EfCoreGovernanceOutboxOutcomeStore : IAsiBackboneGovernanceO
         }
 
         bool saveCompleted = false;
-        EventHandler<SavedChangesEventArgs> savedChangesHandler = (_, _) => saveCompleted = true;
+        void savedChangesHandler(object? _, SavedChangesEventArgs _)
+        {
+            saveCompleted = true;
+        }
+
         dbContext.SavedChanges += savedChangesHandler;
 
         GovernanceOutboxEntry returnedEntry;

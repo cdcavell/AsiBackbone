@@ -17,7 +17,7 @@ public sealed class GovernanceOutboxClaimTransitionResultTests
     {
         GovernanceOutboxEntry entry = CreateEntry();
 
-        GovernanceOutboxClaimTransitionResult result = GovernanceOutboxClaimTransitionResult.Create(
+        var result = GovernanceOutboxClaimTransitionResult.Create(
             entry,
             GovernanceOutboxClaimTransitionOutcome.Applied);
 
@@ -36,7 +36,7 @@ public sealed class GovernanceOutboxClaimTransitionResultTests
     [InlineData(GovernanceOutboxClaimTransitionOutcome.Missing)]
     public void CreateExposesNonAppliedOutcome(GovernanceOutboxClaimTransitionOutcome outcome)
     {
-        GovernanceOutboxClaimTransitionResult result = GovernanceOutboxClaimTransitionResult.Create(CreateEntry(), outcome);
+        var result = GovernanceOutboxClaimTransitionResult.Create(CreateEntry(), outcome);
 
         Assert.Equal(outcome, result.Outcome);
         Assert.False(result.IsApplied);
@@ -66,7 +66,7 @@ public sealed class GovernanceOutboxClaimTransitionResultTests
 
     private static GovernanceOutboxEntry CreateEntry()
     {
-        GovernanceEmissionEnvelope envelope = GovernanceEmissionEnvelope.Create(
+        var envelope = GovernanceEmissionEnvelope.Create(
             GovernanceEmissionEventType.Outbox,
             "claim-transition-result",
             new DateTimeOffset(2026, 7, 13, 12, 0, 0, TimeSpan.Zero),

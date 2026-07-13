@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using AsiBackbone.AspNetCore.DependencyInjection;
+using AsiBackbone.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
@@ -10,6 +11,11 @@ namespace AsiBackbone.AspNetCore.Correlation;
 /// <summary>
 /// Resolves safe request correlation data from the current ASP.NET Core HTTP context.
 /// </summary>
+/// <remarks>
+/// Client-supplied correlation identifiers are accepted only when their trimmed value is printable and does not exceed
+/// <see cref="AsiBackboneIdentifierLimits.MaximumLength" /> characters. Invalid header values are ignored so the resolver
+/// can continue to another configured value or use the existing host-generated fallback.
+/// </remarks>
 public sealed class HttpContextAsiBackboneRequestCorrelationResolver : IAsiBackboneHttpRequestCorrelationResolver
 {
     private readonly IHttpContextAccessor httpContextAccessor;
@@ -51,12 +57,17 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolver : IAsiBackb
                 continue;
             }
 
-            if (httpContext.Request.Headers.TryGetValue(headerName, out StringValues values))
+            if (!httpContext.Request.Headers.TryGetValue(headerName, out StringValues values))
             {
-                string? value = values.FirstOrDefault(static candidate => !string.IsNullOrWhiteSpace(candidate));
-                if (!string.IsNullOrWhiteSpace(value))
+                continue;
+            }
+
+            foreach (string? candidate in values)
+            {
+                string? normalizedCandidate = NormalizeClientCorrelationId(candidate);
+                if (normalizedCandidate is not null)
                 {
-                    return value.Trim();
+                    return normalizedCandidate;
                 }
             }
         }
@@ -64,6 +75,30 @@ public sealed class HttpContextAsiBackboneRequestCorrelationResolver : IAsiBackb
         return options.UseHttpContextTraceIdentifierAsCorrelationId
             ? httpContext.TraceIdentifier
             : null;
+    }
+
+    private static string? NormalizeClientCorrelationId(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
+        string normalizedValue = value.Trim();
+        if (normalizedValue.Length > AsiBackboneIdentifierLimits.MaximumLength)
+        {
+            return null;
+        }
+
+        foreach (char character in normalizedValue)
+        {
+            if (char.IsControl(character))
+            {
+                return null;
+            }
+        }
+
+        return normalizedValue;
     }
 
     private static string? ResolveTraceId(HttpContext httpContext)

@@ -44,7 +44,7 @@ public static class AsiBackboneEntityFrameworkCoreBuilderExtensions
     }
 
     /// <summary>
-    /// Adds EF Core durable governance outbox storage through the AsiBackbone builder facade.
+    /// Adds outcome-aware EF Core durable governance outbox storage through the AsiBackbone builder facade.
     /// </summary>
     public static IAsiBackboneBuilder UseEfCoreGovernanceOutbox<TDbContext>(this IAsiBackboneBuilder builder)
         where TDbContext : DbContext
@@ -53,7 +53,13 @@ public static class AsiBackboneEntityFrameworkCoreBuilderExtensions
 
         _ = builder.Services.AddScoped<DbContext>(serviceProvider =>
             serviceProvider.GetRequiredService<TDbContext>());
-        _ = builder.Services.AddScoped<IAsiBackboneGovernanceOutboxStore, EfCoreGovernanceOutboxStore>();
+        _ = builder.Services.AddScoped<EfCoreGovernanceOutboxOutcomeStore>();
+        _ = builder.Services.AddScoped<IAsiBackboneGovernanceOutboxClaimOutcomeStore>(serviceProvider =>
+            serviceProvider.GetRequiredService<EfCoreGovernanceOutboxOutcomeStore>());
+        _ = builder.Services.AddScoped<IAsiBackboneGovernanceOutboxClaimStore>(serviceProvider =>
+            serviceProvider.GetRequiredService<EfCoreGovernanceOutboxOutcomeStore>());
+        _ = builder.Services.AddScoped<IAsiBackboneGovernanceOutboxStore>(serviceProvider =>
+            serviceProvider.GetRequiredService<EfCoreGovernanceOutboxOutcomeStore>());
 
         return builder;
     }

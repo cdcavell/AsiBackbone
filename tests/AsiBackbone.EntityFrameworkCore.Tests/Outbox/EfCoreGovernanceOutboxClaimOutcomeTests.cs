@@ -254,7 +254,7 @@ public sealed class EfCoreGovernanceOutboxClaimOutcomeTests
 
     private static async Task<GovernanceOutboxClaim> SaveAndClaimAsync(
         GovernanceOutboxTestDbContext context,
-        IAsiBackboneGovernanceOutboxClaimStore store,
+        EfCoreGovernanceOutboxOutcomeStore store,
         string outboxEntryId,
         CancellationToken cancellationToken)
     {

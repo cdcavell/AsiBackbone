@@ -1,21 +1,21 @@
 namespace AsiBackbone.Signing.ManagedKey;
 
 /// <summary>
-/// Calculates bounded exponential retry delays with full jitter.
+/// Calculates bounded exponential retry delays with jitter.
 /// </summary>
 internal static class ManagedKeyRetryBackoff
 {
-    internal const string StrategyName = "exponential-full-jitter";
+    internal const string StrategyName = "exponential-jitter";
 
     /// <summary>
-    /// Calculates a retry delay for the one-based retry attempt.
+    /// Calculates a monotonic retry delay for the one-based retry attempt.
     /// </summary>
     internal static TimeSpan CalculateDelay(
         TimeSpan baseDelay,
         TimeSpan maxDelay,
         int retryAttempt,
         double jitterSample,
-        TimeSpan? providerRetryAfter = null)
+        TimeSpan previousDelay)
     {
         if (baseDelay < TimeSpan.Zero)
         {
@@ -37,20 +37,25 @@ internal static class ManagedKeyRetryBackoff
             throw new ArgumentOutOfRangeException(nameof(jitterSample));
         }
 
-        if (providerRetryAfter < TimeSpan.Zero)
+        if (previousDelay < TimeSpan.Zero || previousDelay > maxDelay)
         {
-            throw new ArgumentOutOfRangeException(nameof(providerRetryAfter));
+            throw new ArgumentOutOfRangeException(nameof(previousDelay));
+        }
+
+        if (baseDelay == TimeSpan.Zero)
+        {
+            return TimeSpan.Zero;
         }
 
         long upperBoundTicks = CalculateUpperBoundTicks(baseDelay.Ticks, maxDelay.Ticks, retryAttempt);
+        long lowerBoundTicks = upperBoundTicks / 2;
+        long jitterRangeTicks = upperBoundTicks - lowerBoundTicks;
         long jitteredTicks = jitterSample >= 1d
             ? upperBoundTicks
-            : (long)(upperBoundTicks * jitterSample);
-        long providerMinimumTicks = providerRetryAfter is null
-            ? 0
-            : Math.Min(providerRetryAfter.Value.Ticks, maxDelay.Ticks);
+            : lowerBoundTicks + (long)(jitterRangeTicks * jitterSample);
+        long monotonicTicks = Math.Max(previousDelay.Ticks, jitteredTicks);
 
-        return TimeSpan.FromTicks(Math.Max(jitteredTicks, providerMinimumTicks));
+        return TimeSpan.FromTicks(Math.Min(monotonicTicks, maxDelay.Ticks));
     }
 
     private static long CalculateUpperBoundTicks(long baseDelayTicks, long maxDelayTicks, int retryAttempt)

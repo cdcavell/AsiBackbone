@@ -11,7 +11,7 @@ This record evaluates whether `EfCoreGovernanceOutboxStore` should replace or su
 The investigation covers:
 
 * batch sizes of 1, 10, 50, and 100;
-* local and injected-latency execution;
+* relational command-count and latency sensitivity;
 * provider-neutral `ExecuteUpdateAsync` feasibility;
 * SQL Server and PostgreSQL-style atomic claim patterns;
 * claim ordering, eligibility, lease, token, attempt-count, and competing-worker guarantees;
@@ -39,9 +39,9 @@ The ordering rules remain:
 
 The second read is not redundant from a correctness perspective. It narrows the stale-candidate window by rechecking eligibility immediately before the concurrency-checked update.
 
-## Confirmed relational command shape
+## Relational integration harness
 
-The integration coverage in `EfCoreGovernanceOutboxClaimRoundTripTests` runs the portable path against relational SQLite and verifies the uncontended command count.
+`EfCoreGovernanceOutboxClaimRoundTripTests` runs the portable path against relational SQLite and verifies the uncontended command count for requested batches of 1, 10, 50, and 100.
 
 For `N` successful claims:
 
@@ -57,11 +57,13 @@ commands = 1 candidate query + N row reads + N row updates
 | 50 | 101 |
 | 100 | 201 |
 
-Under contention, a candidate that becomes ineligible before its second read may consume only the read. A candidate that loses during its concurrency-checked update still consumes both per-row commands. The table therefore describes the stable all-success baseline used for latency comparison.
+The harness also confirms that every requested row is claimed, claim tokens are unique, attempt counts increment to one, and the persisted claim owner, token, acquisition time, and expiration match the returned claims.
+
+Under contention, a candidate that becomes ineligible before its second read may consume only the read. A candidate that loses during its concurrency-checked update still consumes both per-row commands. The table therefore describes the stable all-success baseline used for latency analysis.
 
 ## Latency sensitivity
 
-The command count makes network latency the dominant scaling factor for a remote relational database. The following table is a latency-only floor derived from the confirmed command count. It excludes query execution, serialization, EF Core materialization, context creation, and server load.
+The command count makes network latency the dominant scaling factor for a remote relational database. The following table is an analytical latency-only floor derived from the confirmed command count. It excludes query execution, serialization, EF Core materialization, context creation, server load, locking, and network jitter.
 
 | Batch | Commands | Added floor at 1 ms/command | Latency-only ceiling at 1 ms | Added floor at 5 ms/command | Latency-only ceiling at 5 ms |
 | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -72,27 +74,7 @@ The command count makes network latency the dominant scaling factor for a remote
 
 The asymptotic throughput ceiling is approximately `1 / (2L)` claims per unit time, where `L` is per-command latency. Larger batches amortize the one candidate query, but they do not remove the two commands per successful row.
 
-These are not universal production benchmark numbers. They are the network-latency component implied by the verified command shape. Hosts should measure with their own provider, connection topology, isolation configuration, indexes, and contention level.
-
-## BenchmarkDotNet harness
-
-`EfCoreOutboxClaimBenchmarks` adds a repeatable BenchmarkDotNet scenario using relational SQLite plus a command interceptor that injects 0 ms, 1 ms, or 5 ms before each measured database command.
-
-The benchmark:
-
-* covers batch sizes 1, 10, 50, and 100;
-* seeds an uncontended ordered pending batch outside the measured invocation;
-* verifies all requested claims are won;
-* verifies the measured command count remains `1 + 2N`;
-* reports elapsed time and allocations for same-machine trend comparison.
-
-Run only this group from the repository root:
-
-```powershell
-dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks.BenchmarkDotNet -- --filter "*EfCoreOutboxClaim*"
-```
-
-BenchmarkDotNet output should be compared on the same machine, runtime, repository revision, and build configuration. The injected delay isolates round-trip sensitivity; it does not emulate provider locking, transaction log pressure, query-plan differences, or real network jitter.
+These are not universal production benchmark numbers. Hosts should measure with their actual provider, connection topology, isolation configuration, indexes, workload, and contention level before selecting an optimized adapter.
 
 ## Provider-neutral `ExecuteUpdateAsync` evaluation
 
@@ -110,95 +92,48 @@ A correct bulk claim must atomically:
 
 The provider-neutral limitations are:
 
-* EF Core does not expose a cross-provider ordered, bounded update-and-return contract.
-* `ExecuteUpdateAsync` returns an affected-row count, not the updated entities needed to construct `GovernanceOutboxClaim` values.
-* client-evaluated claim-token values would normally be evaluated once for the statement, which would not preserve per-row token uniqueness.
-* database-side UUID/random functions and update-returning syntax are provider-specific.
-* a bulk update followed by a second read would reintroduce an ownership race unless the operation remained in a carefully controlled provider-specific transaction.
+* EF Core does not expose a cross-provider ordered, bounded update-and-return contract;
+* `ExecuteUpdateAsync` returns an affected-row count, not the updated entities needed to construct `GovernanceOutboxClaim` values;
+* client-evaluated token values do not provide a portable per-row uniqueness guarantee;
+* database-side UUID functions and update-returning syntax are provider-specific;
+* a bulk update followed by a second read reintroduces an ownership race unless enclosed by carefully controlled provider-specific transaction semantics;
 * skip-locked and lock-hint behavior is not portable through the base EF Core API.
 
 A provider-neutral set-based branch would therefore either weaken current guarantees or hide provider-specific behavior behind a misleadingly portable surface.
 
-## SQL Server prototype evaluation
+## Provider-specific prototype evaluation
 
-A viable SQL Server adapter could use an updateable ordered CTE with `UPDLOCK`, `READPAST`, an appropriate isolation mode, and `OUTPUT`:
+### SQL Server
 
-```sql
-;WITH candidates AS
-(
-    SELECT TOP (@maxCount) *
-    FROM dbo.AsiBackboneGovernanceOutboxEntries
-         WITH (UPDLOCK, READPAST, ROWLOCK)
-    WHERE Status = @pendingStatus
-      AND (ClaimToken IS NULL OR ClaimExpiresUtc IS NULL OR ClaimExpiresUtc <= @utcNowTicks)
-    ORDER BY CreatedUtc, OutboxEntryId
-)
-UPDATE candidates
-SET ClaimOwner = @workerId,
-    ClaimToken = CONVERT(nvarchar(36), NEWID()),
-    ClaimedUtc = @utcNowTicks,
-    ClaimExpiresUtc = @claimExpiresUtcTicks,
-    ClaimAttemptCount = ClaimAttemptCount + 1,
-    ConcurrencyStamp = CONVERT(nvarchar(36), NEWID()),
-    UpdatedUtc = @utcNowTicks
-OUTPUT inserted.*;
-```
+A viable SQL Server adapter could use an updateable ordered CTE with `UPDLOCK`, `READPAST`, an appropriate isolation mode, and `OUTPUT`. This may reduce claim acquisition to one server round trip while returning actual winners.
 
-This can reduce the claim acquisition to one server round trip while producing actual winners. However, production correctness depends on details that must be tested against SQL Server itself:
+A production implementation must still validate against SQL Server itself:
 
 * lock hints and transaction isolation, including read-committed snapshot behavior;
-* the exact updateable-CTE plan and index use;
-* starvation behavior under sustained `READPAST` contention;
+* the updateable-CTE plan and index use;
+* starvation under sustained `READPAST` contention;
 * deadlock and retry handling;
-* ordering of the `OUTPUT` result, which is not guaranteed and may require client-side reordering;
+* result ordering, which may require client-side reordering;
 * retry-ready predicate and nullable ordering equivalence;
 * token and concurrency-stamp format compatibility;
 * cancellation and transaction cleanup.
 
-The pattern is technically promising but is not provider-neutral.
+### PostgreSQL
 
-## PostgreSQL prototype evaluation
+A PostgreSQL adapter could use a locked candidate CTE with `FOR UPDATE SKIP LOCKED`, followed by `UPDATE ... RETURNING`. This can return partial winners while avoiding rows already held by competing workers.
 
-A PostgreSQL adapter could use a locked candidate CTE and `UPDATE ... RETURNING`:
+It still requires real-provider coverage for extension availability, isolation, ordering, starvation, retry-ready equivalence, token generation, and result reordering.
 
-```sql
-WITH candidates AS
-(
-    SELECT id
-    FROM "AsiBackboneGovernanceOutboxEntries"
-    WHERE "Status" = @pendingStatus
-      AND ("ClaimToken" IS NULL OR "ClaimExpiresUtc" IS NULL OR "ClaimExpiresUtc" <= @utcNowTicks)
-    ORDER BY "CreatedUtc", "OutboxEntryId"
-    FOR UPDATE SKIP LOCKED
-    LIMIT @maxCount
-)
-UPDATE "AsiBackboneGovernanceOutboxEntries" AS entry
-SET "ClaimOwner" = @workerId,
-    "ClaimToken" = gen_random_uuid()::text,
-    "ClaimedUtc" = @utcNowTicks,
-    "ClaimExpiresUtc" = @claimExpiresUtcTicks,
-    "ClaimAttemptCount" = entry."ClaimAttemptCount" + 1,
-    "ConcurrencyStamp" = gen_random_uuid()::text,
-    "UpdatedUtc" = @utcNowTicks
-FROM candidates
-WHERE entry."Id" = candidates.id
-RETURNING entry.*;
-```
+### SQLite
 
-This is also capable of returning partial winners safely while avoiding locked rows. It still requires provider integration coverage for extension availability, isolation, ordering, starvation, retry-ready equivalence, and result reordering.
+SQLite supports set-based updates and returning clauses in modern versions, but its database-level write serialization does not provide the same skip-locked row-claim model as SQL Server or PostgreSQL. A SQLite-specific bulk path would add complexity without addressing the primary high-volume multi-worker scenario. The portable optimistic path remains the appropriate SQLite baseline.
 
-## SQLite assessment
-
-SQLite supports set-based updates and returning clauses in modern versions, but its database-level write serialization does not provide the same skip-locked row-claim model as SQL Server or PostgreSQL. A SQLite-specific bulk path would add complexity without addressing the main high-volume multi-worker scenario. The portable optimistic path remains the appropriate SQLite baseline.
-
-## Correctness requirements for any future optimized store
-
-A provider-specific implementation must pass the same semantic contract as the portable store:
+## Correctness requirements for a future optimized store
 
 | Requirement | Required behavior |
 | --- | --- |
 | Eligibility | Re-evaluate status, retry readiness, and lease expiration in the atomic claim statement. |
-| Ordering | Select the same bounded order and return claims in that order after any provider result reordering. |
+| Ordering | Select the same bounded order and return claims in that order after provider result reordering. |
 | Partial winners | Return only rows actually acquired by the worker. |
 | Claim token | Generate a unique opaque token per winning row. |
 | Attempt count | Increment exactly once for every successful acquisition or reacquisition. |
@@ -208,7 +143,7 @@ A provider-specific implementation must pass the same semantic contract as the p
 | Completion | Continue requiring owner/token verification for final transitions. |
 | Failure behavior | Roll back or return no ambiguous claims when the atomic statement fails. |
 
-Provider-specific race tests must run against the real provider. SQLite tests cannot prove SQL Server lock-hint or PostgreSQL skip-locked behavior.
+Provider-specific race tests must run against the actual provider. SQLite tests cannot prove SQL Server lock-hint or PostgreSQL skip-locked behavior.
 
 ## Package-boundary decision
 
@@ -221,19 +156,11 @@ AsiBackbone.EntityFrameworkCore.SqlServer
 AsiBackbone.EntityFrameworkCore.PostgreSql
 ```
 
-The optimized store should implement `IAsiBackboneGovernanceOutboxClaimStore`, remain explicitly registered by the host, and fall back conceptually—not silently at runtime—to the portable store when the provider-specific guarantees are unavailable.
-
-This keeps:
-
-* raw SQL out of the portable package;
-* provider dependencies optional;
-* transaction and isolation behavior explicit;
-* correctness tests scoped to the database engine that supplies the guarantee;
-* the current implementation available as the safe baseline.
+The optimized store should implement `IAsiBackboneGovernanceOutboxClaimStore` and remain explicitly registered by the host. This keeps raw SQL out of the portable package, provider dependencies optional, transaction behavior explicit, and correctness tests scoped to the engine supplying the guarantee.
 
 ## Optimization threshold
 
-Provider complexity is justified only when representative real-provider testing demonstrates all of the following:
+Provider complexity is justified only when representative real-provider testing demonstrates:
 
 * at least a 2x sustained throughput improvement for batches of 50 or 100 under the target network latency;
 * materially lower p95 claim latency under competing workers;
@@ -242,8 +169,6 @@ Provider complexity is justified only when representative real-provider testing 
 * acceptable starvation, deadlock, and cancellation behavior;
 * a production host or provider package with a demonstrated need for the additional maintenance surface.
 
-The exact threshold may be raised for a provider package with a small user base because raw SQL, engine-version support, and concurrency testing create ongoing maintenance obligations.
-
 ## Decision
 
 The current investigation does not justify a production bulk path in the provider-neutral store.
@@ -251,10 +176,10 @@ The current investigation does not justify a production bulk path in the provide
 The accepted outcome is:
 
 1. retain the existing per-row optimistic-concurrency implementation;
-2. keep its exact command shape covered by relational integration tests;
-3. provide the latency-injection BenchmarkDotNet harness for host-specific measurement;
+2. keep its command shape and claim metadata covered by relational integration tests;
+3. document the latency-sensitive throughput model and its limitations;
 4. document SQL Server and PostgreSQL set-based approaches as provider-specific future options;
 5. require a separate optimized store or package rather than branching inside the base store;
 6. introduce no raw SQL or production behavior change for this issue.
 
-This closes the performance investigation while preserving a measurable path for a future provider-backed optimization when real workload evidence warrants it.
+This closes the performance investigation while preserving a measurable path for future provider-backed optimization when real workload evidence warrants it.

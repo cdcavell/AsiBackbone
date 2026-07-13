@@ -167,7 +167,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedService(
         Task delayTask = Task.Delay(delay, cancellationToken);
         Task completedTask = await Task.WhenAny(delayTask, optionsChangedTask).ConfigureAwait(false);
 
-        if (completedTask == delayTask)
+        if (completedTask == delayTask && !cancellationToken.IsCancellationRequested)
         {
             await delayTask.ConfigureAwait(false);
         }

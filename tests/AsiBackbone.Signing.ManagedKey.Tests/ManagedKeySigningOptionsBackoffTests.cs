@@ -13,7 +13,7 @@ public sealed class ManagedKeySigningOptionsBackoffTests
     [Fact]
     public void CreateUsesDocumentedBackoffDefaults()
     {
-        ManagedKeySigningOptions options = ManagedKeySigningOptions.Create("managed-key-1");
+        var options = ManagedKeySigningOptions.Create("managed-key-1");
 
         Assert.Equal(TimeSpan.FromMilliseconds(200), options.RetryDelay);
         Assert.Equal(TimeSpan.FromSeconds(5), options.MaxRetryDelay);
@@ -28,8 +28,8 @@ public sealed class ManagedKeySigningOptionsBackoffTests
     [InlineData(true)]
     public void FactoriesSupportExplicitMaximumRetryDelay(bool localValidation)
     {
-        TimeSpan baseDelay = TimeSpan.FromMilliseconds(75);
-        TimeSpan maxDelay = TimeSpan.FromMilliseconds(900);
+        var baseDelay = TimeSpan.FromMilliseconds(75);
+        var maxDelay = TimeSpan.FromMilliseconds(900);
 
         ManagedKeySigningOptions options = localValidation
             ? ManagedKeySigningOptions.CreateLocalValidation("managed-key-1", retryDelay: baseDelay)

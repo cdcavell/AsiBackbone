@@ -21,25 +21,21 @@ public sealed class ManagedKeySigningOptionsBackoffTests
     }
 
     /// <summary>
-    /// Verifies explicit backoff settings are preserved by both option factories.
+    /// Verifies explicit backoff settings can be applied to options from both factories without changing their signatures.
     /// </summary>
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public void FactoriesPreserveExplicitMaximumRetryDelay(bool localValidation)
+    public void FactoriesSupportExplicitMaximumRetryDelay(bool localValidation)
     {
         TimeSpan baseDelay = TimeSpan.FromMilliseconds(75);
         TimeSpan maxDelay = TimeSpan.FromMilliseconds(900);
 
         ManagedKeySigningOptions options = localValidation
-            ? ManagedKeySigningOptions.CreateLocalValidation(
-                "managed-key-1",
-                retryDelay: baseDelay,
-                maxRetryDelay: maxDelay)
-            : ManagedKeySigningOptions.Create(
-                "managed-key-1",
-                retryDelay: baseDelay,
-                maxRetryDelay: maxDelay);
+            ? ManagedKeySigningOptions.CreateLocalValidation("managed-key-1", retryDelay: baseDelay)
+            : ManagedKeySigningOptions.Create("managed-key-1", retryDelay: baseDelay);
+        options.MaxRetryDelay = maxDelay;
+        options.Validate();
 
         Assert.Equal(baseDelay, options.RetryDelay);
         Assert.Equal(maxDelay, options.MaxRetryDelay);

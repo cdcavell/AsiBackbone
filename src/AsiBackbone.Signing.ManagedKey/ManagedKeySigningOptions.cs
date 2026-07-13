@@ -98,8 +98,7 @@ public sealed class ManagedKeySigningOptions
         bool requireKeyVersion = true,
         bool returnUnsignedOnFailure = false,
         int maxRetryAttempts = 2,
-        TimeSpan? retryDelay = null,
-        TimeSpan? maxRetryDelay = null)
+        TimeSpan? retryDelay = null)
     {
         var options = new ManagedKeySigningOptions
         {
@@ -111,8 +110,7 @@ public sealed class ManagedKeySigningOptions
             RequireKeyVersion = requireKeyVersion,
             ReturnUnsignedOnFailure = returnUnsignedOnFailure,
             MaxRetryAttempts = maxRetryAttempts,
-            RetryDelay = retryDelay ?? TimeSpan.FromMilliseconds(200),
-            MaxRetryDelay = maxRetryDelay ?? DefaultMaxRetryDelay
+            RetryDelay = retryDelay ?? TimeSpan.FromMilliseconds(200)
         };
 
         options.Validate();
@@ -135,8 +133,7 @@ public sealed class ManagedKeySigningOptions
         string? hashAlgorithm = null,
         bool requireKeyVersion = true,
         int maxRetryAttempts = 2,
-        TimeSpan? retryDelay = null,
-        TimeSpan? maxRetryDelay = null)
+        TimeSpan? retryDelay = null)
     {
         return Create(
             keyId,
@@ -147,8 +144,7 @@ public sealed class ManagedKeySigningOptions
             requireKeyVersion,
             returnUnsignedOnFailure: true,
             maxRetryAttempts: maxRetryAttempts,
-            retryDelay: retryDelay,
-            maxRetryDelay: maxRetryDelay);
+            retryDelay: retryDelay);
     }
 
     /// <summary>

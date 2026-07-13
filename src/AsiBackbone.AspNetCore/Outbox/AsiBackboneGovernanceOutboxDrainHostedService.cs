@@ -10,7 +10,7 @@ namespace AsiBackbone.AspNetCore.Outbox;
 /// Runs the provider-neutral governance outbox drain from an ASP.NET Core or generic-host background worker.
 /// </summary>
 /// <remarks>
-/// Hosting remains outside Core. The worker resolves the drain through a scoped service provider so durable providers that depend on scoped infrastructure, such as a host-owned EF Core <c>DbContext</c>, remain safe to use.
+/// Hosting remains outside Core. The worker resolves the drain through a scoped service provider so durable providers that depend on scoped infrastructure, such as a host-owned EF Core <c>DbContext</c>, remain safe to use. Runtime changes to <see cref="AsiBackboneGovernanceOutboxDrainWorkerOptions.Enabled" /> pause or resume new drain cycles without terminating the hosted service.
 /// </remarks>
 public sealed class AsiBackboneGovernanceOutboxDrainHostedService(
     IServiceScopeFactory scopeFactory,
@@ -45,6 +45,8 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedService(
     private readonly IServiceScopeFactory scopeFactory = scopeFactory ?? throw new ArgumentNullException(nameof(scopeFactory));
     private readonly IOptionsMonitor<AsiBackboneGovernanceOutboxDrainWorkerOptions> optionsMonitor = optionsMonitor ?? throw new ArgumentNullException(nameof(optionsMonitor));
     private readonly ILogger<AsiBackboneGovernanceOutboxDrainHostedService> logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    private readonly object optionsChangedSync = new();
+    private TaskCompletionSource optionsChanged = CreateOptionsChangedSource();
 
     /// <inheritdoc />
     public override async Task StopAsync(CancellationToken cancellationToken)
@@ -76,13 +78,8 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedService(
     /// <inheritdoc />
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        AsiBackboneGovernanceOutboxDrainWorkerOptions startupOptions = optionsMonitor.CurrentValue;
-
-        if (!startupOptions.Enabled)
-        {
-            LogWorkerDisabled(logger, null);
-            return;
-        }
+        using IDisposable? optionsChangeRegistration = optionsMonitor.OnChange((_, _) => SignalOptionsChanged());
+        bool disabledLogged = false;
 
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -90,15 +87,23 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedService(
 
             if (!options.Enabled)
             {
-                await DelayAsync(options.PollingInterval, stoppingToken).ConfigureAwait(false);
+                if (!disabledLogged)
+                {
+                    LogWorkerDisabled(logger, null);
+                    disabledLogged = true;
+                }
+
+                await WaitForDelayOrOptionsChangeAsync(options.PollingInterval, stoppingToken).ConfigureAwait(false);
                 continue;
             }
+
+            disabledLogged = false;
 
             try
             {
                 int drainedCount = await DrainOnceAsync(options, stoppingToken).ConfigureAwait(false);
                 LogDrainAttempted(logger, drainedCount, null);
-                await DelayAsync(options.PollingInterval, stoppingToken).ConfigureAwait(false);
+                await WaitForDelayOrOptionsChangeAsync(options.PollingInterval, stoppingToken).ConfigureAwait(false);
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {
@@ -107,7 +112,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedService(
             catch (Exception ex)
             {
                 LogWorkerFailed(logger, ex);
-                await DelayAsync(options.FailureDelay, stoppingToken).ConfigureAwait(false);
+                await WaitForDelayOrOptionsChangeAsync(options.FailureDelay, stoppingToken).ConfigureAwait(false);
             }
         }
     }
@@ -131,15 +136,37 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedService(
         return drainedEntries.Count;
     }
 
-    private static async ValueTask DelayAsync(TimeSpan delay, CancellationToken cancellationToken)
+    private async ValueTask WaitForDelayOrOptionsChangeAsync(TimeSpan delay, CancellationToken cancellationToken)
     {
-        try
+        Task optionsChangedTask;
+        lock (optionsChangedSync)
         {
-            await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
+            optionsChangedTask = optionsChanged.Task;
         }
-        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+
+        Task delayTask = Task.Delay(delay, cancellationToken);
+        Task completedTask = await Task.WhenAny(delayTask, optionsChangedTask).ConfigureAwait(false);
+
+        if (completedTask == delayTask)
         {
-            // Host shutdown cancels the delay. The outer loop handles termination.
+            await delayTask.ConfigureAwait(false);
         }
+    }
+
+    private void SignalOptionsChanged()
+    {
+        TaskCompletionSource completedSource;
+        lock (optionsChangedSync)
+        {
+            completedSource = optionsChanged;
+            optionsChanged = CreateOptionsChangedSource();
+        }
+
+        _ = completedSource.TrySetResult();
+    }
+
+    private static TaskCompletionSource CreateOptionsChangedSource()
+    {
+        return new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
     }
 }

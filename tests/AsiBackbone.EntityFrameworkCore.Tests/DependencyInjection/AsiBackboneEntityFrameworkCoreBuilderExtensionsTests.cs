@@ -75,7 +75,7 @@ public sealed class AsiBackboneEntityFrameworkCoreBuilderExtensionsTests
     }
 
     /// <summary>
-    /// Verifies that governance-outbox registration uses the host context, registers the EF Core store, and returns the same builder.
+    /// Verifies that governance-outbox registration exposes one scoped outcome-aware store through all compatible contracts.
     /// </summary>
     [Fact]
     public void UseEfCoreGovernanceOutboxRegistersServicesAndReturnsSameBuilder()
@@ -86,8 +86,19 @@ public sealed class AsiBackboneEntityFrameworkCoreBuilderExtensionsTests
         IAsiBackboneBuilder result = builder.UseEfCoreGovernanceOutbox<TestDbContext>();
 
         Assert.Same(builder, result);
-        AssertScopedRegistration<IAsiBackboneGovernanceOutboxStore, EfCoreGovernanceOutboxStore>(services);
+        AssertScopedRegistration<EfCoreGovernanceOutboxOutcomeStore, EfCoreGovernanceOutboxOutcomeStore>(services);
+        AssertScopedFactoryRegistration<IAsiBackboneGovernanceOutboxClaimOutcomeStore>(services);
+        AssertScopedFactoryRegistration<IAsiBackboneGovernanceOutboxClaimStore>(services);
+        AssertScopedFactoryRegistration<IAsiBackboneGovernanceOutboxStore>(services);
         AssertHostDbContextResolution(services);
+
+        using ServiceProvider provider = services.BuildServiceProvider();
+        using IServiceScope scope = provider.CreateScope();
+        EfCoreGovernanceOutboxOutcomeStore concrete = scope.ServiceProvider.GetRequiredService<EfCoreGovernanceOutboxOutcomeStore>();
+
+        Assert.Same(concrete, scope.ServiceProvider.GetRequiredService<IAsiBackboneGovernanceOutboxClaimOutcomeStore>());
+        Assert.Same(concrete, scope.ServiceProvider.GetRequiredService<IAsiBackboneGovernanceOutboxClaimStore>());
+        Assert.Same(concrete, scope.ServiceProvider.GetRequiredService<IAsiBackboneGovernanceOutboxStore>());
     }
 
     /// <summary>
@@ -107,6 +118,7 @@ public sealed class AsiBackboneEntityFrameworkCoreBuilderExtensionsTests
     private static ServiceCollection CreateServices()
     {
         ServiceCollection services = new();
+        _ = services.AddLogging();
         _ = services.AddDbContext<TestDbContext>(options =>
             options.UseInMemoryDatabase(Guid.NewGuid().ToString("N")));
 
@@ -119,6 +131,15 @@ public sealed class AsiBackboneEntityFrameworkCoreBuilderExtensionsTests
             services,
             descriptor => descriptor.ServiceType == typeof(TService)
                 && descriptor.ImplementationType == typeof(TImplementation)
+                && descriptor.Lifetime == ServiceLifetime.Scoped);
+    }
+
+    private static void AssertScopedFactoryRegistration<TService>(IServiceCollection services)
+    {
+        Assert.Contains(
+            services,
+            descriptor => descriptor.ServiceType == typeof(TService)
+                && descriptor.ImplementationFactory is not null
                 && descriptor.Lifetime == ServiceLifetime.Scoped);
     }
 

@@ -118,7 +118,7 @@ public sealed class EfCoreGovernanceOutboxClaimRoundTripTests
 
         public void Reset()
         {
-            Interlocked.Exchange(ref commandCount, 0);
+            _ = Interlocked.Exchange(ref commandCount, 0);
         }
 
         public override ValueTask<InterceptionResult<DbDataReader>> ReaderExecutingAsync(

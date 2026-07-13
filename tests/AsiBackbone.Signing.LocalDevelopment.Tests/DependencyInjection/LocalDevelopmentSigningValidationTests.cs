@@ -17,7 +17,7 @@ public sealed class LocalDevelopmentSigningValidationTests
     {
         ServiceCollection services = new();
         IAsiBackboneBuilder builder = new AsiBackboneBuilder(services);
-        LocalDevelopmentSigningOptions options = LocalDevelopmentSigningOptions.Create(keySizeBits: 1024);
+        var options = LocalDevelopmentSigningOptions.Create(keySizeBits: 1024);
 
         InvalidOperationException exception = Assert.Throws<InvalidOperationException>(
             () => builder.UseLocalDevelopmentSigning(options));

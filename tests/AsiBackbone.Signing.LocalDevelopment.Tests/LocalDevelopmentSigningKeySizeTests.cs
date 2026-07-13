@@ -14,7 +14,7 @@ public sealed class LocalDevelopmentSigningKeySizeTests
     [Fact]
     public async Task OmittedKeySizeUsesDefault()
     {
-        LocalDevelopmentSigningOptions options = LocalDevelopmentSigningOptions.Create();
+        var options = LocalDevelopmentSigningOptions.Create();
         using var service = new LocalDevelopmentSigningService(options);
 
         SigningResult result = await service.SignAsync(
@@ -62,7 +62,7 @@ public sealed class LocalDevelopmentSigningKeySizeTests
     [InlineData(2047)]
     public void InvalidKeySizeFailsValidation(int keySizeBits)
     {
-        LocalDevelopmentSigningOptions options = LocalDevelopmentSigningOptions.Create(keySizeBits: keySizeBits);
+        var options = LocalDevelopmentSigningOptions.Create(keySizeBits: keySizeBits);
 
         InvalidOperationException validationException = Assert.Throws<InvalidOperationException>(options.Validate);
         InvalidOperationException constructionException = Assert.Throws<InvalidOperationException>(
@@ -80,7 +80,7 @@ public sealed class LocalDevelopmentSigningKeySizeTests
     public async Task ConcurrentDisposeAndSignRemainSafe()
     {
         var service = new LocalDevelopmentSigningService();
-        Task[] operations = Enumerable.Range(0, 32)
+        Task[] operations = [.. Enumerable.Range(0, 32)
             .Select(index => index % 2 == 0
                 ? Task.Run(service.Dispose)
                 : Task.Run(async () =>
@@ -91,10 +91,9 @@ public sealed class LocalDevelopmentSigningKeySizeTests
 
                     Assert.True(
                         result.IsSigned
-                        || result.Metadata.Metadata.TryGetValue("failure_code", out string? failureCode)
-                            && failureCode is "localdev.signing.disposed" or "localdev.signing.failed");
-                }))
-            .ToArray();
+                        || (result.Metadata.Metadata.TryGetValue("failure_code", out string? failureCode)
+                            && failureCode is "localdev.signing.disposed" or "localdev.signing.failed"));
+                }))];
 
         await Task.WhenAll(operations);
 

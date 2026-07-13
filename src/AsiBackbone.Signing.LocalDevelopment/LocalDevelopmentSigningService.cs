@@ -17,7 +17,7 @@ public sealed class LocalDevelopmentSigningService : IAsiBackboneSigningService,
 
     private readonly LocalDevelopmentSigningOptions options;
     private readonly RSA rsa;
-    private readonly object rsaSync = new();
+    private readonly Lock rsaSync = new();
     private readonly int keySizeBits;
     private bool disposed;
 

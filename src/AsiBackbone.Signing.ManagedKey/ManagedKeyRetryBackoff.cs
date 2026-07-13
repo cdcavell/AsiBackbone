@@ -8,7 +8,7 @@ internal static class ManagedKeyRetryBackoff
     internal const string StrategyName = "exponential-jitter";
 
     /// <summary>
-    /// Calculates a monotonic retry delay for the one-based retry attempt.
+    /// Calculates a monotonically increasing retry delay for the one-based retry attempt.
     /// </summary>
     internal static TimeSpan CalculateDelay(
         TimeSpan baseDelay,
@@ -48,14 +48,19 @@ internal static class ManagedKeyRetryBackoff
         }
 
         long upperBoundTicks = CalculateUpperBoundTicks(baseDelay.Ticks, maxDelay.Ticks, retryAttempt);
-        long lowerBoundTicks = upperBoundTicks / 2;
+        long exponentialLowerBoundTicks = upperBoundTicks / 2;
+        long monotonicLowerBoundTicks = previousDelay.Ticks < upperBoundTicks
+            ? previousDelay.Ticks + 1
+            : upperBoundTicks;
+        long lowerBoundTicks = Math.Min(
+            upperBoundTicks,
+            Math.Max(exponentialLowerBoundTicks, monotonicLowerBoundTicks));
         long jitterRangeTicks = upperBoundTicks - lowerBoundTicks;
         long jitteredTicks = jitterSample >= 1d
             ? upperBoundTicks
             : lowerBoundTicks + (long)(jitterRangeTicks * jitterSample);
-        long monotonicTicks = Math.Max(previousDelay.Ticks, jitteredTicks);
 
-        return TimeSpan.FromTicks(Math.Min(monotonicTicks, maxDelay.Ticks));
+        return TimeSpan.FromTicks(Math.Min(jitteredTicks, maxDelay.Ticks));
     }
 
     private static long CalculateUpperBoundTicks(long baseDelayTicks, long maxDelayTicks, int retryAttempt)

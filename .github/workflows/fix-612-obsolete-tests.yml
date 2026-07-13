@@ -1,0 +1,85 @@
+name: Apply issue 612 test cleanup
+
+on:
+  push:
+    branches:
+      - security/612-fail-closed-undefined-threat-enums
+
+permissions:
+  contents: write
+
+jobs:
+  apply-cleanup:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: security/612-fail-closed-undefined-threat-enums
+          fetch-depth: 0
+
+      - name: Remove obsolete permissive threat-outcome tests
+        shell: python
+        run: |
+          from pathlib import Path
+
+          path = Path("tests/AsiBackbone.Core.Tests/Evaluation/DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverageTests.cs")
+          text = path.read_text(encoding="utf-8")
+
+          def remove_documented_method(source: str, method_name: str) -> str:
+              signature = f"    public async Task {method_name}()"
+              signature_index = source.find(signature)
+              if signature_index < 0:
+                  raise RuntimeError(f"Method not found: {method_name}")
+
+              fact_index = source.rfind("    [Fact]", 0, signature_index)
+              if fact_index < 0:
+                  raise RuntimeError(f"Fact attribute not found: {method_name}")
+
+              doc_index = source.rfind("    /// <summary>", 0, fact_index)
+              if doc_index < 0:
+                  raise RuntimeError(f"XML documentation not found: {method_name}")
+
+              open_brace_index = source.find("{", signature_index)
+              if open_brace_index < 0:
+                  raise RuntimeError(f"Opening brace not found: {method_name}")
+
+              depth = 0
+              close_brace_index = None
+              for index in range(open_brace_index, len(source)):
+                  character = source[index]
+                  if character == "{":
+                      depth += 1
+                  elif character == "}":
+                      depth -= 1
+                      if depth == 0:
+                          close_brace_index = index
+                          break
+
+              if close_brace_index is None:
+                  raise RuntimeError(f"Closing brace not found: {method_name}")
+
+              removal_end = close_brace_index + 1
+              while removal_end < len(source) and source[removal_end] in "\r\n":
+                  removal_end += 1
+
+              return source[:doc_index] + source[removal_end:]
+
+          for method in (
+              "EvaluateUnknownThreatOutcomeFallsBackToNormalConstraintComposition",
+              "EvaluateUnknownSecondThreatOutcomeKeepsExistingWarningOutcome",
+          ):
+              text = remove_documented_method(text, method)
+
+          path.write_text(text, encoding="utf-8", newline="")
+
+      - name: Commit cleanup and remove temporary workflow
+        shell: bash
+        run: |
+          rm .github/workflows/fix-612-obsolete-tests.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Remove obsolete permissive threat outcome tests"
+          git push origin HEAD:security/612-fail-closed-undefined-threat-enums

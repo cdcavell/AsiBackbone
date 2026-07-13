@@ -271,8 +271,10 @@ public sealed class EfCoreGovernanceOutboxOutcomeStore : IAsiBackboneGovernanceO
         }
 
         bool saveCompleted = false;
-        void savedChangesHandler(object? _, SavedChangesEventArgs _)
+        void savedChangesHandler(object? sender, SavedChangesEventArgs eventArgs)
         {
+            _ = sender;
+            _ = eventArgs;
             saveCompleted = true;
         }
 

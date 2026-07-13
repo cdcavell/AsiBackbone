@@ -32,6 +32,10 @@ public interface IAsiBackboneGovernanceOutboxStore
     /// saving an already-known <see cref="GovernanceOutboxEntry.OutboxEntryId" /> should update the existing row rather than
     /// append a second logical outbox entry. Concurrent duplicate inserts may still surface provider-specific duplicate-key or
     /// concurrency exceptions that the host must reconcile.
+    ///
+    /// This is a non-claim mutation. Implementations may propagate storage-provider optimistic-concurrency exceptions without
+    /// retrying or translating another writer's state into caller success. The caller owns conflict detection, reload, retry,
+    /// merge, or abandonment according to its idempotency and transaction model.
     /// </remarks>
     ValueTask<GovernanceOutboxEntry> SaveAsync(
         GovernanceOutboxEntry entry,
@@ -70,6 +74,11 @@ public interface IAsiBackboneGovernanceOutboxStore
     /// <summary>
     /// Marks an outbox entry as delivered using a provider-neutral emission result.
     /// </summary>
+    /// <remarks>
+    /// This is a non-claim mutation. Implementations may propagate a storage-provider optimistic-concurrency exception when
+    /// another writer changes the same durable entry before this transition commits. No hidden retry or winner-state recovery
+    /// is implied; the caller owns reload and conflict resolution. Competing workers should prefer a claim-capable store.
+    /// </remarks>
     ValueTask<GovernanceOutboxEntry> MarkDeliveredAsync(
         string outboxEntryId,
         GovernanceEmissionResult result,
@@ -78,6 +87,11 @@ public interface IAsiBackboneGovernanceOutboxStore
     /// <summary>
     /// Marks an outbox entry as failed or retryable failed using provider-neutral error information.
     /// </summary>
+    /// <remarks>
+    /// This is a non-claim mutation. Implementations may propagate a storage-provider optimistic-concurrency exception when
+    /// another writer changes the same durable entry before this transition commits. No hidden retry or winner-state recovery
+    /// is implied; the caller owns reload and conflict resolution. Competing workers should prefer a claim-capable store.
+    /// </remarks>
     ValueTask<GovernanceOutboxEntry> MarkFailedAsync(
         string outboxEntryId,
         GovernanceEmissionError governanceEmissionError,
@@ -87,6 +101,11 @@ public interface IAsiBackboneGovernanceOutboxStore
     /// <summary>
     /// Marks an outbox entry as dead-lettered.
     /// </summary>
+    /// <remarks>
+    /// This is a non-claim mutation. Implementations may propagate a storage-provider optimistic-concurrency exception when
+    /// another writer changes the same durable entry before this transition commits. No hidden retry or winner-state recovery
+    /// is implied; the caller owns reload and conflict resolution. Competing workers should prefer a claim-capable store.
+    /// </remarks>
     ValueTask<GovernanceOutboxEntry> MarkDeadLetteredAsync(
         string outboxEntryId,
         GovernanceEmissionError governanceEmissionError,

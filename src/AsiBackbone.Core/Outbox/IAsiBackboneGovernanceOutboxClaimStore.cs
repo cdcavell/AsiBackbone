@@ -6,7 +6,7 @@ namespace AsiBackbone.Core.Outbox;
 /// Defines an opt-in claim-capable governance outbox store for coordinated multi-worker emission.
 /// </summary>
 /// <remarks>
-/// This contract is additive to <see cref="IAsiBackboneGovernanceOutboxStore" />. Hosts opt in when scaled workers need to claim a lease before provider emission. Claim support reduces duplicate selection risk for cooperating workers, but it does not create exactly-once provider delivery.
+/// This contract is additive to <see cref="IAsiBackboneGovernanceOutboxStore" />. Hosts opt in when scaled workers need to claim a lease before provider emission. Claim support reduces duplicate selection risk for cooperating workers, but it does not create exactly-once provider delivery. Claim-aware implementations may recover from optimistic-concurrency races or expose explicit transition outcomes; callers should use the outcome-aware contract when they must know whether the current invocation applied the durable transition.
 /// </remarks>
 public interface IAsiBackboneGovernanceOutboxClaimStore : IAsiBackboneGovernanceOutboxStore
 {

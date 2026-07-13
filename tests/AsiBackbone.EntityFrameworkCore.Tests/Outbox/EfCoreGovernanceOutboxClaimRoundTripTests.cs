@@ -54,7 +54,7 @@ public sealed class EfCoreGovernanceOutboxClaimRoundTripTests
                 string suffix = $"{index:D4}";
                 string outboxEntryId = $"round-trip-entry-{suffix}";
                 expectedIds[index] = outboxEntryId;
-                GovernanceEmissionEnvelope envelope = GovernanceEmissionEnvelope.Create(
+                var envelope = GovernanceEmissionEnvelope.Create(
                     GovernanceEmissionEventType.Outbox,
                     $"round-trip-event-{suffix}",
                     createdUtc.AddTicks(index),
@@ -62,7 +62,7 @@ public sealed class EfCoreGovernanceOutboxClaimRoundTripTests
                     correlationId: "efcore-outbox-claim-round-trip",
                     emitterStatus: GovernanceEmissionStatus.Pending.ToString(),
                     emitterProvider: "efcore-outbox");
-                GovernanceOutboxEntry entry = GovernanceOutboxEntry.Create(
+                var entry = GovernanceOutboxEntry.Create(
                     envelope,
                     outboxEntryId,
                     createdUtc.AddTicks(index));

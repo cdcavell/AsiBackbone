@@ -17,20 +17,14 @@ internal static class ManagedKeyRetryBackoff
         double jitterSample,
         TimeSpan previousDelay)
     {
-        if (baseDelay < TimeSpan.Zero)
-        {
-            throw new ArgumentOutOfRangeException(nameof(baseDelay));
-        }
+        ArgumentOutOfRangeException.ThrowIfLessThan(baseDelay, TimeSpan.Zero);
 
         if (maxDelay < TimeSpan.Zero || maxDelay < baseDelay)
         {
             throw new ArgumentOutOfRangeException(nameof(maxDelay));
         }
 
-        if (retryAttempt <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(retryAttempt));
-        }
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(retryAttempt);
 
         if (double.IsNaN(jitterSample) || jitterSample < 0d || jitterSample > 1d)
         {

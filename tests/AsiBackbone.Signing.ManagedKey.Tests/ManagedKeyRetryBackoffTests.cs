@@ -16,8 +16,8 @@ public sealed class ManagedKeyRetryBackoffTests
     [Fact]
     public void CalculateDelayGrowsWithinBoundsAndCaps()
     {
-        TimeSpan baseDelay = TimeSpan.FromMilliseconds(100);
-        TimeSpan maxDelay = TimeSpan.FromMilliseconds(500);
+        var baseDelay = TimeSpan.FromMilliseconds(100);
+        var maxDelay = TimeSpan.FromMilliseconds(500);
 
         TimeSpan first = ManagedKeyRetryBackoff.CalculateDelay(baseDelay, maxDelay, 1, 0d, TimeSpan.Zero);
         TimeSpan second = ManagedKeyRetryBackoff.CalculateDelay(baseDelay, maxDelay, 2, 1d, first);
@@ -138,7 +138,7 @@ public sealed class ManagedKeyRetryBackoffTests
     {
         using var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromMilliseconds(20));
 
-        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
+        _ = await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
             await SystemManagedKeyRetryDelay.Instance.DelayAsync(
                 TimeSpan.FromSeconds(5),
                 cancellationTokenSource.Token));
@@ -148,7 +148,7 @@ public sealed class ManagedKeyRetryBackoffTests
         int maxRetryAttempts,
         bool returnUnsignedOnFailure = false)
     {
-        ManagedKeySigningOptions options = ManagedKeySigningOptions.Create(
+        var options = ManagedKeySigningOptions.Create(
             keyId: "managed-key-1",
             keyVersion: "v1",
             providerName: "managed-key-test",
@@ -203,15 +203,12 @@ public sealed class ManagedKeyRetryBackoffTests
             cancellationToken.ThrowIfCancellationRequested();
             CallCount++;
 
-            if (CallCount <= failuresBeforeSuccess)
-            {
-                throw new ManagedKeySigningException(
+            return CallCount <= failuresBeforeSuccess
+                ? throw new ManagedKeySigningException(
                     "managedkey.signing.provider-unavailable",
                     "provider unavailable",
-                    isRetryable: true);
-            }
-
-            return ValueTask.FromResult(ManagedKeySignResult.Create(
+                    isRetryable: true)
+                : ValueTask.FromResult(ManagedKeySignResult.Create(
                 "signature",
                 request.SignatureAlgorithm,
                 request.KeyId,

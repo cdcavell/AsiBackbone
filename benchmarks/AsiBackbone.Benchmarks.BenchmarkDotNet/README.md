@@ -1,8 +1,8 @@
 # AsiBackbone.Benchmarks.BenchmarkDotNet
 
-This project provides the BenchmarkDotNet allocation baseline for AsiBackbone hot paths.
+This project provides the BenchmarkDotNet allocation and latency baselines for AsiBackbone hot paths.
 
-The benchmark class is annotated with `MemoryDiagnoser`, so the summary output includes allocation data such as Gen0 activity and allocated bytes per operation. Use this project for optimization PR baselines and before/after comparisons.
+The benchmark classes are annotated with `MemoryDiagnoser`, so the summary output includes allocation data such as Gen0 activity and allocated bytes per operation. Use this project for optimization PR baselines and before/after comparisons.
 
 ## Run all hot-path baselines
 
@@ -18,6 +18,12 @@ Outbox drain scenarios:
 
 ```powershell
 dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks.BenchmarkDotNet -- --filter "*OutboxDrain*"
+```
+
+EF Core outbox claim batch and injected-latency scenarios:
+
+```powershell
+dotnet run -c Release --project benchmarks/AsiBackbone.Benchmarks.BenchmarkDotNet -- --filter "*EfCoreOutboxClaim*"
 ```
 
 Endpoint governance scenarios:
@@ -45,6 +51,7 @@ The current BenchmarkDotNet baseline covers:
 - `outbox_drain.small_batch_25`;
 - `outbox_drain.medium_batch_100`;
 - `outbox_drain.scoped_medium_batch_100`;
+- `efcore_outbox.claim_pending_portable` with batch sizes 1, 10, 50, and 100 and injected per-command latency of 0 ms, 1 ms, and 5 ms;
 - `endpoint_governance.policy_allow`;
 - `endpoint_governance.policy_warning`;
 - `endpoint_governance.policy_deny`;
@@ -62,6 +69,8 @@ The current BenchmarkDotNet baseline covers:
 ## Interpretation
 
 Use BenchmarkDotNet output for trend comparison on the same machine, runtime, build configuration, and repository revision. Prefer repeated runs or median-focused review before making optimization decisions.
+
+The EF Core outbox claim benchmark seeds data outside the measured invocation and injects latency through a relational command interceptor. It verifies the uncontended portable command shape of one candidate query plus one read and one optimistic-concurrency update per successful claim. The injected delay isolates round-trip sensitivity but does not reproduce provider-specific locking, query plans, server load, or network jitter. See [EF Core Outbox Bulk-Claim Performance Evaluation](../../docs/articles/efcore-outbox-bulk-claim-evaluation.md) for the command-count model, provider-specific analysis, and production decision.
 
 ### Audit residue metadata allocation shape
 

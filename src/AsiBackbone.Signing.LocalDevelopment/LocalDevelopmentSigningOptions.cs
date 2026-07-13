@@ -9,6 +9,11 @@ namespace AsiBackbone.Signing.LocalDevelopment;
 public sealed class LocalDevelopmentSigningOptions
 {
     /// <summary>
+    /// Gets the minimum supported RSA key size for generated local-development keys.
+    /// </summary>
+    public const int MinimumKeySizeBits = 2048;
+
+    /// <summary>
     /// Gets the default provider descriptor returned in signing metadata.
     /// </summary>
     public const string DefaultProviderName = "local-development";
@@ -31,7 +36,7 @@ public sealed class LocalDevelopmentSigningOptions
     /// <summary>
     /// Gets the default RSA key size for generated local-development keys.
     /// </summary>
-    public const int DefaultKeySizeBits = 2048;
+    public const int DefaultKeySizeBits = MinimumKeySizeBits;
 
     /// <summary>
     /// Gets or sets the provider descriptor returned in signing metadata.
@@ -56,12 +61,31 @@ public sealed class LocalDevelopmentSigningOptions
     /// <summary>
     /// Gets or sets the generated RSA key size in bits.
     /// </summary>
+    /// <remarks>
+    /// Values below <see cref="MinimumKeySizeBits" /> are invalid. Omitted configuration uses
+    /// <see cref="DefaultKeySizeBits" />.
+    /// </remarks>
     public int KeySizeBits { get; set; } = DefaultKeySizeBits;
 
     /// <summary>
     /// Gets or sets a value indicating whether signing failures should return unsigned metadata with explicit failure details instead of throwing during normal signing flow.
     /// </summary>
     public bool ReturnUnsignedOnFailure { get; set; } = true;
+
+    /// <summary>
+    /// Validates the configured local-development signing options.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when <see cref="KeySizeBits" /> is below <see cref="MinimumKeySizeBits" />.
+    /// </exception>
+    public void Validate()
+    {
+        if (KeySizeBits < MinimumKeySizeBits)
+        {
+            throw new InvalidOperationException(
+                $"Local-development RSA key size must be at least {MinimumKeySizeBits} bits. Configured value: {KeySizeBits}.");
+        }
+    }
 
     /// <summary>
     /// Creates options for the local-development signing provider.

@@ -20,12 +20,16 @@ public static class LocalDevelopmentSigningBuilderExtensions
     /// <summary>
     /// Adds local-development signing and verification through the AsiBackbone builder facade using configured options.
     /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when the configured local-development signing options are invalid.
+    /// </exception>
     public static IAsiBackboneBuilder UseLocalDevelopmentSigning(
         this IAsiBackboneBuilder builder,
         LocalDevelopmentSigningOptions options)
     {
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(options);
+        options.Validate();
 
         _ = builder.Services.AddSingleton(options);
         _ = builder.Services.AddSingleton<LocalDevelopmentSigningService>();

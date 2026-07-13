@@ -122,9 +122,8 @@ public sealed class AsiBackboneGovernanceOutboxDrainRuntimeOptionsTests
     private sealed class RuntimeOptionsMonitor(AsiBackboneGovernanceOutboxDrainWorkerOptions initialValue)
         : IOptionsMonitor<AsiBackboneGovernanceOutboxDrainWorkerOptions>
     {
-        private readonly object sync = new();
+        private readonly Lock sync = new();
         private readonly List<Action<AsiBackboneGovernanceOutboxDrainWorkerOptions, string?>> listeners = [];
-        private AsiBackboneGovernanceOutboxDrainWorkerOptions currentValue = initialValue;
 
         public AsiBackboneGovernanceOutboxDrainWorkerOptions CurrentValue
         {
@@ -132,10 +131,12 @@ public sealed class AsiBackboneGovernanceOutboxDrainRuntimeOptionsTests
             {
                 lock (sync)
                 {
-                    return currentValue;
+                    return field;
                 }
             }
-        }
+
+            private set;
+        } = initialValue;
 
         public AsiBackboneGovernanceOutboxDrainWorkerOptions Get(string? name)
         {
@@ -167,7 +168,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainRuntimeOptionsTests
 
             lock (sync)
             {
-                currentValue = value;
+                CurrentValue = value;
                 callbacks = [.. listeners];
             }
 
@@ -190,7 +191,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainRuntimeOptionsTests
 
     private sealed class RecordingScopeFactory(IServiceScopeFactory inner) : IServiceScopeFactory
     {
-        private readonly object sync = new();
+        private readonly Lock sync = new();
         private readonly List<(int ExpectedCount, TaskCompletionSource Completion)> waiters = [];
         private int createScopeCallCount;
 
@@ -244,15 +245,24 @@ public sealed class AsiBackboneGovernanceOutboxDrainRuntimeOptionsTests
 
         public ValueTask<GovernanceOutboxEntry> EnqueueAsync(
             GovernanceEmissionEnvelope envelope,
-            CancellationToken cancellationToken = default) => throw new NotSupportedException();
+            CancellationToken cancellationToken = default)
+        {
+            throw new NotSupportedException();
+        }
 
         public ValueTask<GovernanceOutboxEntry> SaveAsync(
             GovernanceOutboxEntry entry,
-            CancellationToken cancellationToken = default) => throw new NotSupportedException();
+            CancellationToken cancellationToken = default)
+        {
+            throw new NotSupportedException();
+        }
 
         public ValueTask<GovernanceOutboxEntry?> FindByOutboxEntryIdAsync(
             string outboxEntryId,
-            CancellationToken cancellationToken = default) => throw new NotSupportedException();
+            CancellationToken cancellationToken = default)
+        {
+            throw new NotSupportedException();
+        }
 
         public ValueTask<IReadOnlyList<GovernanceOutboxEntry>> FindPendingAsync(
             int maxCount = 100,
@@ -275,19 +285,28 @@ public sealed class AsiBackboneGovernanceOutboxDrainRuntimeOptionsTests
         public ValueTask<GovernanceOutboxEntry> MarkDeliveredAsync(
             string outboxEntryId,
             GovernanceEmissionResult result,
-            CancellationToken cancellationToken = default) => throw new NotSupportedException();
+            CancellationToken cancellationToken = default)
+        {
+            throw new NotSupportedException();
+        }
 
         public ValueTask<GovernanceOutboxEntry> MarkFailedAsync(
             string outboxEntryId,
             GovernanceEmissionError governanceEmissionError,
             DateTimeOffset? nextRetryUtc = null,
-            CancellationToken cancellationToken = default) => throw new NotSupportedException();
+            CancellationToken cancellationToken = default)
+        {
+            throw new NotSupportedException();
+        }
 
         public ValueTask<GovernanceOutboxEntry> MarkDeadLetteredAsync(
             string outboxEntryId,
             GovernanceEmissionError governanceEmissionError,
             string? deadLetterReason = null,
-            CancellationToken cancellationToken = default) => throw new NotSupportedException();
+            CancellationToken cancellationToken = default)
+        {
+            throw new NotSupportedException();
+        }
     }
 
     private sealed class NoOpGovernanceEmitter : IAsiBackboneGovernanceEmitter

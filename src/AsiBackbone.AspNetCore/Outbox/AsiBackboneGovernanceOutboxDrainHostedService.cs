@@ -45,7 +45,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedService(
     private readonly IServiceScopeFactory scopeFactory = scopeFactory ?? throw new ArgumentNullException(nameof(scopeFactory));
     private readonly IOptionsMonitor<AsiBackboneGovernanceOutboxDrainWorkerOptions> optionsMonitor = optionsMonitor ?? throw new ArgumentNullException(nameof(optionsMonitor));
     private readonly ILogger<AsiBackboneGovernanceOutboxDrainHostedService> logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    private readonly object optionsChangedSync = new();
+    private readonly Lock optionsChangedSync = new();
     private TaskCompletionSource optionsChanged = CreateOptionsChangedSource();
     private long optionsVersion;
 
@@ -164,7 +164,7 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedService(
             }
         }
 
-        Task delayTask = Task.Delay(delay, cancellationToken);
+        var delayTask = Task.Delay(delay, cancellationToken);
         Task completedTask = await Task.WhenAny(delayTask, optionsChangedTask).ConfigureAwait(false);
 
         if (completedTask == delayTask && !cancellationToken.IsCancellationRequested)

@@ -194,12 +194,12 @@ change is intended.
 
 ### Current stable-line posture
 
-`2.x` is the canonical package identity line for the simplified `AsiBackbone.*`
+`3.x` is the current stable package identity line for the `AsiBackbone.*`
 package IDs and namespaces. Additional breaking changes should be avoided unless
 strongly justified by consumer safety, correctness, maintainability, or a clearly
 documented architectural boundary that cannot be preserved compatibly.
 
-Future work should prefer compatible patch or minor releases on the `2.x` line.
+Future work should prefer compatible patch or minor releases on the current stable line.
 Any proposal that would create another package identity, namespace, or public API
 break should explain why the change cannot wait, why a compatibility shim is not
 sufficient, and what consumer migration support will be provided.

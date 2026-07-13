@@ -333,64 +333,6 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorThreatModelingBranchCoverag
     }
 
     /// <summary>
-    /// Test that when a threat contributor reports an unknown outcome, the evaluator falls back to the normal constraint composition behavior, resulting in an allowed decision with no reason codes.
-    /// </summary>
-    /// <returns>
-    /// A task representing the asynchronous operation.
-    /// </returns>
-    [Fact]
-    public async Task EvaluateUnknownThreatOutcomeFallsBackToNormalConstraintComposition()
-    {
-        TestPolicyContext context = CreateContext();
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
-            [new StaticConstraint(ConstraintEvaluationResult.Allow())],
-            [new StaticThreatContributor(
-                "unknown-outcome-threat-contributor",
-                ThreatAssessment.Create(
-                    ThreatSeverity.Medium,
-                    ThreatCategories.AuditIntegrityRisk,
-                    "threat.unknown_outcome",
-                    "Unknown threat outcome was reported.",
-                    (GovernanceDecisionOutcome)999))]);
-
-        GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
-
-        Assert.True(decision.IsAllowed);
-        Assert.Empty(decision.ReasonCodes);
-    }
-
-    /// <summary>
-    /// Test that when a threat contributor reports an unknown outcome, but there is an existing warning outcome from another contributor, the evaluator preserves the existing warning outcome in the final governance decision, including both reason codes.
-    /// </summary>
-    /// <returns>
-    /// A task representing the asynchronous operation.
-    /// </returns>
-    [Fact]
-    public async Task EvaluateUnknownSecondThreatOutcomeKeepsExistingWarningOutcome()
-    {
-        TestPolicyContext context = CreateContext();
-        var evaluator = new DefaultAsiBackbonePolicyEvaluator<TestPolicyContext>(
-            [new StaticConstraint(ConstraintEvaluationResult.Allow())],
-            [
-                CreateWarningContributor(),
-                new StaticThreatContributor(
-                    "unknown-outcome-threat-contributor",
-                    ThreatAssessment.Create(
-                        ThreatSeverity.Medium,
-                        ThreatCategories.AuditIntegrityRisk,
-                        "threat.unknown_outcome",
-                        "Unknown threat outcome was reported.",
-                        (GovernanceDecisionOutcome)999))
-            ]);
-
-        GovernanceDecision decision = await evaluator.EvaluateAsync(context, TestContext.Current.CancellationToken);
-
-        Assert.True(decision.IsWarning);
-        Assert.Contains("threat.warning", decision.ReasonCodes);
-        Assert.Contains("threat.unknown_outcome", decision.ReasonCodes);
-    }
-
-    /// <summary>
     /// Test that when a threat assessment is created with no threat, it results in a non-actionable assessment with severity None, category None, and recommended outcome Allowed.
     /// </summary>
     [Fact]

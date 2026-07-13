@@ -123,30 +123,12 @@ jobs:
 
       - name: Test adapter and provider package coverage baselines
         shell: pwsh
-        run: |
+        run: >
           ./scripts/Validate-PackageCoverageBaselines.ps1
           -Configuration "$env:CONFIGURATION"
           -NoBuild
           -NoRestore
           -OutputRoot "$env:PACKAGE_COVERAGE_OUTPUT"
-
-          if ($exitCode -ne 0) {
-              Write-Error (
-                  'Package coverage baseline failed for {0}. ' +
-                  'Test project: {1}; threshold: {2}%; exit code: {3}.'
-                  -f $target.Package,
-                     $target.TestProject,
-                     $threshold,
-                     $exitCode
-              )
-
-              $failures += [pscustomobject]@{
-                  Package       = $target.Package
-                  TestProject   = $target.TestProject
-                  LineThreshold = $threshold
-                  ExitCode      = $exitCode
-              }
-          }
 
       - name: Pack packages
         shell: bash
@@ -219,11 +201,12 @@ jobs:
           if-no-files-found: error
 
       - name: Upload adapter and provider package coverage artifacts
+        if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: asi-backbone-package-coverage-baselines
           path: ${{ env.PACKAGE_COVERAGE_OUTPUT }}/**
-          if-no-files-found: error
+          if-no-files-found: warn
 
       - name: Upload XML documentation inventory artifact
         if: always()

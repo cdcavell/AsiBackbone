@@ -1,5 +1,3 @@
-using System.Collections.ObjectModel;
-
 namespace AsiBackbone.Signing.ManagedKey;
 
 /// <summary>
@@ -7,9 +5,6 @@ namespace AsiBackbone.Signing.ManagedKey;
 /// </summary>
 public sealed class ManagedKeySignResult
 {
-    private static readonly ReadOnlyDictionary<string, string> EmptyMetadata =
-        new(new Dictionary<string, string>(StringComparer.Ordinal));
-
     private ManagedKeySignResult(
         string signature,
         string signatureAlgorithm,
@@ -63,8 +58,13 @@ public sealed class ManagedKeySignResult
     public DateTimeOffset SignedUtc { get; }
 
     /// <summary>
-    /// Gets safe provider-neutral metadata returned by the managed-key client.
+    /// Gets minimized provider-neutral diagnostic metadata returned by the managed-key client.
     /// </summary>
+    /// <remarks>
+    /// Provider metadata is an untrusted input. Only documented provider-neutral diagnostic keys
+    /// are retained, and key, value, count, and aggregate-size limits are applied before the
+    /// metadata can reach signing or downstream audit records.
+    /// </remarks>
     public IReadOnlyDictionary<string, string> Metadata { get; }
 
     /// <summary>
@@ -86,31 +86,11 @@ public sealed class ManagedKeySignResult
             keyVersion,
             providerOperationId,
             signedUtc,
-            NormalizeMetadata(metadata));
+            ManagedKeyProviderMetadataFilter.Filter(metadata));
     }
 
     private static string? NormalizeOptional(string? value)
     {
         return string.IsNullOrWhiteSpace(value) ? null : value.Trim();
-    }
-
-    private static ReadOnlyDictionary<string, string> NormalizeMetadata(IReadOnlyDictionary<string, string>? metadata)
-    {
-        if (metadata is null || metadata.Count == 0)
-        {
-            return EmptyMetadata;
-        }
-
-        Dictionary<string, string> normalized = new(StringComparer.Ordinal);
-
-        foreach (KeyValuePair<string, string> item in metadata)
-        {
-            if (!string.IsNullOrWhiteSpace(item.Key))
-            {
-                normalized[item.Key.Trim()] = item.Value?.Trim() ?? string.Empty;
-            }
-        }
-
-        return normalized.Count == 0 ? EmptyMetadata : new ReadOnlyDictionary<string, string>(normalized);
     }
 }

@@ -93,7 +93,22 @@ Signed and unsigned results include retry diagnostics so operators can see how t
 
 ## Safe metadata
 
-Signed results preserve provider-neutral metadata:
+Provider metadata is an untrusted external input and is minimized before it can reach signing metadata, logs, governance residue, or audit records. The managed-key result boundary retains only these provider-neutral diagnostic keys:
+
+- `provider_region`
+- `provider_zone`
+- `provider_service`
+- `provider_request_id`
+- `provider_status_code`
+- `provider_key_state`
+
+Matching is ordinal and case-insensitive, and retained keys are emitted in the canonical lowercase form shown above. Prefix, suffix, separator, and near-match variants are rejected rather than normalized into an allowed key.
+
+Provider metadata is also bounded to 16 entries, 64 characters per key, 256 characters per value, and 2,048 aggregate key/value characters. Values containing control characters are rejected. The source dictionary is copied so later host or provider mutation cannot alter retained signing metadata.
+
+Sensitive or unrecognized fields—including passwords, API keys, authorization headers, bearer tokens, cookies, certificates, connection material, credentials, private keys, and secret-like variants—are dropped by default. Provider operation IDs remain a separate explicit field on `ManagedKeySignResult` and are recorded only through the service-owned `provider_operation_id` diagnostic.
+
+Signed results otherwise preserve provider-neutral signing information:
 
 - signing hash;
 - hash algorithm;
@@ -105,8 +120,6 @@ Signed results preserve provider-neutral metadata:
 - signed UTC timestamp;
 - safe provider operation ID when supplied;
 - retry diagnostics such as `retry_attempts`, `provider_attempts`, and retry delay fields.
-
-Provider metadata keys that appear to contain secrets, tokens, credentials, private key material, or connection strings are filtered. Provider metadata keys that collide with service-owned diagnostic metadata are also filtered so caller or provider metadata cannot hide the actual managed-key signing outcome.
 
 ## Non-goals
 

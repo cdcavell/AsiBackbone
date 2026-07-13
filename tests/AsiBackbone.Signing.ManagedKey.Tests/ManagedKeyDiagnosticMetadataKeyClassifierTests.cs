@@ -149,6 +149,7 @@ public sealed class ManagedKeyDiagnosticMetadataKeyClassifierTests
             StringComparer.Ordinal);
         providerMetadata[" retry_attempts "] = ProviderSpoofValue;
         providerMetadata["provider_region"] = "provider-region";
+        providerMetadata["PrOvIdEr_ZoNe"] = " provider-zone ";
         providerMetadata["retry_attempts_extra"] = "provider-extra";
         providerMetadata["Failure_code"] = "provider-case-variant";
 
@@ -161,8 +162,10 @@ public sealed class ManagedKeyDiagnosticMetadataKeyClassifierTests
 
         Assert.DoesNotContain(ProviderSpoofValue, result.Metadata.Metadata.Values);
         Assert.Equal("provider-region", result.Metadata.Metadata["provider_region"]);
-        Assert.Equal("provider-extra", result.Metadata.Metadata["retry_attempts_extra"]);
-        Assert.Equal("provider-case-variant", result.Metadata.Metadata["Failure_code"]);
+        Assert.Equal("provider-zone", result.Metadata.Metadata["provider_zone"]);
+        Assert.DoesNotContain("PrOvIdEr_ZoNe", result.Metadata.Metadata.Keys);
+        Assert.DoesNotContain("retry_attempts_extra", result.Metadata.Metadata.Keys);
+        Assert.DoesNotContain("Failure_code", result.Metadata.Metadata.Keys);
         Assert.Equal("operation-1", result.Metadata.Metadata["provider_operation_id"]);
     }
 

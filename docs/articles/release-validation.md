@@ -1,10 +1,10 @@
 # Stable Release Validation
 
-This article documents the reusable release-blocking validation path for stable release lines. The current released stable package family is `3.x`, with `3.0.0` as the current major release and `3.0.0.0` as the binary assembly identity for the current major line.
+This article documents the reusable release-blocking validation path for stable release lines. The current released stable package family is `3.x`, with `3.0.1` as the current patch release and `3.0.0.0` as the binary assembly identity for the current major line.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. Release validation should confirm that the package family remains practical governance infrastructure and that implementation claims stay within the documented software boundary. See [Release Cadence and Readiness](release-cadence-and-readiness.md) for the release-stream and stabilization guidance that complements this checklist.
 
-The [3.0.0 Release Readiness Record](release-readiness-300.md) is the current release-candidate control sheet for the `3.0.0` release. The [3.0.0 Consumer Verification Guide](consumer-verification-300.md) documents the consumer-facing package-source, package ID, Source Link, SBOM/provenance, and deferred package-signing verification path. Earlier readiness records are retained for traceability.
+The [3.0.1 Release Readiness Record](release-readiness-301.md) is the current release-candidate control sheet. The [3.0.1 Consumer Verification Guide](consumer-verification-301.md) documents the consumer-facing package-source, package ID, Source Link, SBOM/provenance, and deferred package-signing verification path. Earlier readiness records are retained for traceability.
 
 ## Required checks before tagging a stable release
 
@@ -32,7 +32,7 @@ Before cutting a stable release tag, confirm the following checks have passed on
 | Documentation build | publish docs, stable release validation, package publish | Confirms DocFX can build the documentation included in the release posture. |
 | Documentation link review | release readiness record, manual docs review | Confirms README links, DocFX navigation, release notes, migration guides, package documentation links, and GitHub Pages links point to current pages. |
 | External consumer smoke tests | external consumer smoke workflow, stable release validation | Confirms clean consumer-style projects can reference and wire the package family. |
-| Source Link metadata validation | manual post-publish validation | Confirms published NuGet packages include expected repository type, repository URL, and non-empty repository commit metadata are present. |
+| Source Link metadata validation | manual post-publish validation | Confirms published NuGet packages include expected repository type, repository URL, and non-empty repository commit metadata. |
 
 ## Canonical local release-hardening commands
 
@@ -113,10 +113,10 @@ For every stable release, the release readiness record should explicitly confirm
 
 ## Source Link metadata validation
 
-After `3.0.0` packages are published and visible on NuGet, maintainers should run:
+After `3.0.1` packages are published and visible on NuGet, maintainers should run:
 
 ```powershell
-./scripts/Validate-Source-Link-commit-metadata.ps1 -Version 3.0.0
+./scripts/Validate-Source-Link-commit-metadata.ps1 -Version 3.0.1
 ```
 
 This post-publish check downloads the published packages and confirms the expected repository type, repository URL, and non-empty repository commit metadata are present.
@@ -134,6 +134,9 @@ NuGet package signing is currently a known open supply-chain readiness item. Unt
 - [Release Cadence and Readiness](release-cadence-and-readiness.md)
 - [Public API XML Documentation](public-api-xml-documentation.md)
 - [Supply-Chain Provenance and Package SBOMs](supply-chain-provenance.md)
+- [3.0.1 Consumer Verification Guide](consumer-verification-301.md)
+- [3.0.1 Release Readiness Record](release-readiness-301.md)
+- [3.0.1 Release Notes](release-notes-301.md)
 - [3.0.0 Consumer Verification Guide](consumer-verification-300.md)
 - [3.0.0 Release Readiness Record](release-readiness-300.md)
 - [3.0.0 Release Notes](release-notes-300.md)

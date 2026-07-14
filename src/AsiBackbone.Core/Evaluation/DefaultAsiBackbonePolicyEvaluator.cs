@@ -471,7 +471,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
             }
 
             GovernanceDecisionOutcome effectiveOutcome = GetEffectiveThreatOutcome(assessment);
-            OperationReason reason = assessment.ToOperationReason(GetContributorName(contributor), effectiveOutcome);
+            var reason = assessment.ToOperationReason(GetContributorName(contributor), effectiveOutcome);
             GovernanceDecisionOutcome moreRestrictiveOutcome = SelectMoreRestrictiveOutcome(selectedOutcome, effectiveOutcome);
 
             if (selectedOutcome != moreRestrictiveOutcome)

@@ -1,0 +1,20 @@
+name: Fix Core package README anchor
+
+on:
+  push:
+    branches:
+      - release/3.0.1
+    paths:
+      - .github/workflows/fix-core-readme-anchor.yml
+
+permissions:
+  contents: write
+
+jobs:
+  fix-readme-anchor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout release branch
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          ref

@@ -98,7 +98,6 @@ app.MapPost("/api/orders/{region}/approve", async (
         metadata: context.Metadata);
 
     await auditSink.WriteAsync(residue, cancellationToken);
-
     if (!decision.CanProceed)
     {
         return Results.Json(new
@@ -126,7 +125,7 @@ For production-style hosts, add durable audit/outbox persistence, signing or ver
 
 ## Package family
 
-Stable `3.0.x` package family. `3.0.0` establishes the current major release line and binary assembly identity while preserving the simplified `AsiBackbone.*` package IDs and namespaces established by `2.0.0`. The package family carries forward the governance-spine surface with builder-facade, analyzer, OpenTelemetry, signing-provider, testing-harness, template package, endpoint diagnostics, endpoint reduced metadata mode, metadata budget guardrails, constraint-exception denial behavior, empty-policy warning diagnostics, managed-key fail-closed defaults, threat-model contributor hooks, strict-governance profile helpers, EF Core JSON metadata storage guidance, policy-input hardening, production placeholder guardrails, samples, Source Link metadata, package SBOM/provenance artifacts, BenchmarkDotNet allocation baselines, benchmark guidance, custom decision-policy examples, and documentation-alignment surfaces.
+Stable `3.0.x` package family. `3.0.1` is the current patch release; `3.0.0` established the current major release line and binary assembly identity while preserving the simplified `AsiBackbone.*` package IDs and namespaces established by `2.0.0`. The package family carries forward the governance-spine surface with builder-facade, analyzer, OpenTelemetry, signing-provider, testing-harness, template package, endpoint diagnostics, endpoint reduced metadata mode, metadata budget guardrails, constraint-exception denial behavior, empty-policy warning diagnostics, managed-key fail-closed defaults, threat-model contributor hooks, strict-governance profile helpers, EF Core JSON metadata storage guidance, policy-input hardening, production placeholder guardrails, samples, Source Link metadata, package SBOM/provenance artifacts, BenchmarkDotNet allocation baselines, benchmark guidance, custom decision-policy examples, and documentation-alignment surfaces.
 
 | Package | Role |
 | --- | --- |
@@ -183,9 +182,9 @@ The full, categorized documentation set lives at the [documentation site](https:
 
 ## Current status
 
-Stable `3.0.x` is the current released line, with `3.0.0` as the current major release. This release preserves the simplified `AsiBackbone.*` package and namespace identity established by `2.0.0` while carrying forward the released governance-spine package family and updating the binary assembly identity to `3.0.0.0`.
+Stable `3.0.x` is the current released line, with `3.0.1` as the current patch release and `3.0.0` as the major-line baseline. This release preserves the simplified `AsiBackbone.*` package and namespace identity established by `2.0.0` and the binary assembly identity `3.0.0.0`.
 
-The stable API contract is documented in [API Compatibility and SemVer](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/api-compatibility-and-semver.md). The `3.0.0` release boundary is recorded in [3.0.0 Release Notes](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/release-notes-300.md) and [3.0.0 Release Readiness Record](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/release-readiness-300.md). Consumers can use the [3.0.0 Consumer Verification Guide](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/consumer-verification-300.md) for package-source, package ID, Source Link, SBOM, provenance, and deferred-signing checks. Earlier `1.x` and `2.x` release notes remain available for historical traceability.
+The stable API contract is documented in [API Compatibility and SemVer](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/api-compatibility-and-semver.md). The current patch is recorded in [3.0.1 Release Notes](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/release-notes-301.md) and [3.0.1 Release Readiness Record](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/release-readiness-301.md). Consumers can use the [3.0.1 Consumer Verification Guide](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/consumer-verification-301.md) for package-source, package ID, Source Link, SBOM, provenance, and deferred-signing checks. The `3.0.0` major-release records and earlier `1.x` and `2.x` release notes remain available for historical traceability.
 
 ## Security and vulnerability reporting
 
@@ -207,7 +206,7 @@ A consumer should be able to use AsiBackbone in an application generated from Ne
 
 AsiBackbone is a governance spine, not an intelligence engine. It implements governance-oriented software primitives for accountable decision flow and keeps execution authority with the host application. See [Project Boundaries and Non-Claims](https://cdcavell.github.io/AsiBackbone/articles/project-boundaries.html) for the full scope statement and safe wording guidance.
 
-> **Current NuGet packages are intentionally published without package signing.** This is a deliberate governance decision while the project is independently maintained, balancing operational complexity against practical value. Instead, the project emphasizes transparent source code, GitHub releases, Source Link, SBOM generation, and package provenance. Package signing remains on the long-term roadmap and will be reconsidered as the project's community, governance, and operational needs evolve. For current package verification guidance, see the [**3.0.0 Consumer Verification Guide**](https://cdcavell.github.io/AsiBackbone/articles/consumer-verification-300.html).
+> **Current NuGet packages are intentionally published without package signing.** This is a deliberate governance decision while the project is independently maintained, balancing operational complexity against practical value. Instead, the project emphasizes transparent source code, GitHub releases, Source Link, SBOM generation, and package provenance. Package signing remains on the long-term roadmap and will be reconsidered as the project's community, governance, and operational needs evolve. For current package verification guidance, see the [**3.0.1 Consumer Verification Guide**](https://cdcavell.github.io/AsiBackbone/articles/consumer-verification-301.html).
 
 ## Design principles
 

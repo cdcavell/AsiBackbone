@@ -56,12 +56,26 @@ jobs:
       contents: read
 
     steps:
+      # Step 1: Checkout repository
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           persist-credentials: false
 
-      - name: Run actionlint
-        uses: docker://rhysd/actionlint:1.7.12
-        with:
-          args: -color
+#      - name: Run actionlint
+#        uses: docker://rhysd/actionlint:1.7.12
+#        with:
+#          args: -color
+
+      # Step 2: Install actionlint (latest release)
+      - name: Install actionlint
+        run: |
+          curl -sSL https://github.com/rhysd/actionlint/releases/latest/download/actionlint_$(uname -s)_$(uname -m).tar.gz \
+          | tar -xz
+          sudo mv actionlint /usr/local/bin/
+
+      # Step 3: Run actionlint
+      - name: Lint workflow files
+        run: |
+          # Lint all workflow files in .github/workflows
+          actionlint -color

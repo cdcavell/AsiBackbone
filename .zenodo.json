@@ -1,8 +1,8 @@
 {
   "title": "ASI Backbone",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "upload_type": "software",
-  "description": "AsiBackbone is a .NET package-family project providing framework-neutral governance primitives for consequential software decision flow, including actor context, constraint evaluation, threat-model contributor hooks, governance decisions, acknowledgment workflows, audit residue, durable outbox persistence, provider-neutral governance emission, OpenTelemetry projection, signing-provider boundaries, strict-governance profile helpers, and ASP.NET Core endpoint governance metadata controls. Version 3.0.0 establishes the current 3.x stable release line on the existing AsiBackbone package and namespace identity, updates the binary assembly identity to 3.0.0.0, keeps execution authority and production controls host-owned, and aligns release documentation, template fallbacks, citation metadata, and package validation guidance for the 3.0.0 release posture.",
+  "description": "AsiBackbone is a .NET package-family project providing framework-neutral governance primitives for consequential software decision flow. Version 3.0.1 is a compatible patch release for the stable 3.0.x line that hardens threat-assessment construction, reserves the framework-owned threat metadata namespace, and preserves the reason associated with the selected restrictive threat outcome. Package IDs, public namespaces, the net10.0 target, and AssemblyVersion 3.0.0.0 remain unchanged; host-owned execution authority and production controls remain outside the package boundary.",
   "creators": [
     {
       "name": "Cavell, Christopher D.",

@@ -1,6 +1,8 @@
 # Stable Release Validation
 
-This article documents the reusable release-blocking validation path for stable release lines. The current released stable package family is `3.x`, with `3.0.1` as the current patch release and `3.0.0.0` as the binary assembly identity for the current major line.
+This article documents the reusable release-blocking validation path for stable release lines. The current released stable package family is `3.x`, with `3.0.1` as the current patch release.
+
+The binary assembly identity for the `3.x` line remains `3.0.0.0`.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. Release validation should confirm that the package family remains practical governance infrastructure and that implementation claims stay within the documented software boundary. See [Release Cadence and Readiness](release-cadence-and-readiness.md) for the release-stream and stabilization guidance that complements this checklist.
 

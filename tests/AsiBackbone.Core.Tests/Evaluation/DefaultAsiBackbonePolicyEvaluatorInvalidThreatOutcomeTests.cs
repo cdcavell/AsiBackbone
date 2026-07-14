@@ -19,7 +19,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorInvalidThreatOutcomeTests
     public void CreateThreatEvaluationResultRejectsAllowedOutcome()
     {
         MethodInfo method = GetPrivateStaticMethod(nameof(CreateThreatEvaluationResultRejectsAllowedOutcome), "CreateThreatEvaluationResult");
-        OperationReason selectedReason = OperationReason.Create(
+        var selectedReason = OperationReason.Create(
             "threat.allowed_invalid",
             "Allowed threat outcome is invalid.");
         ReadOnlyCollection<OperationReason> reasons = Array.AsReadOnly([selectedReason]);

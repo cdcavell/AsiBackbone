@@ -1,0 +1,116 @@
+name: Fix 3.0.1 documentation release claims
+
+on:
+  push:
+    branches:
+      - release/3.0.1
+    paths:
+      - .github/workflows/fix-301-release-claims.yml
+
+permissions:
+  contents: write
+
+jobs:
+  fix-release-claims:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout release branch
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          ref: release/3.0.1
+
+      - name: Correct stale and historical release wording
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          replacements = {
+              "docs/articles/consumer-verification-300.md": [
+                  (
+                      "Current `3.0.0` packages should be described as having NuGet metadata, Source Link metadata, package SBOMs, and package/SBOM provenance artifacts where supported by the workflow event. They should not be described as maintainer-signed, repository-signed, Authenticode-signed, tamper-evident, or legally non-repudiable by default.",
+                      "The historical `3.0.0` packages should be described as having NuGet metadata, Source Link metadata, package SBOMs, and package/SBOM provenance artifacts where supported by the workflow event. They should not be described as maintainer-signed, repository-signed, Authenticode-signed, tamper-evident, or legally non-repudiable by default."
+                  )
+              ],
+              "docs/articles/observability-and-governance-emission-architecture.md": [
+                  (
+                      "Event Hubs is a design-only future provider strategy in the current documentation set. It is not a released AsiBackbone NuGet package in `3.0.0`.",
+                      "Event Hubs is a design-only future provider strategy in the current documentation set. It is not a released AsiBackbone NuGet package in `3.0.1`."
+                  ),
+                  (
+                      "Purview is a strategy-only future enrichment direction in the current documentation set. It is not a released AsiBackbone NuGet package in `3.0.0`.",
+                      "Purview is a strategy-only future enrichment direction in the current documentation set. It is not a released AsiBackbone NuGet package in `3.0.1`."
+                  )
+              ],
+              "docs/articles/progressive-adoption.md": [
+                  (
+                      "| Review the current stable package family before broader adoption | [3.0.0 Release Notes](release-notes-300.md) | Install only the packages required by the selected boundary |",
+                      "| Review the current stable package family before broader adoption | [3.0.1 Release Notes](release-notes-301.md) | Install only the packages required by the selected boundary |"
+                  )
+              ],
+              "docs/articles/release-cadence-and-readiness.md": [
+                  (
+                      "`3.x` is the current stable package line. `3.0.1` is the current patch release; `3.0.0` established the major-line binary identity while preserving the existing `AsiBackbone.*` package IDs and namespaces.",
+                      "`3.x` is the current stable package line, and `3.0.1` is the current patch release.\n\nThe historical `3.0.0` release established the major-line binary identity while preserving the existing `AsiBackbone.*` package IDs and namespaces."
+                  )
+              ],
+              "docs/articles/release-validation.md": [
+                  (
+                      "This article documents the reusable release-blocking validation path for stable release lines. The current released stable package family is `3.x`, with `3.0.1` as the current patch release and `3.0.0.0` as the binary assembly identity for the current major line.",
+                      "This article documents the reusable release-blocking validation path for stable release lines. The current released stable package family is `3.x`, with `3.0.1` as the current patch release.\n\nThe binary assembly identity for the `3.x` line remains `3.0.0.0`."
+                  )
+              ],
+              "docs/articles/signing-ready-receipts-and-key-handling.md": [
+                  (
+                      "> `AsiBackbone.Core` includes stable signing-ready metadata, canonical payload hashing, signing seams, and verification-policy primitives in `3.0.0`. Those Core primitives make artifacts ready for provider signing and later verification workflows; they do not create production tamper-evidence by themselves. Production tamper evidence requires a concrete signing provider, protected key management, verification policy, durable storage guarantees, retention policy, monitoring, and operational procedures supplied by the host or provider environment.",
+                      "> `AsiBackbone.Core` includes stable signing-ready metadata, canonical payload hashing, signing seams, and verification-policy primitives in `3.0.1`. Those Core primitives make artifacts ready for provider signing and later verification workflows; they do not create production tamper-evidence by themselves. Production tamper evidence requires a concrete signing provider, protected key management, verification policy, durable storage guarantees, retention policy, monitoring, and operational procedures supplied by the host or provider environment.\n>\n> These primitives were introduced in the historical `3.0.0` release."
+                  )
+              ],
+              "docs/index.md": [
+                  (
+                      "Stable `3.x` is the current release line. `3.0.1` is the current patch release, while `3.0.0` established the current major line and binary assembly identity. The package family preserves the existing `AsiBackbone.*` package IDs and namespaces and carries forward the Core foundation, builder-facade registration surface, in-memory validation storage, EF Core host-owned persistence, ASP.NET Core integration, test harness helpers, dotnet new templates, analyzers, the OpenTelemetry provider, local-development signing, the managed-key signing adapter boundary, samples, release validation, package SBOM/provenance artifacts, BenchmarkDotNet allocation baselines, benchmark guidance, custom decision-policy examples, Source Link metadata validation, endpoint-governance reduced metadata mode, metadata budget guardrails, constraint-exception denial behavior, empty-policy warning diagnostics, managed-key signing fail-closed defaults, threat-model contributor hooks, strict governance profile helpers, EF Core JSON metadata storage guidance, policy-input hardening guidance, production placeholder guardrails, and host-validation documentation.",
+                      "Stable `3.x` is the current release line, and `3.0.1` is the current patch release. The package family preserves the existing `AsiBackbone.*` package IDs and namespaces and carries forward the Core foundation, builder-facade registration surface, in-memory validation storage, EF Core host-owned persistence, ASP.NET Core integration, test harness helpers, dotnet new templates, analyzers, the OpenTelemetry provider, local-development signing, the managed-key signing adapter boundary, samples, release validation, package SBOM/provenance artifacts, BenchmarkDotNet allocation baselines, benchmark guidance, custom decision-policy examples, Source Link metadata validation, endpoint-governance reduced metadata mode, metadata budget guardrails, constraint-exception denial behavior, empty-policy warning diagnostics, managed-key signing fail-closed defaults, threat-model contributor hooks, strict governance profile helpers, EF Core JSON metadata storage guidance, policy-input hardening guidance, production placeholder guardrails, and host-validation documentation.\n\nThe historical `3.0.0` release established the current major line and binary assembly identity."
+                  )
+              ],
+              "docs/articles/index.md": [
+                  (
+                      "Stable `3.x` is the current package line. `3.0.1` is the current patch release; `3.0.0` established the current major line and binary assembly identity while preserving the `AsiBackbone.*` package IDs and namespaces established by the `2.0.0` public rename from `CDCavell.AsiBackbone.*`.",
+                      "Stable `3.x` is the current package line, and `3.0.1` is the current patch release.\n\nThe historical `3.0.0` release established the current major line and binary assembly identity while preserving the `AsiBackbone.*` package IDs and namespaces established by the `2.0.0` public rename from `CDCavell.AsiBackbone.*`."
+                  )
+              ],
+              "README.md": [
+                  (
+                      "Stable `3.0.x` package family. `3.0.1` is the current patch release; `3.0.0` established the current major release line and binary assembly identity while preserving the simplified `AsiBackbone.*` package IDs and namespaces established by `2.0.0`. The package family carries forward the governance-spine surface with builder-facade, analyzer, OpenTelemetry, signing-provider, testing-harness, template package, endpoint diagnostics, endpoint reduced metadata mode, metadata budget guardrails, constraint-exception denial behavior, empty-policy warning diagnostics, managed-key fail-closed defaults, threat-model contributor hooks, strict-governance profile helpers, EF Core JSON metadata storage guidance, policy-input hardening, production placeholder guardrails, samples, Source Link metadata, package SBOM/provenance artifacts, BenchmarkDotNet allocation baselines, benchmark guidance, custom decision-policy examples, and documentation-alignment surfaces.",
+                      "Stable `3.0.x` is the current package family, and `3.0.1` is the current patch release. The package family carries forward the governance-spine surface with builder-facade, analyzer, OpenTelemetry, signing-provider, testing-harness, template package, endpoint diagnostics, endpoint reduced metadata mode, metadata budget guardrails, constraint-exception denial behavior, empty-policy warning diagnostics, managed-key fail-closed defaults, threat-model contributor hooks, strict governance profile helpers, EF Core JSON metadata storage guidance, policy-input hardening, production placeholder guardrails, samples, Source Link metadata, package SBOM/provenance artifacts, BenchmarkDotNet allocation baselines, benchmark guidance, custom decision-policy examples, and documentation-alignment surfaces.\n\nThe historical `3.0.0` release established the current major release line and binary assembly identity while preserving the simplified `AsiBackbone.*` package IDs and namespaces established by `2.0.0`."
+                  ),
+                  (
+                      "Stable `3.0.x` is the current released line, with `3.0.1` as the current patch release and `3.0.0` as the major-line baseline. This release preserves the simplified `AsiBackbone.*` package and namespace identity established by `2.0.0` and the binary assembly identity `3.0.0.0`.",
+                      "Stable `3.0.x` is the current released line, with `3.0.1` as the current patch release. This release preserves the simplified `AsiBackbone.*` package and namespace identity.\n\nThe historical `3.0.0` release remains the major-line baseline, preserving the package and namespace identity established by `2.0.0` and the binary assembly identity `3.0.0.0`."
+                  )
+              ]
+          }
+
+          for relative_path, pairs in replacements.items():
+              path = Path(relative_path)
+              text = path.read_text(encoding="utf-8")
+              original = text
+              for old, new in pairs:
+                  if old not in text:
+                      raise SystemExit(f"Expected text was not found in {relative_path}: {old}")
+                  text = text.replace(old, new, 1)
+              if text == original:
+                  raise SystemExit(f"No changes were produced for {relative_path}")
+              path.write_text(text, encoding="utf-8")
+
+          Path(".github/workflows/fix-301-release-claims.yml").unlink()
+          PY
+
+      - name: Commit corrected release claims
+        shell: bash
+        run: |
+          git diff --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md docs .github/workflows/fix-301-release-claims.yml
+          git commit -m "docs: correct 3.0.1 release claim wording"
+          git push origin HEAD:release/3.0.1

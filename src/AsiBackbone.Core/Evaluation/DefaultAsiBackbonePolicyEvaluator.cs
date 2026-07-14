@@ -45,7 +45,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
     private readonly AsiBackbonePolicyEvaluatorOptions options;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}"/> class.
+    /// Initializes a new instance of the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}" /> class.
     /// </summary>
     /// <param name="constraints">The constraints that make up the active policy structure.</param>
     /// <param name="decisionPolicy">Optional decision policy applied after constraint composition.</param>
@@ -57,7 +57,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}"/> class.
+    /// Initializes a new instance of the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}" /> class.
     /// </summary>
     /// <param name="constraints">The constraints that make up the active policy structure.</param>
     /// <param name="decisionPolicy">Optional decision policy applied after constraint composition.</param>
@@ -71,7 +71,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}"/> class.
+    /// Initializes a new instance of the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}" /> class.
     /// </summary>
     /// <param name="constraints">The constraints that make up the active policy structure.</param>
     /// <param name="decisionPolicy">Optional decision policy applied after constraint composition.</param>
@@ -87,7 +87,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}"/> class.
+    /// Initializes a new instance of the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}" /> class.
     /// </summary>
     /// <param name="constraints">The constraints that make up the active policy structure.</param>
     /// <param name="threatModelContributors">Threat model contributors that inspect the context before constraint composition.</param>
@@ -101,7 +101,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}"/> class.
+    /// Initializes a new instance of the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}" /> class.
     /// </summary>
     /// <param name="constraints">The constraints that make up the active policy structure.</param>
     /// <param name="threatModelContributors">Threat model contributors that inspect the context before constraint composition.</param>
@@ -117,7 +117,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}"/> class.
+    /// Initializes a new instance of the <see cref="DefaultAsiBackbonePolicyEvaluator{TContext}" /> class.
     /// </summary>
     /// <param name="constraints">The constraints that make up the active policy structure.</param>
     /// <param name="threatModelContributors">Threat model contributors that inspect the context before constraint composition.</param>
@@ -446,6 +446,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
         }
 
         List<OperationReason>? reasons = null;
+        OperationReason? selectedReason = null;
         GovernanceDecisionOutcome? selectedOutcome = null;
 
         foreach (IThreatModelContributor<TContext> contributor in threatModelContributors)
@@ -470,14 +471,22 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
             }
 
             GovernanceDecisionOutcome effectiveOutcome = GetEffectiveThreatOutcome(assessment);
-            selectedOutcome = SelectMoreRestrictiveOutcome(selectedOutcome, effectiveOutcome);
+            OperationReason reason = assessment.ToOperationReason(GetContributorName(contributor), effectiveOutcome);
+            GovernanceDecisionOutcome moreRestrictiveOutcome = SelectMoreRestrictiveOutcome(selectedOutcome, effectiveOutcome);
+
+            if (selectedOutcome != moreRestrictiveOutcome)
+            {
+                selectedOutcome = moreRestrictiveOutcome;
+                selectedReason = reason;
+            }
+
             reasons ??= [];
-            reasons.Add(assessment.ToOperationReason(GetContributorName(contributor), effectiveOutcome));
+            reasons.Add(reason);
         }
 
         return reasons is null || selectedOutcome is null
             ? ThreatEvaluationResult.Empty
-            : CreateThreatEvaluationResult(context, selectedOutcome.Value, reasons.AsReadOnly());
+            : CreateThreatEvaluationResult(context, selectedOutcome.Value, selectedReason!, reasons.AsReadOnly());
     }
 
     private ThreatEvaluationResult CreateThreatContributorExceptionResult(
@@ -511,6 +520,7 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
     private static ThreatEvaluationResult CreateThreatEvaluationResult(
         TContext context,
         GovernanceDecisionOutcome outcome,
+        OperationReason selectedReason,
         ReadOnlyCollection<OperationReason> reasons)
     {
         return outcome switch
@@ -523,22 +533,22 @@ public sealed class DefaultAsiBackbonePolicyEvaluator<TContext> : IAsiBackbonePo
                     policyHash: context.PolicyHash)),
             GovernanceDecisionOutcome.Deferred => ThreatEvaluationResult.ForBlockingDecision(
                 GovernanceDecision.Defer(
-                    reasons[0].Code,
-                    reasons[0].Message,
+                    selectedReason.Code,
+                    selectedReason.Message,
                     correlationId: context.CorrelationId,
                     policyVersion: context.PolicyVersion,
                     policyHash: context.PolicyHash)),
             GovernanceDecisionOutcome.AcknowledgmentRequired => ThreatEvaluationResult.ForBlockingDecision(
                 GovernanceDecision.RequireAcknowledgment(
-                    reasons[0].Code,
-                    reasons[0].Message,
+                    selectedReason.Code,
+                    selectedReason.Message,
                     correlationId: context.CorrelationId,
                     policyVersion: context.PolicyVersion,
                     policyHash: context.PolicyHash)),
             GovernanceDecisionOutcome.EscalationRecommended => ThreatEvaluationResult.ForBlockingDecision(
                 GovernanceDecision.Escalate(
-                    reasons[0].Code,
-                    reasons[0].Message,
+                    selectedReason.Code,
+                    selectedReason.Message,
                     correlationId: context.CorrelationId,
                     policyVersion: context.PolicyVersion,
                     policyHash: context.PolicyHash)),

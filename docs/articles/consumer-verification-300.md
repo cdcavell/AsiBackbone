@@ -111,7 +111,7 @@ Consumers should still perform normal source review, dependency scanning, packag
 
 ## NuGet package signing is deferred
 
-Current `3.0.0` packages should be described as having NuGet metadata, Source Link metadata, package SBOMs, and package/SBOM provenance artifacts where supported by the workflow event. They should not be described as maintainer-signed, repository-signed, Authenticode-signed, tamper-evident, or legally non-repudiable by default.
+The historical `3.0.0` packages should be described as having NuGet metadata, Source Link metadata, package SBOMs, and package/SBOM provenance artifacts where supported by the workflow event. They should not be described as maintainer-signed, repository-signed, Authenticode-signed, tamper-evident, or legally non-repudiable by default.
 
 If package signing is adopted in a later release, update `SECURITY.md`, stable release validation guidance, the active release-readiness record, release notes, supply-chain documentation, and this consumer verification guide before publishing public wording that claims signed package artifacts.
 

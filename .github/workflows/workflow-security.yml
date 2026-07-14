@@ -13,6 +13,12 @@ on:
     - cron: '15 4 * * 0'
       timezone: 'America/Chicago'
 
+  pull_request:
+    paths:
+      - '.github/workflows/**'
+      - '.github/actions/**'
+      - '.github/dependabot.yml'
+
 # Deny all token permissions unless granted by a job.
 permissions: {}
 
@@ -40,3 +46,22 @@ jobs:
           persona: regular
           version: v1.26.1
           advanced-security: true
+
+  actionlint:
+    name: Validate workflows with actionlint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Run actionlint
+        uses: docker://rhysd/actionlint:1.7.12
+        with:
+          args: -color

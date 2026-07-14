@@ -64,7 +64,7 @@ public sealed class ThreatAssessmentReservedMetadataTests
     [Fact]
     public void ThreatAssessmentRetainsNonReservedContributorMetadata()
     {
-        ThreatAssessment assessment = ThreatAssessment.Create(
+        var assessment = ThreatAssessment.Create(
             ThreatSeverity.Low,
             ThreatCategories.InputMalformed,
             "threat.input_malformed",

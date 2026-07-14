@@ -19,15 +19,13 @@ public sealed class DefaultAsiBackbonePolicyEvaluatorInvalidThreatOutcomeTests
     public void CreateThreatEvaluationResultRejectsAllowedOutcome()
     {
         MethodInfo method = GetPrivateStaticMethod(nameof(CreateThreatEvaluationResultRejectsAllowedOutcome), "CreateThreatEvaluationResult");
-        ReadOnlyCollection<OperationReason> reasons = Array.AsReadOnly(
-        [
-            OperationReason.Create(
-                "threat.allowed_invalid",
-                "Allowed threat outcome is invalid.")
-        ]);
+        OperationReason selectedReason = OperationReason.Create(
+            "threat.allowed_invalid",
+            "Allowed threat outcome is invalid.");
+        ReadOnlyCollection<OperationReason> reasons = Array.AsReadOnly([selectedReason]);
 
         TargetInvocationException exception = Assert.Throws<TargetInvocationException>(
-            () => method.Invoke(null, [CreateContext(), GovernanceDecisionOutcome.Allowed, reasons]));
+            () => method.Invoke(null, [CreateContext(), GovernanceDecisionOutcome.Allowed, selectedReason, reasons]));
 
         InvalidOperationException innerException = Assert.IsType<InvalidOperationException>(exception.InnerException);
         Assert.Contains("Threat model contributors cannot return an Allowed outcome", innerException.Message);

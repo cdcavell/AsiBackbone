@@ -1,0 +1,106 @@
+name: Prepend 3.0.1 changelog
+
+on:
+  push:
+    branches:
+      - release/3.0.1
+    paths:
+      - .github/workflows/prepend-changelog-301.yml
+
+permissions:
+  contents: write
+
+jobs:
+  update-changelog:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout release branch
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          ref: release/3.0.1
+
+      - name: Prepend 3.0.1 changelog entry
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("CHANGELOG.md")
+          text = path.read_text(encoding="utf-8")
+          marker = "## [3.0.1] - 2026-07-13"
+
+          if marker in text:
+              print("3.0.1 changelog entry already exists.")
+              raise SystemExit(0)
+
+          insertion_marker = "\n## [3.0.0] - 2026-07-13"
+          if insertion_marker not in text:
+              raise SystemExit("Could not find the 3.0.0 changelog insertion point.")
+
+          entry = r'''
+
+          ## [3.0.1] - 2026-07-13
+
+          ### Release summary
+
+          `3.0.1` is a compatible patch release for the stable `3.0.x` AsiBackbone package family. It hardens threat-assessment validation, protects framework-generated threat provenance, and ensures restrictive threat decisions retain the reason associated with the outcome that was actually selected.
+
+          This release does not add a new stable public feature surface. Package IDs, public namespaces, the `net10.0` target, and the host-owned execution boundary remain unchanged.
+
+          ### Changed
+
+          * Promoted central package version metadata from `3.0.0` to `3.0.1`.
+          * Updated `FileVersion` to `3.0.1.0` while preserving `AssemblyVersion` at `3.0.0.0` for compatible `3.x` releases.
+          * Updated citation metadata, Zenodo metadata, template fallback package references, Source Link validation defaults, README release posture, DocFX navigation, release guidance, and consumer verification documentation for `3.0.1`.
+          * Defined the complete normalized, case-insensitive `threat.*` metadata namespace as framework-owned provenance.
+
+          ### Fixed
+
+          * Fixed undefined numeric `ThreatSeverity` and `GovernanceDecisionOutcome` values being accepted during `ThreatAssessment` construction. Invalid values now fail explicitly and follow the existing fail-closed contributor-exception path when produced inside a registered contributor. (#612)
+          * Fixed contributor metadata being able to overwrite canonical threat provenance fields such as `threat.category`, `threat.severity`, `threat.recommended_outcome`, `threat.effective_outcome`, `threat.confidence`, and `threat.contributor`. (#613)
+          * Fixed earlier warning reasons being attached to later `Deferred`, `AcknowledgmentRequired`, or `EscalationRecommended` outcomes. The evaluator now retains the first contributor reason matching the selected restrictive outcome in deterministic registration order. (#614)
+          * Preserved existing multi-reason denial aggregation, warning-only aggregation, cancellation propagation, and critical runtime failure propagation.
+
+          ### Security and governance hardening
+
+          * Invalid threat-assessment enum values can no longer enter the decision pipeline as apparently valid governance data.
+          * Framework-generated threat provenance remains authoritative and cannot be replaced by contributor-supplied `threat.*` metadata.
+          * Restrictive non-denial decisions now explain the outcome that actually blocked or redirected execution, improving audit, telemetry, and API-response integrity.
+          * NuGet package signing remains intentionally deferred while AsiBackbone is independently maintained; official NuGet publication, the public repository, release tags, Source Link, SBOMs, provenance, and reproducible release practices remain the current supply-chain verification posture.
+
+          ### Compatibility notes
+
+          * Package IDs and public namespaces remain unchanged.
+          * The target framework remains `net10.0`.
+          * `AssemblyVersion` remains `3.0.0.0`; `FileVersion` advances to `3.0.1.0`.
+          * Callers that pass undefined or deserialized numeric enum values into `ThreatAssessment` may now receive `ArgumentOutOfRangeException`.
+          * Contributors using custom metadata keys beginning with `threat.` must move those fields to a host-owned or extension-owned namespace.
+          * No production key-management, replay-protection, host execution, robotics, legal, or compliance capability is introduced by this patch.
+
+          ### Validation
+
+          * Release validation covers Debug and Release solution builds, formatting, analyzers, tests, coverage gates, Core branch coverage, XML-documentation inventory, API compatibility, package creation, NuGet metadata, template and consumer smoke tests, version consistency, DocFX, documentation release-claim validation, CodeQL, dependency review, SBOM generation, and provenance handling where supported.
+          * After publication, Source Link repository commit metadata can be validated with:
+
+          ```powershell
+          ./scripts/Validate-Source-Link-commit-metadata.ps1 -Version 3.0.1
+          ```
+          '''.strip("\n")
+
+          text = text.replace(insertion_marker, "\n" + entry + insertion_marker, 1)
+          path.write_text(text, encoding="utf-8")
+          PY
+
+      - name: Commit changelog update
+        shell: bash
+        run: |
+          git diff --check
+          if git diff --quiet -- CHANGELOG.md; then
+            echo "No changelog update required."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add CHANGELOG.md
+          git commit -m "docs: add 3.0.1 changelog entry"
+          git push origin HEAD:release/3.0.1

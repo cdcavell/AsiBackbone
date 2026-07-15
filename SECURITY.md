@@ -26,12 +26,12 @@ Please do **not** place exploit details, secrets, proof-of-concept payloads, pri
 
 Preferred reporting path:
 
-1. Use GitHub's private vulnerability reporting or security advisory flow for this repository when available.
+1. Use [GitHub private vulnerability reporting](https://github.com/cdcavell/AsiBackbone/security/advisories/new) for this repository.
 2. Include a concise title, affected package or documentation area, affected version, reproduction steps, expected behavior, actual behavior, and any safe proof material.
 3. Describe the practical impact in host-application terms: for example, policy bypass, acknowledgment bypass, capability-token misuse, unsafe sample guidance, signing or verification confusion, audit-residue integrity concern, data exposure, or denial-of-service risk.
 4. Keep public disclosure deferred until the maintainer has had reasonable time to triage and respond.
 
-If GitHub private vulnerability reporting is not available to you, open a minimal public issue that only says you have a sensitive security report to share. Do not include technical details in that public issue.
+If the private vulnerability reporting link is unavailable to you, open a minimal public issue that only states that you have a sensitive security report to share. Do not include technical details in the public issue.
 
 For non-sensitive hardening suggestions, documentation wording concerns, or defense-in-depth improvements, a normal GitHub issue is appropriate.
 

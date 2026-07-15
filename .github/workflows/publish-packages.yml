@@ -17,11 +17,8 @@ on:
         type: boolean
         default: true
 
-permissions:
-  contents: read
-  packages: write
-  id-token: write
-  attestations: write
+# Deny all GitHub token permissions by default.
+permissions: {}
 
 env:
   DOTNET_NOLOGO: true
@@ -39,6 +36,11 @@ jobs:
   pack-packages:
     name: Validate and pack packages
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      attestations: write
 
     steps:
       - name: Checkout source
@@ -170,6 +172,11 @@ jobs:
     name: Publish packages
     needs: pack-packages
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
 
     environment:
       name: package-publish

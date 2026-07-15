@@ -9,8 +9,7 @@ on:
 
   # Trigger every Sunday @ 4:00 AM Central Time
   schedule:
-    - cron: '0 4 * * 0'
-      timezone: 'America/Chicago'
+    - cron: '0 10 * * 0'
 
 # Declare default permissions as read only.
 permissions: read-all

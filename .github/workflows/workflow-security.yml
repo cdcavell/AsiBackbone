@@ -10,8 +10,7 @@ on:
 
   # Every Sunday at 4:15 AM Central Time
   schedule:
-    - cron: '15 4 * * 0'
-      timezone: 'America/Chicago'
+    - cron: '15 9 * * 0'
 
   pull_request:
     paths:

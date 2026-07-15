@@ -29,7 +29,9 @@ These pages are the best first stops for implementation-first adoption.
 
 ## Current stable package family
 
-Stable `3.x` is the current release line. `3.0.0` establishes the current major line and binary assembly identity while preserving the existing `AsiBackbone.*` package IDs and namespaces. The release carries forward the Core foundation, builder-facade registration surface, in-memory validation storage, EF Core host-owned persistence, ASP.NET Core integration, test harness helpers, dotnet new templates, analyzers, the OpenTelemetry provider, local-development signing, the managed-key signing adapter boundary, samples, release validation, package SBOM/provenance artifacts, BenchmarkDotNet allocation baselines, benchmark guidance, custom decision-policy examples, Source Link metadata validation, endpoint-governance reduced metadata mode, metadata budget guardrails, constraint-exception denial opt-in behavior, empty-policy warning diagnostics, managed-key signing fail-closed defaults, threat-model contributor hooks, strict governance profile helpers, EF Core JSON metadata storage guidance, policy-input hardening guidance, production placeholder guardrails, and host-validation documentation.
+Stable `3.x` is the current release line, and `3.0.1` is the current patch release. The package family preserves the existing `AsiBackbone.*` package IDs and namespaces and carries forward the Core foundation, builder-facade registration surface, in-memory validation storage, EF Core host-owned persistence, ASP.NET Core integration, test harness helpers, dotnet new templates, analyzers, the OpenTelemetry provider, local-development signing, the managed-key signing adapter boundary, samples, release validation, package SBOM/provenance artifacts, BenchmarkDotNet allocation baselines, benchmark guidance, custom decision-policy examples, Source Link metadata validation, endpoint-governance reduced metadata mode, metadata budget guardrails, constraint-exception denial behavior, empty-policy warning diagnostics, managed-key signing fail-closed defaults, threat-model contributor hooks, strict governance profile helpers, EF Core JSON metadata storage guidance, policy-input hardening guidance, production placeholder guardrails, and host-validation documentation.
+
+The historical `3.0.0` release established the current major line and binary assembly identity.
 
 ```text
 AsiBackbone.Core
@@ -107,6 +109,7 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 * [Project Boundaries and Non-Claims](articles/project-boundaries.md)
 * [Production Wording and Stable Signing Boundaries](articles/production-wording-and-alpha-limitations.md)
 * [Supply-Chain Provenance and Package SBOMs](articles/supply-chain-provenance.md)
+* [3.0.1 Consumer Verification Guide](articles/consumer-verification-301.md)
 * [3.0.0 Consumer Verification Guide](articles/consumer-verification-300.md)
 * [Signing-Ready Receipts and Key Handling](articles/signing-ready-receipts-and-key-handling.md)
 * [Signed Audit and Outbox Records](articles/signed-audit-and-outbox-records.md)
@@ -122,6 +125,9 @@ Package-specific READMEs and release notes define which surfaces are stable, opt
 * [Quality Reports](quality/)
 * [Performance Benchmark Baseline](articles/performance-benchmark-baseline.md)
 * [Release Validation](articles/release-validation.md)
+* [3.0.1 Consumer Verification Guide](articles/consumer-verification-301.md)
+* [3.0.1 Release Readiness Record](articles/release-readiness-301.md)
+* [3.0.1 Release Notes](articles/release-notes-301.md)
 * [3.0.0 Consumer Verification Guide](articles/consumer-verification-300.md)
 * [3.0.0 Release Readiness Record](articles/release-readiness-300.md)
 * [3.0.0 Release Notes](articles/release-notes-300.md)

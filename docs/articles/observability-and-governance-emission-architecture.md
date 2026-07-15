@@ -161,7 +161,7 @@ Boundary limits:
 
 ## Design-only: Event Hubs streaming provider path
 
-Event Hubs is a design-only future provider strategy in the current documentation set. It is not a released AsiBackbone NuGet package in `3.0.0`.
+Event Hubs is a design-only future provider strategy in the current documentation set. It is not a released AsiBackbone NuGet package in `3.0.1`.
 
 Appropriate future Event Hubs usage:
 
@@ -179,7 +179,7 @@ Boundary limits:
 
 ## Strategy-only: Purview governance and lineage enrichment
 
-Purview is a strategy-only future enrichment direction in the current documentation set. It is not a released AsiBackbone NuGet package in `3.0.0`.
+Purview is a strategy-only future enrichment direction in the current documentation set. It is not a released AsiBackbone NuGet package in `3.0.1`.
 
 Appropriate future Purview usage:
 

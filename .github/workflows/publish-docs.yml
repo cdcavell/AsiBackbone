@@ -89,7 +89,7 @@ jobs:
           preserve_root="./artifacts/preserved-pages"
           mkdir -p "$preserve_root"
 
-          for report in core aspnetcore; do
+          for report in core aspnetcore signing-managedkey opentelemetry; do
             report_url="${PAGES_BASE_URL%/}/mutation/${report}/"
 
             echo "Attempting to preserve deployed mutation report from $report_url"

@@ -26,7 +26,9 @@ Major releases should be rare. They should be reserved for identity, namespace, 
 
 ## Current `3.x` stabilization posture
 
-`3.x` is the current stable package line. The `3.0.0` release establishes the current major-line binary identity while preserving the existing `AsiBackbone.*` package IDs and namespaces.
+`3.x` is the current stable package line, and `3.0.1` is the current patch release.
+
+The historical `3.0.0` release established the major-line binary identity while preserving the existing `AsiBackbone.*` package IDs and namespaces.
 
 Future `3.x` releases should prioritize compatibility, documentation clarity, patch-level release correction, and carefully scoped additive improvements. Additional breaking changes should be avoided unless strongly justified by consumer safety, correctness, maintainability, or a documented architectural boundary that cannot be preserved compatibly.
 
@@ -110,6 +112,8 @@ Avoid:
 
 - [Governance](../../GOVERNANCE.md)
 - [Release Validation](release-validation.md)
+- [3.0.1 Release Readiness Record](release-readiness-301.md)
+- [3.0.1 Release Notes](release-notes-301.md)
 - [3.0.0 Release Readiness Record](release-readiness-300.md)
 - [3.0.0 Release Notes](release-notes-300.md)
 - [API Compatibility and SemVer](api-compatibility-and-semver.md)

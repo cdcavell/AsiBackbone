@@ -7,15 +7,17 @@ This section maps the AsiBackbone documentation set for the stable `3.x` Account
 
 ## Search and navigation
 
-Use the header search box for package names, API concepts, and article titles. Search is enabled for the published DocFX site; if a newly merged page is missing from results, wait for the documentation publish workflow to finish and refresh the browser cache. Long pages use the left navigation tree and the right **In this article** rail for local heading navigation. Source files live under `docs/` in the repository, and the site header includes a Repository link for source review or edits.
+Use the header search box for package names, API concepts, and article titles. Search is enabled for the published DocFX site; if a newly merged page is missing from results, wait for the documentation publish workflow to finish and refresh the browser cache. Source files live under `docs/` in the repository, and the site header includes a Repository link for source review or edits.
 
 ## Current stable package posture
 
-Stable `3.x` is the current package line. `3.0.0` establishes the current major line and binary assembly identity while preserving the `AsiBackbone.*` package IDs and namespaces established by the `2.0.0` public rename from `CDCavell.AsiBackbone.*`.
+Stable `3.x` is the current package line, and `3.0.1` is the current patch release.
 
-Released stable package surfaces include Core, DependencyInjection, Storage.InMemory, EntityFrameworkCore, AspNetCore, Testing, Templates, Analyzers, OpenTelemetry, Signing.LocalDevelopment, and Signing.ManagedKey. OpenTelemetry is the concrete released governance-emission provider. Runtime governance-residue signing remains provider-neutral through the managed-key adapter boundary; first-party production signing providers and production-style signing sample hosts are not shipped or planned. Event Hubs, Purview, Azure-specific non-signing SDK adapters, Aspire runtime packages, robotics, immutable-storage, and additional non-signing provider packages remain design-only, strategy-only, sample-only, host-owned, or future-provider work unless a later stable release explicitly ships them.
+The historical `3.0.0` release established the current major line and binary assembly identity while preserving the `AsiBackbone.*` package IDs and namespaces established by the `2.0.0` public rename from `CDCavell.AsiBackbone.*`.
 
-The release process includes explicit [Release Cadence and Readiness](release-cadence-and-readiness.md) guidance for patch/minor/major release selection, early-major stabilization, package metadata assets, Source Link, SBOM/provenance, documentation links, and future package identity or namespace changes. The [3.0.0 Consumer Verification Guide](consumer-verification-300.md) gives consumers a conservative package-source, package ID, Source Link, SBOM/provenance, and deferred-signing verification path.
+Released stable package surfaces include Core, DependencyInjection, Storage.InMemory, EntityFrameworkCore, AspNetCore, Testing, Templates, Analyzers, OpenTelemetry, Signing.LocalDevelopment, and Signing.ManagedKey. OpenTelemetry is the concrete released governance-emission provider. Runtime governance-residue signing remains provider-neutral through the managed-key adapter boundary; first-party production signing providers and production-style signing sample hosts are not shipped. Event Hubs, Purview, Azure-specific non-signing SDK adapters, Aspire runtime packages, robotics, immutable storage, and additional non-signing provider packages remain design-only, strategy-only, sample-only, host-owned, or future-provider work unless a later stable release explicitly ships them.
+
+The release process includes explicit [Release Cadence and Readiness](release-cadence-and-readiness.md) guidance for patch, minor, and major release selection, package metadata, Source Link, SBOM/provenance, documentation links, and future package identity or namespace changes. The [3.0.1 Consumer Verification Guide](consumer-verification-301.md) gives consumers a conservative package-source, package ID, Source Link, SBOM/provenance, and deferred-signing verification path.
 
 ## Start here / implementation-first usage
 
@@ -30,23 +32,17 @@ The release process includes explicit [Release Cadence and Readiness](release-ca
 * [AddAsiBackbone Builder Facade](add-asibackbone-builder-facade.md)
 * [dotnet new Templates](templates.md)
 * [Why AsiBackbone?](why-asi-backbone.md)
+* [3.0.1 Release Notes](release-notes-301.md)
+* [3.0.1 Consumer Verification Guide](consumer-verification-301.md)
 * [3.0.0 Release Notes](release-notes-300.md)
 * [3.0.0 Consumer Verification Guide](consumer-verification-300.md)
-* [2.3.0 Release Notes](release-notes-230.md)
-* [2.2.1 Release Notes](release-notes-221.md)
-* [2.2.0 Release Notes](release-notes-220.md)
-* [2.1.0 Release Notes](release-notes-210.md)
-* [2.0.2 Release Notes](release-notes-202.md)
-* [2.0.1 Release Notes](release-notes-201.md)
-* [2.0.0 Release Notes](release-notes-200.md)
-* [1.2.1 Release Notes](release-notes-121.md)
-* [1.2.0 Release Notes](release-notes-120.md)
-* [Upgrade Guide: 1.0.0 to 1.1.0](upgrade-100-to-110.md)
 
 ## Core engineering concepts and domain language
 
 * [Policy Evaluator Pipeline](policy-evaluator-pipeline.md)
 * [Threat Model Contributors](threat-model-contributors.md)
+* [Threat Outcome Reason Selection](threat-outcome-reason-selection.md)
+* [Threat Metadata Provenance](threat-metadata-provenance.md)
 * [Constraint Exception Policy](constraint-exception-policy.md)
 * [Strict Governance Profile](strict-governance-profile.md)
 * [Production Hardening: Evaluator and Outbox Configuration](production-hardening-evaluator-and-outbox.md)
@@ -80,7 +76,6 @@ These pages remain available for readers who want the broader framing. They are 
 * [Reference Deployment: Plain ASP.NET Core Host Evidence](reference-deployment.md)
 * [dotnet new Templates](templates.md)
 * [Aspire AppHost Sample](aspire-apphost-sample.md)
-* [1.0.0 Quickstart](quickstart-100.md)
 * [EF Core Integration Boundary](ef-core-integration-boundary.md)
 * [EF Core JSON Metadata Storage](ef-core-json-metadata-storage.md)
 * [EF Core Host Ownership and Migration Guidance](ef-core-host-ownership-and-migrations.md)
@@ -95,8 +90,6 @@ These pages remain available for readers who want the broader framing. They are 
 * [Privacy and Signing Boundaries](privacy-and-signing-boundaries.md)
 
 ## Durability, observability, signing, diagnostics, and developer experience
-
-These pages cover the durability, governance-emission, signing, diagnostics, testing, and template surfaces carried forward into the current `3.x` package family.
 
 * [Observability and Governance Emission Architecture](observability-and-governance-emission-architecture.md)
 * [Governance Emission Contract](governance-emission-contract.md)
@@ -126,6 +119,7 @@ These pages describe signing, verification, capability, and cryptographic-harden
 * [Project Boundaries and Non-Claims](project-boundaries.md)
 * [Production Wording and Stable Signing Boundaries](production-wording-and-alpha-limitations.md)
 * [Supply-Chain Provenance and Package SBOMs](supply-chain-provenance.md)
+* [3.0.1 Consumer Verification Guide](consumer-verification-301.md)
 * [3.0.0 Consumer Verification Guide](consumer-verification-300.md)
 * [Signing-Ready Receipts and Key Handling](signing-ready-receipts-and-key-handling.md)
 * [Signed Audit and Outbox Records](signed-audit-and-outbox-records.md)
@@ -134,19 +128,16 @@ These pages describe signing, verification, capability, and cryptographic-harden
 * [Capability Grant Hardening](capability-grant-hardening.md)
 * [Audit Integrity Chain Model](audit-integrity-chain-model.md)
 * [Cryptographic Security Posture and Production Guidance](cryptographic-security-posture.md)
-* [Production Managed-Key Integration Guide](production-managed-key-integration.md)
 * [Cryptographic Security Hardening Roadmap](cryptographic-security-hardening-roadmap.md)
 
 ## Design-only and future provider strategy
 
-These pages remain available as strategy/design material. They are not released provider packages unless a future release explicitly says so.
+These pages remain available as strategy or design material. They are not released provider packages unless a future release explicitly says so.
 
 * [Design-Only: Event Hubs Governance Emission Provider](event-hubs-governance-emission-provider-design.md)
 * [Strategy-Only: Purview Governance and Lineage Enrichment](purview-governance-lineage-enrichment-strategy.md)
 
 ## Advanced scenarios
-
-Scenario pages describe applied patterns. They remain optional and do not imply current package implementation beyond the documented seams.
 
 * [AI Agent Gateway](scenarios/ai-agent-gateway.md)
 * [Human Approval Before AI Tool Execution](scenarios/human-approval-before-ai-tool-execution.md)
@@ -162,33 +153,17 @@ Scenario pages describe applied patterns. They remain optional and do not imply 
 * [Release Cadence and Readiness](release-cadence-and-readiness.md)
 * [Release Validation](release-validation.md)
 * [Supply-Chain Provenance and Package SBOMs](supply-chain-provenance.md)
+* [3.0.1 Consumer Verification Guide](consumer-verification-301.md)
+* [3.0.1 Release Readiness Record](release-readiness-301.md)
+* [3.0.1 Release Notes](release-notes-301.md)
 * [3.0.0 Consumer Verification Guide](consumer-verification-300.md)
 * [3.0.0 Release Readiness Record](release-readiness-300.md)
+* [3.0.0 Release Notes](release-notes-300.md)
 * [2.3.0 Release Readiness Record](release-readiness-230.md)
-* [2.2.1 Release Readiness Record](release-readiness-221.md)
-* [2.2.0 Release Readiness Record](release-readiness-220.md)
-* [2.1.0 Release Readiness Record](release-readiness-210.md)
-* [2.0.2 Release Readiness Record](release-readiness-202.md)
-* [2.0.1 Release Readiness Record](release-readiness-201.md)
-* [2.0.0 Release Readiness Record](release-readiness-200.md)
-* [1.2.1 Release Readiness Record](release-readiness-121.md)
-* [1.2.0 Release Readiness Record](release-readiness-120.md)
-* [Historical 1.1.0 Release Readiness Record](release-readiness-checklist.md)
+* [2.3.0 Release Notes](release-notes-230.md)
 * [API Baseline and Boundary Checks](api-baseline-and-boundary-checks.md)
 * [Implicit Usings Posture](implicit-usings-posture.md)
 * [Developer Checklist](developer-checklist.md)
-* [3.0.0 Release Notes](release-notes-300.md)
-* [2.3.0 Release Notes](release-notes-230.md)
-* [2.2.1 Release Notes](release-notes-221.md)
-* [2.2.0 Release Notes](release-notes-220.md)
-* [2.1.0 Release Notes](release-notes-210.md)
-* [2.0.2 Release Notes](release-notes-202.md)
-* [2.0.1 Release Notes](release-notes-201.md)
-* [2.0.0 Release Notes](release-notes-200.md)
-* [1.2.1 Release Notes](release-notes-121.md)
-* [1.2.0 Release Notes](release-notes-120.md)
-* [1.1.x Release Notes](release-notes-110.md)
-* [1.0.0 Release Notes](release-notes-100.md)
 
 ## Historical design records
 

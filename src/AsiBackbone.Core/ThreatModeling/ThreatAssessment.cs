@@ -9,6 +9,8 @@ namespace AsiBackbone.Core.ThreatModeling;
 /// </summary>
 public sealed class ThreatAssessment
 {
+    private const string ReservedMetadataPrefix = "threat.";
+
     private static readonly IReadOnlyDictionary<string, string> EmptyMetadata =
         new ReadOnlyDictionary<string, string>(
             new Dictionary<string, string>(StringComparer.Ordinal));
@@ -32,7 +34,19 @@ public sealed class ThreatAssessment
     /// <param name="description">The human-readable threat description.</param>
     /// <param name="recommendedOutcome">The governance outcome recommended by the contributor.</param>
     /// <param name="confidence">The contributor confidence from 0.0 to 1.0.</param>
-    /// <param name="metadata">Optional host-supplied metadata retained on generated operation reasons.</param>
+    /// <param name="metadata">
+    /// Optional contributor-supplied metadata retained on generated operation reasons.
+    /// Keys beginning with <c>threat.</c> are reserved for framework-generated provenance.
+    /// </param>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="category" />, <paramref name="reasonCode" />, or
+    /// <paramref name="description" /> is null, empty, or whitespace, or when
+    /// <paramref name="metadata" /> contains a key in the reserved <c>threat.</c> namespace.
+    /// </exception>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when <paramref name="severity" /> or <paramref name="recommendedOutcome" /> is undefined,
+    /// or when <paramref name="confidence" /> is outside the supported range.
+    /// </exception>
     public ThreatAssessment(
         ThreatSeverity severity,
         string category,
@@ -42,6 +56,19 @@ public sealed class ThreatAssessment
         double confidence = MaximumConfidence,
         IReadOnlyDictionary<string, string>? metadata = null)
     {
+        if (!Enum.IsDefined(severity))
+        {
+            throw new ArgumentOutOfRangeException(nameof(severity), severity, "Threat severity must be defined.");
+        }
+
+        if (!Enum.IsDefined(recommendedOutcome))
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(recommendedOutcome),
+                recommendedOutcome,
+                "Recommended governance outcome must be defined.");
+        }
+
         ArgumentException.ThrowIfNullOrWhiteSpace(category);
         ArgumentException.ThrowIfNullOrWhiteSpace(reasonCode);
         ArgumentException.ThrowIfNullOrWhiteSpace(description);
@@ -94,7 +121,7 @@ public sealed class ThreatAssessment
     public double Confidence { get; }
 
     /// <summary>
-    /// Gets optional host-supplied metadata retained on generated operation reasons.
+    /// Gets optional contributor-supplied metadata retained on generated operation reasons.
     /// </summary>
     public IReadOnlyDictionary<string, string> Metadata { get; }
 
@@ -127,8 +154,20 @@ public sealed class ThreatAssessment
     /// <param name="description">The human-readable threat description.</param>
     /// <param name="recommendedOutcome">The governance outcome recommended by the contributor.</param>
     /// <param name="confidence">The contributor confidence from 0.0 to 1.0.</param>
-    /// <param name="metadata">Optional host-supplied metadata retained on generated operation reasons.</param>
+    /// <param name="metadata">
+    /// Optional contributor-supplied metadata retained on generated operation reasons.
+    /// Keys beginning with <c>threat.</c> are reserved for framework-generated provenance.
+    /// </param>
     /// <returns>A threat assessment.</returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="category" />, <paramref name="reasonCode" />, or
+    /// <paramref name="description" /> is null, empty, or whitespace, or when
+    /// <paramref name="metadata" /> contains a key in the reserved <c>threat.</c> namespace.
+    /// </exception>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when <paramref name="severity" /> or <paramref name="recommendedOutcome" /> is undefined,
+    /// or when <paramref name="confidence" /> is outside the supported range.
+    /// </exception>
     public static ThreatAssessment Create(
         ThreatSeverity severity,
         string category,
@@ -197,7 +236,16 @@ public sealed class ThreatAssessment
                 continue;
             }
 
-            normalizedMetadata[item.Key.Trim()] = item.Value?.Trim() ?? string.Empty;
+            string normalizedKey = item.Key.Trim();
+
+            if (normalizedKey.StartsWith(ReservedMetadataPrefix, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new ArgumentException(
+                    $"Contributor metadata keys beginning with '{ReservedMetadataPrefix}' are reserved for framework-generated threat provenance.",
+                    nameof(metadata));
+            }
+
+            normalizedMetadata[normalizedKey] = item.Value?.Trim() ?? string.Empty;
         }
 
         return normalizedMetadata.Count == 0

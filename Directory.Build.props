@@ -5,6 +5,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>latest</LangVersion>
 
+    <!-- Generate packages.lock.json for reproducible restores. -->
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+
     <VersionPrefix>3.0.1</VersionPrefix>
     <VersionSuffix></VersionSuffix>
     <Version Condition="'$(VersionSuffix)' == ''">$(VersionPrefix)</Version>

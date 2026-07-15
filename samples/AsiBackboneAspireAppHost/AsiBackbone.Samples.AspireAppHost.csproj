@@ -9,6 +9,9 @@
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
     <UserSecretsId>asibackbone-samples-aspire-apphost</UserSecretsId>
+
+    <!-- Aspire adds host-specific Dashboard and Orchestration packages. -->
+    <NuGetLockFilePath>packages.$(NETCoreSdkRuntimeIdentifier).lock.json</NuGetLockFilePath>
   </PropertyGroup>
 
   <ItemGroup>

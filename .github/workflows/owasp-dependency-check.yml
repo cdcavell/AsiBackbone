@@ -19,7 +19,7 @@ on:
 
   # Every Sunday at 4:30 AM Central Time
   schedule:
-    - cron: '30 10 * * 0'
+    - cron: '30 9 * * 0'
 
   # Re-scan when dependency manifests change
   pull_request:

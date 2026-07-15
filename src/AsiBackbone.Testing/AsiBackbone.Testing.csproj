@@ -24,10 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="all" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\AsiBackbone.AspNetCore\AsiBackbone.AspNetCore.csproj" />
     <ProjectReference Include="..\AsiBackbone.Core\AsiBackbone.Core.csproj" />
     <ProjectReference Include="..\AsiBackbone.Storage.InMemory\AsiBackbone.Storage.InMemory.csproj" />

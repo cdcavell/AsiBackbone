@@ -13,8 +13,6 @@ on:
 
 permissions:
   contents: read
-  id-token: write
-  attestations: write
 
 env:
   DOTNET_NOLOGO: true
@@ -53,6 +51,10 @@ jobs:
   build-test-pack:
     name: Build, test, and pack
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
 
     steps:
       - name: Checkout repository

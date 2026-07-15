@@ -34,11 +34,14 @@ jobs:
         run: |
           $arguments = @{}
 
-          if ('${{ github.ref_type }}' -eq 'tag') {
-              $arguments['TagName'] = '${{ github.ref_name }}'
+          if ('${REF_TYPE}' -eq 'tag') {
+              $arguments['TagName'] = '${REF_NAME}'
           }
-
+        
           ./scripts/Validate-VersionConsistency.ps1 @arguments
+        env:
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
 
       - name: Test documentation release-claim validator
         shell: pwsh

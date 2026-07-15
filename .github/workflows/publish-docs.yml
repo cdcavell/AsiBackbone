@@ -6,11 +6,9 @@ on:
       - main
   workflow_dispatch:
 
-permissions:
-  contents: read
-  actions: read
-  pages: write
-  id-token: write
+
+# Deny all GitHub token permissions by default.
+permissions: {}
 
 concurrency:
   group: github-pages
@@ -27,12 +25,16 @@ jobs:
   build-docs:
     name: Build documentation
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           fetch-depth: 0
+          persist-credentials: false
+
 
       - name: Setup .NET
         uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
@@ -154,6 +156,10 @@ jobs:
     name: Deploy documentation
     needs: build-docs
     runs-on: ubuntu-latest
+
+    permissions:
+      pages: write
+      id-token: write
 
     environment:
       name: github-pages

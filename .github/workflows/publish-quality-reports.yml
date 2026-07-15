@@ -31,6 +31,8 @@ jobs:
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           fetch-depth: 0
+          persist-credentials: false
+
 
       - name: Setup .NET
         uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
@@ -59,8 +61,8 @@ jobs:
       - name: Run Core tests with branch coverage gate
         shell: pwsh
         run: |
-          dotnet test ${{ env.CORE_TEST_PROJECT }} `
-            --configuration ${{ env.CONFIGURATION }} `
+          dotnet test ${ CORE_TEST_PROJECT } `
+            --configuration ${ CONFIGURATION } `
             --no-restore `
             --no-build `
             --verbosity normal `
@@ -69,18 +71,25 @@ jobs:
             /p:ContinuousIntegrationBuild=true `
             /p:CollectCoverage=true `
             /p:CoverletOutputFormat=cobertura `
-            /p:CoverletOutput="${{ env.CORE_COVERAGE_OUTPUT }}/" `
+            /p:CoverletOutput="${ CORE_COVERAGE_OUTPUT }/" `
             /p:Include="[AsiBackbone.Core]*" `
             /p:Exclude="[*.Tests]*" `
-            /p:Threshold="${{ env.CORE_BRANCH_COVERAGE_THRESHOLD }}" `
+            /p:Threshold="${ CORE_BRANCH_COVERAGE_THRESHOLD }" `
             /p:ThresholdType=branch `
             /p:ThresholdStat=total
-
+        env:
+          CORE_TEST_PROJECT: ${{ env.CORE_TEST_PROJECT }}
+          CONFIGURATION: ${{ env.CONFIGURATION }}
+          CORE_COVERAGE_OUTPUT: ${{ env.CORE_COVERAGE_OUTPUT }}
+          CORE_BRANCH_COVERAGE_THRESHOLD: ${{ env.CORE_BRANCH_COVERAGE_THRESHOLD }}
+    
       - name: List Core coverage outputs
         shell: pwsh
         run: |
-          Get-ChildItem -Path "${{ github.workspace }}" -Recurse -Filter "*.cobertura.xml" |
+          Get-ChildItem -Path "${ WORKSPACE }" -Recurse -Filter "*.cobertura.xml" |
             ForEach-Object { Write-Host $_.FullName }
+        env:
+          WORKSPACE: ${{ github.workspace }}
 
       - name: Restore .NET tools
         run: dotnet tool restore
@@ -99,11 +108,13 @@ jobs:
         shell: pwsh
         run: |
           dotnet reportgenerator `
-            -reports:"${{ env.CORE_COVERAGE_OUTPUT }}/coverage.cobertura.xml" `
+            -reports:"${ CORE_COVERAGE_OUTPUT }/coverage.cobertura.xml" `
             -targetdir:"./artifacts/core-branch-coverage-report" `
             -reporttypes:"Html;MarkdownSummaryGithub;Cobertura" `
             -assemblyfilters:"+AsiBackbone.Core;-*.Tests" `
             -filefilters:"-**/bin/**;-**/obj/**;-**/*.g.cs"
+        env:
+          CORE_COVERAGE_OUTPUT: ${{ env.CORE_COVERAGE_OUTPUT }}
 
       - name: Generate Core mutation report
         shell: pwsh

@@ -17,11 +17,8 @@ on:
         type: boolean
         default: true
 
-permissions:
-  contents: read
-  packages: write
-  id-token: write
-  attestations: write
+# Deny all GitHub token permissions by default.
+permissions: {}
 
 env:
   DOTNET_NOLOGO: true
@@ -39,12 +36,19 @@ jobs:
   pack-packages:
     name: Validate and pack packages
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      attestations: write
 
     steps:
       - name: Checkout source
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           fetch-depth: 0
+          persist-credentials: false
+
 
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
@@ -171,6 +175,11 @@ jobs:
     needs: pack-packages
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+
     environment:
       name: package-publish
 
@@ -179,6 +188,9 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
 
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
@@ -195,11 +207,14 @@ jobs:
         id: source
         shell: bash
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "url=${{ inputs.publish_source }}" >> "$GITHUB_OUTPUT"
+          if [ "${EVENT_NAME}" = "workflow_dispatch" ]; then
+            echo "url=${INPUTS_PUBLISH_SOURCE}" >> "$GITHUB_OUTPUT"
           else
             echo "url=https://api.nuget.org/v3/index.json" >> "$GITHUB_OUTPUT"
           fi
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUTS_PUBLISH_SOURCE: ${{ inputs.publish_source }}
 
       - name: NuGet login
         if: steps.source.outputs.url == 'https://api.nuget.org/v3/index.json'

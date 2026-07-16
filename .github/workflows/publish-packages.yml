@@ -60,8 +60,8 @@ jobs:
         run: |
           $arguments = @{}
 
-          if ('${REF_TYPE}' -eq 'tag') {
-              $arguments['TagName'] = '${REF_NAME}'
+          if ($env:REF_TYPE -eq 'tag') {
+              $arguments['TagName'] = $env:REF_NAME
           }
 
           ./scripts/Validate-VersionConsistency.ps1 @arguments
@@ -126,15 +126,16 @@ jobs:
         shell: pwsh
         run: |
           $arguments = @{
-              PackageDirectory = '${{ env.PACKAGE_OUTPUT }}'
+              PackageDirectory = $env:PACKAGE_OUTPUT
           }
 
-          if ('${REF_TYPE}' -eq 'tag') {
-              $arguments['TagName'] = '${REF_NAME}'
+          if ($env:REF_TYPE -eq 'tag') {
+              $arguments['TagName'] = $env:REF_NAME
           }
 
           ./scripts/Validate-VersionConsistency.ps1 @arguments
         env:
+          PACKAGE_OUTPUT: ${{ env.PACKAGE_OUTPUT }}
           REF_TYPE: ${{ github.ref_type }}
           REF_NAME: ${{ github.ref_name }}
 

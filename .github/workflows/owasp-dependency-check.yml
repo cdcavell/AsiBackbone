@@ -17,7 +17,7 @@ on:
   # Manual trigger
   workflow_dispatch:
 
-  # Every Sunday at 4:30 AM Central Time
+  # Every Sunday morning
   schedule:
     - cron: '30 9 * * 0'
 

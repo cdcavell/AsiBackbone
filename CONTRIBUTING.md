@@ -51,6 +51,18 @@ bash ./eng/smoke-tests/stable-package-integration-smoke.sh
 
 The smoke scripts pack local package artifacts, create temporary external consumer projects, install packages from the local NuGet output, and validate that package consumers can wire the implemented package family without repository project references.
 
+## Testing expectations
+
+Major new functionality and changes to existing behavior must include automated
+tests covering the new or changed behavior.
+
+Bug fixes should include a regression test when the failure can be reproduced
+reliably. Changes affecting package-consumer behavior should also update or add
+the applicable smoke tests.
+
+When automated testing is genuinely impractical, the pull request must explain
+why and describe the alternative validation performed.
+
 ## Documentation checks
 
 Build the documentation site locally when documentation changes or public behavior changes:

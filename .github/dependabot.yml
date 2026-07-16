@@ -4,8 +4,8 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "monday"
-      time: "06:00"
+      day: "friday"
+      time: "15:00"
       timezone: "America/Chicago"
     cooldown:
       default-days: 7
@@ -41,8 +41,8 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "monday"
-      time: "06:30"
+      day: "friday"
+      time: "15:30"
       timezone: "America/Chicago"
     cooldown:
       default-days: 7

@@ -18,7 +18,7 @@ public sealed class GovernedOperationExecutionReceiptTests
     [Fact]
     public void CommittedReceiptCarriesOpaqueMutationBinding()
     {
-        GovernedOperationExecutionReceipt receipt = GovernedOperationExecutionReceipt.Create(
+        var receipt = GovernedOperationExecutionReceipt.Create(
             " operation-1 ",
             GovernedOperationPersistenceOutcome.Committed,
             executionAttemptId: " attempt-2 ",
@@ -51,7 +51,7 @@ public sealed class GovernedOperationExecutionReceiptTests
     [Fact]
     public void CompletedWithoutMutationHasNoMutationBinding()
     {
-        GovernedOperationExecutionReceipt receipt = GovernedOperationExecutionReceipt.Create(
+        var receipt = GovernedOperationExecutionReceipt.Create(
             "operation-1",
             GovernedOperationPersistenceOutcome.CompletedWithoutMutation,
             executionAttemptId: "attempt-1");
@@ -72,7 +72,7 @@ public sealed class GovernedOperationExecutionReceiptTests
         GovernedOperationPersistenceOutcome outcome,
         string attemptId)
     {
-        GovernedOperationExecutionReceipt receipt = GovernedOperationExecutionReceipt.Create(
+        var receipt = GovernedOperationExecutionReceipt.Create(
             "operation-1",
             outcome,
             executionAttemptId: attemptId);
@@ -89,7 +89,7 @@ public sealed class GovernedOperationExecutionReceiptTests
     [Fact]
     public void FailedReceiptRejectsMutationBinding()
     {
-        Assert.Throws<ArgumentException>(() => GovernedOperationExecutionReceipt.Create(
+        _ = Assert.Throws<ArgumentException>(() => GovernedOperationExecutionReceipt.Create(
             "operation-1",
             GovernedOperationPersistenceOutcome.Failed,
             mutationBatchId: "batch-1",
@@ -105,7 +105,7 @@ public sealed class GovernedOperationExecutionReceiptTests
     public void CompletionLifecycleEventPreservesDecisionCorrelation()
     {
         var residue = new TestAuditResidue();
-        GovernedOperationExecutionReceipt receipt = GovernedOperationExecutionReceipt.Create(
+        var receipt = GovernedOperationExecutionReceipt.Create(
             "operation-1",
             GovernedOperationPersistenceOutcome.Committed,
             executionAttemptId: "attempt-1",
@@ -148,7 +148,7 @@ public sealed class GovernedOperationExecutionReceiptTests
             ["ignored"] = "two",
             ["safe"] = "included"
         });
-        CanonicalPayloadOptions options = CanonicalPayloadOptions.Create(["safe"]);
+        var options = CanonicalPayloadOptions.Create(["safe"]);
 
         CanonicalPayload firstPayload = GovernedOperationExecutionReceiptCanonicalPayload.Create(first, options);
         CanonicalPayload secondPayload = GovernedOperationExecutionReceiptCanonicalPayload.Create(second, options);
@@ -160,7 +160,7 @@ public sealed class GovernedOperationExecutionReceiptTests
         Assert.Equal(firstPayload.CanonicalJson, secondPayload.CanonicalJson);
         Assert.Equal(firstHash.HashValue, secondHash.HashValue);
 
-        using JsonDocument document = JsonDocument.Parse(firstPayload.CanonicalJson);
+        using var document = JsonDocument.Parse(firstPayload.CanonicalJson);
         JsonElement content = document.RootElement.GetProperty("content");
         Assert.Equal("Committed", content.GetProperty("persistenceOutcome").GetString());
         Assert.Equal("included", content.GetProperty("metadata").GetProperty("safe").GetString());

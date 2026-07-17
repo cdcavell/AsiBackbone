@@ -64,7 +64,7 @@ public static class HostAccountabilityLifecycleEvent
             metadata: receipt.ToLifecycleMetadata(metadata));
     }
 
-    private static void AddMetadata(IDictionary<string, string> destination, IReadOnlyDictionary<string, string>? metadata)
+    private static void AddMetadata(SortedDictionary<string, string> destination, IReadOnlyDictionary<string, string>? metadata)
     {
         if (metadata is null)
         {
@@ -80,7 +80,7 @@ public static class HostAccountabilityLifecycleEvent
         }
     }
 
-    private static void AddOptional(IDictionary<string, string> destination, string key, string? value)
+    private static void AddOptional(SortedDictionary<string, string> destination, string key, string? value)
     {
         if (!string.IsNullOrWhiteSpace(value))
         {

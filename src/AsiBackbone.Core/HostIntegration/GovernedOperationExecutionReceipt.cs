@@ -213,17 +213,11 @@ public sealed class GovernedOperationExecutionReceipt
     private static string Normalize(string value, string parameterName, int maximumLength)
     {
         string normalized = value.Trim();
-        if (normalized.Length > maximumLength)
-        {
-            throw new ArgumentOutOfRangeException(parameterName, value, $"Value cannot exceed {maximumLength} characters.");
-        }
-
-        if (normalized.Any(char.IsControl))
-        {
-            throw new ArgumentException("Value cannot contain control characters.", parameterName);
-        }
-
-        return normalized;
+        return normalized.Length > maximumLength
+            ? throw new ArgumentOutOfRangeException(parameterName, value, $"Value cannot exceed {maximumLength} characters.")
+            : normalized.Any(char.IsControl)
+            ? throw new ArgumentException("Value cannot contain control characters.", parameterName)
+            : normalized;
     }
 
     private static IReadOnlyDictionary<string, string> NormalizeMetadata(IReadOnlyDictionary<string, string>? metadata)
@@ -244,7 +238,7 @@ public sealed class GovernedOperationExecutionReceipt
         return new ReadOnlyDictionary<string, string>(normalized);
     }
 
-    private static void AddMetadata(IDictionary<string, string> destination, IReadOnlyDictionary<string, string>? metadata)
+    private static void AddMetadata(SortedDictionary<string, string> destination, IReadOnlyDictionary<string, string>? metadata)
     {
         IReadOnlyDictionary<string, string> normalized = NormalizeMetadata(metadata);
         foreach (KeyValuePair<string, string> item in normalized)
@@ -253,7 +247,7 @@ public sealed class GovernedOperationExecutionReceipt
         }
     }
 
-    private static void AddOptional(IDictionary<string, string> destination, string key, string? value)
+    private static void AddOptional(SortedDictionary<string, string> destination, string key, string? value)
     {
         if (value is not null)
         {

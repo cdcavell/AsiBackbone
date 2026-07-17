@@ -39,4 +39,9 @@ public static class CanonicalArtifactTypes
     /// Identifies a provider-neutral audit integrity chain link payload.
     /// </summary>
     public const string AuditIntegrityLink = "asibackbone.audit-integrity-link";
+
+    /// <summary>
+    /// Identifies a framework-neutral governed operation execution receipt payload.
+    /// </summary>
+    public const string GovernedOperationExecutionReceipt = "asibackbone.governed-operation-execution-receipt";
 }

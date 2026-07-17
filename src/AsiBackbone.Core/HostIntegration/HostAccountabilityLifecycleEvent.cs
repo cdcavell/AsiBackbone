@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using AsiBackbone.Core.Audit;
 
 namespace AsiBackbone.Core.HostIntegration;
@@ -20,12 +21,13 @@ public static class HostAccountabilityLifecycleEvent
         IReadOnlyDictionary<string, string>? metadata = null)
     {
         ArgumentNullException.ThrowIfNull(residue);
-        GovernedOperationExecutionReceipt identity = GovernedOperationExecutionReceipt.Create(
-            operationExecutionId,
-            GovernedOperationPersistenceOutcome.CompletedWithoutMutation,
-            executionAttemptId: executionAttemptId,
-            completedUtc: occurredUtc,
-            decisionAuditRecordId: decisionAuditRecordId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(operationExecutionId);
+
+        SortedDictionary<string, string> lifecycleMetadata = new(StringComparer.Ordinal);
+        AddMetadata(lifecycleMetadata, metadata);
+        lifecycleMetadata[HostAccountabilityMetadataKeys.OperationExecutionId] = operationExecutionId.Trim();
+        AddOptional(lifecycleMetadata, HostAccountabilityMetadataKeys.ExecutionAttemptId, executionAttemptId);
+        AddOptional(lifecycleMetadata, HostAccountabilityMetadataKeys.DecisionAuditRecordId, decisionAuditRecordId);
 
         return AuditResidueLifecycleEvent.FromResidue(
             AuditResidueLifecycleStage.GatewayExecutionStarted,
@@ -33,7 +35,7 @@ public static class HostAccountabilityLifecycleEvent
             eventId: eventId,
             occurredUtc: occurredUtc,
             outcome: "Started",
-            metadata: identity.ToLifecycleMetadata(metadata));
+            metadata: new ReadOnlyDictionary<string, string>(lifecycleMetadata));
     }
 
     /// <summary>
@@ -60,5 +62,29 @@ public static class HostAccountabilityLifecycleEvent
             occurredUtc: receipt.CompletedUtc,
             outcome: receipt.PersistenceOutcome.ToString(),
             metadata: receipt.ToLifecycleMetadata(metadata));
+    }
+
+    private static void AddMetadata(IDictionary<string, string> destination, IReadOnlyDictionary<string, string>? metadata)
+    {
+        if (metadata is null)
+        {
+            return;
+        }
+
+        foreach (KeyValuePair<string, string> item in metadata)
+        {
+            if (!string.IsNullOrWhiteSpace(item.Key))
+            {
+                destination[item.Key.Trim()] = item.Value?.Trim() ?? string.Empty;
+            }
+        }
+    }
+
+    private static void AddOptional(IDictionary<string, string> destination, string key, string? value)
+    {
+        if (!string.IsNullOrWhiteSpace(value))
+        {
+            destination[key] = value.Trim();
+        }
     }
 }

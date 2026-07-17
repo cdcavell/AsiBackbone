@@ -32,6 +32,8 @@ on:
       - '**/packages.*.lock.json'
       - '**/Directory.Packages.props'
       - '**/Directory.Build.props'
+      - 'dependency-check-suppressions.xml'
+      - '.github/workflows/owasp-dependency-check.yml'
 
 # Deny all token permissions unless granted by a job.
 permissions: {}
@@ -67,7 +69,8 @@ jobs:
         with:
           project: 'AsiBackbone'
           path: '.'
-          format: 'SARIF'
+          format: 'ALL'
+          others: '--suppression=/github/workspace/dependency-check-suppressions.xml'
 
       - name: Upload report artifact
         if: always()

@@ -21,7 +21,9 @@ public sealed class NcatAuditCompletionAdapterTests
         var store = new InMemoryAuditResidueLifecycleStore();
         var adapter = CreateAdapter(store);
 
-        NcatAuditCompletionDeliveryResult result = await adapter.DeliverAsync(CreateCommittedHandoff());
+        NcatAuditCompletionDeliveryResult result = await adapter.DeliverAsync(
+            CreateCommittedHandoff(),
+            TestContext.Current.CancellationToken);
 
         Assert.Equal(NcatAuditCompletionDeliveryDisposition.Delivered, result.Disposition);
         Assert.True(result.ShouldAcknowledgeSource);
@@ -63,7 +65,9 @@ public sealed class NcatAuditCompletionAdapterTests
             MutationManifestAlgorithm = null
         };
 
-        NcatAuditCompletionDeliveryResult result = await adapter.DeliverAsync(handoff);
+        NcatAuditCompletionDeliveryResult result = await adapter.DeliverAsync(
+            handoff,
+            TestContext.Current.CancellationToken);
 
         Assert.Equal(NcatAuditCompletionDeliveryDisposition.Delivered, result.Disposition);
         Assert.Equal(expectedOutcome, result.Receipt!.PersistenceOutcome);
@@ -83,7 +87,9 @@ public sealed class NcatAuditCompletionAdapterTests
             MutationManifestAlgorithm = null
         };
 
-        NcatAuditCompletionDeliveryResult result = await adapter.DeliverAsync(handoff);
+        NcatAuditCompletionDeliveryResult result = await adapter.DeliverAsync(
+            handoff,
+            TestContext.Current.CancellationToken);
 
         Assert.Equal(NcatAuditCompletionDeliveryDisposition.Terminal, result.Disposition);
         Assert.Equal("invalid-execution-receipt", result.ReasonCode);
@@ -100,7 +106,9 @@ public sealed class NcatAuditCompletionAdapterTests
             new InMemoryAuditResidueLifecycleStore(),
             new StubResolver(null));
 
-        NcatAuditCompletionDeliveryResult result = await adapter.DeliverAsync(CreateCommittedHandoff());
+        NcatAuditCompletionDeliveryResult result = await adapter.DeliverAsync(
+            CreateCommittedHandoff(),
+            TestContext.Current.CancellationToken);
 
         Assert.Equal(NcatAuditCompletionDeliveryDisposition.Deferred, result.Disposition);
         Assert.False(result.ShouldAcknowledgeSource);
@@ -115,7 +123,9 @@ public sealed class NcatAuditCompletionAdapterTests
         var adapter = CreateAdapter(new InMemoryAuditResidueLifecycleStore());
         NcatAuditCompletionHandoff handoff = CreateCommittedHandoff() with { CorrelationId = "other" };
 
-        NcatAuditCompletionDeliveryResult result = await adapter.DeliverAsync(handoff);
+        NcatAuditCompletionDeliveryResult result = await adapter.DeliverAsync(
+            handoff,
+            TestContext.Current.CancellationToken);
 
         Assert.Equal(NcatAuditCompletionDeliveryDisposition.Terminal, result.Disposition);
         Assert.Equal("correlation-id-mismatch", result.ReasonCode);
@@ -131,8 +141,12 @@ public sealed class NcatAuditCompletionAdapterTests
         var adapter = CreateAdapter(store);
         NcatAuditCompletionHandoff handoff = CreateCommittedHandoff();
 
-        NcatAuditCompletionDeliveryResult first = await adapter.DeliverAsync(handoff);
-        NcatAuditCompletionDeliveryResult second = await adapter.DeliverAsync(handoff);
+        NcatAuditCompletionDeliveryResult first = await adapter.DeliverAsync(
+            handoff,
+            TestContext.Current.CancellationToken);
+        NcatAuditCompletionDeliveryResult second = await adapter.DeliverAsync(
+            handoff,
+            TestContext.Current.CancellationToken);
 
         Assert.Equal(NcatAuditCompletionDeliveryDisposition.Delivered, first.Disposition);
         Assert.Equal(NcatAuditCompletionDeliveryDisposition.Duplicate, second.Disposition);
@@ -148,7 +162,9 @@ public sealed class NcatAuditCompletionAdapterTests
     {
         var adapter = CreateAdapter(new ThrowingLifecycleStore());
 
-        NcatAuditCompletionDeliveryResult result = await adapter.DeliverAsync(CreateCommittedHandoff());
+        NcatAuditCompletionDeliveryResult result = await adapter.DeliverAsync(
+            CreateCommittedHandoff(),
+            TestContext.Current.CancellationToken);
 
         Assert.Equal(NcatAuditCompletionDeliveryDisposition.Retryable, result.Disposition);
         Assert.Equal("lifecycle-persistence-failed", result.ReasonCode);
@@ -167,7 +183,9 @@ public sealed class NcatAuditCompletionAdapterTests
             new NcatAuditCompletionAdapterOptions { DeadLetterAfterAttempts = 3 });
         NcatAuditCompletionHandoff handoff = CreateCommittedHandoff() with { DeliveryAttempt = 3 };
 
-        NcatAuditCompletionDeliveryResult result = await adapter.DeliverAsync(handoff);
+        NcatAuditCompletionDeliveryResult result = await adapter.DeliverAsync(
+            handoff,
+            TestContext.Current.CancellationToken);
 
         Assert.Equal(NcatAuditCompletionDeliveryDisposition.DeadLetter, result.Disposition);
         Assert.False(result.ShouldAcknowledgeSource);
@@ -194,7 +212,9 @@ public sealed class NcatAuditCompletionAdapterTests
             DecisionAuditRecordId = decisionAuditRecordId
         };
 
-        NcatAuditCompletionDeliveryResult result = await adapter.DeliverAsync(handoff);
+        NcatAuditCompletionDeliveryResult result = await adapter.DeliverAsync(
+            handoff,
+            TestContext.Current.CancellationToken);
 
         Assert.Equal(NcatAuditCompletionDeliveryDisposition.Terminal, result.Disposition);
         Assert.Equal(expectedReason, result.ReasonCode);

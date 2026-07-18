@@ -151,32 +151,17 @@ public sealed class NcatAuditCompletionAdapter
 
     private static NcatAuditCompletionDeliveryResult? ValidateHandoff(NcatAuditCompletionHandoff handoff)
     {
-        if (string.IsNullOrWhiteSpace(handoff.CompletionEntryId))
-        {
-            return Terminal("completion-entry-id-required");
-        }
-
-        if (string.IsNullOrWhiteSpace(handoff.OperationExecutionId))
-        {
-            return Terminal("operation-execution-id-required");
-        }
-
-        if (string.IsNullOrWhiteSpace(handoff.DecisionAuditRecordId))
-        {
-            return Terminal("decision-audit-record-id-required");
-        }
-
-        if (string.IsNullOrWhiteSpace(handoff.PersistenceOutcome))
-        {
-            return Terminal("persistence-outcome-required");
-        }
-
-        if (handoff.AuditRecordCount < 0)
-        {
-            return Terminal("audit-record-count-invalid");
-        }
-
-        return handoff.DeliveryAttempt < 0
+        return string.IsNullOrWhiteSpace(handoff.CompletionEntryId)
+            ? Terminal("completion-entry-id-required")
+            : string.IsNullOrWhiteSpace(handoff.OperationExecutionId)
+            ? Terminal("operation-execution-id-required")
+            : string.IsNullOrWhiteSpace(handoff.DecisionAuditRecordId)
+            ? Terminal("decision-audit-record-id-required")
+            : string.IsNullOrWhiteSpace(handoff.PersistenceOutcome)
+            ? Terminal("persistence-outcome-required")
+            : handoff.AuditRecordCount < 0
+            ? Terminal("audit-record-count-invalid")
+            : handoff.DeliveryAttempt < 0
             ? Terminal("delivery-attempt-invalid")
             : null;
     }

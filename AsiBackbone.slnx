@@ -22,7 +22,9 @@
   </Folder>
   <Folder Name="/samples/">
     <Project Path="samples/AsiBackboneAspireAppHost/AsiBackbone.Samples.AspireAppHost.csproj" />
-    <Project Path="samples/NcatAuditCompletionAdapter/AsiBackbone.Samples.NcatAuditCompletionAdapter.csproj" />
+    <Project Path="samples/NcatAuditCompletionAdapter/AsiBackbone.Samples.NcatAuditCompletionAdapter.csproj">
+      <Build Solution="Debug|*" Project="false" />
+    </Project>
     <Project Path="samples/PlainAspNetCoreHost/AsiBackbone.Samples.PlainAspNetCoreHost.csproj">
       <Build Solution="Debug|*" Project="false" />
     </Project>
@@ -34,7 +36,9 @@
     <Project Path="tests/AsiBackbone.DependencyInjection.Tests/AsiBackbone.DependencyInjection.Tests.csproj" />
     <Project Path="tests/AsiBackbone.EntityFrameworkCore.Tests/AsiBackbone.EntityFrameworkCore.Tests.csproj" />
     <Project Path="tests/AsiBackbone.OpenTelemetry.Tests/AsiBackbone.OpenTelemetry.Tests.csproj" />
-    <Project Path="tests/AsiBackbone.Samples.NcatAuditCompletionAdapter.Tests/AsiBackbone.Samples.NcatAuditCompletionAdapter.Tests.csproj" />
+    <Project Path="tests/AsiBackbone.Samples.NcatAuditCompletionAdapter.Tests/AsiBackbone.Samples.NcatAuditCompletionAdapter.Tests.csproj">
+      <Build Solution="Debug|*" Project="false" />
+    </Project>
     <Project Path="tests/AsiBackbone.Signing.LocalDevelopment.Tests/AsiBackbone.Signing.LocalDevelopment.Tests.csproj" />
     <Project Path="tests/AsiBackbone.Signing.ManagedKey.Tests/AsiBackbone.Signing.ManagedKey.Tests.csproj" />
     <Project Path="tests/AsiBackbone.Testing.Tests/AsiBackbone.Testing.Tests.csproj" />

@@ -1,0 +1,290 @@
+using System.Security.Cryptography;
+using System.Text;
+using AsiBackbone.Core.Audit;
+using AsiBackbone.Core.HostIntegration;
+
+namespace AsiBackbone.Samples.NcatAuditCompletionAdapter;
+
+/// <summary>
+/// Maps a minimized NCAT audit-completion handoff into AsiBackbone governed execution evidence.
+/// </summary>
+/// <remarks>
+/// This reference adapter intentionally depends only on AsiBackbone Core and the source-neutral
+/// <see cref="NcatAuditCompletionHandoff" /> contract. A consuming host may translate its NCAT
+/// completion receipt or completion-outbox entry into that contract without coupling either core product.
+/// </remarks>
+public sealed class NcatAuditCompletionAdapter
+{
+    private const string SourceCompletionEntryIdMetadataKey = "ncatCompletionEntryId";
+    private const string SourceAdapterMetadataKey = "completionAdapter";
+    private const string SourceAdapterMetadataValue = "NCAT";
+    private const string LifecycleEventPrefix = "ncat-completion-";
+
+    private readonly IAsiBackboneAuditResidueLifecycleStore lifecycleStore;
+    private readonly INcatDecisionResidueResolver decisionResidueResolver;
+    private readonly NcatAuditCompletionAdapterOptions options;
+
+    /// <summary>
+    /// Initializes a new optional NCAT audit-completion adapter.
+    /// </summary>
+    public NcatAuditCompletionAdapter(
+        IAsiBackboneAuditResidueLifecycleStore lifecycleStore,
+        INcatDecisionResidueResolver decisionResidueResolver,
+        NcatAuditCompletionAdapterOptions? options = null)
+    {
+        this.lifecycleStore = lifecycleStore ?? throw new ArgumentNullException(nameof(lifecycleStore));
+        this.decisionResidueResolver = decisionResidueResolver ?? throw new ArgumentNullException(nameof(decisionResidueResolver));
+        this.options = options ?? new NcatAuditCompletionAdapterOptions();
+        this.options.Validate();
+    }
+
+    /// <summary>
+    /// Attempts to append the governed completion lifecycle event before the source entry is acknowledged.
+    /// </summary>
+    public async ValueTask<NcatAuditCompletionDeliveryResult> DeliverAsync(
+        NcatAuditCompletionHandoff handoff,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(handoff);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        NcatAuditCompletionDeliveryResult? validationFailure = ValidateHandoff(handoff);
+        if (validationFailure is not null)
+        {
+            return validationFailure;
+        }
+
+        if (!TryMapOutcome(handoff.PersistenceOutcome, out GovernedOperationPersistenceOutcome persistenceOutcome))
+        {
+            return Terminal("unsupported-persistence-outcome");
+        }
+
+        IAsiBackboneAuditResidue? residue = await decisionResidueResolver.ResolveAsync(
+            handoff.DecisionAuditRecordId!.Trim(),
+            NormalizeOptional(handoff.CorrelationId),
+            cancellationToken).ConfigureAwait(false);
+
+        if (residue is null)
+        {
+            return new NcatAuditCompletionDeliveryResult(
+                NcatAuditCompletionDeliveryDisposition.Deferred,
+                "decision-residue-not-available");
+        }
+
+        NcatAuditCompletionDeliveryResult? correlationFailure = ValidateDecisionCorrelation(handoff, residue);
+        if (correlationFailure is not null)
+        {
+            return correlationFailure;
+        }
+
+        GovernedOperationExecutionReceipt receipt;
+        try
+        {
+            receipt = GovernedOperationExecutionReceipt.Create(
+                operationExecutionId: handoff.OperationExecutionId!,
+                persistenceOutcome: persistenceOutcome,
+                executionAttemptId: handoff.ExecutionAttemptId,
+                mutationBatchId: handoff.MutationBatchId,
+                mutationRecordCount: handoff.AuditRecordCount,
+                mutationManifestHash: handoff.MutationManifestHash,
+                mutationManifestAlgorithm: handoff.MutationManifestAlgorithm,
+                completedUtc: handoff.CompletedUtc,
+                persistenceProvider: options.PersistenceProvider,
+                decisionAuditRecordId: handoff.DecisionAuditRecordId);
+        }
+        catch (ArgumentException exception)
+        {
+            return Terminal("invalid-execution-receipt", exception.GetType().Name);
+        }
+
+        string lifecycleEventId = CreateLifecycleEventId(handoff.CompletionEntryId);
+        IReadOnlyDictionary<string, string> metadata = new Dictionary<string, string>(StringComparer.Ordinal)
+        {
+            [SourceCompletionEntryIdMetadataKey] = handoff.CompletionEntryId.Trim(),
+            [SourceAdapterMetadataKey] = SourceAdapterMetadataValue
+        };
+
+        AuditResidueLifecycleEvent lifecycleEvent = HostAccountabilityLifecycleEvent.FromExecutionReceipt(
+            residue,
+            receipt,
+            eventId: lifecycleEventId,
+            metadata: metadata);
+
+        AuditResidueLifecycleEvent? existing = await lifecycleStore.FindByEventIdAsync(
+            lifecycleEventId,
+            cancellationToken).ConfigureAwait(false);
+
+        if (existing is not null)
+        {
+            return Equivalent(existing, lifecycleEvent)
+                ? new NcatAuditCompletionDeliveryResult(
+                    NcatAuditCompletionDeliveryDisposition.Duplicate,
+                    "completion-already-delivered",
+                    lifecycleEventId,
+                    receipt,
+                    existing)
+                : Terminal("idempotency-conflict", lifecycleEventId: lifecycleEventId);
+        }
+
+        try
+        {
+            AuditResidueLifecycleEvent appended = await lifecycleStore.AppendAsync(
+                lifecycleEvent,
+                cancellationToken).ConfigureAwait(false);
+
+            return new NcatAuditCompletionDeliveryResult(
+                NcatAuditCompletionDeliveryDisposition.Delivered,
+                "lifecycle-event-appended",
+                appended.EventId,
+                receipt,
+                appended);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (Exception exception)
+        {
+            return PersistenceFailure(handoff, lifecycleEventId, receipt, lifecycleEvent, exception);
+        }
+    }
+
+    private static NcatAuditCompletionDeliveryResult? ValidateHandoff(NcatAuditCompletionHandoff handoff)
+    {
+        return string.IsNullOrWhiteSpace(handoff.CompletionEntryId)
+            ? Terminal("completion-entry-id-required")
+            : string.IsNullOrWhiteSpace(handoff.OperationExecutionId)
+            ? Terminal("operation-execution-id-required")
+            : string.IsNullOrWhiteSpace(handoff.DecisionAuditRecordId)
+            ? Terminal("decision-audit-record-id-required")
+            : string.IsNullOrWhiteSpace(handoff.PersistenceOutcome)
+            ? Terminal("persistence-outcome-required")
+            : handoff.AuditRecordCount < 0
+            ? Terminal("audit-record-count-invalid")
+            : handoff.DeliveryAttempt < 0
+            ? Terminal("delivery-attempt-invalid")
+            : null;
+    }
+
+    private static NcatAuditCompletionDeliveryResult? ValidateDecisionCorrelation(
+        NcatAuditCompletionHandoff handoff,
+        IAsiBackboneAuditResidue residue)
+    {
+        string? correlationId = NormalizeOptional(handoff.CorrelationId);
+        if (correlationId is not null &&
+            !string.Equals(correlationId, residue.CorrelationId, StringComparison.Ordinal))
+        {
+            return Terminal("correlation-id-mismatch");
+        }
+
+        string? traceId = NormalizeOptional(handoff.TraceId);
+        return traceId is not null &&
+            !string.Equals(traceId, residue.TraceId, StringComparison.Ordinal)
+            ? Terminal("trace-id-mismatch")
+            : null;
+    }
+
+    private NcatAuditCompletionDeliveryResult PersistenceFailure(
+        NcatAuditCompletionHandoff handoff,
+        string lifecycleEventId,
+        GovernedOperationExecutionReceipt receipt,
+        AuditResidueLifecycleEvent lifecycleEvent,
+        Exception exception)
+    {
+        bool deadLettered = options.DeadLetterAfterAttempts is int threshold &&
+            handoff.DeliveryAttempt >= threshold;
+
+        return new NcatAuditCompletionDeliveryResult(
+            deadLettered
+                ? NcatAuditCompletionDeliveryDisposition.DeadLetter
+                : NcatAuditCompletionDeliveryDisposition.Retryable,
+            deadLettered
+                ? "lifecycle-persistence-dead-lettered"
+                : "lifecycle-persistence-failed",
+            lifecycleEventId,
+            receipt,
+            lifecycleEvent,
+            exception.GetType().Name);
+    }
+
+    private static bool TryMapOutcome(
+        string sourceOutcome,
+        out GovernedOperationPersistenceOutcome persistenceOutcome)
+    {
+        string normalized = string.Concat(sourceOutcome
+            .Where(char.IsLetterOrDigit)
+            .Select(char.ToLowerInvariant));
+
+        persistenceOutcome = normalized switch
+        {
+            "committed" => GovernedOperationPersistenceOutcome.Committed,
+            "failed" => GovernedOperationPersistenceOutcome.Failed,
+            "rolledback" => GovernedOperationPersistenceOutcome.RolledBack,
+            "completedwithoutmutation" or "nomutation" => GovernedOperationPersistenceOutcome.CompletedWithoutMutation,
+            _ => default
+        };
+
+        return normalized is "committed" or "failed" or "rolledback" or "completedwithoutmutation" or "nomutation";
+    }
+
+    private static string CreateLifecycleEventId(string completionEntryId)
+    {
+        byte[] digest = SHA256.HashData(Encoding.UTF8.GetBytes(completionEntryId.Trim()));
+        return string.Concat(LifecycleEventPrefix, Convert.ToHexString(digest).ToLowerInvariant());
+    }
+
+    private static bool Equivalent(
+        AuditResidueLifecycleEvent existing,
+        AuditResidueLifecycleEvent candidate)
+    {
+        if (existing.Stage != candidate.Stage ||
+            !string.Equals(existing.CorrelationId, candidate.CorrelationId, StringComparison.Ordinal) ||
+            !string.Equals(existing.AuditResidueId, candidate.AuditResidueId, StringComparison.Ordinal) ||
+            !string.Equals(existing.TraceId, candidate.TraceId, StringComparison.Ordinal) ||
+            !string.Equals(existing.OperationName, candidate.OperationName, StringComparison.Ordinal) ||
+            !string.Equals(existing.Outcome, candidate.Outcome, StringComparison.Ordinal))
+        {
+            return false;
+        }
+
+        string[] keys =
+        [
+            SourceCompletionEntryIdMetadataKey,
+            HostAccountabilityMetadataKeys.OperationExecutionId,
+            HostAccountabilityMetadataKeys.ExecutionAttemptId,
+            HostAccountabilityMetadataKeys.DecisionAuditRecordId,
+            HostAccountabilityMetadataKeys.PersistenceOutcome,
+            HostAccountabilityMetadataKeys.MutationBatchId,
+            HostAccountabilityMetadataKeys.MutationRecordCount,
+            HostAccountabilityMetadataKeys.MutationManifestHash,
+            HostAccountabilityMetadataKeys.MutationManifestAlgorithm
+        ];
+
+        return keys.All(key => string.Equals(
+            GetMetadata(existing.Metadata, key),
+            GetMetadata(candidate.Metadata, key),
+            StringComparison.Ordinal));
+    }
+
+    private static string? GetMetadata(IReadOnlyDictionary<string, string> metadata, string key)
+    {
+        return metadata.TryGetValue(key, out string? value) ? value : null;
+    }
+
+    private static string? NormalizeOptional(string? value)
+    {
+        return string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+    }
+
+    private static NcatAuditCompletionDeliveryResult Terminal(
+        string reasonCode,
+        string? failureType = null,
+        string? lifecycleEventId = null)
+    {
+        return new NcatAuditCompletionDeliveryResult(
+            NcatAuditCompletionDeliveryDisposition.Terminal,
+            reasonCode,
+            lifecycleEventId,
+            FailureType: failureType);
+    }
+}

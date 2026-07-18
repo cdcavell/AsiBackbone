@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
     <AsiBackboneSuppressMissingXmlDocs>true</AsiBackboneSuppressMissingXmlDocs>
+    <Include>[AsiBackbone.Samples.NcatAuditCompletionAdapter]*</Include>
   </PropertyGroup>
 
   <ItemGroup>

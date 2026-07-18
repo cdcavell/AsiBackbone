@@ -1,7 +1,6 @@
 using AsiBackbone.Core.Actors;
 using AsiBackbone.Core.Audit;
 using AsiBackbone.Core.HostIntegration;
-using AsiBackbone.Samples.NcatAuditCompletionAdapter;
 using AsiBackbone.Storage.InMemory.Audit;
 using Xunit;
 
@@ -18,8 +17,8 @@ public sealed class NcatAuditCompletionAdapterTests
     [Fact]
     public async Task CommittedHandoffAppendsBoundLifecycleEvent()
     {
-        var store = new InMemoryAuditResidueLifecycleStore();
-        var adapter = CreateAdapter(store);
+        InMemoryAuditResidueLifecycleStore store = new();
+        NcatAuditCompletionAdapter adapter = CreateAdapter(store);
 
         NcatAuditCompletionDeliveryResult result = await adapter.DeliverAsync(
             CreateCommittedHandoff(),
@@ -55,7 +54,7 @@ public sealed class NcatAuditCompletionAdapterTests
         string sourceOutcome,
         GovernedOperationPersistenceOutcome expectedOutcome)
     {
-        var adapter = CreateAdapter(new InMemoryAuditResidueLifecycleStore());
+        NcatAuditCompletionAdapter adapter = CreateAdapter(new InMemoryAuditResidueLifecycleStore());
         NcatAuditCompletionHandoff handoff = CreateCommittedHandoff() with
         {
             PersistenceOutcome = sourceOutcome,
@@ -80,7 +79,7 @@ public sealed class NcatAuditCompletionAdapterTests
     [Fact]
     public async Task CommittedHandoffWithoutManifestIsTerminal()
     {
-        var adapter = CreateAdapter(new InMemoryAuditResidueLifecycleStore());
+        NcatAuditCompletionAdapter adapter = CreateAdapter(new InMemoryAuditResidueLifecycleStore());
         NcatAuditCompletionHandoff handoff = CreateCommittedHandoff() with
         {
             MutationManifestHash = null,
@@ -102,7 +101,7 @@ public sealed class NcatAuditCompletionAdapterTests
     [Fact]
     public async Task MissingDecisionResidueDefersDelivery()
     {
-        var adapter = new NcatAuditCompletionAdapter(
+        NcatAuditCompletionAdapter adapter = new(
             new InMemoryAuditResidueLifecycleStore(),
             new StubResolver(null));
 
@@ -120,7 +119,7 @@ public sealed class NcatAuditCompletionAdapterTests
     [Fact]
     public async Task CorrelationMismatchIsTerminal()
     {
-        var adapter = CreateAdapter(new InMemoryAuditResidueLifecycleStore());
+        NcatAuditCompletionAdapter adapter = CreateAdapter(new InMemoryAuditResidueLifecycleStore());
         NcatAuditCompletionHandoff handoff = CreateCommittedHandoff() with { CorrelationId = "other" };
 
         NcatAuditCompletionDeliveryResult result = await adapter.DeliverAsync(
@@ -137,8 +136,8 @@ public sealed class NcatAuditCompletionAdapterTests
     [Fact]
     public async Task DuplicateHandoffIsAcknowledgedWithoutSecondAppend()
     {
-        var store = new InMemoryAuditResidueLifecycleStore();
-        var adapter = CreateAdapter(store);
+        InMemoryAuditResidueLifecycleStore store = new();
+        NcatAuditCompletionAdapter adapter = CreateAdapter(store);
         NcatAuditCompletionHandoff handoff = CreateCommittedHandoff();
 
         NcatAuditCompletionDeliveryResult first = await adapter.DeliverAsync(
@@ -160,7 +159,7 @@ public sealed class NcatAuditCompletionAdapterTests
     [Fact]
     public async Task LifecyclePersistenceFailureRemainsRetryable()
     {
-        var adapter = CreateAdapter(new ThrowingLifecycleStore());
+        NcatAuditCompletionAdapter adapter = CreateAdapter(new ThrowingLifecycleStore());
 
         NcatAuditCompletionDeliveryResult result = await adapter.DeliverAsync(
             CreateCommittedHandoff(),
@@ -178,7 +177,7 @@ public sealed class NcatAuditCompletionAdapterTests
     [Fact]
     public async Task ExhaustedPersistenceRetriesReturnDeadLetter()
     {
-        var adapter = CreateAdapter(
+        NcatAuditCompletionAdapter adapter = CreateAdapter(
             new ThrowingLifecycleStore(),
             new NcatAuditCompletionAdapterOptions { DeadLetterAfterAttempts = 3 });
         NcatAuditCompletionHandoff handoff = CreateCommittedHandoff() with { DeliveryAttempt = 3 };
@@ -204,7 +203,7 @@ public sealed class NcatAuditCompletionAdapterTests
         string decisionAuditRecordId,
         string expectedReason)
     {
-        var adapter = CreateAdapter(new InMemoryAuditResidueLifecycleStore());
+        NcatAuditCompletionAdapter adapter = CreateAdapter(new InMemoryAuditResidueLifecycleStore());
         NcatAuditCompletionHandoff handoff = CreateCommittedHandoff() with
         {
             CompletionEntryId = completionEntryId,

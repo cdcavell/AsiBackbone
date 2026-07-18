@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using AsiBackbone.Core.Audit;
@@ -177,12 +176,9 @@ public sealed class NcatAuditCompletionAdapter
             return Terminal("audit-record-count-invalid");
         }
 
-        if (handoff.DeliveryAttempt < 0)
-        {
-            return Terminal("delivery-attempt-invalid");
-        }
-
-        return null;
+        return handoff.DeliveryAttempt < 0
+            ? Terminal("delivery-attempt-invalid")
+            : null;
     }
 
     private static NcatAuditCompletionDeliveryResult? ValidateDecisionCorrelation(
@@ -197,13 +193,10 @@ public sealed class NcatAuditCompletionAdapter
         }
 
         string? traceId = NormalizeOptional(handoff.TraceId);
-        if (traceId is not null &&
-            !string.Equals(traceId, residue.TraceId, StringComparison.Ordinal))
-        {
-            return Terminal("trace-id-mismatch");
-        }
-
-        return null;
+        return traceId is not null &&
+            !string.Equals(traceId, residue.TraceId, StringComparison.Ordinal)
+            ? Terminal("trace-id-mismatch")
+            : null;
     }
 
     private NcatAuditCompletionDeliveryResult PersistenceFailure(
@@ -233,10 +226,9 @@ public sealed class NcatAuditCompletionAdapter
         string sourceOutcome,
         out GovernedOperationPersistenceOutcome persistenceOutcome)
     {
-        string normalized = new(sourceOutcome
+        string normalized = string.Concat(sourceOutcome
             .Where(char.IsLetterOrDigit)
-            .Select(char.ToLowerInvariant)
-            .ToArray());
+            .Select(char.ToLowerInvariant));
 
         persistenceOutcome = normalized switch
         {

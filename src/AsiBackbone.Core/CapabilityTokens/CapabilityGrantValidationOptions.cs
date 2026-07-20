@@ -19,7 +19,13 @@ public sealed class CapabilityGrantValidationOptions
         bool requireProof,
         bool requireAcknowledgmentReference,
         bool requireUseCheck,
-        int maxUseCount)
+        int maxUseCount,
+        string? expectedProofKeyId,
+        string? expectedProofKeyVersion,
+        string? expectedProofPolicyVersion,
+        string? expectedProofPolicyHash,
+        string? requiredProofProvider,
+        string? requiredProofHashAlgorithm)
     {
         if (allowedClockSkew < TimeSpan.Zero)
         {
@@ -49,6 +55,12 @@ public sealed class CapabilityGrantValidationOptions
         RequireAcknowledgmentReference = requireAcknowledgmentReference;
         RequireUseCheck = requireUseCheck;
         MaxUseCount = maxUseCount;
+        ExpectedProofKeyId = NormalizeOptional(expectedProofKeyId);
+        ExpectedProofKeyVersion = NormalizeOptional(expectedProofKeyVersion);
+        ExpectedProofPolicyVersion = NormalizeOptional(expectedProofPolicyVersion);
+        ExpectedProofPolicyHash = NormalizeOptional(expectedProofPolicyHash);
+        RequiredProofProvider = NormalizeOptional(requiredProofProvider);
+        RequiredProofHashAlgorithm = NormalizeOptional(requiredProofHashAlgorithm);
     }
 
     public string? Issuer { get; }
@@ -66,6 +78,12 @@ public sealed class CapabilityGrantValidationOptions
     public bool RequireAcknowledgmentReference { get; }
     public bool RequireUseCheck { get; }
     public int MaxUseCount { get; }
+    public string? ExpectedProofKeyId { get; }
+    public string? ExpectedProofKeyVersion { get; }
+    public string? ExpectedProofPolicyVersion { get; }
+    public string? ExpectedProofPolicyHash { get; }
+    public string? RequiredProofProvider { get; }
+    public string? RequiredProofHashAlgorithm { get; }
 
     public static CapabilityGrantValidationOptions Create(
         string? issuer = null,
@@ -82,7 +100,13 @@ public sealed class CapabilityGrantValidationOptions
         bool requireAcknowledgmentReference = false,
         bool requireUseCheck = false,
         int maxUseCount = 1,
-        TimeSpan allowedClockSkew = default)
+        TimeSpan allowedClockSkew = default,
+        string? expectedProofKeyId = null,
+        string? expectedProofKeyVersion = null,
+        string? expectedProofPolicyVersion = null,
+        string? expectedProofPolicyHash = null,
+        string? requiredProofProvider = null,
+        string? requiredProofHashAlgorithm = null)
     {
         return new CapabilityGrantValidationOptions(
             issuer,
@@ -99,7 +123,13 @@ public sealed class CapabilityGrantValidationOptions
             requireProof,
             requireAcknowledgmentReference,
             requireUseCheck,
-            maxUseCount);
+            maxUseCount,
+            expectedProofKeyId,
+            expectedProofKeyVersion,
+            expectedProofPolicyVersion,
+            expectedProofPolicyHash,
+            requiredProofProvider,
+            requiredProofHashAlgorithm);
     }
 
     private static IReadOnlyList<string> NormalizeScopes(IEnumerable<string>? scopes)

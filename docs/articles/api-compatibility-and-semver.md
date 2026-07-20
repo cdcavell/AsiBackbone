@@ -47,15 +47,15 @@ The `2.0.0` release established the simplified `AsiBackbone.*` package and names
 
 ### Current `3.x` stable family
 
-`3.0.1` is the current stable patch release. It preserves the `AsiBackbone.*` package IDs and namespaces and the binary assembly identity `3.0.0.0` established by `3.0.0`.
+`3.1.0` is the current stable minor release. It preserves the `AsiBackbone.*` package IDs and namespaces and the binary assembly identity `3.0.0.0` established by `3.0.0`.
 
 | Package | `3.x` stable role |
 | --- | --- |
-| `AsiBackbone.Core` | Framework-neutral governance primitives and durable artifact contracts for the current `3.x` line, including policy evaluation, governance decisions, threat-model contributor hooks, metadata budget validation helpers, constraint-exception denial behavior, empty-policy warning diagnostics, and builder-style audit residue construction. |
+| `AsiBackbone.Core` | Framework-neutral governance primitives and durable artifact contracts for the current `3.x` line, including policy evaluation, governance decisions, threat-model contributor hooks, metadata budget validation helpers, constraint-exception denial behavior, governed execution-to-mutation accountability receipts, capability-proof trust pinning, and builder-style audit residue construction. |
 | `AsiBackbone.DependencyInjection` | Explicit builder facade and host-selected provider registration composition path. |
 | `AsiBackbone.Storage.InMemory` | Non-durable storage helpers for tests, samples, local validation, lifecycle events, and outbox proof paths. |
 | `AsiBackbone.EntityFrameworkCore` | EF Core host-owned persistence helpers for audit, acknowledgment, lifecycle, JSON metadata storage guidance, and outbox records. |
-| `AsiBackbone.AspNetCore` | ASP.NET Core host adapters, endpoint governance, endpoint-governance metadata mode, strict-governance profile helpers, development diagnostics, endpoint fast-abort metadata, startup/configured-options validation, and hosted outbox drain integration. |
+| `AsiBackbone.AspNetCore` | ASP.NET Core host adapters, endpoint governance, endpoint-governance metadata mode, strict-governance profile helpers, development diagnostics, endpoint fast-abort metadata, conservative actor-type claim trust controls, startup/configured-options validation, and hosted outbox drain integration. |
 | `AsiBackbone.Testing` | Test-only harness helpers for deterministic governance and package-wiring tests. |
 | `AsiBackbone.Templates` | Developer-experience `dotnet new` templates for governed ASP.NET Core host scaffolding. |
 | `AsiBackbone.Analyzers` | Build-time analyzer safety rails, including production-signing configuration guidance. |
@@ -116,6 +116,7 @@ Expected stable-line behavior:
 | `2.3.0` | `2.3.0` | `2.0.0.0` | `2.3.0.0` | `2.3.0+...` |
 | `3.0.0` | `3.0.0` | `3.0.0.0` | `3.0.0.0` | `3.0.0+...` |
 | `3.0.1` | `3.0.1` | `3.0.0.0` | `3.0.1.0` | `3.0.1+...` |
+| `3.1.0` | `3.1.0` | `3.0.0.0` | `3.1.0.0` | `3.1.0+...` |
 
 Before cutting stable releases, release validation should verify that `AssemblyVersion`, `FileVersion`, `InformationalVersion`, package metadata, release notes, and repository tags match this policy.
 
@@ -146,6 +147,9 @@ Before cutting a stable release or stable package-family expansion, the release 
 
 ## Related documentation
 
+- [3.1.0 Release Notes](release-notes-310.md)
+- [3.1.0 Release Readiness Record](release-readiness-310.md)
+- [3.1.0 Consumer Verification Guide](consumer-verification-310.md)
 - [3.0.1 Release Notes](release-notes-301.md)
 - [3.0.1 Release Readiness Record](release-readiness-301.md)
 - [3.0.1 Consumer Verification Guide](consumer-verification-301.md)

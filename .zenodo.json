@@ -1,8 +1,8 @@
 {
   "title": "ASI Backbone",
-  "version": "3.0.1",
+  "version": "3.1.0",
   "upload_type": "software",
-  "description": "AsiBackbone is a .NET package-family project providing framework-neutral governance primitives for consequential software decision flow. Version 3.0.1 is a compatible patch release for the stable 3.0.x line that hardens threat-assessment construction, reserves the framework-owned threat metadata namespace, and preserves the reason associated with the selected restrictive threat outcome. Package IDs, public namespaces, the net10.0 target, and AssemblyVersion 3.0.0.0 remain unchanged; host-owned execution authority and production controls remain outside the package boundary.",
+  "description": "AsiBackbone is a .NET package-family project providing framework-neutral governance primitives for consequential software decision flow. Version 3.1.0 is a backward-compatible minor release for the stable 3.x line that adds governed execution-to-mutation accountability receipts, optional capability-proof trust pinning, conservative actor-type claim trust controls, and supporting audit-integrity and lifecycle hardening. Package IDs, public namespaces, the net10.0 target, and AssemblyVersion 3.0.0.0 remain unchanged; host-owned execution authority and production controls remain outside the package boundary.",
   "creators": [
     {
       "name": "Cavell, Christopher D.",

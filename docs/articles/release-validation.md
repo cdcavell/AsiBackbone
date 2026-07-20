@@ -1,12 +1,12 @@
 # Stable Release Validation
 
-This article documents the reusable release-blocking validation path for stable release lines. The current released stable package family is `3.x`, with `3.0.1` as the current patch release.
+This article documents the reusable release-blocking validation path for stable release lines. The current released stable package family is `3.x`, with `3.1.0` as the current minor release.
 
 The binary assembly identity for the `3.x` line remains `3.0.0.0`.
 
 In this software project, **ASI** means **Accountable Systems Infrastructure**. Release validation should confirm that the package family remains practical governance infrastructure and that implementation claims stay within the documented software boundary. See [Release Cadence and Readiness](release-cadence-and-readiness.md) for the release-stream and stabilization guidance that complements this checklist.
 
-The [3.0.1 Release Readiness Record](release-readiness-301.md) is the current release-candidate control sheet. The [3.0.1 Consumer Verification Guide](consumer-verification-301.md) documents the consumer-facing package-source, package ID, Source Link, SBOM/provenance, and deferred package-signing verification path. Earlier readiness records are retained for traceability.
+The [3.1.0 Release Readiness Record](release-readiness-310.md) is the current release-candidate control sheet. The [3.1.0 Consumer Verification Guide](consumer-verification-310.md) documents the consumer-facing package-source, package ID, actor-claim, capability-proof, execution-receipt, Source Link, SBOM/provenance, and deferred package-signing verification path. Earlier readiness records are retained for traceability.
 
 ## Required checks before tagging a stable release
 
@@ -17,7 +17,7 @@ Before cutting a stable release tag, confirm the following checks have passed on
 | Release stream classification | Release PR, release readiness record | Confirms the release is correctly classified as patch, minor, major, or preview. |
 | Version metadata validation | stable release validation, package publish | Confirms MSBuild version metadata, citation metadata, Zenodo metadata, optional tag metadata, and generated package filenames align. |
 | Debug solution build coverage validation | CI, stable release validation, developer checklist | Confirms first-party package and test projects remain enabled for default Debug solution builds and that any remaining Debug exclusions are reviewed. |
-| Restore | CI, stable release validation, package publish | Confirms package dependencies resolve for the solution. |
+| Locked restore | CI, stable release validation, package publish | Confirms committed lock files match the current package and project dependency graph. |
 | Build | CI, stable release validation, package publish | Confirms release projects compile in Release configuration. |
 | Public API XML documentation inventory | CI, release readiness record | Inventories `CS1591` gaps for selected public package projects while staged enforcement is phased in. |
 | Formatting | CI, stable release validation, package publish | Confirms source formatting is stable before release. |
@@ -41,7 +41,7 @@ Before cutting a stable release tag, confirm the following checks have passed on
 Use these commands before treating local validation as release evidence:
 
 ```bash
-dotnet restore AsiBackbone.slnx
+dotnet restore AsiBackbone.slnx --locked-mode
 dotnet build AsiBackbone.slnx --configuration Release --no-restore
 dotnet test AsiBackbone.slnx --configuration Release --no-build --no-restore
 ```
@@ -65,7 +65,7 @@ The following workflows form the reusable gate for stable release candidates:
 - `CI` validates dependency review for pull requests, Debug solution build coverage, solution restore/build/test, public API XML documentation inventory, formatting, package creation, package SBOM generation, template package smoke validation, coverage output, and CodeQL analysis.
 - `External Consumer Smoke Test` validates package-consumer wiring through the external consumer and stable package integration smoke scripts.
 - `Publish Documentation` validates the DocFX build used for the documentation site.
-- `Stable Release Validation` provides a single release-candidate gate for version metadata, Debug solution build coverage, restore, build, formatting, tests, DocFX, package creation, generated package version validation, generated NuGet metadata validation, SBOM generation, package/SBOM provenance attestation where supported, template package smoke validation, and smoke checks.
+- `Stable Release Validation` provides a single release-candidate gate for version metadata, Debug solution build coverage, locked restore, build, formatting, tests, DocFX, package creation, generated package version validation, generated NuGet metadata validation, SBOM generation, template package smoke validation, smoke checks, and provenance handling where supported.
 - `Publish AsiBackbone Packages` repeats release-critical validation before package publish.
 
 ## Tagging rule
@@ -78,11 +78,11 @@ If a tag is pushed and package validation fails, do not publish replacement pack
 
 The `Stable Release Validation` workflow runs on pull requests to `main`, pushes to `main`, `v*.*.*` tags, and manual dispatch.
 
-The workflow validates .NET SDK setup, version metadata, Debug solution build coverage, restore, Release build, formatting, tests, tool restore, DocFX, package creation, package versions, NuGet metadata, package SBOM generation, template package smoke validation, external consumer smoke tests, stable package integration smoke tests, provenance handling where supported, and artifact upload.
+The workflow validates .NET SDK setup, version metadata, Debug solution build coverage, locked restore, Release build, formatting, tests, tool restore, DocFX, package creation, package versions, NuGet metadata, package SBOM generation, template package smoke validation, external consumer smoke tests, stable package integration smoke tests, provenance handling where supported, and artifact upload.
 
 ## Package publish validation
 
-The package publish workflow performs release-critical validation before publishing packages. It validates version metadata, restores dependencies, builds the solution, verifies formatting, runs tests, restores .NET tools, builds DocFX documentation, packs package projects, validates generated package versions and NuGet metadata, generates SBOMs, handles provenance where supported, uploads artifacts, and publishes only after validation succeeds.
+The package publish workflow performs release-critical validation before publishing packages. It validates version metadata, restores dependencies in locked mode, builds the solution, verifies formatting, runs tests, restores .NET tools, builds DocFX documentation, packs package projects, validates generated package versions and NuGet metadata, generates SBOMs, handles provenance where supported, uploads artifacts, and publishes only after validation succeeds.
 
 ## NuGet metadata validation
 
@@ -115,10 +115,10 @@ For every stable release, the release readiness record should explicitly confirm
 
 ## Source Link metadata validation
 
-After `3.0.1` packages are published and visible on NuGet, maintainers should run:
+After `3.1.0` packages are published and visible on NuGet, maintainers should run:
 
 ```powershell
-./scripts/Validate-Source-Link-commit-metadata.ps1 -Version 3.0.1
+./scripts/Validate-Source-Link-commit-metadata.ps1 -Version 3.1.0
 ```
 
 This post-publish check downloads the published packages and confirms the expected repository type, repository URL, and non-empty repository commit metadata are present.
@@ -136,6 +136,9 @@ NuGet package signing is currently a known open supply-chain readiness item. Unt
 - [Release Cadence and Readiness](release-cadence-and-readiness.md)
 - [Public API XML Documentation](public-api-xml-documentation.md)
 - [Supply-Chain Provenance and Package SBOMs](supply-chain-provenance.md)
+- [3.1.0 Consumer Verification Guide](consumer-verification-310.md)
+- [3.1.0 Release Readiness Record](release-readiness-310.md)
+- [3.1.0 Release Notes](release-notes-310.md)
 - [3.0.1 Consumer Verification Guide](consumer-verification-301.md)
 - [3.0.1 Release Readiness Record](release-readiness-301.md)
 - [3.0.1 Release Notes](release-notes-301.md)

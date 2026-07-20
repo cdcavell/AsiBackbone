@@ -4,6 +4,177 @@ All notable changes to this project are documented in this file.
 
 This project follows the spirit of [Keep a Changelog](https://keepachangelog.com/) and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.0] - 2026-07-20
+
+### Release summary
+
+`3.1.0` is a backward-compatible minor release for the stable `3.x`
+AsiBackbone package family. It expands the stable public surface around
+host execution accountability, capability-proof trust policy, and
+ASP.NET Core actor classification while preserving package IDs, public
+namespaces, the `net10.0` target, and the stable `AssemblyVersion` of
+`3.0.0.0`.
+
+The release strengthens the evidence chain between governance decisions
+and host-owned execution outcomes without transferring execution,
+authentication, authorization, persistence, key custody, monitoring, or
+compliance responsibility from the consuming host to AsiBackbone.
+
+### Added
+
+* Added `GovernedOperationExecutionReceipt`, a provider-neutral completion
+  receipt for binding governance lifecycle evidence to one host-owned
+  execution attempt. (#634)
+* Added `GovernedOperationPersistenceOutcome` with explicit outcomes for
+  committed, failed, rolled-back, and completed-without-mutation
+  execution attempts. (#634)
+* Added canonical execution-receipt payload construction suitable for
+  hashing, signing, verification, and durable evidence workflows. (#634)
+* Added stable host-accountability metadata keys and lifecycle helpers
+  that preserve decision correlation while linking logical execution,
+  retry attempt, and optional host mutation batch identifiers. (#634)
+* Added optional capability-proof trust pins for signing key ID, key
+  version, proof policy version, proof policy hash, verification
+  provider, and proof hash algorithm. (#638)
+* Added a provider-neutral `VerificationPolicyContext` to capability-proof
+  validation so proof-signing metadata can be constrained independently
+  from capability-grant policy metadata. (#638)
+* Added conservative ASP.NET Core actor-type claim controls through
+  `AllowedActorTypesFromClaims` and
+  `DefaultAuthenticatedActorType`. (#639)
+* Added explicit host opt-in before `System`, `Service`, `Agent`, or
+  `Unknown` actor types supplied through HTTP claims are honored. (#639)
+* Added documentation and tests covering trusted actor-type claim
+  boundaries, capability-proof trust pinning, host mutation
+  accountability, and audit-integrity sequence handling.
+* Added an isolated, source-neutral NCAT audit-completion reference
+  adapter and test project outside the required AsiBackbone package
+  graph. The adapter is sample-only and non-packable. (#636)
+* Added property-based tests for governance metadata normalization,
+  including idempotence and bounded-output properties.
+* Added OpenSSF Scorecard, workflow-security, actionlint/Zizmor, and
+  OWASP Dependency-Check workflows for complementary repository and
+  supply-chain analysis.
+* Added reproducible NuGet restore lock files across source, test,
+  benchmark, sample, and platform-specific Aspire projects.
+
+### Changed
+
+* Promoted central package version metadata from `3.0.1` to `3.1.0`.
+* Updated `FileVersion` to `3.1.0.0` while preserving
+  `AssemblyVersion` at `3.0.0.0` for the compatible `3.x` binary line.
+* Updated citation metadata, Zenodo metadata, template fallback package
+  references, Source Link validation defaults, README release posture,
+  documentation navigation, release guidance, and consumer verification
+  documentation for `3.1.0`.
+* Changed claim-based actor classification to accept only defined actor
+  types explicitly permitted by the host-configured allow-list.
+* Changed the conservative actor-type claim default to accept only
+  `Human`; other actor categories require explicit host authorization.
+* Changed unrecognized, undefined, or disallowed actor-type claim values
+  to fall back to `DefaultAuthenticatedActorType`.
+* Updated dependency-management workflows to use reproducible locked
+  restores and recognize solution, platform-specific lock-file, and
+  dependency-related path changes.
+* Moved scheduled Dependabot updates to Friday so dependency changes can
+  be reviewed before weekend security scans.
+* Scoped GitHub Actions permissions more narrowly across CI,
+  documentation, quality-report, package-publishing, and attestation
+  jobs.
+* Updated selected GitHub Actions to immutable versions or digests where
+  appropriate.
+
+### Fixed
+
+* Fixed audit-integrity verification so the outer verification loop has
+  sole ownership of recording accepted sequence values. (#640)
+* Fixed duplicate audit sequence handling so repeated values are
+  classified consistently as `ForkedChain` before continuity checks are
+  evaluated. (#640)
+* Removed the temporary add/remove accepted-sequence pattern from
+  individual audit-link verification. (#640)
+* Fixed the hosted governance outbox worker leaving a losing polling
+  delay scheduled after an options-change signal completed first. The
+  delay is now canceled and disposed before returning. (#641)
+* Removed a redundant capability-validation verification-action
+  pass-through helper while preserving existing validation behavior.
+  (#641)
+* Fixed GitHub Actions permission findings by moving privileged
+  permissions to only the jobs that require them.
+* Fixed unsafe GitHub Actions expression expansion that could permit
+  workflow command or script injection.
+* Fixed release-workflow PowerShell environment-variable interpolation
+  that previously used non-interpolating string syntax.
+* Fixed OpenSSF Scorecard workflow parsing and SARIF-upload behavior.
+* Fixed dependency-scanning noise caused by cross-ecosystem CVE
+  associations by adding narrow, documented, expiring suppressions.
+* Removed the redundant explicit Source Link package dependency while
+  preserving the Source Link support supplied by the .NET SDK.
+
+### Security and governance hardening
+
+* Privileged actor classifications supplied through HTTP claims are no
+  longer trusted merely because their text parses as an enum value.
+* Hosts must establish a trusted identity-provider or host-generated
+  claim boundary before permitting non-human actor categories.
+* Capability proofs may now be restricted to an expected signing
+  authority, key version, policy identity, provider, and hash algorithm.
+* A cryptographically valid proof can be rejected when its signing
+  metadata does not satisfy the host's configured trust policy.
+* Governed execution receipts carry minimized opaque identifiers,
+  counts, hashes, timestamps, provider information, and bounded metadata
+  instead of copying raw application values into AsiBackbone.
+* Audit-integrity duplicate and fork classification is deterministic and
+  retains stable failure codes.
+* Repository workflows apply narrower token permissions and stronger
+  dependency and action pinning.
+* Reviewed OWASP suppressions are package-specific, ecosystem-specific,
+  documented, and expiration-bound.
+* NuGet package signing remains intentionally deferred while AsiBackbone
+  is independently maintained. Official NuGet publication, the public
+  repository, release tags, Source Link, SBOMs, provenance, and
+  reproducible release practices remain the current supply-chain
+  verification posture.
+
+### Compatibility notes
+
+* Package IDs and public namespaces remain unchanged.
+* The target framework remains `net10.0`.
+* `AssemblyVersion` remains `3.0.0.0`; `FileVersion` advances to
+  `3.1.0.0`.
+* The new Core and ASP.NET Core public APIs are additive.
+* Hosts that currently map `System`, `Service`, `Agent`, or `Unknown`
+  from a trusted actor-type claim must explicitly add those values to
+  `AllowedActorTypesFromClaims`.
+* Without explicit actor-type opt-in, authenticated claim mapping falls
+  back to `DefaultAuthenticatedActorType`, which defaults to `Human`.
+* Capability-proof trust pins are optional. Existing consumers that do
+  not configure them retain the previous proof-verification behavior.
+* `GovernedOperationExecutionReceipt` does not persist host mutations,
+  authenticate actors, authorize execution, manage transactions, or
+  replace the host's authoritative audit store.
+* The NCAT audit-completion adapter is sample-only and non-packable; it
+  does not add NCAT to the stable package dependency graph.
+* No production key-management, host execution, robotics, legal, or
+  compliance capability is introduced by this release.
+
+### Validation
+
+* Release validation covers locked restore, Debug and Release solution
+  builds, formatting, analyzers, tests, property-based tests, coverage
+  gates, Core branch coverage, XML-documentation inventory, API
+  compatibility, package creation, generated NuGet metadata, template
+  and consumer smoke tests, version consistency, DocFX, documentation
+  release-claim validation, CodeQL, dependency review, OpenSSF
+  Scorecard, actionlint/Zizmor, OWASP Dependency-Check, SBOM generation,
+  and provenance handling where supported.
+* After publication, Source Link repository commit metadata can be
+  validated with:
+
+```powershell
+./scripts/Validate-Source-Link-commit-metadata.ps1 -Version 3.1.0
+```
+
 ## [3.0.1] - 2026-07-13
 
 ### Release summary

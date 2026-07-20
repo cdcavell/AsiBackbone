@@ -84,7 +84,7 @@ public static class AuditIntegrityVerifier
                 link);
         }
 
-        if (!observedSequences.Add(link.Sequence))
+        if (observedSequences.Contains(link.Sequence))
         {
             return AuditIntegrityVerificationResult.Failed(
                 AuditIntegrityVerificationCategory.ForkedChain,
@@ -92,8 +92,6 @@ public static class AuditIntegrityVerifier
                 "Multiple links claim the same chain sequence.",
                 link);
         }
-
-        _ = observedSequences.Remove(link.Sequence);
 
         if (link.Sequence != expectedSequence)
         {

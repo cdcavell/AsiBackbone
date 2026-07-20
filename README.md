@@ -126,17 +126,17 @@ For production-style hosts, add durable audit/outbox persistence, signing or ver
 
 ## Package family
 
-Stable `3.0.x` package family. `3.0.1` is the current patch release. The package family carries forward the governance-spine surface with builder-facade, analyzer, OpenTelemetry, signing-provider, testing-harness, template package, endpoint diagnostics, endpoint reduced metadata mode, metadata budget guardrails, constraint-exception denial behavior, empty-policy warning diagnostics, managed-key fail-closed defaults, threat-model contributor hooks, strict governance profile helpers, EF Core JSON metadata storage guidance, policy-input hardening, production placeholder guardrails, samples, Source Link metadata, package SBOM/provenance artifacts, BenchmarkDotNet allocation baselines, benchmark guidance, custom decision-policy examples, and documentation-alignment surfaces.
+Stable `3.x` package family. `3.1.0` is the current minor release. The package family carries forward the governance-spine surface and adds governed execution-to-mutation accountability receipts, optional capability-proof trust pinning, and conservative ASP.NET Core actor-type claim trust controls.
 
 The historical `3.0.0` release established the current major release line and binary assembly identity while preserving the simplified `AsiBackbone.*` package IDs and namespaces established by `2.0.0`.
 
 | Package | Role |
 | --- | --- |
-| `AsiBackbone.Core` | Framework-neutral governance primitives: decisions, constraints, threat-model contributor hooks, acknowledgments, audit residue, lifecycle events, capability-token abstractions, durable outbox contracts, provider-neutral emission contracts, DLP/classification policy primitives, signing-ready metadata, canonical hashing/signing seams, verification-policy primitives, policy evaluator options, metadata budget helpers, and builder-style audit residue construction. |
+| `AsiBackbone.Core` | Framework-neutral governance primitives: decisions, constraints, threat-model contributor hooks, acknowledgments, audit residue, lifecycle events, governed execution receipts, capability-token abstractions and proof trust pinning, durable outbox contracts, provider-neutral emission contracts, DLP/classification policy primitives, signing-ready metadata, canonical hashing/signing seams, verification-policy primitives, policy evaluator options, metadata budget helpers, and builder-style audit residue construction. |
 | `AsiBackbone.DependencyInjection` | Explicit `AddAsiBackbone(...)` builder facade for coordinating host-selected provider registrations without making Core own infrastructure. |
 | `AsiBackbone.Storage.InMemory` | Non-durable in-memory storage helpers for tests, samples, local validation, lifecycle events, and outbox proof paths. |
 | `AsiBackbone.EntityFrameworkCore` | EF Core model configuration and host-owned persistence for audit ledger, acknowledgments, lifecycle events, JSON metadata storage, and governance outbox records. |
-| `AsiBackbone.AspNetCore` | ASP.NET Core host adapters for actor context, request correlation, audit enrichment, HTTP result mapping, acknowledgment challenge flows, endpoint governance, endpoint metadata mode, strict-governance profile helpers, endpoint fast-abort metadata, and hosted outbox drain integration. |
+| `AsiBackbone.AspNetCore` | ASP.NET Core host adapters for actor context, conservative actor-type claim mapping, request correlation, audit enrichment, HTTP result mapping, acknowledgment challenge flows, endpoint governance, endpoint metadata mode, strict-governance profile helpers, endpoint fast-abort metadata, and hosted outbox drain integration. |
 | `AsiBackbone.Testing` | Test-only harness helpers for deterministic endpoint governance, policy results, capability validation, in-memory audit inspection, non-durable outbox storage, and no-signature signing seams. |
 | `AsiBackbone.Templates` | `dotnet new` templates for generating governed ASP.NET Core host scaffolds with endpoint governance, sample policies, local in-memory audit inspection, analyzers, and README guidance. |
 | `AsiBackbone.Analyzers` | Roslyn analyzer safety rails for governance persistence and continuation flows. |
@@ -148,9 +148,9 @@ Runtime governance-residue signing remains provider-neutral through `AsiBackbone
 
 ## Supported target framework
 
-Stable `3.0.x` packages intentionally target `net10.0`. Consumers should plan on a .NET 10 SDK/runtime or later for the current package line.
+Stable `3.x` packages intentionally target `net10.0`. Consumers should plan on a .NET 10 SDK/runtime or later for the current package line.
 
-The project is not multi-targeting .NET 8 for `3.0.x`. That is an explicit adoption decision, not a defect workaround. The current package family uses a single repository-wide `TargetFramework` of `net10.0`, the EF Core integration is aligned with centrally managed EF Core `10.0.x` dependencies, and backporting the full package, analyzer, template, CI, packaging, and smoke-test surface would add compatibility overhead for a short-lived adoption window.
+The project is not multi-targeting .NET 8 for `3.x`. That is an explicit adoption decision, not a defect workaround. The current package family uses a single repository-wide `TargetFramework` of `net10.0`, the EF Core integration is aligned with centrally managed EF Core `10.0.x` dependencies, and backporting the full package, analyzer, template, CI, packaging, and smoke-test surface would add compatibility overhead for a short-lived adoption window.
 
 If meaningful external consumer demand appears, additional TFM support can be reconsidered in a later release with CI, packaging validation, analyzer compatibility, template smoke tests, and documentation updated together. See the [Target Framework Support Decision Record](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/target-framework-support.md).
 
@@ -185,11 +185,9 @@ The full, categorized documentation set lives at the [documentation site](https:
 
 ## Current status
 
-Stable `3.0.x` is the current released line, with `3.0.1` as the current patch release. This release preserves the simplified `AsiBackbone.*` package and namespace identity.
+Stable `3.x` is the current released line, with `3.1.0` as the current minor release. This release preserves the simplified `AsiBackbone.*` package and namespace identity and the binary assembly identity `3.0.0.0`.
 
-The historical `3.0.0` release remains the major-line baseline, preserving the package and namespace identity established by `2.0.0` and the binary assembly identity `3.0.0.0`.
-
-The stable API contract is documented in [API Compatibility and SemVer](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/api-compatibility-and-semver.md). The current patch is recorded in [3.0.1 Release Notes](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/release-notes-301.md) and [3.0.1 Release Readiness Record](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/release-readiness-301.md). Consumers can use the [3.0.1 Consumer Verification Guide](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/consumer-verification-301.md) for package-source, package ID, Source Link, SBOM, provenance, and deferred-signing checks. The `3.0.0` major-release records and earlier `1.x` and `2.x` release notes remain available for historical traceability.
+The stable API contract is documented in [API Compatibility and SemVer](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/api-compatibility-and-semver.md). The current release is recorded in [3.1.0 Release Notes](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/release-notes-310.md) and [3.1.0 Release Readiness Record](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/release-readiness-310.md). Consumers can use the [3.1.0 Consumer Verification Guide](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/consumer-verification-310.md) for package-source, package ID, actor-claim, capability-proof, execution-receipt, Source Link, SBOM, provenance, and deferred-signing checks. Earlier release records remain available for historical traceability.
 
 ## Security and vulnerability reporting
 
@@ -211,7 +209,7 @@ A consumer should be able to use AsiBackbone in an application generated from Ne
 
 AsiBackbone is a governance spine, not an intelligence engine. It implements governance-oriented software primitives for accountable decision flow and keeps execution authority with the host application. See [Project Boundaries and Non-Claims](https://cdcavell.github.io/AsiBackbone/articles/project-boundaries.html) for the full scope statement and safe wording guidance.
 
-> **Current NuGet packages are intentionally published without package signing.** This is a deliberate governance decision while the project is independently maintained, balancing operational complexity against practical value. Instead, the project emphasizes transparent source code, GitHub releases, Source Link, SBOM generation, and package provenance. Package signing remains on the long-term roadmap and will be reconsidered as the project's community, governance, and operational needs evolve. For current package verification guidance, see the [**3.0.1 Consumer Verification Guide**](https://cdcavell.github.io/AsiBackbone/articles/consumer-verification-301.html).
+> **Current NuGet packages are intentionally published without package signing.** This is a deliberate governance decision while the project is independently maintained, balancing operational complexity against practical value. Instead, the project emphasizes transparent source code, GitHub releases, Source Link, SBOM generation, and package provenance. Package signing remains on the long-term roadmap and will be reconsidered as the project's community, governance, and operational needs evolve. For current package verification guidance, see the [**3.1.0 Consumer Verification Guide**](https://cdcavell.github.io/AsiBackbone/articles/consumer-verification-310.html).
 
 ## Design principles
 

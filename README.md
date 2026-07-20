@@ -126,7 +126,7 @@ For production-style hosts, add durable audit/outbox persistence, signing or ver
 
 ## Package family
 
-Stable `3.x` package family. `3.1.0` is the current minor release. The package family carries forward the governance-spine surface and adds governed execution-to-mutation accountability receipts, optional capability-proof trust pinning, and conservative ASP.NET Core actor-type claim trust controls.
+Stable `3.1.x` package family. `3.1.0` is the current minor release. The package family carries forward the governance-spine surface and adds governed execution-to-mutation accountability receipts, optional capability-proof trust pinning, and conservative ASP.NET Core actor-type claim trust controls.
 
 The historical `3.0.0` release established the current major release line and binary assembly identity while preserving the simplified `AsiBackbone.*` package IDs and namespaces established by `2.0.0`.
 
@@ -148,9 +148,9 @@ Runtime governance-residue signing remains provider-neutral through `AsiBackbone
 
 ## Supported target framework
 
-Stable `3.x` packages intentionally target `net10.0`. Consumers should plan on a .NET 10 SDK/runtime or later for the current package line.
+Stable `3.1.x` packages intentionally target `net10.0`. Consumers should plan on a .NET 10 SDK/runtime or later for the current package line.
 
-The project is not multi-targeting .NET 8 for `3.x`. That is an explicit adoption decision, not a defect workaround. The current package family uses a single repository-wide `TargetFramework` of `net10.0`, the EF Core integration is aligned with centrally managed EF Core `10.0.x` dependencies, and backporting the full package, analyzer, template, CI, packaging, and smoke-test surface would add compatibility overhead for a short-lived adoption window.
+The project is not multi-targeting .NET 8 for `3.1.x`. That is an explicit adoption decision, not a defect workaround. The current package family uses a single repository-wide `TargetFramework` of `net10.0`, the EF Core integration is aligned with centrally managed EF Core `10.0.x` dependencies, and backporting the full package, analyzer, template, CI, packaging, and smoke-test surface would add compatibility overhead for a short-lived adoption window.
 
 If meaningful external consumer demand appears, additional TFM support can be reconsidered in a later release with CI, packaging validation, analyzer compatibility, template smoke tests, and documentation updated together. See the [Target Framework Support Decision Record](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/target-framework-support.md).
 
@@ -185,7 +185,7 @@ The full, categorized documentation set lives at the [documentation site](https:
 
 ## Current status
 
-Stable `3.x` is the current released line, with `3.1.0` as the current minor release. This release preserves the simplified `AsiBackbone.*` package and namespace identity and the binary assembly identity `3.0.0.0`.
+Stable `3.1.x` is the current released line, with `3.1.0` as the current minor release. This release preserves the simplified `AsiBackbone.*` package and namespace identity and the binary assembly identity `3.0.0.0`.
 
 The stable API contract is documented in [API Compatibility and SemVer](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/api-compatibility-and-semver.md). The current release is recorded in [3.1.0 Release Notes](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/release-notes-310.md) and [3.1.0 Release Readiness Record](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/release-readiness-310.md). Consumers can use the [3.1.0 Consumer Verification Guide](https://github.com/cdcavell/AsiBackbone/blob/main/docs/articles/consumer-verification-310.md) for package-source, package ID, actor-claim, capability-proof, execution-receipt, Source Link, SBOM, provenance, and deferred-signing checks. Earlier release records remain available for historical traceability.
 

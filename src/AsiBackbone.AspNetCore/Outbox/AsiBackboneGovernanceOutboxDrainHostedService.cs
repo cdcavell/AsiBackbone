@@ -164,13 +164,17 @@ public sealed class AsiBackboneGovernanceOutboxDrainHostedService(
             }
         }
 
-        var delayTask = Task.Delay(delay, cancellationToken);
+        using var delayCancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        Task delayTask = Task.Delay(delay, delayCancellation.Token);
         Task completedTask = await Task.WhenAny(delayTask, optionsChangedTask).ConfigureAwait(false);
 
-        if (completedTask == delayTask && !cancellationToken.IsCancellationRequested)
+        if (completedTask == optionsChangedTask)
         {
-            await delayTask.ConfigureAwait(false);
+            await delayCancellation.CancelAsync().ConfigureAwait(false);
+            return;
         }
+
+        await delayTask.ConfigureAwait(false);
     }
 
     private (long Version, Task ChangedTask) CaptureOptionsChangeState()

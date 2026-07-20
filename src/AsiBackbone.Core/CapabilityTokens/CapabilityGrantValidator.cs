@@ -23,6 +23,7 @@ public static class CapabilityGrantValidator
             CapabilityGrantValidationResult? proofResult = await ValidateProofAsync(
                 signedGrant,
                 grant,
+                effectiveOptions,
                 verificationService,
                 cancellationToken).ConfigureAwait(false);
 
@@ -60,6 +61,7 @@ public static class CapabilityGrantValidator
     private static async ValueTask<CapabilityGrantValidationResult?> ValidateProofAsync(
         SignedGovernanceArtifact<CapabilityTokenGrant> signedGrant,
         CapabilityTokenGrant grant,
+        CapabilityGrantValidationOptions options,
         IAsiBackboneSignatureVerificationService? verificationService,
         CancellationToken cancellationToken)
     {
@@ -73,9 +75,19 @@ public static class CapabilityGrantValidator
                 "A proof verifier is required for this validation context.");
         }
 
+        VerificationPolicyContext verificationContext = VerificationPolicyContext.Create(
+            purpose: CanonicalArtifactTypes.CapabilityTokenGrant,
+            expectedKeyId: options.ExpectedProofKeyId,
+            expectedKeyVersion: options.ExpectedProofKeyVersion,
+            expectedPolicyVersion: options.PolicyVersion,
+            expectedPolicyHash: options.PolicyHash,
+            requiredProvider: options.RequiredProofProvider,
+            requiredHashAlgorithm: options.RequiredProofHashAlgorithm);
+
         VerificationPolicyOutcome verificationOutcome = await GovernanceArtifactVerifier.VerifyAsync(
             signedGrant,
             verificationService,
+            context: verificationContext,
             cancellationToken: cancellationToken).ConfigureAwait(false);
 
         return verificationOutcome.ShouldAllow

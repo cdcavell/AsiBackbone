@@ -8,359 +8,209 @@ using Xunit;
 namespace AsiBackbone.AspNetCore.Tests.Actors;
 
 /// <summary>
-/// Unit tests for <see cref="HttpContextAsiBackboneActorContextResolver"/> class.
+/// Tests for <see cref="HttpContextAsiBackboneActorContextResolver"/>.
 /// </summary>
 public sealed class HttpContextAsiBackboneActorContextResolverTests
 {
-    /// <summary>
-    /// Tests that the <see cref="HttpContextAsiBackboneActorContextResolver.ResolveActorContext"/> method correctly maps an authenticated user from default claim types.
-    /// </summary>
     [Fact]
     public void ResolveActorContextMapsAuthenticatedUserFromDefaultClaims()
     {
-        DefaultHttpContext httpContext = new()
-        {
-            User = CreatePrincipal(
-                new Claim(ClaimTypes.NameIdentifier, "  user-123  "),
-                new Claim(ClaimTypes.Name, "  Ada Lovelace  ")),
-        };
+        DefaultHttpContext httpContext = CreateHttpContext(
+            new Claim(ClaimTypes.NameIdentifier, "  user-123  "),
+            new Claim(ClaimTypes.Name, "  Ada Lovelace  "));
 
-        HttpContextAsiBackboneActorContextResolver resolver = CreateResolver(httpContext);
+        IAsiBackboneActorContext actor = CreateResolver(httpContext).ResolveActorContext();
 
-        IAsiBackboneActorContext actorContext = resolver.ResolveActorContext();
-
-        Assert.Equal("user-123", actorContext.ActorId);
-        Assert.Equal(AsiBackboneActorType.Human, actorContext.ActorType);
-        Assert.Equal("Ada Lovelace", actorContext.DisplayName);
-        Assert.True(actorContext.IsKnown);
-        Assert.True(actorContext.IsAuthenticated);
+        Assert.Equal("user-123", actor.ActorId);
+        Assert.Equal(AsiBackboneActorType.Human, actor.ActorType);
+        Assert.Equal("Ada Lovelace", actor.DisplayName);
+        Assert.True(actor.IsAuthenticated);
     }
 
-    /// <summary>
-    /// Tests that the <see cref="HttpContextAsiBackboneActorContextResolver.ResolveActorContext"/> method correctly uses configured claim types and actor type when resolving the actor context.
-    /// </summary>
     [Fact]
-    public void ResolveActorContextUsesConfiguredClaimTypesAndActorType()
+    public void ResolveActorContextAcceptsHumanClaimByDefault()
     {
-        DefaultHttpContext httpContext = new()
-        {
-            User = CreatePrincipal(
-                new Claim("custom_id", "service-42"),
-                new Claim("custom_name", "Service Worker"),
-                new Claim("custom_actor_type", "Service")),
-        };
+        DefaultHttpContext httpContext = CreateHttpContext(
+            new Claim(ClaimTypes.NameIdentifier, "human-1"),
+            new Claim("actor_type", "Human"));
 
-        HttpContextAsiBackboneActorContextResolver resolver = CreateResolver(
+        IAsiBackboneActorContext actor = CreateResolver(httpContext).ResolveActorContext();
+
+        Assert.Equal(AsiBackboneActorType.Human, actor.ActorType);
+        Assert.Equal("human-1", actor.ActorId);
+    }
+
+    [Theory]
+    [InlineData("System")]
+    [InlineData("Service")]
+    [InlineData("Agent")]
+    [InlineData("Unknown")]
+    public void ResolveActorContextRejectsNonHumanClaimsByDefault(string claimedActorType)
+    {
+        DefaultHttpContext httpContext = CreateHttpContext(
+            new Claim(ClaimTypes.NameIdentifier, "caller-1"),
+            new Claim("actor_type", claimedActorType));
+
+        IAsiBackboneActorContext actor = CreateResolver(httpContext).ResolveActorContext();
+
+        Assert.Equal(AsiBackboneActorType.Human, actor.ActorType);
+        Assert.Equal("caller-1", actor.ActorId);
+        Assert.True(actor.IsAuthenticated);
+    }
+
+    [Fact]
+    public void ResolveActorContextAcceptsServiceAfterExplicitOptIn()
+    {
+        DefaultHttpContext httpContext = CreateHttpContext(
+            new Claim("custom_id", "service-42"),
+            new Claim("custom_name", "Service Worker"),
+            new Claim("custom_actor_type", "Service"));
+
+        IAsiBackboneActorContext actor = CreateResolver(
             httpContext,
             options =>
             {
                 options.ActorIdClaimTypes = ["custom_id"];
                 options.DisplayNameClaimTypes = ["custom_name"];
                 options.ActorTypeClaimType = "custom_actor_type";
-            });
+                options.AllowedActorTypesFromClaims = [AsiBackboneActorType.Human, AsiBackboneActorType.Service];
+            }).ResolveActorContext();
 
-        IAsiBackboneActorContext actorContext = resolver.ResolveActorContext();
-
-        Assert.Equal("service-42", actorContext.ActorId);
-        Assert.Equal(AsiBackboneActorType.Service, actorContext.ActorType);
-        Assert.Equal("Service Worker", actorContext.DisplayName);
-        Assert.True(actorContext.IsKnown);
-        Assert.True(actorContext.IsAuthenticated);
+        Assert.Equal("service-42", actor.ActorId);
+        Assert.Equal(AsiBackboneActorType.Service, actor.ActorType);
+        Assert.Equal("Service Worker", actor.DisplayName);
     }
 
-    /// <summary>
-    /// Tests that the <see cref="HttpContextAsiBackboneActorContextResolver.ResolveActorContext"/> method correctly maps a system actor type to the system context.
-    /// </summary>
     [Fact]
-    public void ResolveActorContextMapsSystemActorTypeToSystemContext()
+    public void ResolveActorContextAcceptsSystemAfterExplicitOptIn()
     {
-        DefaultHttpContext httpContext = new()
-        {
-            User = CreatePrincipal(
-                new Claim(ClaimTypes.NameIdentifier, "ignored-system-id"),
-                new Claim("actor_type", "System")),
-        };
+        DefaultHttpContext httpContext = CreateHttpContext(
+            new Claim(ClaimTypes.NameIdentifier, "ignored-system-id"),
+            new Claim("actor_type", "System"));
 
-        HttpContextAsiBackboneActorContextResolver resolver = CreateResolver(httpContext);
-
-        IAsiBackboneActorContext actorContext = resolver.ResolveActorContext();
-
-        Assert.Equal(AsiBackboneActorContext.SystemActorId, actorContext.ActorId);
-        Assert.Equal(AsiBackboneActorType.System, actorContext.ActorType);
-        Assert.Equal("System", actorContext.DisplayName);
-        Assert.True(actorContext.IsKnown);
-        Assert.True(actorContext.IsAuthenticated);
-    }
-
-    /// <summary>
-    /// Tests that the <see cref="HttpContextAsiBackboneActorContextResolver.ResolveActorContext"/> method correctly maps an agent actor type to the agent context.
-    /// </summary>
-    [Fact]
-    public void ResolveActorContextMapsAgentActorType()
-    {
-        DefaultHttpContext httpContext = new()
-        {
-            User = CreatePrincipal(
-                new Claim(ClaimTypes.NameIdentifier, "agent-007"),
-                new Claim(ClaimTypes.Name, "Agent Runner"),
-                new Claim("actor_type", "Agent")),
-        };
-
-        HttpContextAsiBackboneActorContextResolver resolver = CreateResolver(httpContext);
-
-        IAsiBackboneActorContext actorContext = resolver.ResolveActorContext();
-
-        Assert.Equal("agent-007", actorContext.ActorId);
-        Assert.Equal(AsiBackboneActorType.Agent, actorContext.ActorType);
-        Assert.Equal("Agent Runner", actorContext.DisplayName);
-        Assert.True(actorContext.IsKnown);
-        Assert.True(actorContext.IsAuthenticated);
-    }
-
-    /// <summary>
-    /// Tests that the <see cref="HttpContextAsiBackboneActorContextResolver.ResolveActorContext"/> method correctly maps an unknown actor type claim to the unknown context.
-    /// </summary>
-    [Fact]
-    public void ResolveActorContextMapsUnknownActorTypeClaimToUnknownContext()
-    {
-        DefaultHttpContext httpContext = new()
-        {
-            User = CreatePrincipal(
-                new Claim(ClaimTypes.NameIdentifier, "unknown-actor"),
-                new Claim("actor_type", "Unknown")),
-        };
-
-        HttpContextAsiBackboneActorContextResolver resolver = CreateResolver(httpContext);
-
-        IAsiBackboneActorContext actorContext = resolver.ResolveActorContext();
-
-        Assert.Equal(AsiBackboneActorContext.UnknownActorId, actorContext.ActorId);
-        Assert.Equal(AsiBackboneActorType.Unknown, actorContext.ActorType);
-        Assert.False(actorContext.IsKnown);
-        Assert.False(actorContext.IsAuthenticated);
-    }
-
-    /// <summary>
-    /// Tests that the <see cref="HttpContextAsiBackboneActorContextResolver.ResolveActorContext"/> method falls back to the configured default actor type when the claim is invalid.
-    /// </summary>
-    [Fact]
-    public void ResolveActorContextFallsBackToConfiguredDefaultActorTypeWhenClaimIsInvalid()
-    {
-        DefaultHttpContext httpContext = new()
-        {
-            User = CreatePrincipal(
-                new Claim(ClaimTypes.NameIdentifier, "agent-default"),
-                new Claim("actor_type", "not-a-valid-type")),
-        };
-
-        HttpContextAsiBackboneActorContextResolver resolver = CreateResolver(
+        IAsiBackboneActorContext actor = CreateResolver(
             httpContext,
-            options => options.DefaultAuthenticatedActorType = AsiBackboneActorType.Agent);
+            options => options.AllowedActorTypesFromClaims = [AsiBackboneActorType.System]).ResolveActorContext();
 
-        IAsiBackboneActorContext actorContext = resolver.ResolveActorContext();
-
-        Assert.Equal("agent-default", actorContext.ActorId);
-        Assert.Equal(AsiBackboneActorType.Agent, actorContext.ActorType);
-        Assert.True(actorContext.IsKnown);
-        Assert.True(actorContext.IsAuthenticated);
+        Assert.Equal(AsiBackboneActorContext.SystemActorId, actor.ActorId);
+        Assert.Equal(AsiBackboneActorType.System, actor.ActorType);
     }
 
-    /// <summary>
-    /// Tests that the <see cref="HttpContextAsiBackboneActorContextResolver.ResolveActorContext"/> method falls back to the human actor type when the claim is undefined or unrecognized.
-    /// </summary>
     [Fact]
-    public void ResolveActorContextFallsBackToHumanForUndefinedParsedActorType()
+    public void ResolveActorContextAcceptsAgentAfterExplicitOptIn()
     {
-        DefaultHttpContext httpContext = new()
-        {
-            User = CreatePrincipal(
-                new Claim(ClaimTypes.NameIdentifier, "numeric-actor"),
-                new Claim("actor_type", "999")),
-        };
+        DefaultHttpContext httpContext = CreateHttpContext(
+            new Claim(ClaimTypes.NameIdentifier, "agent-007"),
+            new Claim(ClaimTypes.Name, "Agent Runner"),
+            new Claim("actor_type", "Agent"));
 
-        HttpContextAsiBackboneActorContextResolver resolver = CreateResolver(httpContext);
+        IAsiBackboneActorContext actor = CreateResolver(
+            httpContext,
+            options => options.AllowedActorTypesFromClaims = [AsiBackboneActorType.Agent]).ResolveActorContext();
 
-        IAsiBackboneActorContext actorContext = resolver.ResolveActorContext();
-
-        Assert.Equal("numeric-actor", actorContext.ActorId);
-        Assert.Equal(AsiBackboneActorType.Human, actorContext.ActorType);
-        Assert.True(actorContext.IsKnown);
-        Assert.True(actorContext.IsAuthenticated);
+        Assert.Equal("agent-007", actor.ActorId);
+        Assert.Equal(AsiBackboneActorType.Agent, actor.ActorType);
     }
 
-    /// <summary>
-    /// Tests that the <see cref="HttpContextAsiBackboneActorContextResolver.ResolveActorContext"/> method correctly skips blank configured claim types and blank claim values when resolving the actor context.
-    /// </summary>
-    [Fact]
-    public void ResolveActorContextSkipsBlankConfiguredClaimTypesAndBlankClaimValues()
+    [Theory]
+    [InlineData("not-a-valid-type")]
+    [InlineData("999")]
+    public void ResolveActorContextFallsBackForUnrecognizedOrUndefinedClaim(string claimedActorType)
     {
-        DefaultHttpContext httpContext = new()
-        {
-            User = CreatePrincipal(
-                new Claim(ClaimTypes.NameIdentifier, "   "),
-                new Claim("sub", "subject-456"),
-                new Claim(ClaimTypes.Email, "display@example.test")),
-        };
+        DefaultHttpContext httpContext = CreateHttpContext(
+            new Claim(ClaimTypes.NameIdentifier, "caller-1"),
+            new Claim("actor_type", claimedActorType));
 
-        HttpContextAsiBackboneActorContextResolver resolver = CreateResolver(
+        IAsiBackboneActorContext actor = CreateResolver(
+            httpContext,
+            options => options.DefaultAuthenticatedActorType = AsiBackboneActorType.Agent).ResolveActorContext();
+
+        Assert.Equal(AsiBackboneActorType.Agent, actor.ActorType);
+        Assert.Equal("caller-1", actor.ActorId);
+    }
+
+    [Fact]
+    public void ResolveActorContextDisablesClaimMappingWhenAllowedListIsEmpty()
+    {
+        DefaultHttpContext httpContext = CreateHttpContext(
+            new Claim(ClaimTypes.NameIdentifier, "caller-1"),
+            new Claim("actor_type", "Human"));
+
+        IAsiBackboneActorContext actor = CreateResolver(
             httpContext,
             options =>
             {
-                options.ActorIdClaimTypes = [" ", ClaimTypes.NameIdentifier, "sub"];
-                options.DisplayNameClaimTypes = [" ", "missing_display", ClaimTypes.Email];
-            });
+                options.AllowedActorTypesFromClaims = [];
+                options.DefaultAuthenticatedActorType = AsiBackboneActorType.Service;
+            }).ResolveActorContext();
 
-        IAsiBackboneActorContext actorContext = resolver.ResolveActorContext();
-
-        Assert.Equal("subject-456", actorContext.ActorId);
-        Assert.Equal("display@example.test", actorContext.DisplayName);
-        Assert.Equal(AsiBackboneActorType.Human, actorContext.ActorType);
+        Assert.Equal(AsiBackboneActorType.Service, actor.ActorType);
     }
 
-    /// <summary>
-    /// Tests that the <see cref="HttpContextAsiBackboneActorContextResolver.ResolveActorContext"/> method correctly represents an unauthenticated request without throwing an exception.
-    /// </summary>
     [Fact]
-    public void ResolveActorContextRepresentsUnauthenticatedRequestWithoutThrowing()
+    public void ResolveActorContextRepresentsUnauthenticatedRequest()
     {
         DefaultHttpContext httpContext = new()
         {
             User = new ClaimsPrincipal(new ClaimsIdentity()),
         };
 
-        HttpContextAsiBackboneActorContextResolver resolver = CreateResolver(httpContext);
+        IAsiBackboneActorContext actor = CreateResolver(httpContext).ResolveActorContext();
 
-        IAsiBackboneActorContext actorContext = resolver.ResolveActorContext();
-
-        Assert.Equal(AsiBackboneActorContext.UnknownActorId, actorContext.ActorId);
-        Assert.Equal(AsiBackboneActorType.Unknown, actorContext.ActorType);
-        Assert.Null(actorContext.DisplayName);
-        Assert.False(actorContext.IsKnown);
-        Assert.False(actorContext.IsAuthenticated);
+        Assert.Equal(AsiBackboneActorType.Unknown, actor.ActorType);
+        Assert.False(actor.IsAuthenticated);
     }
 
-    /// <summary>
-    /// Tests that the <see cref="HttpContextAsiBackboneActorContextResolver.ResolveActorContext"/> method correctly uses the configured unauthenticated display name when resolving the actor context for an unauthenticated request.
-    /// </summary>
     [Fact]
-    public void ResolveActorContextUsesConfiguredUnauthenticatedDisplayName()
+    public void ResolveActorContextRepresentsMissingActorIdentifierAsUnknown()
     {
-        DefaultHttpContext httpContext = new()
-        {
-            User = new ClaimsPrincipal(new ClaimsIdentity()),
-        };
+        DefaultHttpContext httpContext = CreateHttpContext(new Claim(ClaimTypes.Name, "No Identifier"));
 
-        HttpContextAsiBackboneActorContextResolver resolver = CreateResolver(
-            httpContext,
-            options => options.UnauthenticatedDisplayName = " Guest Actor ");
+        IAsiBackboneActorContext actor = CreateResolver(httpContext).ResolveActorContext();
 
-        IAsiBackboneActorContext actorContext = resolver.ResolveActorContext();
-
-        Assert.Equal(AsiBackboneActorContext.UnknownActorId, actorContext.ActorId);
-        Assert.Equal(AsiBackboneActorType.Human, actorContext.ActorType);
-        Assert.Equal("Guest Actor", actorContext.DisplayName);
-        Assert.True(actorContext.IsKnown);
-        Assert.False(actorContext.IsAuthenticated);
+        Assert.Equal(AsiBackboneActorType.Unknown, actor.ActorType);
+        Assert.False(actor.IsAuthenticated);
     }
 
-    /// <summary>
-    /// Tests that the <see cref="HttpContextAsiBackboneActorContextResolver.ResolveActorContext"/> method correctly represents a missing actor identifier claim without throwing an exception.
-    /// </summary>
     [Fact]
-    public void ResolveActorContextRepresentsMissingActorIdClaimWithoutThrowing()
-    {
-        DefaultHttpContext httpContext = new()
-        {
-            User = CreatePrincipal(new Claim(ClaimTypes.Name, "No Identifier")),
-        };
-
-        HttpContextAsiBackboneActorContextResolver resolver = CreateResolver(httpContext);
-
-        IAsiBackboneActorContext actorContext = resolver.ResolveActorContext();
-
-        Assert.Equal(AsiBackboneActorContext.UnknownActorId, actorContext.ActorId);
-        Assert.Equal(AsiBackboneActorType.Unknown, actorContext.ActorType);
-        Assert.False(actorContext.IsKnown);
-        Assert.False(actorContext.IsAuthenticated);
-    }
-
-    /// <summary>
-    /// Tests that the <see cref="HttpContextAsiBackboneActorContextResolver.ResolveActorContext"/> method correctly represents a background scenario (no HTTP context) without throwing an exception.
-    /// </summary>
-    [Fact]
-    public void ResolveActorContextRepresentsBackgroundScenarioWithoutThrowing()
-    {
-        HttpContextAccessor httpContextAccessor = new();
-        HttpContextAsiBackboneActorContextResolver resolver = new(
-            httpContextAccessor,
-            Options.Create(new AsiBackboneHttpActorContextOptions()));
-
-        IAsiBackboneActorContext actorContext = resolver.ResolveActorContext();
-
-        Assert.Equal(AsiBackboneActorContext.UnknownActorId, actorContext.ActorId);
-        Assert.Equal(AsiBackboneActorType.Unknown, actorContext.ActorType);
-        Assert.False(actorContext.IsKnown);
-        Assert.False(actorContext.IsAuthenticated);
-    }
-
-    /// <summary>
-    /// Tests that the <see cref="HttpContextAsiBackboneActorContextResolver"/> constructor throws an <see cref="ArgumentNullException"/> when provided with a null <see cref="IHttpContextAccessor"/>.
-    /// </summary>
-    [Fact]
-    public void ConstructorRejectsNullHttpContextAccessor()
-    {
-        _ = Assert.Throws<ArgumentNullException>(() =>
-            new HttpContextAsiBackboneActorContextResolver(null!, Options.Create(new AsiBackboneHttpActorContextOptions())));
-    }
-
-    /// <summary>
-    /// Tests that the <see cref="HttpContextAsiBackboneActorContextResolver"/> constructor throws an <see cref="ArgumentNullException"/> when provided with a null <see cref="IOptions{AsiBackboneHttpActorContextOptions}"/>.
-    /// </summary>
-    [Fact]
-    public void ConstructorRejectsNullOptionsWrapper()
-    {
-        _ = Assert.Throws<ArgumentNullException>(() =>
-            new HttpContextAsiBackboneActorContextResolver(new HttpContextAccessor(), null!));
-    }
-
-    /// <summary>
-    /// Tests that the <see cref="AsiBackboneHttpActorContextOptions"/> validation rejects invalid actor identifier claim types.
-    /// </summary>
-    [Theory]
-    [InlineData(null)]
-    [InlineData("empty")]
-    [InlineData("blank")]
-    public void ActorOptionsRejectInvalidActorIdentifierClaimTypes(string? mode)
+    public void ActorOptionsRejectNullAllowedActorTypes()
     {
         AsiBackboneHttpActorContextOptions options = new()
         {
-            ActorIdClaimTypes = mode is null ? null! : mode == "empty" ? [] : [" ", ""]
+            AllowedActorTypesFromClaims = null!,
         };
 
         InvalidOperationException exception = Assert.Throws<InvalidOperationException>(options.Validate);
 
-        Assert.Contains("actor identifier claim type", exception.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains(nameof(AsiBackboneHttpActorContextOptions.AllowedActorTypesFromClaims), exception.Message, StringComparison.Ordinal);
     }
 
-    /// <summary>
-    /// Tests that the <see cref="AsiBackboneHttpActorContextOptions"/> validation rejects null display name claim types.
-    /// </summary>
     [Fact]
-    public void ActorOptionsRejectNullDisplayNameClaimTypes()
+    public void ActorOptionsRejectUndefinedAllowedActorType()
     {
         AsiBackboneHttpActorContextOptions options = new()
         {
-            DisplayNameClaimTypes = null!,
+            AllowedActorTypesFromClaims = [(AsiBackboneActorType)999],
         };
 
         InvalidOperationException exception = Assert.Throws<InvalidOperationException>(options.Validate);
 
-        Assert.Contains(nameof(AsiBackboneHttpActorContextOptions.DisplayNameClaimTypes), exception.Message, StringComparison.Ordinal);
+        Assert.Contains(nameof(AsiBackboneHttpActorContextOptions.AllowedActorTypesFromClaims), exception.Message, StringComparison.Ordinal);
     }
 
-    /// <summary>
-    /// Tests that the <see cref="AsiBackboneHttpActorContextOptions"/> validation rejects blank actor type claim types.
-    /// </summary>
+    [Fact]
+    public void ActorOptionsRejectUndefinedDefaultActorType()
+    {
+        AsiBackboneHttpActorContextOptions options = new()
+        {
+            DefaultAuthenticatedActorType = (AsiBackboneActorType)999,
+        };
+
+        InvalidOperationException exception = Assert.Throws<InvalidOperationException>(options.Validate);
+
+        Assert.Contains(nameof(AsiBackboneHttpActorContextOptions.DefaultAuthenticatedActorType), exception.Message, StringComparison.Ordinal);
+    }
+
     [Theory]
     [InlineData(null)]
     [InlineData("")]
@@ -372,9 +222,15 @@ public sealed class HttpContextAsiBackboneActorContextResolverTests
             ActorTypeClaimType = claimType!,
         };
 
-        InvalidOperationException exception = Assert.Throws<InvalidOperationException>(options.Validate);
+        Assert.Throws<InvalidOperationException>(options.Validate);
+    }
 
-        Assert.Contains(nameof(AsiBackboneHttpActorContextOptions.ActorTypeClaimType), exception.Message, StringComparison.Ordinal);
+    private static DefaultHttpContext CreateHttpContext(params Claim[] claims)
+    {
+        return new DefaultHttpContext
+        {
+            User = new ClaimsPrincipal(new ClaimsIdentity(claims, authenticationType: "Test")),
+        };
     }
 
     private static HttpContextAsiBackboneActorContextResolver CreateResolver(
@@ -387,10 +243,5 @@ public sealed class HttpContextAsiBackboneActorContextResolverTests
         return new HttpContextAsiBackboneActorContextResolver(
             new HttpContextAccessor { HttpContext = httpContext },
             Options.Create(options));
-    }
-
-    private static ClaimsPrincipal CreatePrincipal(params Claim[] claims)
-    {
-        return new ClaimsPrincipal(new ClaimsIdentity(claims, authenticationType: "Test"));
     }
 }

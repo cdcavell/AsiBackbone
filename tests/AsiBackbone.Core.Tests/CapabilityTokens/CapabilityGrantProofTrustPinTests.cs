@@ -115,7 +115,7 @@ public sealed class CapabilityGrantProofTrustPinTests
         string keyVersion,
         string provider)
     {
-        CapabilityTokenGrant grant = CapabilityTokenGrant.Create(
+        var grant = CapabilityTokenGrant.Create(
             tokenId: "grant-proof-pins",
             issuer: "issuer-1",
             audience: "gateway-1",

@@ -75,7 +75,7 @@ public static class CapabilityGrantValidator
                 "A proof verifier is required for this validation context.");
         }
 
-        VerificationPolicyContext verificationContext = VerificationPolicyContext.Create(
+        var verificationContext = VerificationPolicyContext.Create(
             purpose: CanonicalArtifactTypes.CapabilityTokenGrant,
             expectedKeyId: options.ExpectedProofKeyId,
             expectedKeyVersion: options.ExpectedProofKeyVersion,

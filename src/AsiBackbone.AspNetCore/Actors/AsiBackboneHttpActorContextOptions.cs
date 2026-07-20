@@ -34,6 +34,17 @@ public sealed class AsiBackboneHttpActorContextOptions
     ];
 
     /// <summary>
+    /// Gets the default actor types that may be accepted from an HTTP claim.
+    /// </summary>
+    /// <remarks>
+    /// Privileged software actor types require explicit host opt-in because claim trust is established by the host identity boundary, not by AsiBackbone.
+    /// </remarks>
+    public static IReadOnlyList<AsiBackboneActorType> DefaultAllowedActorTypesFromClaims { get; } =
+    [
+        AsiBackboneActorType.Human,
+    ];
+
+    /// <summary>
     /// Gets or sets the claim types used to resolve a stable actor identifier.
     /// </summary>
     public IList<string> ActorIdClaimTypes { get; set; } = [.. DefaultActorIdClaimTypes];
@@ -46,10 +57,21 @@ public sealed class AsiBackboneHttpActorContextOptions
     /// <summary>
     /// Gets or sets the claim type used to resolve an actor type.
     /// </summary>
+    /// <remarks>
+    /// This must identify a trusted identity-provider-issued or host-generated claim. It must not be populated from user-controlled request, scope, profile, or application data.
+    /// </remarks>
     public string ActorTypeClaimType { get; set; } = "actor_type";
 
     /// <summary>
-    /// Gets or sets the actor type used when an authenticated principal does not provide a valid actor type claim.
+    /// Gets or sets the actor types that may be accepted from <see cref="ActorTypeClaimType" />.
+    /// </summary>
+    /// <remarks>
+    /// The conservative default accepts only <see cref="AsiBackboneActorType.Human" />. A host must explicitly add <see cref="AsiBackboneActorType.System" />, <see cref="AsiBackboneActorType.Service" />, or <see cref="AsiBackboneActorType.Agent" /> after establishing that the configured claim is protected by a trusted identity boundary. An empty list disables actor-type claim mapping.
+    /// </remarks>
+    public IList<AsiBackboneActorType> AllowedActorTypesFromClaims { get; set; } = [.. DefaultAllowedActorTypesFromClaims];
+
+    /// <summary>
+    /// Gets or sets the actor type used when an authenticated principal does not provide a valid or allowed actor type claim.
     /// </summary>
     public AsiBackboneActorType DefaultAuthenticatedActorType { get; set; } = AsiBackboneActorType.Human;
 
@@ -76,6 +98,21 @@ public sealed class AsiBackboneHttpActorContextOptions
         if (string.IsNullOrWhiteSpace(ActorTypeClaimType))
         {
             throw new InvalidOperationException("ActorTypeClaimType must be configured.");
+        }
+
+        if (AllowedActorTypesFromClaims is null)
+        {
+            throw new InvalidOperationException("AllowedActorTypesFromClaims must be configured.");
+        }
+
+        if (AllowedActorTypesFromClaims.Any(static actorType => !Enum.IsDefined(actorType)))
+        {
+            throw new InvalidOperationException("AllowedActorTypesFromClaims must contain only defined actor types.");
+        }
+
+        if (!Enum.IsDefined(DefaultAuthenticatedActorType))
+        {
+            throw new InvalidOperationException("DefaultAuthenticatedActorType must be a defined actor type.");
         }
     }
 }

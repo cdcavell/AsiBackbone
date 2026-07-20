@@ -58,17 +58,19 @@ public sealed class HttpContextAsiBackboneActorContextResolver : IAsiBackboneHtt
     }
 
     private IAsiBackboneActorContext ResolveUnauthenticatedActor => string.IsNullOrWhiteSpace(options.UnauthenticatedDisplayName)
-            ? AsiBackboneActorContext.Unknown
-            : AsiBackboneActorContext.Human(
-                AsiBackboneActorContext.UnknownActorId,
-                options.UnauthenticatedDisplayName,
-                isAuthenticated: false);
+        ? AsiBackboneActorContext.Unknown
+        : AsiBackboneActorContext.Human(
+            AsiBackboneActorContext.UnknownActorId,
+            options.UnauthenticatedDisplayName,
+            isAuthenticated: false);
 
     private AsiBackboneActorType ResolveActorType(ClaimsPrincipal user)
     {
-        string? actorTypeValue = FindFirstNonEmptyClaimValue(user, new[] { options.ActorTypeClaimType });
+        string? actorTypeValue = FindFirstNonEmptyClaimValue(user, [options.ActorTypeClaimType]);
 
         return Enum.TryParse(actorTypeValue, ignoreCase: true, out AsiBackboneActorType actorType)
+            && Enum.IsDefined(actorType)
+            && options.AllowedActorTypesFromClaims.Contains(actorType)
             ? actorType
             : options.DefaultAuthenticatedActorType;
     }

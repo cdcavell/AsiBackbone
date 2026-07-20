@@ -61,8 +61,8 @@ jobs:
       - name: Run Core tests with branch coverage gate
         shell: pwsh
         run: |
-          dotnet test ${ CORE_TEST_PROJECT } `
-            --configuration ${ CONFIGURATION } `
+          dotnet test "${env:CORE_TEST_PROJECT}" `
+            --configuration "${env:CONFIGURATION}" `
             --no-restore `
             --no-build `
             --verbosity normal `
@@ -71,10 +71,10 @@ jobs:
             /p:ContinuousIntegrationBuild=true `
             /p:CollectCoverage=true `
             /p:CoverletOutputFormat=cobertura `
-            /p:CoverletOutput="${ CORE_COVERAGE_OUTPUT }/" `
+            /p:CoverletOutput="${env:CORE_COVERAGE_OUTPUT}/" `
             /p:Include="[AsiBackbone.Core]*" `
             /p:Exclude="[*.Tests]*" `
-            /p:Threshold="${ CORE_BRANCH_COVERAGE_THRESHOLD }" `
+            /p:Threshold="${env:CORE_BRANCH_COVERAGE_THRESHOLD}" `
             /p:ThresholdType=branch `
             /p:ThresholdStat=total
         env:
@@ -82,11 +82,11 @@ jobs:
           CONFIGURATION: ${{ env.CONFIGURATION }}
           CORE_COVERAGE_OUTPUT: ${{ env.CORE_COVERAGE_OUTPUT }}
           CORE_BRANCH_COVERAGE_THRESHOLD: ${{ env.CORE_BRANCH_COVERAGE_THRESHOLD }}
-    
+
       - name: List Core coverage outputs
         shell: pwsh
         run: |
-          Get-ChildItem -Path "${ WORKSPACE }" -Recurse -Filter "*.cobertura.xml" |
+          Get-ChildItem -Path "${env:WORKSPACE}" -Recurse -Filter "*.cobertura.xml" |
             ForEach-Object { Write-Host $_.FullName }
         env:
           WORKSPACE: ${{ github.workspace }}
@@ -108,7 +108,7 @@ jobs:
         shell: pwsh
         run: |
           dotnet reportgenerator `
-            -reports:"${ CORE_COVERAGE_OUTPUT }/coverage.cobertura.xml" `
+            -reports:"${env:CORE_COVERAGE_OUTPUT}/coverage.cobertura.xml" `
             -targetdir:"./artifacts/core-branch-coverage-report" `
             -reporttypes:"Html;MarkdownSummaryGithub;Cobertura" `
             -assemblyfilters:"+AsiBackbone.Core;-*.Tests" `
@@ -167,7 +167,6 @@ jobs:
             New-Item -ItemType Directory -Path $TargetRoot -Force | Out-Null
 
             $indexFile = Get-ChildItem -Path $ReportRoot -Filter "index.html" -Recurse | Select-Object -First 1
-
             if ($null -eq $indexFile) {
               Write-Host "Stryker report files found under ${ReportRoot}:"
               Get-ChildItem -Path $ReportRoot -Recurse | ForEach-Object { Write-Host $_.FullName }

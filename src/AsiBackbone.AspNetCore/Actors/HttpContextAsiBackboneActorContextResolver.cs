@@ -68,13 +68,9 @@ public sealed class HttpContextAsiBackboneActorContextResolver : IAsiBackboneHtt
     {
         string? actorTypeValue = FindFirstNonEmptyClaimValue(user, [options.ActorTypeClaimType]);
 
-        if (!Enum.TryParse(actorTypeValue, ignoreCase: true, out AsiBackboneActorType actorType)
-            || !Enum.IsDefined(actorType))
-        {
-            return options.DefaultAuthenticatedActorType;
-        }
-
-        return options.AllowedActorTypesFromClaims.Contains(actorType)
+        return Enum.TryParse(actorTypeValue, ignoreCase: true, out AsiBackboneActorType actorType)
+            && Enum.IsDefined(actorType)
+            && options.AllowedActorTypesFromClaims.Contains(actorType)
             ? actorType
             : options.DefaultAuthenticatedActorType;
     }

@@ -93,11 +93,11 @@ public static class CapabilityGrantValidator
         return verificationOutcome.ShouldAllow
             ? null
             : CapabilityGrantValidationResult.Failed(
-            grant,
-            MapVerificationCategory(verificationOutcome.Category),
-            MapVerificationAction(verificationOutcome.Action),
-            verificationOutcome.FailureCode ?? "capability.proof-invalid",
-            verificationOutcome.FailureMessage);
+                grant,
+                MapVerificationCategory(verificationOutcome.Category),
+                verificationOutcome.Action,
+                verificationOutcome.FailureCode ?? "capability.proof-invalid",
+                verificationOutcome.FailureMessage);
     }
 
     private static CapabilityGrantValidationResult? ValidateMetadata(
@@ -202,12 +202,5 @@ public static class CapabilityGrantValidator
             SignatureVerificationCategory.Failed => CapabilityTokenValidationCategory.Failed,
             _ => CapabilityTokenValidationCategory.Failed
         };
-    }
-
-    private static VerificationPolicyAction MapVerificationAction(VerificationPolicyAction action)
-    {
-        return action is VerificationPolicyAction.Allow
-            ? VerificationPolicyAction.Allow
-            : action;
     }
 }

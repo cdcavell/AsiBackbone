@@ -1,3 +1,5 @@
+#pragma warning disable CS1591
+
 using System.Security.Claims;
 using AsiBackbone.AspNetCore.Actors;
 using AsiBackbone.Core.Actors;
@@ -222,7 +224,7 @@ public sealed class HttpContextAsiBackboneActorContextResolverTests
             ActorTypeClaimType = claimType!,
         };
 
-        Assert.Throws<InvalidOperationException>(options.Validate);
+        _ = Assert.Throws<InvalidOperationException>(options.Validate);
     }
 
     private static DefaultHttpContext CreateHttpContext(params Claim[] claims)

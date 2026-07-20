@@ -22,6 +22,8 @@ public sealed class CapabilityGrantValidationOptions
         int maxUseCount,
         string? expectedProofKeyId,
         string? expectedProofKeyVersion,
+        string? expectedProofPolicyVersion,
+        string? expectedProofPolicyHash,
         string? requiredProofProvider,
         string? requiredProofHashAlgorithm)
     {
@@ -55,6 +57,8 @@ public sealed class CapabilityGrantValidationOptions
         MaxUseCount = maxUseCount;
         ExpectedProofKeyId = NormalizeOptional(expectedProofKeyId);
         ExpectedProofKeyVersion = NormalizeOptional(expectedProofKeyVersion);
+        ExpectedProofPolicyVersion = NormalizeOptional(expectedProofPolicyVersion);
+        ExpectedProofPolicyHash = NormalizeOptional(expectedProofPolicyHash);
         RequiredProofProvider = NormalizeOptional(requiredProofProvider);
         RequiredProofHashAlgorithm = NormalizeOptional(requiredProofHashAlgorithm);
     }
@@ -76,6 +80,8 @@ public sealed class CapabilityGrantValidationOptions
     public int MaxUseCount { get; }
     public string? ExpectedProofKeyId { get; }
     public string? ExpectedProofKeyVersion { get; }
+    public string? ExpectedProofPolicyVersion { get; }
+    public string? ExpectedProofPolicyHash { get; }
     public string? RequiredProofProvider { get; }
     public string? RequiredProofHashAlgorithm { get; }
 
@@ -97,6 +103,8 @@ public sealed class CapabilityGrantValidationOptions
         TimeSpan allowedClockSkew = default,
         string? expectedProofKeyId = null,
         string? expectedProofKeyVersion = null,
+        string? expectedProofPolicyVersion = null,
+        string? expectedProofPolicyHash = null,
         string? requiredProofProvider = null,
         string? requiredProofHashAlgorithm = null)
     {
@@ -118,6 +126,8 @@ public sealed class CapabilityGrantValidationOptions
             maxUseCount,
             expectedProofKeyId,
             expectedProofKeyVersion,
+            expectedProofPolicyVersion,
+            expectedProofPolicyHash,
             requiredProofProvider,
             requiredProofHashAlgorithm);
     }

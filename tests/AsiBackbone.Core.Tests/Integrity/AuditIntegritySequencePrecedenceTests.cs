@@ -14,8 +14,8 @@ public sealed class AuditIntegritySequencePrecedenceTests
     [Fact]
     public void VerifyClassifiesAdjacentDuplicateAsForkedChain()
     {
-        AuditIntegrityLink first = AuditIntegrityLink.CreateGenesis("audit-ledger", CreateRecordHash("record-1"), Now);
-        AuditIntegrityLink second = AuditIntegrityLink.Append(first, CreateRecordHash("record-2"), Now.AddSeconds(1));
+        var first = AuditIntegrityLink.CreateGenesis("audit-ledger", CreateRecordHash("record-1"), Now);
+        var second = AuditIntegrityLink.Append(first, CreateRecordHash("record-2"), Now.AddSeconds(1));
         AuditIntegrityLink duplicate = RehydrateWithRecordId(second, "record-2-duplicate");
 
         AuditIntegrityVerificationResult result = AuditIntegrityVerifier.Verify([first, second, duplicate], "audit-ledger");
@@ -26,9 +26,9 @@ public sealed class AuditIntegritySequencePrecedenceTests
     [Fact]
     public void VerifyClassifiesNonAdjacentDuplicateAsForkedChainBeforeReorderedRecord()
     {
-        AuditIntegrityLink first = AuditIntegrityLink.CreateGenesis("audit-ledger", CreateRecordHash("record-1"), Now);
-        AuditIntegrityLink second = AuditIntegrityLink.Append(first, CreateRecordHash("record-2"), Now.AddSeconds(1));
-        AuditIntegrityLink third = AuditIntegrityLink.Append(second, CreateRecordHash("record-3"), Now.AddSeconds(2));
+        var first = AuditIntegrityLink.CreateGenesis("audit-ledger", CreateRecordHash("record-1"), Now);
+        var second = AuditIntegrityLink.Append(first, CreateRecordHash("record-2"), Now.AddSeconds(1));
+        var third = AuditIntegrityLink.Append(second, CreateRecordHash("record-3"), Now.AddSeconds(2));
         AuditIntegrityLink duplicate = RehydrateWithRecordId(second, "record-2-late-duplicate");
 
         AuditIntegrityVerificationResult result = AuditIntegrityVerifier.Verify([first, second, third, duplicate], "audit-ledger");
@@ -55,7 +55,7 @@ public sealed class AuditIntegritySequencePrecedenceTests
     [Fact]
     public void VerifyClassifiesForwardSequenceGapAsMissingRecord()
     {
-        AuditIntegrityLink first = AuditIntegrityLink.CreateGenesis("audit-ledger", CreateRecordHash("record-1"), Now);
+        var first = AuditIntegrityLink.CreateGenesis("audit-ledger", CreateRecordHash("record-1"), Now);
         AuditIntegrityLink third = CreateComputedLink(3, first.LinkHash, "record-3");
 
         AuditIntegrityVerificationResult result = AuditIntegrityVerifier.Verify([first, third], "audit-ledger");
@@ -68,8 +68,8 @@ public sealed class AuditIntegritySequencePrecedenceTests
     [Fact]
     public void VerifyClassifiesConflictingLinksClaimingSameSequenceAsForkedChain()
     {
-        AuditIntegrityLink first = AuditIntegrityLink.CreateGenesis("audit-ledger", CreateRecordHash("record-1"), Now);
-        AuditIntegrityLink accepted = AuditIntegrityLink.Append(first, CreateRecordHash("record-2a"), Now.AddSeconds(1));
+        var first = AuditIntegrityLink.CreateGenesis("audit-ledger", CreateRecordHash("record-1"), Now);
+        var accepted = AuditIntegrityLink.Append(first, CreateRecordHash("record-2a"), Now.AddSeconds(1));
         AuditIntegrityLink conflicting = CreateComputedLink(2, first.LinkHash, "record-2b");
 
         Assert.NotEqual(accepted.LinkHash, conflicting.LinkHash);
@@ -82,7 +82,7 @@ public sealed class AuditIntegritySequencePrecedenceTests
     [Fact]
     public void VerifyDoesNotRecordRejectedSequenceAsAccepted()
     {
-        AuditIntegrityLink first = AuditIntegrityLink.CreateGenesis("audit-ledger", CreateRecordHash("record-1"), Now);
+        var first = AuditIntegrityLink.CreateGenesis("audit-ledger", CreateRecordHash("record-1"), Now);
         AuditIntegrityLink invalidSecond = CreateComputedLink(2, "wrong-previous-hash", "record-2");
         AuditIntegrityLink validSecond = CreateComputedLink(2, first.LinkHash, "record-2-valid");
 
@@ -110,7 +110,7 @@ public sealed class AuditIntegritySequencePrecedenceTests
     private static AuditIntegrityLink CreateComputedLink(long sequence, string previousLinkHash, string recordId)
     {
         CanonicalPayloadHash recordHash = CreateRecordHash(recordId);
-        AuditIntegrityLink draft = AuditIntegrityLink.Rehydrate(
+        var draft = AuditIntegrityLink.Rehydrate(
             "audit-ledger",
             sequence,
             recordId,
@@ -139,7 +139,7 @@ public sealed class AuditIntegritySequencePrecedenceTests
 
     private static CanonicalPayloadHash CreateRecordHash(string recordId)
     {
-        CanonicalPayload payload = CanonicalPayload.Create(
+        var payload = CanonicalPayload.Create(
             CanonicalArtifactTypes.AuditLedgerRecord,
             recordId,
             AsiBackboneSchemaVersions.StableArtifactsV1,

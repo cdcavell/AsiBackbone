@@ -63,7 +63,7 @@ public static class AuditIntegrityVerifier
         string expectedChainId,
         long expectedSequence,
         string expectedPreviousHash,
-        IReadOnlySet<long> observedSequences,
+        HashSet<long> observedSequences,
         bool requireGenesis)
     {
         if (!string.Equals(link.HashAlgorithm, CanonicalPayloadOptions.DefaultHashAlgorithm, StringComparison.Ordinal))

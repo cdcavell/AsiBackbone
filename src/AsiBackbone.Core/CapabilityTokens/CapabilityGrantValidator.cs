@@ -79,8 +79,8 @@ public static class CapabilityGrantValidator
             purpose: CanonicalArtifactTypes.CapabilityTokenGrant,
             expectedKeyId: options.ExpectedProofKeyId,
             expectedKeyVersion: options.ExpectedProofKeyVersion,
-            expectedPolicyVersion: options.PolicyVersion,
-            expectedPolicyHash: options.PolicyHash,
+            expectedPolicyVersion: options.ExpectedProofPolicyVersion,
+            expectedPolicyHash: options.ExpectedProofPolicyHash,
             requiredProvider: options.RequiredProofProvider,
             requiredHashAlgorithm: options.RequiredProofHashAlgorithm);
 
@@ -131,20 +131,14 @@ public static class CapabilityGrantValidator
             : null;
     }
 
-    private static bool IsNotYetValid(
-        CapabilityTokenGrant grant,
-        DateTimeOffset validationUtc,
-        TimeSpan allowedClockSkew)
+    private static bool IsNotYetValid(CapabilityTokenGrant grant, DateTimeOffset validationUtc, TimeSpan allowedClockSkew)
     {
         return grant.NotBeforeUtc.HasValue
             && grant.NotBeforeUtc.Value > validationUtc
             && grant.NotBeforeUtc.Value - validationUtc > allowedClockSkew;
     }
 
-    private static bool IsExpired(
-        CapabilityTokenGrant grant,
-        DateTimeOffset validationUtc,
-        TimeSpan allowedClockSkew)
+    private static bool IsExpired(CapabilityTokenGrant grant, DateTimeOffset validationUtc, TimeSpan allowedClockSkew)
     {
         return validationUtc >= grant.ExpiresUtc
             && validationUtc - grant.ExpiresUtc >= allowedClockSkew;

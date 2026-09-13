@@ -167,6 +167,23 @@ The project is not multi-targeting .NET 8 for `5.x`. That is an explicit adoptio
 
 If meaningful external consumer demand appears, additional TFM support can be reconsidered in a later release with CI, packaging validation, analyzer compatibility, template smoke tests, and documentation updated together. See the [Target Framework Support Decision Record](https://github.com/AsiBackbone/AsiBackbone/blob/main/docs/articles/target-framework-support.md).
 
+## Choose your path
+
+Use the organization as one connected path; each repository has a distinct job:
+
+1. **Learn the pattern:** start with [ASI Backbone Learning](https://asibackbone.github.io/Learning/)
+   for concepts, tutorials, labs, comparisons, and adoption personas.
+2. **Try a complete host:** use
+   [NetCoreApplicationTemplate](https://github.com/AsiBackbone/NetCoreApplicationTemplate)
+   when you want a production-oriented ASP.NET Core baseline to evaluate or adapt.
+3. **Adopt the packages:** return here for the
+   [implementation-first path](https://asibackbone.github.io/AsiBackbone/articles/implementation-first-adoption.html),
+   install only the `AsiBackbone.*` packages your host needs, and validate one
+   low-risk governed operation before expanding.
+
+Already evaluating or using the project? See the public [adopter registry](ADOPTERS.md)
+and use its report form to share permission-based adoption evidence or feedback.
+
 ## Start here
 
 For **implementation-first adoption**:
@@ -208,6 +225,7 @@ The stable API contract is documented in [API Compatibility and SemVer](https://
 - Report sensitive concerns through the repository [Security Policy](SECURITY.md).
 - See [Maintainers](MAINTAINERS.md) for current operational and publishing ownership.
 - See [Governance](GOVERNANCE.md) for authoritative roles, decisions, triage, and release policy.
+- See [Adopters](ADOPTERS.md) for public adoption evidence and the opt-in reporting path.
 
 ## Relationship to NetCoreApplicationTemplate
 

@@ -61,7 +61,11 @@ Under the current bootstrap solo-maintainer model:
 
 ## Adding or Removing Maintainers
 
-Maintainer changes follow [GOVERNANCE.md](GOVERNANCE.md). Before expanding maintainership, review repository permissions, independent approval requirements, the emergency bypass actor, protected environments, package publishing access, advisory access, and CODEOWNERS coverage.
+Maintainer changes follow the documented
+[contributor → triager → Core Maintainer path](GOVERNANCE.md#contributor-path).
+Before expanding maintainership, review repository permissions, independent
+approval requirements, the emergency bypass actor, protected environments,
+package publishing access, advisory access, and CODEOWNERS coverage.
 
 Update this file, `GOVERNANCE.md`, `.github/CODEOWNERS`, and the repository-host security controls together whenever maintainer ownership changes.
 

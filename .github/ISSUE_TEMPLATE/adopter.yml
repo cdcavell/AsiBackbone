@@ -1,0 +1,70 @@
+name: Adopter report
+description: Opt into the public adopter list, update an entry, or request removal.
+title: "[Adopter]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for sharing how you use AsiBackbone. Submit only information you are authorized to make public. Do not include customer data, credentials, private architecture, or other sensitive details.
+
+  - type: dropdown
+    id: request-type
+    attributes:
+      label: Request type
+      options:
+        - Add an adopter
+        - Update an adopter entry
+        - Remove an adopter entry
+    validations:
+      required: true
+
+  - type: input
+    id: display-name
+    attributes:
+      label: Public display name
+      description: Your name, project, or organization as it may appear in ADOPTERS.md.
+      placeholder: Example organization or project
+    validations:
+      required: true
+
+  - type: dropdown
+    id: usage-stage
+    attributes:
+      label: Usage stage
+      options:
+        - Learning or exploration
+        - Evaluation or pilot
+        - Internal use
+        - Production use
+        - Prefer not to specify
+    validations:
+      required: true
+
+  - type: textarea
+    id: usage
+    attributes:
+      label: How are you using AsiBackbone?
+      description: Name the packages, template, sample, or learning path and the problem it helps you explore or solve.
+    validations:
+      required: true
+
+  - type: input
+    id: evidence
+    attributes:
+      label: Optional public evidence
+      description: A public repository, article, case study, or website. Leave blank if a maintainer should record the report as privately verified.
+      placeholder: https://example.com/public-reference
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: consent
+    attributes:
+      label: Consent and safety
+      options:
+        - label: I am authorized to publish the display name, usage summary, and links in this report.
+          required: true
+        - label: I consent to the accepted summary being listed in ADOPTERS.md; I may request correction or removal later.
+          required: true
+        - label: This report contains no credentials, customer data, private architecture, or other sensitive information.
+          required: true

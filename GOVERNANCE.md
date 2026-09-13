@@ -16,12 +16,13 @@ boundaries over implicit behavior.
 ## Table of Contents
 
 1. [Roles and Responsibilities](#roles-and-responsibilities)
-2. [Decision-Making Model](#decision-making-model)
-3. [Triage Workflow](#triage-workflow)
-4. [Issue and PR Ownership](#issue-and-pr-ownership)
-5. [Release Cadence and Release Readiness](#release-cadence-and-release-readiness)
-6. [AI-Assisted Development Policy](#ai-assisted-development-policy)
-7. [Amendments to This Document](#amendments-to-this-document)
+2. [Contributor Path](#contributor-path)
+3. [Decision-Making Model](#decision-making-model)
+4. [Triage Workflow](#triage-workflow)
+5. [Issue and PR Ownership](#issue-and-pr-ownership)
+6. [Release Cadence and Release Readiness](#release-cadence-and-release-readiness)
+7. [AI-Assisted Development Policy](#ai-assisted-development-policy)
+8. [Amendments to This Document](#amendments-to-this-document)
 
 ---
 
@@ -35,12 +36,6 @@ responsibility for the project's direction, quality, and community health.
 | GitHub Handle | Area of Responsibility |
 |---|---|
 | *@cdcavell* | Architecture, API design, CI/CD, infrastructure, documentation, community |
-
-> **Becoming a maintainer:** Regular contributors who demonstrate sustained
-> quality contributions, sound judgment, and alignment with project values may
-> be nominated by any existing maintainer. Confirmation requires a simple
-> majority vote among current Core Maintainers with no active objections after a
-> 7-day comment period.
 
 > **Bootstrap governance note:** While the project has fewer than two active
 > Core Maintainers, the current Core Maintainer may handle routine changes,
@@ -65,6 +60,69 @@ See [Contributing to AsiBackbone](CONTRIBUTING.md) for information on contributi
 
 Former Core Maintainers who have stepped back from active duties. Their
 expertise is welcome in discussions but they hold no voting rights.
+
+---
+
+## Contributor Path
+
+The project uses a contributor → triager → Core Maintainer path. Advancement is
+based on demonstrated work and judgment rather than a fixed contribution count,
+employment, sponsorship, or time in the community. A person may remain a valued
+Contributor or Triager without seeking another role.
+
+### Contributor to Triager
+
+A Contributor may be nominated for Triager access after showing all of the
+following in public project work:
+
+- constructive, respectful participation consistent with the Code of Conduct;
+- reliable issue reproduction, review, documentation, or pull-request work;
+- correct use of project scope, support, security, and documentation boundaries;
+- sound handling of labels, duplicates, incomplete reports, and newcomer questions;
+- no need for access to source merging, releases, secrets, or security advisories.
+
+Any Core Maintainer may nominate the candidate in a public issue or discussion.
+The nomination must link the evidence, describe the proposed responsibilities,
+and remain open for at least 7 days. Current Core Maintainers decide by the
+normal consensus-seeking model. The candidate must accept before access is
+granted. A Core Maintainer reviews the first triage actions and records a
+90-day access review in the nomination thread.
+
+### Triager to Core Maintainer
+
+A Triager may be nominated for Core Maintainer after demonstrating:
+
+- sustained, high-quality contributions across more than one type of project work;
+- reviews that identify correctness, compatibility, security, testing, and
+  documentation risks rather than checking only style;
+- dependable issue stewardship and respectful contributor mentoring;
+- sound judgment about the stable package boundary and cautious public claims;
+- the ability to run and interpret required build, test, documentation, package,
+  and release checks; and
+- willingness to share operational responsibility for reviews, incidents,
+  releases, and community health.
+
+Any current Core Maintainer may open a public nomination issue or discussion
+that links evidence and names the initial ownership area. The candidate must
+accept, and the nomination remains open for at least 7 days. Confirmation
+requires a simple majority of current Core Maintainers with no active objection.
+During bootstrap solo-maintainer operation, the current Core Maintainer records
+the decision and its evidence after the comment period.
+
+Before merge or release rights are granted, the onboarding maintainer documents
+the candidate's repository role, branch-protection impact, CODEOWNERS coverage,
+protected-environment access, release permissions, and security-advisory access.
+The new maintainer begins with paired reviews and releases appropriate to the
+assigned area. The appointment is complete only when `MAINTAINERS.md`,
+`.github/CODEOWNERS`, and applicable repository-host control records agree.
+
+### Inactivity, stepping down, and removal
+
+Role holders should state when they need to step back. A Core Maintainer may
+propose removal or Emeritus status through the same public 7-day decision
+process, except that private security, safety, or Code of Conduct details must
+not be exposed. Access may be suspended immediately when needed to protect the
+project, with the durable public record limited to an appropriate summary.
 
 ---
 
@@ -125,12 +183,13 @@ labels below and takes the corresponding action.
 | Label | Meaning | Action |
 |---|---|---|
 | `bug` | Confirmed defect | Assign priority (`P0`–`P3`); link to milestone if applicable |
-| `enhancement` | Feature request | Move to `proposal` workflow if significant; label `good-first-issue` if small |
+| `enhancement` | Feature request | Move to `proposal` workflow if significant; label `good first issue` if small |
 | `question` | Usage question | Answer or link to docs; close after resolution |
 | `duplicate` | Already tracked | Link to canonical issue; close with comment |
 | `wontfix` | Out of scope | Explain decision; close |
 | `needs-info` | Waiting on reporter | Auto-close after 14 days of no response |
-| `good-first-issue` | Suitable for new contributors | Keep unassigned until claimed |
+| `good first issue` | Small, well-scoped work suitable for a first contribution | Include acceptance criteria and keep unassigned until claimed |
+| `help wanted` | Maintainer-approved work where external help is welcome | Document context, constraints, and the expected outcome |
 
 ### Pull request labels
 

@@ -8,6 +8,10 @@ This project follows the spirit of [Keep a Changelog](https://keepachangelog.com
 
 ### Added
 
+* Added an opt-in adopter registry and structured self-report form, plus a
+  cross-repository learn → try → adopt entry point.
+* Defined evidence-based contributor → triager → Core Maintainer criteria,
+  nomination, onboarding, review, and role-removal expectations.
 * Added durable GitHub release publication for package SBOMs, package/hash
   mappings, exact release notes, and a release-evidence manifest, with a
   fail-closed post-upload asset check.
